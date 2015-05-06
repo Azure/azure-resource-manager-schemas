@@ -1,0 +1,634 @@
+﻿{
+    "id": "http://schema.management.azure.com/schemas/2014-08-01/Microsoft.Scheduler.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Microsoft.Scheduler",
+    "description": "Microsoft Scheduler Resource Types",
+    "definitions": {
+        "jobCollections": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "enum": [
+                        "Microsoft.Scheduler/jobCollections"
+                    ]
+                },
+                "apiVersion": {
+                    "enum": [
+                        "2014-08-01"
+                    ]
+                },
+                "properties": {
+                    "type": "object",
+                    "properties": {
+                        "sku": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "enum": [
+                                        "Free",
+                                        "Standard",
+                                        "Premium"
+                                    ]
+                                }
+                            },
+                            "description": "Microsoft.Scheduler/jobCollections: Job Collection sku"
+                        },
+                        "quota": {
+                            "type": "object",
+                            "properties": {
+                                "maxJobCount": {
+                                    "type": "integer",
+                                    "minimum": 1,
+                                    "description": "Microsoft.Scheduler/jobCollections/quota: The maximum number of jobs that can be created in this job collection.  Default value based on sku."
+                                },
+                                "maxRecurrence": {
+                                    "$ref": "#/definitions/recurrenceFrequency",
+                                    "description": "Microsoft.Scheduler/jobCollections/quota: The maximum recurrence frequency that a job can execute at. Default value based on sku."
+                                }
+                            }
+                        }
+                    },
+                    "required": [
+                        "sku"
+                    ]
+                },
+                "resources": {
+                    "type": "array",
+                    "items": {
+                        "allOf": [
+                            { "$ref": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#/definitions/resourceBase" },
+                            {
+                                "anyOf": [
+                                    { "$ref": "#/definitions/jobs" }
+                                ]
+                            }
+                        ],
+                        "description": "Microsoft.Scheduler/jobCollections: Collection of job resources."
+                    }
+                }
+            },
+            "required": [
+                "type",
+                "apiVersion",
+                "properties"
+            ],
+            "description": "Microsoft.Scheduler/jobCollections resource"
+        },
+        "jobs": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "enum": [
+                        "Microsoft.Scheduler/jobCollections/jobs",
+                        "jobs"
+                    ]
+                },
+                "apiVersion": {
+                    "enum": [
+                        "2014-08-01"
+                    ]
+                },
+                "properties": {
+                    "type": "object",
+                    "properties": {
+                        "startTime": {
+                            "$ref": "#/definitions/UTC",
+                            "description": "Microsoft.Scheduler/jobCollections/jobs: For simple scheduler startTime will be the first occurrence and for complex schedules the job will start no sooner than startTime."
+                        },
+                        "recurrence": {
+                            "$ref": "#/definitions/recurrence",
+                            "description": "Microsoft.Scheduler/jobCollections/jobs: The recurrence schedule the job will execute."
+                        },
+                        "state": {
+                            "enum": [
+                                "Enabled",
+                                "Disabled"
+                            ],
+                            "description": "Microsoft.Scheduler/jobCollections/jobs: Running state of the job."
+                        },
+                        "action": {
+                            "anyOf": [
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "type": {
+                                            "enum": [
+                                                "HTTP",
+                                                "HTTPS"
+                                            ],
+                                            "description": "Microsoft.Scheduler/jobCollections/jobs: Type of job action"
+                                        },
+                                        "request": {
+                                            "$ref": "#/definitions/httpActionRequest"
+                                        },
+                                        "retryPolicy": {
+                                            "$ref": "#/definitions/retryPolicy"
+                                        },
+                                        "errorAction": {
+                                            "$ref": "#/definitions/errorAction"
+                                        }
+                                    },
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "type",
+                                        "request"
+                                    ]
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "type": {
+                                            "enum": [
+                                                "STORAGEQUEUE"
+                                            ],
+                                            "description": "Microsoft.Scheduler/jobCollections/jobs: Type of job action"
+                                        },
+                                        "queueMessage": {
+                                            "$ref": "#/definitions/storageQueueActionQueueMessage"
+                                        },
+                                        "retryPolicy": {
+                                            "$ref": "#/definitions/retryPolicy"
+                                        },
+                                        "errorAction": {
+                                            "$ref": "#/definitions/errorAction"
+                                        }
+                                    },
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "type",
+                                        "queueMessage"
+                                    ]
+                                }
+                            ],
+                            "description": "Microsoft.Scheduler/jobCollections/jobs: Action to perform on the prescribed schedule"
+                        }
+                    }
+                }
+            },
+            "required": [
+                "type",
+                "apiVersion",
+                "properties"
+            ],
+            "description": "Microsoft.Scheduler/jobCollections/jobs resource"
+        },
+        "httpActionRequest": {
+            "type": "object",
+            "properties": {
+                "uri": {
+                    "type": "string",
+                    "maxLength": 2048,
+                    "description": "Microsoft.Scheduler/jobCollections/jobs: URI of the endpoint to call"
+                },
+                "method": {
+                    "anyOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "enum": [
+                                "GET",
+                                "PUT",
+                                "POST",
+                                "PATCH",
+                                "DELETE",
+                                "HEAD",
+                                "TRACE",
+                                "CONNECT",
+                                "OPTIONS"
+                            ]
+                        }
+                    ],
+                    "description": "Microsoft.Scheduler/jobCollections/jobs: HTTP method used to communicate with the endpoint"
+                },
+                "headers": {
+                    "type": "object",
+                    "description": "Microsoft.Scheduler/jobCollections/jobs: Dictionary HTTP request headers. Limited to 50 headers."
+                },
+                "body": {
+                    "type": "string",
+                    "maxLength": 8192,
+                    "description": "Microsoft.Scheduler/jobCollections/jobs: HTTP request body"
+                },
+                "authentication": {
+                    "oneOf": [
+                        {
+                            "type": "object",
+                            "properties": {
+                                "type": {
+                                    "enum": [ "ClientCertificate" ],
+                                    "description": "Authentication type"
+                                },
+                                "pfx": {
+                                    "type": "string",
+                                    "maxLength": 32768,
+                                    "description": "base64-encoded pfx. Required when providing a different certificate."
+                                },
+                                "password": {
+                                    "type": "string",
+                                    "maxLength": 256,
+                                    "description": "Certificate password. Required when providing a different certificate."
+                                },
+                                "certificateThumbprint": {
+                                    "type": "string",
+                                    "description": "Thumbprint of the certificate set on the job. Must match the currently configured certificate."
+                                },
+                                "certificateExpiration": {
+                                    "type": "string",
+                                    "description": "Date-time of the expiration of the certificate set on the job. Must match the currently configured certificate."
+                                },
+                                "certificateSubjectName": {
+                                    "type": "string",
+                                    "description": "Subject name of the certificate set on the job. Must match the currently configured certficate."
+                                }
+                            }
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "type": {
+                                    "enum": [ "ActiveDirectoryOAuth" ],
+                                    "description": "Authentication type"
+                                },
+                                "secret": {
+                                    "type": "string",
+                                    "maxLength": 4096,
+                                    "description": "OAuth secret. Only required when providing different OAuth profile."
+                                },
+                                "tenant": {
+                                    "type": "string",
+                                    "maxLength": 4096,
+                                    "description": "OAuth tenant id."
+                                },
+                                "audience": {
+                                    "type": "string",
+                                    "maxLength": 2048,
+                                    "description": "OAuth audience"
+                                },
+                                "clientId": {
+                                    "type": "string",
+                                    "maxLength": 4096,
+                                    "description": "OAuth client id"
+                                }
+                            },
+                            "required": [
+                                "tenant",
+                                "audience",
+                                "clientId"
+                            ]
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "type": {
+                                    "enum": [ "Basic" ],
+                                    "description": "Authentication type"
+                                },
+                                "username": {
+                                    "type": "string",
+                                    "maxLength": 4096,
+                                    "description": "Username to use for Basic Authentication"
+                                },
+                                "password": {
+                                    "type": "string",
+                                    "maxLength": 4096,
+                                    "description": "Password to use for Basic Authentication. Only required when providing a different username."
+                                }
+                            },
+                            "required": [
+                                "username"
+                            ]
+                        }
+                    ]
+                }
+            },
+            "required": [
+                "uri",
+                "method"
+            ]
+        },
+        "storageQueueActionQueueMessage": {
+            "type": "object",
+            "properties": {
+                "storageAccount": {
+                    "type": "string",
+                    "description": "Microsoft.Scheduler/jobCollections/jobs: storage account containing the queue to send scheduled messages to"
+                },
+                "queueName": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 63,
+                    "pattern": "^[a-z0-9]",
+                    "description": "Microsoft.Scheduler/jobCollections/jobs: queue to send scheduled messages to"
+                },
+                "sasToken": {
+                    "type": "string",
+                    "description": "Microsoft.Scheduler/jobCollections/jobs: SAS Token of storage account that has add messages to queue permissions to the storage account"
+                },
+                "message": {
+                    "type": "string",
+                    "maxLength": 8192,
+                    "description": "Microsoft.Scheduler/jobCollections/jobs: message to send to queue"
+                }
+            }
+        },
+        "errorAction": {
+            "oneOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "enum": [
+                                "HTTP",
+                                "HTTPS"
+                            ],
+                            "description": "Microsoft.Scheduler/jobCollections/jobs: Type of job action"
+                        },
+                        "request": {
+                            "$ref": "#/definitions/httpActionRequest"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "type",
+                        "request"
+                    ]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "enum": [
+                                "STORAGEQUEUE"
+                            ],
+                            "description": "Microsoft.Scheduler/jobCollections/jobs: Type of job action"
+                        },
+                        "queueMessage": {
+                            "$ref": "#/definitions/storageQueueActionQueueMessage"
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "type",
+                        "queueMessage"
+                    ]
+                }
+            ],
+            "description": "Microsoft.Scheduler/jobCollections/jobs: Error action to perform when the main action faults (initial attempt and all retry attempts fail)"
+        },
+        "retryPolicy": {
+            "oneOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "retryType": {
+                            "enum": [
+                                "Fixed"
+                            ],
+                            "default": "Fixed",
+                            "description": "Microsoft.Scheduler/jobCollections/jobs: Type of retry policy.  None will not retry, Fixed will retry on the fixed interval provided."
+                        },
+                        "retryInterval": {
+                            "$ref": "#/definitions/UTC",
+                            "description": "Microsoft.Scheduler/jobCollections/jobs: Interval at which to retry in case of a request failure. If not specified defaults to 30 seconds."
+                        },
+                        "retryCount": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 20,
+                            "description": "Microsoft.Scheduler/jobCollections/jobs: Number of times to retry a failed called.  If not specified defaults to 4."
+                        }
+                    },
+                    "additionalProperties": false,
+                    "required": [
+                        "retryType"
+                    ]
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "retryType": {
+                            "enum": [
+                                "None"
+                            ],
+                            "default": "Fixed",
+                            "description": "Microsoft.Scheduler/jobCollections/jobs: Type of retry policy.  None will not retry, Fixed will retry on the fixed interval provided."
+                        }
+                    },
+                    "additionalItems": false,
+                    "required": [
+                        "retryType"
+                    ]
+                }
+            ],
+            "description": "Micrsoft.Scheduler/jobCollections/jobs: retry policy for failed requests.  If not specified defaults to retrying every 30 seconds 4 more times."
+        },
+        "recurrenceFrequency": {
+            "type": "object",
+            "properties": {
+                "frequency": {
+                    "enum": [
+                        "Minute",
+                        "Hour",
+                        "Day",
+                        "Week",
+                        "Month",
+                        "Year"
+                    ],
+                    "description": "Recurrence frequency."
+                },
+                "interval": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Recurrence interval."
+                }
+            },
+            "additionalProperties": false
+        },
+        "recurrence": {
+            "oneOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "count": {
+                            "type": "integer",
+                            "description": "Microsoft.Scheduler/jobCollections/jobs: Number of times this job should run before completing"
+                        },
+                        "endTime": {
+                            "$ref": "#/definitions/UTC",
+                            "description": "Microsoft.Scheduler/jobCollections/jobs: Job should not execute past this time"
+                        },
+                        "interval": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "description": "Microsoft.Scheduler/jobCollections/jobs: Interval for the frequency that determines how often the job will run"
+                        },
+                        "frequency": {
+                            "enum": [
+                                "Minute",
+                                "Hour",
+                                "Year"
+                            ],
+                            "description": "Microsoft.Scheduler/jobCollections/jobs: Frequency at which this job will run"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "count": {
+                            "type": "integer",
+                            "description": "Microsoft.Scheduler/jobCollections/jobs: Number of times this job should run before completing"
+                        },
+                        "endTime": {
+                            "$ref": "#/definitions/UTC",
+                            "description": "Microsoft.Scheduler/jobCollections/jobs: Job should not execute past this time"
+                        },
+                        "interval": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "description": "Microsoft.Scheduler/jobCollections/jobs: Interval for the frequency that determines how often the job will run"
+                        },
+                        "frequency": {
+                            "enum": [
+                                "Day",
+                                "Week",
+                                "Month"
+                            ],
+                            "description": "Microsoft.Scheduler/jobCollections/jobs: Frequency at which this job will run"
+                        },
+                        "schedule": {
+                            "type": "object",
+                            "properties": {
+                                "minutes": {
+                                    "anyOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "integer"
+                                            }
+                                        }
+                                    ],
+                                    "description": "Minutes of the hour at which the job will run"
+                                },
+                                "hours": {
+                                    "anyOf": [
+                                        {
+                                            "type": "integer"
+                                        },
+                                        {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "integer"
+                                            }
+                                        }
+                                    ],
+                                    "description": "Hours of the day at which the job will run"
+                                },
+                                "weekDays": {
+                                    "anyOf": [
+                                        {
+                                            "$ref": "#/definitions/dayOfWeek"
+                                        },
+                                        {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dayOfWeek"
+                                            },
+                                            "uniqueItems": true,
+                                            "maxItems": 7
+                                        }
+                                    ],
+                                    "description": "Days of the week the job will run.  Can only be specified with a weekly frequency."
+                                },
+                                "monthlyOccurrences": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "day": {
+                                                "$ref": "#/definitions/dayOfWeek",
+                                                "description": "Day of the week the job will run, e.g. {Sunday} is every Sunday of the month."
+                                            },
+                                            "occurrence": {
+                                                "type": "integer",
+                                                "minimum": -5,
+                                                "maximum": 5,
+                                                "description": "Occurrence of the day during the month, e.g. {Sunday, -1} is the last Sunday of the month. Optional."
+                                            }
+                                        },
+                                        "required": [
+                                            "day"
+                                        ],
+                                        "description": "Determines which days of the month the job will run.  Can only be specified with a monthly frequency."
+                                    }
+                                },
+                                "monthDays": {
+                                    "anyOf": [
+                                        {
+                                            "type": "integer",
+                                            "minimum": -31,
+                                            "maximum": -1
+                                        },
+                                        {
+                                            "type": "integer",
+                                            "minimum": 1,
+                                            "maximum": 31
+                                        },
+                                        {
+                                            "type": "array",
+                                            "items": {
+                                                "anyOf": [
+                                                    {
+                                                        "type": "integer",
+                                                        "minimum": -31,
+                                                        "maximum": -1
+                                                    },
+                                                    {
+                                                        "type": "integer",
+                                                        "minimum": 1,
+                                                        "maximum": 31
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    ],
+                                    "description": "Day of the month the job will run.  Can only be specified with a monthly frequency."
+                                }
+                            }
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            ]
+        },
+        "dayOfWeek": {
+            "enum": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday"
+            ]
+        },
+        "expression": {
+            "type": "string",
+            "pattern": "^\\[(concat|parameters|variables|reference|resourceId|resourceGroup|subscription|listKeys|listPackage)\\(.*\\).*\\]$",
+            "description": "Deployment template expression.  Expressions are enclosed in [] and must start with a function of concat(), parameters(), variables(), reference(), resourceId(), resourceGroup(), subscription(), listKeys(), listPackage()"
+        },
+        "Iso8601Duration": {
+            "type": "string",
+            "pattern": "^P(\\d+Y)?(\\d+M)?(\\d+D)?(T(((\\d+H)(\\d+M)?(\\d+(\\.\\d{1,2})?S)?)|((\\d+M)(\\d+(\\.\\d{1,2})?S)?)|((\\d+(\\.\\d{1,2})?S))))?$"
+        },
+        "UTC": {
+            "type": "string",
+            "pattern": "^\\d{4}(-(0[1-9]|1[0-2])(-([012]\\d|3[01])(T((([01]\\d|2[0123]):[0-5]\\d)|(24:00))(:(([0-5]\\d)|60)(\\.\\d{1,}){0,1}){0,1}){0,1}((Z)|([+-]((([01]\\d|2[0123]):[0-5]\\d)|(24:00)))){0,1}){0,1}){0,1}$"
+        }
+    }
+}

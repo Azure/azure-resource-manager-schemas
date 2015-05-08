@@ -1,0 +1,268 @@
+﻿{
+  "id": "http://schema.management.azure.com/schemas/2015-03-01-preview/Microsoft.AppService.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Microsoft.AppService",
+  "description": "Microsoft AppService Resource Types",
+  "definitions": {
+    "apiapps": {
+      "type": "object",
+      "description": "AppService API App resource",
+      "properties": {
+        "type": {
+          "enum": [
+            "Microsoft.AppService/apiapps"
+          ]
+        },
+        "apiVersion": {
+          "$ref": "#/definitions/appServiceApiVersion"
+        },
+        "properties": {
+          "type": "object",
+          "properties": {
+            "gateway": {
+              "$ref": "#/definitions/resourceReference",
+              "description": "Microsoft.AppService/apiapps: Reference to a gateway resource"
+            },
+            "host": {
+              "$ref": "#/definitions/resourceReference",
+              "description": "Microsoft.AppService/apiapps: Reference to a hosting web site resource"
+            },
+            "package": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Microsoft.AppService/apiapps: API App NuGet gallery package id"
+                }
+              }
+            },
+            "updatePolicy": {
+              "enum": [
+                "Auto",
+                "Manual",
+                "Inherited"
+              ],
+              "default": "Auto",
+              "description": "Microsoft.AppService/apiapps: Update policy for the API App instance"
+            },
+            "accessLevel": {
+              "enum": [
+                "PublicAnonymous",
+                "Internal",
+                "PublicAuthenticated"
+              ],
+              "default": "Internal",
+              "description": "Microsoft.AppService/apiapps: Access level of the API App instance"
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/resourceReference"
+              },
+              "description": "Microsoft.AppService/apiapps: Collection of references to dependent API Apps instances"
+            }
+          },
+          "required": [
+            "gateway",
+            "package"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "apiVersion",
+        "properties"
+      ]
+    },
+    "gateways": {
+      "type": "object",
+      "description": "AppService gateway resource",
+      "properties": {
+        "type": {
+          "enum": [
+            "Microsoft.AppService/gateways"
+          ]
+        },
+        "apiVersion": {
+          "$ref": "#/definitions/appServiceApiVersion"
+        },
+        "properties": {
+          "type": "object",
+          "properties": {
+            "host": {
+              "$ref": "#/definitions/resourceReference",
+              "description": "Microsoft.AppService/gateways: Reference to a hosting web site resource"
+            }
+          }
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/resourceBase"
+              },
+              {
+                "$ref": "#/definitions/registrationsChild"
+              }
+            ]
+          },
+          "description": "Microsoft.AppService/apiapps: Child CSM resources to define registrations or links"
+        }
+      },
+      "required": [
+        "type",
+        "apiVersion",
+        "properties"
+      ]
+    },
+    "registrationsProperties": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "$ref": "#/definitions/resourceReference",
+          "description": "Microsoft.AppService/gateways/registrations: Reference to a resource to be registered"
+        }
+      },
+      "required": [
+        "resource"
+      ]
+    },
+    "registrationsChild": {
+      "type": "object",
+      "description": "AppService gateway registration child resource",
+      "properties": {
+        "type": {
+          "enum": [
+            "registrations"
+          ]
+        },
+        "apiVersion": {
+          "$ref": "#/definitions/appServiceApiVersion"
+        },
+        "properties": {
+          "$ref": "#/definitions/registrationsProperties"
+        }
+      },
+      "required": [
+        "type",
+        "apiVersion",
+        "properties"
+      ]
+    },
+    "registrations": {
+      "type": "object",
+      "description": "AppService gateway registration stand-alone resource",
+      "properties": {
+        "type": {
+          "enum": [
+            "Microsoft.AppService/gateways/registrations"
+          ]
+        },
+        "apiVersion": {
+          "$ref": "#/definitions/appServiceApiVersion"
+        },
+        "properties": {
+          "$ref": "#/definitions/registrationsProperties"
+        }
+      },
+      "required": [
+        "type",
+        "apiVersion",
+        "properties"
+      ]
+    },
+    "resourceReference": {
+      "type": "object",
+      "description": "Reference to a CSM resource",
+      "properties": {
+        "id": {
+          "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression",
+          "description": "Full CSM resource ID"
+        },
+        "resourceName": {
+          "oneOf": [
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "CSM resource name"
+        },
+        "resourceType": {
+          "type": "string",
+          "description": "Type of a CSM resource"
+        }
+      }
+    },
+    "appServiceApiVersion": {
+      "oneOf": [
+        {
+          "enum": [
+            "2015-03-01-preview"
+          ]
+        },
+        {
+          "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+        }
+      ],
+      "description": "API version of AppService resource"
+    },
+    "systemParameterObject": {
+      "type": "object",
+      "description": "Package template $system parameter",
+      "properties": {
+        "apiAppName": {
+          "type": "string",
+          "description": "API App instance name"
+        },
+        "gatewaySiteName": {
+          "type": "string",
+          "description": "Name of the gateway web site resource"
+        },
+        "gatewayName": {
+          "type": "string",
+          "description": "Name of the AppService gateway resource"
+        },
+        "gatewayUri": {
+          "type": "string",
+          "description": "Gateway web site Url"
+        },
+        "location": {
+          "type": "string",
+          "description": "Resource group location"
+        },
+        "siteName": {
+          "type": "string",
+          "description": "API App web site resource name"
+        },
+        "siteExtensionName": {
+          "type": "string",
+          "description": "Name of the site extension resource"
+        },
+        "appServicePlanName": {
+          "type": "string",
+          "description": "Hosting plan"
+        },
+        "hostingEnvironmentName": {
+          "type": "string",
+          "description": "Hosting environment"
+        },
+        "secret": {
+          "type": "string",
+          "description": "Protocol HTTP signing key"
+        },
+        "signingKey": {
+          "type": "string",
+          "description": "Zumo authentication token signing key"
+        },
+        "apiVersion": {
+          "type": "string",
+          "description": "AppService API version"
+        }
+      }
+    }
+  }
+}

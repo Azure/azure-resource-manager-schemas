@@ -87,7 +87,7 @@ function getErrorMessage(prefix, value, suffix)
  * @return {Object}
  */
 module.exports.validate = validate;
-function validate(json, schema)
+function validate(json, schema, externalSchemas)
 {
 	if(!json)
 	{
@@ -103,10 +103,23 @@ function validate(json, schema)
 	{
 		var tv4 = require("tv4");
         
-        var validationResult = tv4.validateMultiple(json, schema);
-        for(var missingIndex in validationResult.missing)
+        if(externalSchemas && externalSchemas.length > 0)
         {
-            logError("Missing json object for external schema reference: " + validationResult.missing[missingIndex]);
+            for(var externalSchemaIndex in externalSchemas)
+            {
+                var externalSchema = externalSchemas[externalSchemaIndex];
+                tv4.addSchema(externalSchema.path, externalSchema.json);
+            }
+        }
+        
+        var validationResult = tv4.validateMultiple(json, schema);
+        if(validationResult.missing.length > 0)
+        {
+            for(var missingIndex in validationResult.missing)
+            {
+                var missing = validationResult.missing[missingIndex];
+                console.log("Missing reference to external schema: \"" + missing + "\"...");
+            }
         }
         
 		var result = { valid: validationResult.valid, errors: [], missingExternalSchemas: validationResult.missing };

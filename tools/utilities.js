@@ -48,3 +48,11 @@ function readJSONFile(filePath)
     var fileContentsWithoutBOM = fileContents.replace(/^\uFEFF/, '');
     return JSON.parse(fileContentsWithoutBOM);
 }
+
+module.exports.readJSONUri = readJSONUri;
+function readJSONUri(uri)
+{
+    var response = require("sync-request")("GET", uri);
+    var responseBody = response.getBody();
+    return JSON.parse(responseBody);
+}

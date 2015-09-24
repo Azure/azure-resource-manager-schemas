@@ -1,83 +1,52 @@
-var fs = require("fs");
 var path = require("path");
 
-var assert = require("./assert.js");
-var test = require("./test.js");
+var utilities = require("./utilities.js");
 var validator = require("./validateJSON.js");
 
-function iterateFiles(folder, callback)
+var schemasFolderPath = utilities.getSchemasFolderPath();
+var schemaFilePaths = [];
+utilities.forEachFile(schemasFolderPath, function(filePath)
 {
-    var files = fs.readdirSync(folder);
-    for(var fileIndex in files)
+    if(filePath.endsWith(".json"))
     {
-        var filePath = path.join(folder, files[fileIndex]);
-        
-        var fileStats = fs.statSync(filePath);
-        if(fileStats.isDirectory())
-        {
-            iterateFiles(filePath, callback);
-        }
-        else if(fileStats.isFile())
-        {
-            callback(filePath);
-        }
+        schemaFilePaths.push(filePath);
     }
-}
+});
 
-function getTestFiles(folder)
+var metaSchemaFilePath = path.join(__dirname, "ResourceMetaSchema.json");
+var metaSchemaJSON = utilities.readJSONFile(metaSchemaFilePath);
+
+var schemasValidated = 0;
+for(var schemaFilePathIndex in schemaFilePaths)
 {
-    var testFiles = [];
+    var schemaFilePath = schemaFilePaths[schemaFilePathIndex];
     
-    iterateFiles(folder, function(filePath)
+    var schemaFileName = path.basename(schemaFilePath);
+    if(schemaFileName !== "deploymentParameters.json" &&
+       schemaFileName !== "deploymentTemplate.json")
     {
-       if(filePath.endsWith(".tests.json"))
-       {
-           testFiles.push(filePath);
-       } 
-    });
-    
-    return testFiles;
-}
-
-function readJSONFile(filePath)
-{
-    var fileContents = fs.readFileSync(filePath, "utf8").replace(/^\uFEFF/, '');;
-    return JSON.parse(fileContents);
-}
-
-var schemasFolderPath = path.join(__dirname, "../schemas/");
-
-var deploymentTemplateSchema = readJSONFile(path.join(schemasFolderPath, "2014-04-01-preview/deploymentTemplate.json"));
-
-var testFiles = getTestFiles(schemasFolderPath);
-for(var testFileIndex in testFiles)
-{
-    var testFilePath = testFiles[testFileIndex];
-    
-    var tests = readJSONFile(testFilePath);
-    
-    for(var testIndex in tests)
-    {
-        var testObject = tests[testIndex];
-        
-        test.run(function()
+        if(schemasValidated > 0)
         {
-            var result = validator.validate(testObject.deploymentTemplate, deploymentTemplateSchema);
-            assert.Equal(testObject.valid, result.valid);
-            
-            assert.Equal(testObject.errors.length, result.errors.length, "The lengths of " + JSON.stringify(testObject.errors) + " and " + JSON.stringify(result.errors) + " were not equal.");
-            for(var errorIndex in testObject.errors)
+            console.log();
+        }
+        ++schemasValidated;
+        
+        console.log(schemaFilePath);
+        
+        var schemaJSON = utilities.readJSONFile(schemaFilePath);
+        var validationResult = validator.validate(schemaJSON, metaSchemaJSON);
+        
+        if(!validationResult.valid)
+        {
+            for(var errorIndex in validationResult.errors)
             {
-                var testObjectError = testObject.errors[errorIndex];
-                var resultError = result.errors[errorIndex];
-                
-                for(var propertyName in testObjectError)
-                {
-                    assert.Equal(testObjectError[propertyName], resultError[propertyName]);
-                }
+                var error = validationResult.errors[errorIndex];
+                console.log("\t" + (parseInt(errorIndex) + 1) + ". Error at \"" + error.dataPath + "\" - " + error.message);
             }
-        });
+        }
+        else
+        {
+            console.log("\tPassed");
+        }
     }
 }
-
-test.showResults();

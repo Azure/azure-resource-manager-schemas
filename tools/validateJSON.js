@@ -92,27 +92,21 @@ function validate(json, schema)
 	if(!json)
 	{
 		logError(getErrorMessage("Cannot validate a", json, "json object."));
-		return { valid: false, errors: [ { message: "Invalid JSON" } ], missing: [] };
+		return { valid: false, errors: [ { message: "Invalid JSON" } ], missingExternalSchemas: [] };
 	}
 	else if(!schema)
 	{
 		logError(getErrorMessage("Cannot use a", schema, "schema for validation."));
-		return { valid: false, errors: [ { message: "Invalid schema" } ], missing: [] };
+		return { valid: false, errors: [ { message: "Invalid schema" } ], missingExternalSchemas: [] };
 	}
 	else
 	{
 		var tv4 = require("tv4");
         
-        var validationFinished = false;
-        
-        var validationResult = null;
-        while(!validationFinished)
+        var validationResult = tv4.validateMultiple(json, schema);
+        for(var missingIndex in validationResult.missing)
         {
-            validationResult = tv4.validateMultiple(json, schema);
-            for(var missingIndex in validationResult.missing)
-            {
-                logError("Missing json object for external schema reference: " + validationResult.missing[missingIndex]);
-            }
+            logError("Missing json object for external schema reference: " + validationResult.missing[missingIndex]);
         }
         
 		var result = { valid: validationResult.valid, errors: [], missingExternalSchemas: validationResult.missing };
@@ -120,11 +114,18 @@ function validate(json, schema)
 		for(var errorIndex in validationResult.errors)
 		{
 			var currentError = validationResult.errors[errorIndex];
-			result.errors.push(
-			{
+            var resultError =
+            {
 				message: currentError.message,
+                dataPath: currentError.dataPath,
 				schemaPath: currentError.schemaPath,
-			});
+			};
+            if(!resultError.dataPath)
+            {
+                resultError.dataPath = "/";
+            }
+            
+			result.errors.push(resultError);
 		}
 		
 		return result;

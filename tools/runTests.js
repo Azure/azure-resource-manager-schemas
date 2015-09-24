@@ -34,9 +34,8 @@ function runAndReportTestsIndividually()
 	{
 		test.resetResults();
 		
-		runTestFile(resolve(testFiles[index]));
-		
 		console.log(testFiles[index] + ":");
+		runTestFile(resolve(testFiles[index]));
 		test.showResults();
 		console.log();
 	}

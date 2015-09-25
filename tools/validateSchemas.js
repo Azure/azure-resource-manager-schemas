@@ -10,7 +10,6 @@ var schemaFilePaths = utilities.getFiles(schemasFolderPath, function(filePath)
     if(filePath.endsWith(".json"))
     {
         var schemaFileName = path.basename(filePath);
-        console.log("schemaFileName: \"" + schemaFileName + "\"");
         result = schemaFileName !== "deploymentParameters.json" &&
                  schemaFileName !== "deploymentTemplate.json";
     }   

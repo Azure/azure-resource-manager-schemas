@@ -1,3 +1,5 @@
+var tv4 = require("tv4");
+        
 module.exports.logger = console.log;
 
 function log(message)
@@ -80,6 +82,12 @@ function getErrorMessage(prefix, value, suffix)
 	return errorMessage;
 }
 
+module.exports.addExternalSchema = addExternalSchema;
+function addExternalSchema(externalSchemaUri, externalSchema)
+{
+    tv4.addSchema(externalSchemaUri, externalSchema);
+}
+
 /**
  * Validates the provided JSON object against the provided schema.
  * @param {Object} json
@@ -87,7 +95,7 @@ function getErrorMessage(prefix, value, suffix)
  * @return {Object}
  */
 module.exports.validate = validate;
-function validate(json, schema, externalSchemas)
+function validate(json, schema, missingExternalSchemasCallback)
 {
 	if(!json)
 	{
@@ -101,25 +109,11 @@ function validate(json, schema, externalSchemas)
 	}
 	else
 	{
-		var tv4 = require("tv4");
+		var validationResult = tv4.validateMultiple(json, schema);
         
-        if(externalSchemas && externalSchemas.length > 0)
+        if(missingExternalSchemasCallback && validationResult.missing.length > 0)
         {
-            for(var externalSchemaIndex in externalSchemas)
-            {
-                var externalSchema = externalSchemas[externalSchemaIndex];
-                tv4.addSchema(externalSchema.path, externalSchema.json);
-            }
-        }
-        
-        var validationResult = tv4.validateMultiple(json, schema);
-        if(validationResult.missing.length > 0)
-        {
-            for(var missingIndex in validationResult.missing)
-            {
-                var missing = validationResult.missing[missingIndex];
-                console.log("Missing reference to external schema: \"" + missing + "\"...");
-            }
+            missingExternalSchemasCallback(validationResult.missing);
         }
         
 		var result = { valid: validationResult.valid, errors: [], missingExternalSchemas: validationResult.missing };

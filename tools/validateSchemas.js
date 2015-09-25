@@ -25,6 +25,11 @@ var metaSchemaJSONObjects =
     utilities.readJSONUri(metaSchemaPaths[1]),
 ]
 
+for(var i in metaSchemaPaths)
+{
+    validator.addExternalSchema(metaSchemaPaths[i], metaSchemaJSONObjects[i]);
+}
+
 var schemasValidated = 0;
 for(var schemaFilePathIndex in schemaFilePaths)
 {
@@ -44,34 +49,31 @@ for(var schemaFilePathIndex in schemaFilePaths)
         
         var schemaJSON = utilities.readJSONFile(schemaFilePath);
         
-        var foundErrors = false;
         for(var metaSchemaIndex in metaSchemaJSONObjects)
         {
             var metaSchemaJSON = metaSchemaJSONObjects[metaSchemaIndex];
             
-            var validationResult = validator.validate(schemaJSON, metaSchemaJSON,
-            [
+            var validationResult = validator.validate(schemaJSON, metaSchemaJSON, function(missingExternalSchemas)
+            {
+                for(var i in missingExternalSchemas)
                 {
-                    "path": metaSchemaPaths[metaSchemaIndex],
-                    "json": metaSchemaJSON,
+                    console.log("Missing reference to external schema: \"" + missingExternalSchemas[i] + "\"");
                 }
-            ]);
+            });
 
+            console.log("\tUsing schema: \"" + metaSchemaPaths[metaSchemaIndex] + "\"");
             if(!validationResult.valid)
             {
-                foundErrors = true;
-                console.log("\tUsing schema: \"" + metaSchemaPaths[metaSchemaIndex] + "\"");
-                
                 for(var errorIndex in validationResult.errors)
                 {
                     var error = validationResult.errors[errorIndex];
                     console.log("\t\t" + (parseInt(errorIndex) + 1) + ". Error at \"" + error.dataPath + "\" - " + error.message);
                 }
             }
-        }
-        if(!foundErrors)
-        {
-            console.log("\tPassed");
+            else
+            {
+                console.log("\t\tPassed");
+            }
         }
     }
 }

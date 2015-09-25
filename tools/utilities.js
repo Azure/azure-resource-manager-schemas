@@ -1,3 +1,7 @@
+var fs = require("fs");
+var path = require("path");
+var syncRequest = require("sync-request")
+
 var currentFileDirectory = __dirname;
 
 module.exports.getSchemasFolderPath = getSchemasFolderPath;
@@ -19,9 +23,6 @@ function getTestsFolderPath()
 module.exports.forEachFile = forEachFile;
 function forEachFile(folder, callback)
 {
-    var fs = require("fs");
-    var path = require("path");
-    
     var files = fs.readdirSync(folder);
     for(var fileIndex in files)
     {
@@ -39,20 +40,61 @@ function forEachFile(folder, callback)
     }
 }
 
+function stripUTF8BOM(value)
+{
+    return value.replace(/^\uFEFF/, '');
+}
+
 module.exports.readJSONFile = readJSONFile;
 function readJSONFile(filePath)
 {
-    var fs = require("fs");
-    
     var fileContents = fs.readFileSync(filePath, "utf8");
-    var fileContentsWithoutBOM = fileContents.replace(/^\uFEFF/, '');
+    var fileContentsWithoutBOM = stripUTF8BOM(fileContents);
     return JSON.parse(fileContentsWithoutBOM);
 }
 
 module.exports.readJSONUri = readJSONUri;
 function readJSONUri(uri)
 {
-    var response = require("sync-request")("GET", uri);
-    var responseBody = response.getBody();
+    var response = syncRequest("GET", uri);
+    var responseBody = stripUTF8BOM(response.getBody("utf8"));
     return JSON.parse(responseBody);
+}
+
+module.exports.contains = contains;
+function contains(container, value, comparisonFunction)
+{
+    if(!comparisonFunction)
+    {
+        comparisonFunction = function(lhs, rhs) { return lhs === rhs; };
+    }
+    
+    var result = false;
+    
+    for(var i = 0; i < container.length; ++i)
+    {
+        if(comparisonFunction(container[i], value))
+        {
+            result = true;
+            break;
+        }
+    }
+    
+    return result;
+}
+
+module.exports.unique = unique;
+function unique(array)
+{
+    var result = [];
+    
+    for(var i = 0; i < this.length; ++i)
+    {
+        if(!contains(result, array[i]))
+        {
+            result.push(array[i]);
+        }
+    }
+    
+    return result;
 }

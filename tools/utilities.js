@@ -7,16 +7,12 @@ var currentFileDirectory = __dirname;
 module.exports.getSchemasFolderPath = getSchemasFolderPath;
 function getSchemasFolderPath()
 {
-    var path = require("path");
-    
     return path.join(currentFileDirectory, "../schemas/");
 }
 
 module.exports.getTestsFolderPath = getTestsFolderPath;
 function getTestsFolderPath()
 {
-    var path = require("path");
-    
     return path.join(currentFileDirectory, "../tests/");
 }
 
@@ -38,6 +34,28 @@ function forEachFile(folder, callback)
             callback(filePath);
         }
     }
+}
+
+module.exports.getFiles = getFiles;
+function getFiles(folder, filterFunction)
+{
+    var files = [];
+    
+    if(typeof filterFunction === "string")
+    {
+        var fileExtension = filterFunction;
+        filterFunction = function(filePath) { return filePath.endsWith(fileExtension); };
+    }
+    
+    forEachFile(folder, function(filePath)
+    {
+        if(filterFunction(filePath))
+        {
+            files.push(filePath);
+        }
+    });
+    
+    return files;
 }
 
 function stripUTF8BOM(value)

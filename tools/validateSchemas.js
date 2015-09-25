@@ -4,14 +4,16 @@ var utilities = require("./utilities.js");
 var validator = require("./validateJSON.js");
 
 var schemasFolderPath = utilities.getSchemasFolderPath();
-
-var schemaFilePaths = [];
-utilities.forEachFile(schemasFolderPath, function(filePath)
+var schemaFilePaths = utilities.getFiles(schemasFolderPath, function(filePath)
 {
+    var result = false;
     if(filePath.endsWith(".json"))
     {
-        schemaFilePaths.push(filePath);
-    }
+        var schemaFileName = path.basename(schemaFilePath);
+        result = schemaFileName !== "deploymentParameters.json" &&
+                 schemaFileName !== "deploymentTemplate.json";
+    }   
+    return result;
 });
 
 var metaSchemaPaths =
@@ -30,50 +32,44 @@ for(var i in metaSchemaPaths)
     validator.addExternalSchema(metaSchemaPaths[i], metaSchemaJSONObjects[i]);
 }
 
-var schemasValidated = 0;
 for(var schemaFilePathIndex in schemaFilePaths)
 {
     var schemaFilePath = schemaFilePaths[schemaFilePathIndex];
     
-    var schemaFileName = path.basename(schemaFilePath);
-    if(schemaFileName !== "deploymentParameters.json" &&
-       schemaFileName !== "deploymentTemplate.json")
+    if(schemaFilePathIndex > 0)
     {
-        if(schemasValidated > 0)
+        console.log();
+    }
+    
+    console.log(schemaFilePath);
+    
+    var schemaJSON = utilities.readJSONFile(schemaFilePath);
+    
+    for(var metaSchemaIndex in metaSchemaJSONObjects)
+    {
+        var metaSchemaJSON = metaSchemaJSONObjects[metaSchemaIndex];
+        
+        var validationResult = validator.validate(schemaJSON, metaSchemaJSON, function(missingExternalSchemas)
         {
-            console.log();
-        }
-        ++schemasValidated;
-        
-        console.log(schemaFilePath);
-        
-        var schemaJSON = utilities.readJSONFile(schemaFilePath);
-        
-        for(var metaSchemaIndex in metaSchemaJSONObjects)
-        {
-            var metaSchemaJSON = metaSchemaJSONObjects[metaSchemaIndex];
-            
-            var validationResult = validator.validate(schemaJSON, metaSchemaJSON, function(missingExternalSchemas)
+            for(var i in missingExternalSchemas)
             {
-                for(var i in missingExternalSchemas)
-                {
-                    console.log("Missing reference to external schema: \"" + missingExternalSchemas[i] + "\"");
-                }
-            });
+                console.log("Missing reference to external schema: \"" + missingExternalSchemas[i] + "\"");
+            }
+        });
 
-            console.log("\tUsing schema: \"" + metaSchemaPaths[metaSchemaIndex] + "\"");
-            if(!validationResult.valid)
+        console.log("\tUsing schema: \"" + metaSchemaPaths[metaSchemaIndex] + "\"");
+        if(!validationResult.valid)
+        {
+            console.log("\t\tFailed");
+            for(var errorIndex in validationResult.errors)
             {
-                for(var errorIndex in validationResult.errors)
-                {
-                    var error = validationResult.errors[errorIndex];
-                    console.log("\t\t" + (parseInt(errorIndex) + 1) + ". Error at \"" + error.dataPath + "\" - " + error.message);
-                }
+                var error = validationResult.errors[errorIndex];
+                console.log("\t\t" + (parseInt(errorIndex) + 1) + ". Error at \"" + error.dataPath + "\" - " + error.message);
             }
-            else
-            {
-                console.log("\t\tPassed");
-            }
+        }
+        else
+        {
+            console.log("\t\tPassed");
         }
     }
 }

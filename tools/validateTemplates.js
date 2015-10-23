@@ -32,40 +32,40 @@ var testFiles = getTestFiles();
 for(var testFileIndex in testFiles)
 {
     var testFilePath = testFiles[testFileIndex];
+    console.log("Running test file \"" + testFilePath + "\"");
     
     var tests = utilities.readJSONFile(testFilePath);
     
     for(var testIndex in tests)
     {
         var testObject = tests[testIndex];
+        console.log("\tRunning test \"" + testObject.name + "\"");
         
         test.run(function()
         {
             var finishedValidating = false;
             while(!finishedValidating)
             {
-                finishedValidating = true;
-                
-                for(var i = 0; i < externalSchemas.length; ++i)
+                var result = validator.validate(testObject.deploymentTemplate, deploymentTemplateSchema, externalSchemas);
+                if(result.missingSchemas && result.missingSchemas.length > 0)
                 {
-                    validator.addExternalSchema(externalSchemas[i].path, externalSchemas[i].json);    
-                }
-                
-                var result = validator.validate(testObject.deploymentTemplate, deploymentTemplateSchema, function(missingExternalSchemas)
-                {
-                    for(var i in missingExternalSchemas)
+                    for(var missingSchemaIndex in result.missingSchemas)
                     {
-                        var missingExternalSchemaUri = missingExternalSchemas[i];
-                        var externalSchemaUris = externalSchemas.map(function(value) { return value.path; });
-                        if(!utilities.contains(externalSchemaUris, missingExternalSchemaUri))
+                        var missingSchemaPath = result.missingSchemas[missingSchemaIndex];
+                        var externalSchemaPaths = externalSchemas.map(function(value) { return value.path; });
+                        if(!utilities.contains(externalSchemaPaths, missingSchemaPath))
                         {
-                            var missingExternalSchemaJSON = utilities.readJSONUri(missingExternalSchemaUri);
-                            externalSchemas.push( { "path": missingExternalSchemaUri, "json": missingExternalSchemaJSON } );
+                            var missingSchemaJSON = utilities.readJSONUri(missingSchemaPath);
+                            externalSchemas.push( { "path": missingSchemaPath, "json": missingSchemaJSON } );
                         }
                     }
                     
                     finishedValidating = false;
-                });
+                }
+                else
+                {
+                    finishedValidating = true;
+                }
             }
             assert.Equal(testObject.valid, result.valid, "Test \"" + testObject.name + "\" should " + (testObject.valid ? "" : "not ") + "have been valid, but it was" + (result.valid ? "" : " not") + ".");
             

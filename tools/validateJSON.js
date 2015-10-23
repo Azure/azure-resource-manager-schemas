@@ -1,4 +1,6 @@
 var tv4 = require("tv4");
+
+var utilities = require("./utilities.js");
         
 module.exports.logger = console.log;
 
@@ -82,12 +84,6 @@ function getErrorMessage(prefix, value, suffix)
 	return errorMessage;
 }
 
-module.exports.addExternalSchema = addExternalSchema;
-function addExternalSchema(externalSchemaUri, externalSchema)
-{
-    tv4.addSchema(externalSchemaUri, externalSchema);
-}
-
 /**
  * Validates the provided JSON object against the provided schema.
  * @param {Object} json
@@ -95,28 +91,37 @@ function addExternalSchema(externalSchemaUri, externalSchema)
  * @return {Object}
  */
 module.exports.validate = validate;
-function validate(json, schema, missingExternalSchemasCallback)
+function validate(json, schema, retrieveMissingSchemas)
 {
 	if(!json)
 	{
 		logError(getErrorMessage("Cannot validate a", json, "json object."));
-		return { valid: false, errors: [ { message: "Invalid JSON" } ], missingExternalSchemas: [] };
+		return { valid: false, errors: [ { message: "Invalid JSON" } ], missingSchemas: [] };
 	}
 	else if(!schema)
 	{
 		logError(getErrorMessage("Cannot use a", schema, "schema for validation."));
-		return { valid: false, errors: [ { message: "Invalid schema" } ], missingExternalSchemas: [] };
+		return { valid: false, errors: [ { message: "Invalid schema" } ], missingSchemas: [] };
 	}
 	else
-	{
-		var validationResult = tv4.validateMultiple(json, schema);
-        
-        if(missingExternalSchemasCallback && validationResult.missing.length > 0)
+    {
+        tv4.addSchema(json);
+        tv4.addSchema(schema);
+        var missingUris = tv4.getMissingUris();
+        console.log("tv4 has " + missingUris.length + " missing external schemas after adding json and schema.");
+        while(missingUris && missingUris.length > 0)
         {
-            missingExternalSchemasCallback(validationResult.missing);
+            var missingUri = missingUris.pop();
+            console.log("\tRetrieving missing schema at \"" + missingUri + "\"");
+
+            tv4.addSchema(missingUri, utilities.readJSONUri(missingUri));
+            
+            missingUris = tv4.getMissingUris();
+            console.log("tv4 has " + missingUris.length + " missing external schemas after adding missing schemas");
         }
         
-		var result = { valid: validationResult.valid, errors: [], missingExternalSchemas: validationResult.missing };
+        var validationResult = tv4.validateMultiple(json, schema);
+		var result = { valid: validationResult.valid, errors: [], missingSchemas: validationResult.missing };
 		
 		for(var errorIndex in validationResult.errors)
 		{

@@ -16,21 +16,34 @@ var schemaFilePaths = utilities.getFiles(schemasFolderPath, function(filePath)
     return result;
 });
 
-var metaSchemaPaths =
+function getMetaSchemas(metaSchemaPaths)
+{
+    var result = [];
+    
+    for(var i in metaSchemaPaths)
+    {
+        var metaSchemaPath = metaSchemaPaths[i];
+        
+        var metaSchemaJson;
+        if(utilities.pathExists(metaSchemaPath))
+        {
+            metaSchemaJson = utilities.readJSONFile(metaSchemaPath);
+        }
+        else
+        {
+            metaSchemaJson = utilities.readJSONUri(metaSchemaPath);
+        }
+        
+        result.push({ "path": metaSchemaPath, "json": metaSchemaJson });
+    }
+    
+    return result;
+}
+var metaSchemas = getMetaSchemas(
 [
     path.join(__dirname, "ResourceMetaSchema.json"),
-    "http://json-schema.org/draft-04/schema",
-]
-var metaSchemaJSONObjects =
-[
-    utilities.readJSONFile(metaSchemaPaths[0]),
-    utilities.readJSONUri(metaSchemaPaths[1]),
-]
-
-for(var i in metaSchemaPaths)
-{
-    validator.addExternalSchema(metaSchemaPaths[i], metaSchemaJSONObjects[i]);
-}
+    "http://json-schema.org/draft-04/schema"
+]);
 
 for(var schemaFilePathIndex in schemaFilePaths)
 {
@@ -45,19 +58,13 @@ for(var schemaFilePathIndex in schemaFilePaths)
     
     var schemaJSON = utilities.readJSONFile(schemaFilePath);
     
-    for(var metaSchemaIndex in metaSchemaJSONObjects)
+    for(var metaSchemaIndex in metaSchemas)
     {
-        var metaSchemaJSON = metaSchemaJSONObjects[metaSchemaIndex];
+        var metaSchema = metaSchemas[metaSchemaIndex];
         
-        var validationResult = validator.validate(schemaJSON, metaSchemaJSON, function(missingExternalSchemas)
-        {
-            for(var i in missingExternalSchemas)
-            {
-                console.log("Missing reference to external schema: \"" + missingExternalSchemas[i] + "\"");
-            }
-        });
-
-        console.log("\tUsing schema: \"" + metaSchemaPaths[metaSchemaIndex] + "\"");
+        var validationResult = validator.validate(schemaJSON, metaSchema.json, metaSchemas, true);
+        
+        console.log("\tUsing schema: \"" + metaSchema.path + "\"");
         if(!validationResult.valid)
         {
             console.log("\t\tFailed");

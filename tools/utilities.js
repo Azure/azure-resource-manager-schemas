@@ -16,6 +16,21 @@ function getTestsFolderPath()
     return path.join(currentFileDirectory, "../tests/");
 }
 
+module.exports.pathExists = pathExists;
+function pathExists(path)
+{
+    var result = true;
+    try
+    {
+        fs.statSync(path);    
+    }
+    catch(e)
+    {
+        result = false;
+    }
+    return result;
+}
+
 module.exports.forEachFile = forEachFile;
 function forEachFile(folder, callback)
 {

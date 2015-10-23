@@ -3,7 +3,35 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "title": "Microsoft.Network",
     "description": "Microsoft Network Resource Types",
-    "resourceDefinitions": {
+    "definitions": {
+        "publicIPAddressDnsSettings": {
+            "type": "object",
+            "properties": {
+                "domainNameLabel": {
+                    "type": "string"
+                },
+                "reverseFqdn": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "domainNameLabel"
+            ]
+        },
+        "networkInterfaceDnsSettings": {
+            "type": "object",
+            "properties": {
+                "dnsServers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "internalDnsNameLabel": {
+                    "type": "string"
+                }
+            }
+        },
         "publicIPAddresses": {
             "type": "object",
             "properties": {
@@ -18,7 +46,11 @@
                         "2015-06-15"
                     ]
                 },
+                "name": {
+                    "type": "string"
+                },
                 "properties": {
+                    "type": "object",
                     "properties": {
                         "publicIPAllocationMethod": {
                             "type": "string"
@@ -27,17 +59,78 @@
                             "type": "number"
                         },
                         "dnsSettings": {
-                            "$ref": "#/definitions/dnsSettings"
+                            "$ref": "#/definitions/publicIPAddressDnsSettings"
                         }
                     },
-                    "type": "object",
                     "required": [
                         "publicIPAllocationMethod"
                     ]
                 }
             },
             "required": [
+                "type",
+                "apiVersion",
+                "name",
                 "properties"
+            ]
+        },
+        "id": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "id"
+            ]
+        },
+        "ipConfiguration": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "properties": {
+                    "$ref": "#/definitions/ipConfigurationProperties"
+                }
+            },
+            "required": [
+                "name",
+                "properties"
+            ]
+        },
+        "ipConfigurationProperties": {
+            "type": "object",
+            "properties": {
+                "subnet": {
+                    "$ref": "#/definitions/id"
+                },
+                "privateIPAddress": {
+                    "type": "string"
+                },
+                "privateIPAllocationMethod": {
+                    "type": "string"
+                },
+                "publicIPAddress": {
+                    "$ref": "#/definitions/id"
+                },
+                "loadBalancerBackendAddressPools": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/id"
+                    }
+                },
+                "loadBalancerInboundNatRules": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/id"
+                    }
+                }
+            },
+            "required": [
+                "subnet",
+                "privateIPAllocationMethod"
             ]
         },
         "networkInterfaces": {
@@ -54,7 +147,11 @@
                         "2015-06-15"
                     ]
                 },
+                "name": {
+                    "type": "string"
+                },
                 "properties": {
+                    "type": "object",
                     "properties": {
                         "networkSecurityGroup": {
                             "$ref": "#/definitions/id"
@@ -66,16 +163,78 @@
                             }
                         },
                         "dnsSettings": {
-                            "$ref": "#/definitions/dnsSettings"
+                            "$ref": "#/definitions/networkInterfaceDnsSettings"
                         }
                     },
-                    "type": "object",
                     "required": [
                         "ipConfigurations"
                     ]
                 }
             },
             "required": [
+                "type",
+                "apiVersion",
+                "name",
+                "properties"
+            ]
+        },
+        "addressSpace": {
+            "type": "object",
+            "properties": {
+                "addressPrefixes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": [
+                "addressPrefixes"
+            ]
+        },
+        "dhcpOptions": {
+            "type": "object",
+            "properties": {
+                "dnsServers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "required": [
+                "dnsServers"
+            ]
+        },
+        "subnetProperties": {
+            "type": "object",
+            "properties": {
+                "addressPrefix": {
+                    "type": "string"
+                },
+                "networkSecurityGroup": {
+                    "$ref": "#/definitions/id"
+                },
+                "routeTable": {
+                    "$ref": "#/definitions/id"
+                }
+            },
+            "required": [
+                "addressPrefix"
+            ]
+        },
+        "subnet": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "properties": {
+                    "$ref": "#/definitions/subnetProperties"
+                }
+            },
+            "required": [
+                "name",
                 "properties"
             ]
         },
@@ -93,7 +252,11 @@
                         "2015-06-15"
                     ]
                 },
+                "name": {
+                    "type": "string"
+                },
                 "properties": {
+                    "type": "object",
                     "properties": {
                         "addressSpace": {
                             "$ref": "#/definitions/addressSpace"
@@ -108,7 +271,6 @@
                             }
                         }
                     },
-                    "type": "object",
                     "required": [
                         "addressSpace",
                         "subnets"
@@ -116,240 +278,25 @@
                 }
             },
             "required": [
-                "properties"
-            ]
-        },
-        "loadBalancers": {
-            "type": "object",
-            "properties": {
-                "type": {
-                    "enum": [
-                        "Microsoft.Network/loadBalancers"
-                    ]
-                },
-                "apiVersion": {
-                    "enum": [
-                        "2015-05-01-preview",
-                        "2015-06-15"
-                    ]
-                },
-                "properties": {
-                    "properties": {
-                        "frontendIPConfigurations": {
-                            "$ref": "#/definitions/frontendIPConfigurations"
-                        },
-                        "backendAddressPools": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/backendAddressPools"
-                            }
-                        },
-                        "loadBalancingRules": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/loadBalancingRules"
-                            }
-                        },
-                        "probes": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/probes"
-                            }
-                        },
-                        "inboundNatRules": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/inboundNatRules"
-                            }
-                        },
-                        "outboundNatRules": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/outboundNatRules"
-                            }
-                        }
-                    },
-                    "type": "object"
-                }
-            },
-            "required": [
-                "properties"
-            ]
-        },
-        "networkSecurityGroups": {
-            "type": "object",
-            "properties": {
-                "type": {
-                    "enum": [
-                        "Microsoft.Network/networkSecurityGroups"
-                    ]
-                },
-                "apiVersion": {
-                    "enum": [
-                        "2015-05-01-preview",
-                        "2015-06-15"
-                    ]
-                },
-                "properties": {
-                    "properties": {
-                        "securityRules": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/securityRules"
-                            }
-                        }
-                    },
-                    "type": "object",
-                    "required": [
-                        "securityRules"
-                    ]
-                }
-            },
-            "required": [
-                "properties"
-            ]
-        }
-    },
-    "definitions": {
-        "dnsSettings": {
-            "properties": {
-                "domainNameLabel" : {
-                    "type" : "string"
-                },
-                "dnsServers": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            },
-            "type": "object",
-            "required": [
-                "domainNameLabel"
-            ]
-        },
-        "id": {
-            "properties": {
-                "id": {
-                    "type": "string"
-                }
-            },
-            "type": "object",
-            "required": [
-                "id"
-            ]
-        },
-        "ipConfiguration": {
-            "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "properties": {
-                    "$ref": "#/definitions/ipConfigurationProperties"
-                }
-            },
-            "type": "object",
-            "required": [
-                "name",
-                "properties"
-            ]
-        },
-        "ipConfigurationProperties": {
-            "properties": {
-                "subnet": {
-                    "$ref": "#/definitions/id"
-                },
-                "privateIPAddress": {
-                    "type": "string"
-                },
-                "privateIPAllocationMethod": {
-                    "type": "string"
-                },
-                "publicIPAddress": {
-                    "$ref": "#/definitions/id"
-                }
-            },
-            "type": "object",
-            "required": [
-                "subnet",
-                "privateIPAllocationMethod"
-            ]
-        },
-        "addressSpace": {
-            "properties": {
-                "addressPrefixes": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            },
-            "type": "object",
-            "required": [
-                "addressPrefixes"
-            ]
-        },
-        "dhcpOptions": {
-            "properties": {
-                "dnsServers": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            },
-            "type": "object",
-            "required": [
-                "dnsServers"
-            ]
-        },
-        "subnetProperties": {
-            "properties": {
-                "addressPrefix": {
-                    "type": "string"
-                },
-                "networkSecurityGroup": {
-                    "$ref": "#/definitions/id"
-                },
-                "ipConfigurations": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/id"
-                    }
-                }
-            },
-            "type": "object",
-            "required": [
-                "addressPrefix"
-            ]
-        },
-        "subnet": {
-            "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "properties": {
-                    "$ref": "#/definitions/subnetProperties"
-                }
-            },
-            "type": "object",
-            "required": [
+                "type",
+                "apiVersion",
                 "name",
                 "properties"
             ]
         },
         "frontendIPConfigurationsExternalProperties": {
+            "type": "object",
             "properties": {
                 "publicIPAddress": {
                     "$ref": "#/definitions/id"
                 }
             },
-            "type": "object",
             "required": [
                 "publicIPAddress"
             ]
         },
         "frontendIPConfigurationsInternalProperties": {
+            "type": "object",
             "properties": {
                 "subnet": {
                     "$ref": "#/definitions/id"
@@ -361,18 +308,19 @@
                     "type": "string"
                 }
             },
-            "type": "object",
             "required": [
                 "subnet",
                 "privateIPAllocationMethod"
             ]
         },
         "frontendIPConfigurations": {
+            "type": "object",
             "properties": {
                 "name": {
                     "type": "string"
                 },
                 "properties": {
+                    "type": "object",
                     "properties": {
                         "subnet": {
                             "$ref": "#/definitions/id"
@@ -386,42 +334,28 @@
                         "publicIPAddress": {
                             "$ref": "#/definitions/id"
                         }
-                    },
-                    "additionalProperties": false,
-                    "type": "object"
-                }
-            },
-            "type": "object"
-        },
-        "backendIPConfigurationProperties": {
-            "properties": {
-                "backendIPConfigurations": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/id"
                     }
                 }
             },
-            "type": "object",
             "required": [
-                "backendIPConfigurations"
+                "name",
+                "properties"
             ]
         },
         "backendAddressPools": {
+            "type": "object",
             "properties": {
                 "name": {
                     "type": "string"
-                },
-                "properties": {
-                    "$ref": "#/definitions/backendIPConfigurationProperties"
                 }
             },
-            "type": "object",
             "required": [
                 "name"
-            ]
+            ],
+            "additionalProperties": false
         },
         "loadBalancingRulesProperties": {
+            "type": "object",
             "properties": {
                 "frontendIPConfiguration": {
                     "$ref": "#/definitions/id"
@@ -451,7 +385,6 @@
                     "type": "string"
                 }
             },
-            "type": "object",
             "required": [
                 "frontendIPConfiguration",
                 "backendAddressPool",
@@ -461,6 +394,7 @@
             ]
         },
         "loadBalancingRules": {
+            "type": "object",
             "properties": {
                 "name": {
                     "type": "string"
@@ -469,13 +403,13 @@
                     "$ref": "#/definitions/loadBalancingRulesProperties"
                 }
             },
-            "type": "object",
             "required": [
                 "name",
                 "properties"
             ]
         },
         "probeProperties": {
+            "type": "object",
             "properties": {
                 "protocol": {
                     "type": "string"
@@ -493,13 +427,13 @@
                     "type": "number"
                 }
             },
-            "type": "object",
             "required": [
                 "protocol",
                 "port"
             ]
         },
         "probes": {
+            "type": "object",
             "properties": {
                 "name": {
                     "type": "string"
@@ -508,18 +442,15 @@
                     "$ref": "#/definitions/probeProperties"
                 }
             },
-            "type": "object",
             "required": [
                 "name",
                 "properties"
             ]
         },
         "inboundNatRulesProperties": {
+            "type": "object",
             "properties": {
                 "frontendIPConfiguration": {
-                    "$ref": "#/definitions/id"
-                },
-                "backendIPConfiguration": {
                     "$ref": "#/definitions/id"
                 },
                 "protocol": {
@@ -532,16 +463,15 @@
                     "type": "number"
                 }
             },
-            "type": "object",
             "required": [
                 "frontendIPConfiguration",
-                "backendIPConfiguration",
                 "protocol",
                 "frontendPort",
                 "backendPort"
             ]
         },
         "inboundNatRules": {
+            "type": "object",
             "properties": {
                 "name": {
                     "type": "string"
@@ -550,13 +480,55 @@
                     "$ref": "#/definitions/inboundNatRulesProperties"
                 }
             },
+            "required": [
+                "name",
+                "properties"
+            ]
+        },
+        "inboundNatPoolsProperties": {
             "type": "object",
+            "properties": {
+                "frontendIPConfiguration": {
+                    "$ref": "#/definitions/id"
+                },
+                "protocol": {
+                    "type": "string"
+                },
+                "frontendPortRangeStart": {
+                    "type": "number"
+                },
+                "frontendPortRangeEnd": {
+                    "type": "number"
+                },
+                "backendPort": {
+                    "type": "number"
+                }
+            },
+            "required": [
+                "frontendIPConfiguration",
+                "protocol",
+                "frontendPortRangeStart",
+                "frontendPortRangeEnd",
+                "backendPort"
+            ]
+        },
+        "inboundNatPools": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "properties": {
+                    "$ref": "#/definitions/inboundNatPoolsProperties"
+                }
+            },
             "required": [
                 "name",
                 "properties"
             ]
         },
         "outboundNatRulesProperties": {
+            "type": "object",
             "properties": {
                 "frontendIPConfigurations": {
                     "type": "array",
@@ -568,13 +540,13 @@
                     "$ref": "#/definitions/id"
                 }
             },
-            "type": "object",
             "required": [
                 "frontendIPConfigurations",
                 "backendAddressPool"
             ]
         },
         "outboundNatRules": {
+            "type": "object",
             "properties": {
                 "name": {
                     "type": "string"
@@ -583,13 +555,88 @@
                     "$ref": "#/definitions/outboundNatRulesProperties"
                 }
             },
-            "type": "object",
             "required": [
                 "name",
                 "properties"
             ]
         },
+        "loadBalancers": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "enum": [
+                        "Microsoft.Network/loadBalancers"
+                    ]
+                },
+                "apiVersion": {
+                    "enum": [
+                        "2015-05-01-preview",
+                        "2015-06-15"
+                    ]
+                },
+                "name": {
+                    "type": "string"
+                },
+                "properties": {
+                    "type": "object",
+                    "properties": {
+                        "frontendIPConfigurations": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/frontendIPConfigurations"
+                            }
+                        },
+                        "backendAddressPools": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/backendAddressPools"
+                            }
+                        },
+                        "loadBalancingRules": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/loadBalancingRules"
+                            }
+                        },
+                        "probes": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/probes"
+                            }
+                        },
+                        "inboundNatRules": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/inboundNatRules"
+                            }
+                        },
+                        "inboundNatPools": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/inboundNatPools"
+                            }
+                        },
+                        "outboundNatRules": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/outboundNatRules"
+                            }
+                        }
+                    },
+                    "required": [
+                        "frontendIPConfigurations"
+                    ]
+                }
+            },
+            "required": [
+                "type",
+                "apiVersion",
+                "name",
+                "properties"
+            ]
+        },
         "securityruleProperties": {
+            "type": "object",
             "properties": {
                 "description": {
                     "type": "string"
@@ -619,7 +666,6 @@
                     "type": "string"
                 }
             },
-            "type": "object",
             "required": [
                 "protocol",
                 "sourcePortRange",
@@ -632,6 +678,7 @@
             ]
         },
         "securityRules": {
+            "type": "object",
             "properties": {
                 "name": {
                     "type": "string"
@@ -640,8 +687,118 @@
                     "$ref": "#/definitions/securityruleProperties"
                 }
             },
-            "type": "object",
             "required": [
+                "name",
+                "properties"
+            ]
+        },
+        "networkSecurityGroups": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "enum": [
+                        "Microsoft.Network/networkSecurityGroups"
+                    ]
+                },
+                "apiVersion": {
+                    "enum": [
+                        "2015-05-01-preview",
+                        "2015-06-15"
+                    ]
+                },
+                "name": {
+                    "type": "string"
+                },
+                "properties": {
+                    "type": "object",
+                    "properties": {
+                        "securityRules": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/securityRules"
+                            }
+                        }
+                    },
+                    "required": [
+                        "securityRules"
+                    ]
+                }
+            },
+            "required": [
+                "type",
+                "apiVersion",
+                "name",
+                "properties"
+            ]
+        },
+        "routeProperties": {
+            "type": "object",
+            "properties": {
+                "addressPrefix": {
+                    "type": "string"
+                },
+                "nextHopType": {
+                    "type": "string"
+                },
+                "nextHopIpAddress": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "addressPrefix",
+                "nextHopType"
+            ]
+        },
+        "routes": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "properties": {
+                    "$ref": "#/definitions/routeProperties"
+                }
+            },
+            "required": [
+                "name",
+                "properties"
+            ]
+        },
+        "routeTables": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "enum": [
+                        "Microsoft.Network/routeTables"
+                    ]
+                },
+                "apiVersion": {
+                    "enum": [
+                        "2015-05-01-preview",
+                        "2015-06-15"
+                    ]
+                },
+                "name": {
+                    "type": "string"
+                },
+                "properties": {
+                    "type": "object",
+                    "properties": {
+                        "routes": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/routes"
+                            }
+                        }
+                    },
+                    "required": [
+                        "routes"
+                    ]
+                }
+            },
+            "required": [
+                "type",
+                "apiVersion",
                 "name",
                 "properties"
             ]

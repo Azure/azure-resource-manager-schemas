@@ -26,8 +26,6 @@ var schemasFolderPath = utilities.getSchemasFolderPath();
 
 var deploymentTemplateSchema = utilities.readJSONFile(path.join(schemasFolderPath, "2015-01-01/deploymentTemplate.json"));
 
-var externalSchemas = [];
-
 var testFiles = getTestFiles();
 for(var testFileIndex in testFiles)
 {
@@ -43,30 +41,7 @@ for(var testFileIndex in testFiles)
         
         test.run(function()
         {
-            var finishedValidating = false;
-            while(!finishedValidating)
-            {
-                var result = validator.validate(testObject.deploymentTemplate, deploymentTemplateSchema, externalSchemas);
-                if(result.missingSchemas && result.missingSchemas.length > 0)
-                {
-                    for(var missingSchemaIndex in result.missingSchemas)
-                    {
-                        var missingSchemaPath = result.missingSchemas[missingSchemaIndex];
-                        var externalSchemaPaths = externalSchemas.map(function(value) { return value.path; });
-                        if(!utilities.contains(externalSchemaPaths, missingSchemaPath))
-                        {
-                            var missingSchemaJSON = utilities.readJSONUri(missingSchemaPath);
-                            externalSchemas.push( { "path": missingSchemaPath, "json": missingSchemaJSON } );
-                        }
-                    }
-                    
-                    finishedValidating = false;
-                }
-                else
-                {
-                    finishedValidating = true;
-                }
-            }
+            var result = validator.validate(testObject.deploymentTemplate, deploymentTemplateSchema, schemasFolderPath);
             assert.Equal(testObject.valid, result.valid, "Test \"" + testObject.name + "\" should " + (testObject.valid ? "" : "not ") + "have been valid, but it was" + (result.valid ? "" : " not") + ".");
             
             assert.Equal(testObject.errors.length, result.errors.length, "Test \"" + testObject.name + "\" - The lengths of " + JSON.stringify(testObject.errors) + " and " + JSON.stringify(result.errors) + " were not equal.");

@@ -19,7 +19,7 @@ function logError(message)
 
 function logUsage()
 {
-	log("USAGE: \"node validateJSON.js <path-to-json-file> <path-to-schema-file>\"");
+	log("USAGE: \"node validateJSON.js <path-to-json-file> <path-to-schema-file> [<path-to-schema-folder>]\"");
 }
 
 function exit(exitCode)
@@ -30,7 +30,7 @@ function exit(exitCode)
 function getCommandLineArgument(commandLineArgumentIndex, errorMessage)
 {
 	var commandLineArgument = process.argv[commandLineArgumentIndex];
-	if(!commandLineArgument)
+	if(!commandLineArgument && errorMessage)
 	{
 		logError(errorMessage);
 		logUsage();
@@ -91,7 +91,7 @@ function getErrorMessage(prefix, value, suffix)
  * @return {Object}
  */
 module.exports.validate = validate;
-function validate(json, schema, retrieveMissingSchemas)
+function validate(json, schema, missingSchemaFolderPath)
 {
 	if(!json)
 	{
@@ -108,16 +108,33 @@ function validate(json, schema, retrieveMissingSchemas)
         tv4.addSchema(json);
         tv4.addSchema(schema);
         var missingUris = tv4.getMissingUris();
-        console.log("tv4 has " + missingUris.length + " missing external schemas after adding json and schema.");
+        //console.log("tv4 has " + missingUris.length + " missing external schemas after adding json and schema.");
         while(missingUris && missingUris.length > 0)
         {
             var missingUri = missingUris.pop();
-            console.log("\tRetrieving missing schema at \"" + missingUri + "\"");
+            //console.log("\tRetrieving missing schema at \"" + missingUri + "\"");
+            
+            var missingUriWithJsonEnding = missingUri;
+            if(missingUriWithJsonEnding.endsWith(".json") == false)
+            {
+                missingUriWithJsonEnding += ".json";
+            }
 
-            tv4.addSchema(missingUri, utilities.readJSONUri(missingUri));
+            //console.log("missingSchemaFolderPath: \"" + missingSchemaFolderPath + "\"");
+            if(missingSchemaFolderPath && utilities.pathExists(missingSchemaFolderPath))
+            {
+                var missingFileWithJsonEnding = missingUriWithJsonEnding.replace("http://schema.management.azure.com/schemas/", missingSchemaFolderPath);
+                //console.log("Retrieving " + missingUriWithJsonEnding + " from disk (" + missingFileWithJsonEnding + ")...");
+                tv4.addSchema(missingUri, utilities.readJSONFile(missingFileWithJsonEnding));
+            }
+            else
+            {
+                //console.log("Retrieving " + missingUriWithJsonEnding + " from network...");
+                tv4.addSchema(missingUri, utilities.readJSONUri(missingUriWithJsonEnding));
+            }
             
             missingUris = tv4.getMissingUris();
-            console.log("tv4 has " + missingUris.length + " missing external schemas after adding missing schemas");
+            //console.log("tv4 has " + missingUris.length + " missing external schemas after adding missing schemas");
         }
         
         var validationResult = tv4.validateMultiple(json, schema);
@@ -145,15 +162,12 @@ function validate(json, schema, retrieveMissingSchemas)
 }
 
 module.exports.validateFile = validateFile;
-function validateFile(jsonFilePath, schemaFilePath)
+function validateFile(jsonFilePath, schemaFilePath, missingSchemaFolderPath)
 {
-	var jsonString = getFileContents(jsonFilePath);
-	var schemaString = getFileContents(schemaFilePath);
+	var json = utilities.readJSONFile(jsonFilePath);
+	var schemaJson = utilities.readJSONFile(schemaFilePath);
 	
-	var json = JSON.parse(jsonString);
-	var schemaJson = JSON.parse(schemaString);
-	
-	return validate(json, schemaJson);
+	return validate(json, schemaJson, missingSchemaFolderPath);
 }
 
 if(require.main === module)
@@ -162,9 +176,10 @@ if(require.main === module)
 	// commandLineArguments[1] is validateResourceSchema.js
 	var jsonFilePath = getCommandLineArgument(2, "The first argument must be the path to the json file to validate.");
 	var schemaFilePath = getCommandLineArgument(3, "The second argument must be the path to the schema file to use for validation.");
+    var missingSchemaFolderPath = getCommandLineArgument(4);
 	
-	var validationResult = validateFile(jsonFilePath, schemaFilePath);
-	if(validationResult && validationResult.passed)
+	var validationResult = validateFile(jsonFilePath, schemaFilePath, missingSchemaFolderPath);
+	if(validationResult && validationResult.valid)
 	{
 		log("JSON validation passed");
 	}

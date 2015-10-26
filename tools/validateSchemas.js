@@ -62,7 +62,8 @@ for(var schemaFilePathIndex in schemaFilePaths)
     {
         var metaSchema = metaSchemas[metaSchemaIndex];
         
-        var validationResult = validator.validate(schemaJSON, metaSchema.json, metaSchemas, true);
+        console.log("schemasFolderPath: \"" + schemasFolderPath + "\"");
+        var validationResult = validator.validate(schemaJSON, metaSchema.json, schemasFolderPath);
         
         console.log("\tUsing schema: \"" + metaSchema.path + "\"");
         if(!validationResult.valid)

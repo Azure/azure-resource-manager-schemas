@@ -34,15 +34,15 @@ for(var testFileIndex in testFiles)
     
     var tests = utilities.readJSONFile(testFilePath);
     
-    for(var testIndex in tests)
+    for(var testIndex in tests.tests)
     {
-        var testObject = tests[testIndex];
+        var testObject = tests.tests[testIndex];
         console.log("\tRunning test \"" + testObject.name + "\"");
         
         test.run(function()
         {
             var result = validator.validate(testObject.deploymentTemplate, deploymentTemplateSchema, schemasFolderPath);
-            assert.Equal(testObject.valid, result.valid, "Test \"" + testObject.name + "\" should " + (testObject.valid ? "" : "not ") + "have been valid, but it was" + (result.valid ? "" : " not") + ".");
+            assert.Equal(testObject.valid, result.valid, "Test \"" + testObject.name + "\" should " + (testObject.valid ? "" : "not ") + "have been valid, but it was" + (result.valid ? "." : " not: " + JSON.stringify(result)));
             
             assert.Equal(testObject.errors.length, result.errors.length, "Test \"" + testObject.name + "\" - The lengths of " + JSON.stringify(testObject.errors) + " and " + JSON.stringify(result.errors) + " were not equal.");
             for(var errorIndex in testObject.errors)

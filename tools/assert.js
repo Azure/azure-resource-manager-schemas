@@ -41,11 +41,16 @@ function NotNull(value)
 }
 
 module.exports.Empty = Empty;
-function Empty(value)
+function Empty(value, message)
 {
 	if(!(value === null || value === undefined || value.length === 0))
 	{
-		Fail("Expected " + value + " to be empty.");
+	    var errorMessage = "Expected " + value + " to be empty.";
+	    if (message)
+	    {
+	        errorMessage += "\n" + message;
+	    }
+		Fail(errorMessage);
 	}
 }
 
@@ -54,14 +59,10 @@ function Equal(lhs, rhs, message)
 {
 	if(!(lhs === rhs))
 	{
-        var errorMessage = "Expected \"" + lhs + "\" to equal \"" + rhs + "\"";
+        var errorMessage = "Expected \"" + lhs + "\" to equal \"" + rhs + "\".";
         if(message)
         {
-            errorMessage += ": " + message;
-        }
-        else
-        {
-            errorMessage += ".";
+            errorMessage += "\n" + message;
         }
 		Fail(errorMessage);
 	}

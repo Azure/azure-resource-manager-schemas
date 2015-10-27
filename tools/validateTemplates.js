@@ -5,26 +5,16 @@ var test = require("./test.js");
 var utilities = require("./utilities.js");
 var validator = require("./validateJSON.js");
 
-function getTestFiles()
-{
-    var testsFolderPath = utilities.getTestsFolderPath();
-    
-    var testFiles = [];
-    
-    utilities.forEachFile(testsFolderPath, function(filePath)
-    {
-       if(filePath.endsWith(".tests.json"))
-       {
-           testFiles.push(filePath);
-       } 
-    });
-    
-    return testFiles;
-}
-
 var schemasFolderPath = utilities.getSchemasFolderPath();
 
-var testFiles = getTestFiles();
+var testsFolderPath = utilities.getTestsFolderPath();
+var testFiles = [];
+utilities.forEachFile(testsFolderPath, function (filePath) {
+    if (filePath.endsWith(".tests.json")) {
+        testFiles.push(filePath);
+    }
+});
+
 for(var testFileIndex in testFiles)
 {
     var testFilePath = testFiles[testFileIndex];
@@ -39,50 +29,53 @@ for(var testFileIndex in testFiles)
 
         test.run(function()
         {
-            var resourceSchemaLocation = testObject.resource;
-            var resourceSchemaLocationHashIndex = resourceSchemaLocation.indexOf("#");
+            // Get the definition schema JSON
+            var definitionSchemaLocation = testObject.definition;
+            var definitionSchemaLocationHashIndex = definitionSchemaLocation.indexOf("#");
             
-            var resourceSchemaJSON;
-            if (resourceSchemaLocationHashIndex === -1 || resourceSchemaLocationHashIndex === resourceSchemaLocation.length - 1)
+            var definitionSchemaJSON;
+            if (definitionSchemaLocationHashIndex === -1 || definitionSchemaLocationHashIndex === definitionSchemaLocation.length - 1)
             {
-                resourceSchemaJSON = utilities.readJSONPath(resourceSchemaLocation, schemasFolderPath);
+                definitionSchemaJSON = utilities.readJSONPath(definitionSchemaLocation, schemasFolderPath);
             }
             else
             {
-                var resourceSchemaUri = resourceSchemaLocation.substring(0, resourceSchemaLocationHashIndex);
-                var resourceSchemaJSON = utilities.readJSONPath(resourceSchemaUri, schemasFolderPath);
+                var definitionSchemaUri = definitionSchemaLocation.substring(0, definitionSchemaLocationHashIndex);
+                var definitionSchemaJSON = utilities.readJSONPath(definitionSchemaUri, schemasFolderPath);
 
-                var resourceSchemaPath = resourceSchemaLocation.substring(resourceSchemaLocationHashIndex + 1);
-                if (resourceSchemaPath.startsWith("/")) {
-                    resourceSchemaPath = resourceSchemaPath.substring(1);
+                var definitionSchemaPath = definitionSchemaLocation.substring(definitionSchemaLocationHashIndex + 1);
+                if (definitionSchemaPath.startsWith("/")) {
+                    definitionSchemaPath = definitionSchemaPath.substring(1);
                 }
-                var resourceSchemaPathParts = resourceSchemaPath.split("/");
-                for (var resourceSchemaPathPartIndex in resourceSchemaPathParts) {
-                    var resourceSchemaPathPart = resourceSchemaPathParts[resourceSchemaPathPartIndex];
-                    resourceSchemaJSON = resourceSchemaJSON[resourceSchemaPathPart];
+                var definitionSchemaPathParts = definitionSchemaPath.split("/");
+                for (var definitionSchemaPathPartIndex in definitionSchemaPathParts) {
+                    var definitionSchemaPathPart = definitionSchemaPathParts[definitionSchemaPathPartIndex];
+                    definitionSchemaJSON = definitionSchemaJSON[definitionSchemaPathPart];
 
-                    if (!resourceSchemaJSON) {
-                        assert.Fail("Could not find the resource \"" + resourceSchemaPath + "\" in schema \"" + resourceSchemaUri + "\"");
+                    if (!definitionSchemaJSON) {
+                        assert.Fail("Could not find the resource \"" + definitionSchemaPath + "\" in schema \"" + definitionSchemaUri + "\"");
                     }
                 }
-            }    
-
-            var result = validator.validate(testObject.json, resourceSchemaJSON, schemasFolderPath);
-            assert.Equal(testObject.valid, result.valid, "Test \"" + testObject.name + "\" should " + (testObject.valid ? "" : "not ") + "have been valid, but it was" + (result.valid ? "." : " not: " + JSON.stringify(result)));
+            }
             
-            if (!testObject.errors)
+            var result = validator.validate(testObject.json, definitionSchemaJSON, schemasFolderPath);
+            var expectedValid = !testObject.errors;
+            assert.Equal(expectedValid, result.valid, "Test \"" + testObject.name + "\" should " + (expectedValid ? "" : "not ") + "have been valid, but it was" + (result.valid ? "." : " not: " + JSON.stringify(result)));
+            
+            var testErrorPrefix = "Test \"" + testObject.name + "\" - ";
+            if (expectedValid)
             {
-                assert.Empty(result.errors, "Test \"" + testObject.name + "\" - No errors were expected, but found: " + JSON.stringify(testObject.errors) + " and " + JSON.stringify(result.errors));
+                assert.Empty(result.errors, testErrorPrefix + "No errors were expected, but validation returned the following error" + (result.errors.length === 1 ? "" : "s") + ": " + JSON.stringify(result.errors));
             }
             else
             {
-                assert.Equal(testObject.errors.length, result.errors.length, "Test \"" + testObject.name + "\" - The lengths of " + JSON.stringify(testObject.errors) + " and " + JSON.stringify(result.errors) + " were not equal.");
+                assert.Equal(testObject.errors.length, result.errors.length, testErrorPrefix + "The lengths of " + JSON.stringify(testObject.errors) + " and " + JSON.stringify(result.errors) + " were not equal.");
                 for (var errorIndex in testObject.errors) {
                     var testObjectError = testObject.errors[errorIndex];
                     var resultError = result.errors[errorIndex];
 
                     for (var propertyName in testObjectError) {
-                        assert.Equal(testObjectError[propertyName], resultError[propertyName], "Test \"" + testObject.name + "\" - The error property \"" + propertyName + "\" should have been \"" + testObjectError[propertyName] + "\", but was \"" + resultError[propertyName] + "\".");
+                        assert.Equal(testObjectError[propertyName], resultError[propertyName], testErrorPrefix + "The error property \"" + propertyName + "\" should have been \"" + testObjectError[propertyName] + "\", but was \"" + resultError[propertyName] + "\".");
                     }
                 }
             }

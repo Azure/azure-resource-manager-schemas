@@ -78,9 +78,28 @@ function stripUTF8BOM(value)
     return value.replace(/^\uFEFF/, '');
 }
 
+module.exports.readJSONPath = readJSONPath;
+function readJSONPath(jsonUri, schemaFolderPath) {
+    var retval;
+
+    var azurePrefix = "http://schema.management.azure.com/schemas/";
+    if (jsonUri.startsWith(azurePrefix) && schemaFolderPath && pathExists(schemaFolderPath)) {
+        var jsonFilePath = jsonUri.replace(azurePrefix, schemaFolderPath);
+        //console.log("Retrieving " + jsonUri + " from disk (" + jsonFilePath + ")...");
+        retval = readJSONFile(jsonFilePath);
+    }
+    else {
+        //console.log("Retrieving " + jsonUri + " from network...");
+        retval = readJSONUri(jsonUri);
+    }
+
+    return retval;
+}
+
 module.exports.readJSONFile = readJSONFile;
 function readJSONFile(filePath)
 {
+    //console.log("Reading JSON file at file path: \"" + filePath + "\"");
     var fileContents = fs.readFileSync(filePath, "utf8");
     var fileContentsWithoutBOM = stripUTF8BOM(fileContents);
     return JSON.parse(fileContentsWithoutBOM);

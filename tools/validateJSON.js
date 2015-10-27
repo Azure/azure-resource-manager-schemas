@@ -120,18 +120,7 @@ function validate(json, schema, missingSchemaFolderPath)
                 missingUriWithJsonEnding += ".json";
             }
 
-            //console.log("missingSchemaFolderPath: \"" + missingSchemaFolderPath + "\"");
-            if(missingSchemaFolderPath && utilities.pathExists(missingSchemaFolderPath))
-            {
-                var missingFileWithJsonEnding = missingUriWithJsonEnding.replace("http://schema.management.azure.com/schemas/", missingSchemaFolderPath);
-                //console.log("Retrieving " + missingUriWithJsonEnding + " from disk (" + missingFileWithJsonEnding + ")...");
-                tv4.addSchema(missingUri, utilities.readJSONFile(missingFileWithJsonEnding));
-            }
-            else
-            {
-                //console.log("Retrieving " + missingUriWithJsonEnding + " from network...");
-                tv4.addSchema(missingUri, utilities.readJSONUri(missingUriWithJsonEnding));
-            }
+            tv4.addSchema(missingUri, utilities.readJSONPath(missingUriWithJsonEnding, missingSchemaFolderPath));
             
             missingUris = tv4.getMissingUris();
             //console.log("tv4 has " + missingUris.length + " missing external schemas after adding missing schemas");

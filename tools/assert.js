@@ -1,7 +1,14 @@
+var utilities = require("./utilities.js");
+
+function expectedActualString(expected, actual, message)
+{
+    return (message ? message : "") + "\nExpected: " + utilities.toString(expected) + "\nActual: " + utilities.toString(actual);
+}
+
 module.exports.Fail = Fail;
 function Fail(message)
 {
-	throw new Error("FAILURE: " + message);
+	throw new Error(message);
 }
 
 module.exports.True = True;
@@ -9,7 +16,7 @@ function True(condition)
 {
 	if(!(condition === true))
 	{
-		Fail("Condition \"" + condition + "\" should have been true.");
+	    Fail(expectedActualString(true, condition));
 	}
 }
 
@@ -18,7 +25,7 @@ function False(condition)
 {
 	if(!(condition === false))
 	{
-		Fail("Condition \"" + condition + "\" should have been false.");
+	    Fail(expectedActualString(false, condition));
 	}
 }
 
@@ -27,7 +34,7 @@ function Null(value)
 {
 	if(!(value === null))
 	{
-		Fail("Expected value to be null.");
+	    Fail(expectedActualString(null, value));
 	}
 }
 
@@ -36,7 +43,7 @@ function NotNull(value)
 {
 	if(!(value !== null))
 	{
-		Fail("Expected value to be not null.");
+	    Fail(expectedActualString("not null", value));
 	}
 }
 
@@ -45,26 +52,16 @@ function Empty(value, message)
 {
 	if(!(value === null || value === undefined || value.length === 0))
 	{
-	    var errorMessage = "Expected " + value + " to be empty.";
-	    if (message)
-	    {
-	        errorMessage += "\n" + message;
-	    }
-		Fail(errorMessage);
+	    Fail(expectedActualString("empty", value, message));
 	}
 }
 
 module.exports.Equal = Equal;
 function Equal(lhs, rhs, message)
 {
-	if(!(lhs === rhs))
+	if(!utilities.equals(lhs, rhs))
 	{
-        var errorMessage = "Expected \"" + lhs + "\" to equal \"" + rhs + "\".";
-        if(message)
-        {
-            errorMessage += "\n" + message;
-        }
-		Fail(errorMessage);
+        Fail(expectedActualString(lhs, rhs, message));
 	}
 }
 

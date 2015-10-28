@@ -1,5 +1,7 @@
+var clc = require("cli-color");
+
 var testsPassed = 0;
-var testFailures = [];
+var testFailures = 0;
 
 module.exports.run = run;
 function run(testFunction)
@@ -11,7 +13,8 @@ function run(testFunction)
 	}
 	catch(e)
 	{
-		testFailures.push(e.stack);
+	    console.log(clc.red(e.stack));
+		++testFailures;
 	}
 }
 
@@ -19,21 +22,12 @@ module.exports.resetResults = resetResults;
 function resetResults()
 {
 	testsPassed = 0;
-	testFailures = [];
+	testFailures = 0;
 }
 
 module.exports.showResults = showResults;
 function showResults()
 {
 	console.log(testsPassed + " tests passed");
-	console.log(testFailures.length + " tests failed");
-	for(var index in testFailures)
-	{
-		if(1 <= index)
-		{
-			console.log();
-		}
-		
-		console.log(testFailures[index]);
-	}
+	console.log(testFailures + " tests failed");
 }

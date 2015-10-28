@@ -150,3 +150,98 @@ function unique(array)
     
     return result;
 }
+
+module.exports.repeat = repeat;
+function repeat(value, count)
+{
+    var result = value;
+    for(var i = 1; i < count; ++i)
+    {
+        result += value;
+    }
+    return result;
+}
+
+var singleIndentSpaceCount = 4;
+var singleIndent = repeat(" ", singleIndentSpaceCount);
+
+module.exports.toString = toString;
+function toString(value, indent)
+{
+    if (!indent)
+    {
+        indent = "";
+    }
+
+    var result;
+    if(Array.isArray(value))
+    {
+        result = indent + "[";
+        var addComma = false;
+        for (var index in value) {
+            if (addComma) {
+                result += ",";
+            }
+            else {
+                addComma = true;
+            }
+
+            var elementIndent = indent + singleIndent;
+            var elementString = toString(value[index], elementIndent);
+            result += "\n" + elementString;
+        }
+        result += "\n" + indent + "]";
+    }
+    else if (typeof value === "object" && value !== null)
+    {
+        result = indent + "{";
+        var addComma = false;
+        for (var propertyName in value) {
+            if (addComma) {
+                result += ",";
+            }
+            else {
+                addComma = true;
+            }
+
+            var propertyIndent = indent + singleIndent;
+            var propertyValueString = toString(value[propertyName], propertyIndent);
+            result += "\n" + propertyIndent + "\"" + propertyName + "\": " + propertyValueString;
+        }
+        result += "\n" + indent + "}";
+    }
+    else
+    {
+        result = JSON.stringify(value);
+    }
+
+    return result;
+}
+
+module.exports.equals = equals;
+function equals(lhs, rhs)
+{
+    var result = (lhs === rhs);
+
+    if(!result && typeof lhs === typeof rhs)
+    {
+        if(typeof lhs === "object")
+        {
+            result = true;
+            for (var lhsPropertyName in lhs) {
+                if (!equals(lhs[lhsPropertyName], rhs[lhsPropertyName])) {
+                    result = false;
+                    break;
+                }
+            }
+            for (var rhsPropertyName in rhs) {
+                if (!equals(lhs[rhsPropertyName], rhs[rhsPropertyName])) {
+                    result = false;
+                    break;
+                }
+            }
+        }
+    }
+
+    return result;
+}

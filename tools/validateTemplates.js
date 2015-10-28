@@ -8,12 +8,15 @@ var validator = require("./validateJSON.js");
 var schemasFolderPath = utilities.getSchemasFolderPath();
 
 var testsFolderPath = utilities.getTestsFolderPath();
+
 var testFiles = [];
 utilities.forEachFile(testsFolderPath, function (filePath) {
     if (filePath.endsWith(".tests.json")) {
         testFiles.push(filePath);
     }
 });
+
+var singleIndent = utilities.repeat(" ", 4);
 
 for(var testFileIndex in testFiles)
 {
@@ -25,7 +28,7 @@ for(var testFileIndex in testFiles)
     for (var testIndex in testFileJSON.tests)
     {
         var testObject = testFileJSON.tests[testIndex];
-        console.log("\tRunning test \"" + testObject.name + "\"");
+        console.log(singleIndent + "Running test \"" + testObject.name + "\"");
 
         test.run(function()
         {
@@ -53,31 +56,21 @@ for(var testFileIndex in testFiles)
                     definitionSchemaJSON = definitionSchemaJSON[definitionSchemaPathPart];
 
                     if (!definitionSchemaJSON) {
-                        assert.Fail("Could not find the resource \"" + definitionSchemaPath + "\" in schema \"" + definitionSchemaUri + "\"");
+                        assert.Fail("Could not find definition \"" + definitionSchemaPath + "\" in schema \"" + definitionSchemaUri + "\"");
                     }
                 }
             }
             
             var result = validator.validate(testObject.json, definitionSchemaJSON, schemasFolderPath);
-            var expectedValid = !testObject.errors;
-            assert.Equal(expectedValid, result.valid, "Test \"" + testObject.name + "\" should " + (expectedValid ? "" : "not ") + "have been valid, but it was" + (result.valid ? "." : " not: " + JSON.stringify(result)));
             
-            var testErrorPrefix = "Test \"" + testObject.name + "\" - ";
-            if (expectedValid)
+            var testErrorPrefix = "Test \"" + testObject.name + "\" ";
+            if (!testObject.expectedErrors || testObject.expectedErrors.length === 0)
             {
-                assert.Empty(result.errors, testErrorPrefix + "No errors were expected, but validation returned the following error" + (result.errors.length === 1 ? "" : "s") + ": " + JSON.stringify(result.errors));
+                assert.Empty(result.errors, testErrorPrefix + "had no expected errors, but the validation result contained errors.");
             }
             else
             {
-                assert.Equal(testObject.errors.length, result.errors.length, testErrorPrefix + "The lengths of " + JSON.stringify(testObject.errors) + " and " + JSON.stringify(result.errors) + " were not equal.");
-                for (var errorIndex in testObject.errors) {
-                    var testObjectError = testObject.errors[errorIndex];
-                    var resultError = result.errors[errorIndex];
-
-                    for (var propertyName in testObjectError) {
-                        assert.Equal(testObjectError[propertyName], resultError[propertyName], testErrorPrefix + "The error property \"" + propertyName + "\" should have been \"" + testObjectError[propertyName] + "\", but was \"" + resultError[propertyName] + "\".");
-                    }
-                }
+                assert.Equal(testObject.expectedErrors, result.errors, testErrorPrefix + "had a different set of validation errors than were expected.");
             }
         });
     }

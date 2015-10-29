@@ -29,7 +29,12 @@
             }
           }
         }
-      }
+      },
+      "required": [
+        "type",
+        "apiVersion",
+        "properties"
+      ]
     },
     "virtualMachines": {
       "type": "object",
@@ -89,7 +94,7 @@
                     "$ref": "http://schema.management.azure.com/schemas/2015-01-01/Microsoft.Resources.json#/definitions/links"
                   },
                   {
-                    "$ref": "#/definitions/extensionsChild"
+                    "$ref": "#/resourceDefinitions/extensionsChild"
                   }
                 ]
               }
@@ -99,9 +104,74 @@
         }
       },
       "required": [
+        "type",
+        "apiVersion",
         "properties"
       ]
     },
+    "virtualMachineScaleSets": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "Microsoft.Compute/virtualMachineScaleSets"
+          ]
+        },
+        "apiVersion": {
+          "enum": [
+            "2015-05-01-preview",
+            "2015-06-15"
+          ]
+        },
+        "properties": {
+          "sku": {
+            "$ref": "#/definitions/sku"
+          },
+          "properties": {
+            "upgradePolicy": {
+              "$ref": "#/definitions/upgradePolicy"
+            },
+            "virtualMachineProfile": {
+              "$ref": "#/definitions/virtualMachineProfile"
+            }
+          },
+          "type": "object",
+          "required": [
+            "upgradePolicy",
+            "virtualMachineProfile"
+          ]
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "allOf": [
+              {
+                "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/resourceBase"
+              },
+              {
+                "oneOf": [
+                  {
+                    "$ref": "http://schema.management.azure.com/schemas/2014-10-01-preview/Microsoft.Authorization.json#/definitions/roleAssignments"
+                  },
+                  {
+                    "$ref": "http://schema.management.azure.com/schemas/2015-01-01/Microsoft.Authorization.json#/definitions/locks"
+                  },
+                  {
+                    "$ref": "http://schema.management.azure.com/schemas/2015-01-01/Microsoft.Resources.json#/definitions/links"
+                  }
+                ]
+              }
+            ]
+          },
+          "description": "Microsoft.Compute/virtualMachineScaleSets: Resource Definition for Virtual Machine Scale Sets."
+        }
+      },
+      "required": [
+        "sku",
+        "properties"
+      ]
+    },
+
     "extensions": {
       "type": "object",
       "properties": {
@@ -141,6 +211,8 @@
         }
       },
       "required": [
+        "type",
+        "apiVersion",
         "properties"
       ]
     },
@@ -183,305 +255,10 @@
         }
       },
       "required": [
+        "type",
+        "apiVersion",
         "properties"
       ]
-    },
-    "sku": {
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "tier": {
-          "type": "string"
-        },
-        "capacity": {
-          "type": "number"
-        }
-      },
-      "type": "object",
-      "required": [
-        "name",
-        "capacity"
-      ]
-    },
-    "upgradePolicy": {
-      "properties": {
-        "mode": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "mode"
-      ]
-    },
-    "virtualMachineScaleSetOsProfile": {
-      "properties": {
-        "computerNamePrefix": {
-          "type": "string"
-        },
-        "adminUsername": {
-          "type": "string"
-        },
-        "adminPassword": {
-          "type": "string"
-        },
-        "customData": {
-          "type": "string"
-        },
-        "windowsConfiguration": {
-          "$ref": "#/definitions/windowsConfiguration"
-        },
-        "linuxConfiguration": {
-          "$ref": "#/definitions/linuxConfiguration"
-        },
-        "secrets": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/secret"
-          }
-        }
-      },
-      "type": "object",
-      "required": [
-        "computerNamePrefix",
-        "adminUsername",
-        "adminPassword"
-      ]
-    },
-    "virtualMachineScaleSetOSDisk": {
-      "properties": {
-        "osType": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "vhdContainers": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "caching": {
-          "type": "string"
-        },
-        "createOption": {
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "required": [
-        "name",
-        "createOption"
-      ]
-    },
-    "virtualMachineScaleSetStorageProfile": {
-      "properties": {
-        "imageReference": {
-          "$ref": "#/definitions/imageReference"
-        },
-        "osDisk": {
-          "$ref": "#/definitions/virtualMachineScaleSetOSDisk"
-        }
-      },
-      "type": "object",
-      "required": [
-        "osDisk"
-      ]
-    },
-    "virtualMachineScaleSetExtension": {
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "properties": {
-          "properties": {
-            "publisher": {
-              "type": "string"
-            },
-            "type": {
-              "type": "string"
-            },
-            "typeHandlerVersion": {
-              "type": "string"
-            },
-            "settings": {
-              "type": "object"
-            }
-          },
-          "type": "object",
-          "required": [
-            "publisher",
-            "type",
-            "typeHandlerVersion"
-          ]
-        }
-      },
-      "virtualMachineScaleSetExtensionProfile": {
-        "properties": {
-          "extensions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/definitions/virtualMachineScaleSetExtension"
-            }
-          }
-        },
-        "type": "object"
-      },
-      "ipConfiguration": {
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "properties": {
-            "subnet": {
-              "$ref": "#/definitions/id"
-            },
-            "loadBalancerBackendAddressPools": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/id"
-              }
-            }
-          },
-          "type": "object",
-          "required": [
-            "subnet"
-          ]
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "properties"
-        ]
-      },
-      "networkInterfaceConfiguration": {
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "properties": {
-            "primary": {
-              "type": "boolean"
-            },
-            "ipConfigurations": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/ipConfiguration"
-              }
-            }
-          },
-          "type": "object",
-          "required": [
-            "ipConfigurations"
-          ]
-        },
-        "type": "object",
-        "required": [
-          "name",
-          "properties"
-        ]
-      },
-      "virtualMachineScaleSetNetworkProfile": {
-        "properties": {
-          "networkInterfaceConfigurations": {
-            "type": "array",
-            "items": {
-              "$ref": "#/definitions/networkInterfaceConfiguration"
-            }
-          }
-        },
-        "type": "object",
-        "required": [
-          "networkInterfaceConfigurations"
-        ]
-      },
-      "virtualMachineProfile": {
-        "properties": {
-          "osProfile": {
-            "$ref": "#/definitions/virtualMachineScaleSetOsProfile"
-          },
-          "storageProfile": {
-            "$ref": "#/definitions/virtualMachineScaleSetStorageProfile"
-          },
-          "extensionProfile": {
-            "$ref": "#/definitions/virtualMachineScaleSetExtensionProfile"
-          },
-          "networkProfile": {
-            "$ref": "#/definitions/virtualMachineScaleSetNetworkProfile"
-          }
-        },
-        "type": "object",
-        "required": [
-          "osProfile",
-          "storageProfile",
-          "extensionProfile",
-          "networkProfile"
-        ]
-      },
-      "virtualMachineScaleSets": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "enum": [
-              "Microsoft.Compute/virtualMachineScaleSets"
-            ]
-          },
-          "apiVersion": {
-            "enum": [
-              "2015-05-01-preview",
-              "2015-06-15"
-            ]
-          },
-          "properties": {
-            "sku": {
-              "$ref": "#/definitions/sku"
-            },
-            "properties": {
-              "upgradePolicy": {
-                "$ref": "#/definitions/upgradePolicy"
-              },
-              "virtualMachineProfile": {
-                "$ref": "#/definitions/virtualMachineProfile"
-              }
-            },
-            "type": "object",
-            "required": [
-              "upgradePolicy",
-              "virtualMachineProfile"
-            ]
-          },
-          "resources": {
-            "type": "array",
-            "items": {
-              "allOf": [
-                {
-                  "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/resourceBase"
-                },
-                {
-                  "oneOf": [
-                    {
-                      "$ref": "http://schema.management.azure.com/schemas/2014-10-01-preview/Microsoft.Authorization.json#/definitions/roleAssignments"
-                    },
-                    {
-                      "$ref": "http://schema.management.azure.com/schemas/2015-01-01/Microsoft.Authorization.json#/definitions/locks"
-                    },
-                    {
-                      "$ref": "http://schema.management.azure.com/schemas/2015-01-01/Microsoft.Resources.json#/definitions/links"
-                    }
-                  ]
-                }
-              ]
-            },
-            "description": "Microsoft.Compute/virtualMachineScaleSets: Resource Definition for Virtual Machine Scale Sets."
-          }
-        },
-        "required": [
-          "sku",
-          "properties"
-        ]
-      }
     }
   },
   "definitions": {
@@ -829,6 +606,242 @@
       "type": "object",
       "required": [
         "networkInterfaces"
+      ]
+    },
+    "sku": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "tier": {
+          "type": "string"
+        },
+        "capacity": {
+          "type": "number"
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "capacity"
+      ]
+    },
+    "upgradePolicy": {
+      "properties": {
+        "mode": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "mode"
+      ]
+    },
+    "virtualMachineScaleSetOsProfile": {
+      "properties": {
+        "computerNamePrefix": {
+          "type": "string"
+        },
+        "adminUsername": {
+          "type": "string"
+        },
+        "adminPassword": {
+          "type": "string"
+        },
+        "customData": {
+          "type": "string"
+        },
+        "windowsConfiguration": {
+          "$ref": "#/definitions/windowsConfiguration"
+        },
+        "linuxConfiguration": {
+          "$ref": "#/definitions/linuxConfiguration"
+        },
+        "secrets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/secret"
+          }
+        }
+      },
+      "type": "object",
+      "required": [
+        "computerNamePrefix",
+        "adminUsername",
+        "adminPassword"
+      ]
+    },
+    "virtualMachineScaleSetOSDisk": {
+      "properties": {
+        "osType": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "vhdContainers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "caching": {
+          "type": "string"
+        },
+        "createOption": {
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "createOption"
+      ]
+    },
+    "virtualMachineScaleSetStorageProfile": {
+      "properties": {
+        "imageReference": {
+          "$ref": "#/definitions/imageReference"
+        },
+        "osDisk": {
+          "$ref": "#/definitions/virtualMachineScaleSetOSDisk"
+        }
+      },
+      "type": "object",
+      "required": [
+        "osDisk"
+      ]
+    },
+    "virtualMachineScaleSetExtension": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "properties": {
+          "properties": {
+            "publisher": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "typeHandlerVersion": {
+              "type": "string"
+            },
+            "settings": {
+              "type": "object"
+            }
+          },
+          "type": "object",
+          "required": [
+            "publisher",
+            "type",
+            "typeHandlerVersion"
+          ]
+        }
+      }
+    },
+    "virtualMachineScaleSetExtensionProfile": {
+      "properties": {
+        "extensions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/virtualMachineScaleSetExtension"
+          }
+        }
+      },
+      "type": "object"
+    },
+    "ipConfiguration": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "properties": {
+          "subnet": {
+            "$ref": "#/definitions/id"
+          },
+          "loadBalancerBackendAddressPools": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/id"
+            }
+          }
+        },
+        "type": "object",
+        "required": [
+          "subnet"
+        ]
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "properties"
+      ]
+    },
+    "networkInterfaceConfiguration": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "properties": {
+          "primary": {
+            "type": "boolean"
+          },
+          "ipConfigurations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/ipConfiguration"
+            }
+          }
+        },
+        "type": "object",
+        "required": [
+          "primary",
+          "ipConfigurations"
+        ]
+      },
+      "type": "object",
+      "required": [
+        "name",
+        "properties"
+      ]
+    },
+    "virtualMachineScaleSetNetworkProfile": {
+      "properties": {
+        "networkInterfaceConfigurations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/networkInterfaceConfiguration"
+          }
+        }
+      },
+      "type": "object",
+      "required": [
+        "networkInterfaceConfigurations"
+      ]
+    },
+    "virtualMachineProfile": {
+      "properties": {
+        "osProfile": {
+          "$ref": "#/definitions/virtualMachineScaleSetOsProfile"
+        },
+        "storageProfile": {
+          "$ref": "#/definitions/virtualMachineScaleSetStorageProfile"
+        },
+        "extensionProfile": {
+          "$ref": "#/definitions/virtualMachineScaleSetExtensionProfile"
+        },
+        "networkProfile": {
+          "$ref": "#/definitions/virtualMachineScaleSetNetworkProfile"
+        }
+      },
+      "type": "object",
+      "required": [
+        "osProfile",
+        "storageProfile",
+        "extensionProfile",
+        "networkProfile"
       ]
     }
   }

@@ -1,0 +1,218 @@
+{
+    "id": "http://schema.management.azure.com/schemas/2015-06-01/Microsoft.KeyVault.json#",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Microsoft.KeyVault",
+    "description": "Microsoft KeyVault Resource Types",
+    "resourceDefinitions": {
+        "secrets": {
+            "allOf": [
+                { "$ref": "#/definitions/secretsCommon" },
+                {
+                    "properties": {
+                        "type": {
+                            "enum": [
+                                "Microsoft.KeyVault/vaults/secrets"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "secretsChild": {
+            "allOf": [
+                { "$ref": "#/definitions/secretsCommon" },
+                {
+                    "properties": {
+                        "type": {
+                            "enum": [
+                                "secrets"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "vaults": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "enum": [
+                        "Microsoft.KeyVault/vaults"
+                    ]
+                },
+                "apiVersion": {
+                    "enum": [
+                        "2014-12-19-preview",
+                        "2015-06-01"
+                    ]
+                },
+                "properties": {
+                    "type": "object",
+                    "properties": {
+                        "sku": {
+                            "$ref": "#/definitions/sku"
+                        },
+                        "tenantId": {
+                            "type": "string",
+                            "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+                            "description": "Microsoft.KeyVault/vaults: The tenant ID of the Azure Active Directory Tenant to use for authorization."
+                        },
+                        "accessPolicies": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/accessPolicy"
+                            }
+                        },
+                        "enabledForDeployment": {
+                            "type": "boolean"
+                        }
+                    },
+                    "required": [
+                        "tenantId",
+                        "sku",
+                        "accessPolicies"
+                    ]
+                },
+                "resources": {
+                    "type": "array",
+                    "items": {
+                        "allOf": [
+                            { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/resourceBase" },
+                            { "$ref": "#/resourceDefinitions/secretsChild" }
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "apiVersion",
+                "properties",
+                "type"
+            ]
+        }
+    },
+    "definitions": {
+        "accessPolicy": {
+            "type": "object",
+            "properties": {
+                "tenantId": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+                    "description": "Microsoft.KeyVault/vaults: The tenant ID of the Azure Active Directory Tenant containing the objectId in this access policy."
+                },
+                "objectId": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+                    "description": "Microsoft.KeyVault/vaults: The object ID of the Azure Active Directory object to apply this access policy to.  For example, the object ID of a Service Principal, or of a User Principal."
+                },
+                "permissions": {
+                    "$ref": "#/definitions/permissions"
+                }
+            },
+            "required": [
+                "tenantId",
+                "objectId",
+                "permissions"
+            ]
+        },
+        "permissions": {
+            "type": "object",
+            "properties": {
+                "keys": {
+                    "type": "array",
+                    "items": {
+                        "enum": [
+                            "all",
+                            "backup",
+                            "create",
+                            "decrypt",
+                            "delete",
+                            "encrypt",
+                            "get",
+                            "import",
+                            "list",
+                            "restore",
+                            "sign",
+                            "unwrapKey",
+                            "update",
+                            "verify",
+                            "wrapKey"
+                        ]
+                    },
+                    "minItems": 1,
+                    "description": "Microsoft.KeyVault/vaults: The permissions granted on keys in this vault to this Active Directory object."
+                },
+                "secrets": {
+                    "type": "array",
+                    "items": {
+                        "enum": [
+                            "all",
+                            "delete",
+                            "get",
+                            "list",
+                            "set"
+                        ]
+                    },
+                    "minItems": 1,
+                    "description": "Microsoft.KeyVault/vaults: The permissions granted on secrets in this vault to this Active Directory object."
+                }
+            },
+            "anyOf": [
+                {
+                    "required": [ "secrets" ]
+                },
+                {
+                    "required": [ "keys" ]
+                }
+            ],
+            "description": "Microsoft.KeyVault/vaults: The permissions granted on this vault to this Active Directory object."
+        },
+        "secretsCommon": {
+            "type": "object",
+            "properties": {
+                "apiVersion": {
+                    "enum": [
+                        "2014-12-19-preview",
+                        "2015-06-01"
+                    ]
+                },
+                "properties": {
+                    "type": "object",
+                    "properties": {
+                        "value": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [ "value" ],
+                    "description": "Microsoft.KeyVault/vaults/secrets: Use a parameter of type securestring for this value.  The secret value to store in KeyVault."
+                }
+            },
+            "required": [
+                "apiVersion",
+                "properties",
+                "type"
+            ]
+        },
+        "sku": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "enum": [
+                        "standard",
+                        "premium"
+                    ],
+                    "description": "Microsoft.KeyVault/vaults: The service tier of KeyVault to use.  Standard supports secrets and software-protected keys.  Premium adds support for HSM-protected keys."
+                },
+                "family": {
+                    "enum": [
+                        "A"
+                    ],
+                    "description": "Microsoft.KeyVault/vaults: The SKU family to use."
+                }
+            },
+            "required": [
+                "family",
+                "name"
+            ]
+        }
+    }
+}

@@ -32,7 +32,6 @@ for(var testFileIndex in testFiles)
 
         test.run(function()
         {
-            // Get the definition schema JSON
             var definitionSchemaLocation = testObject.definition;
             var definitionSchemaLocationHashIndex = definitionSchemaLocation.indexOf("#");
             
@@ -44,7 +43,7 @@ for(var testFileIndex in testFiles)
             else
             {
                 var definitionSchemaUri = definitionSchemaLocation.substring(0, definitionSchemaLocationHashIndex);
-                var definitionSchemaJSON = utilities.readJSONPath(definitionSchemaUri, schemasFolderPath);
+                definitionSchemaJSON = utilities.readJSONPath(definitionSchemaUri, schemasFolderPath);
 
                 var definitionSchemaPath = definitionSchemaLocation.substring(definitionSchemaLocationHashIndex + 1);
                 if (definitionSchemaPath.startsWith("/")) {
@@ -70,7 +69,22 @@ for(var testFileIndex in testFiles)
             }
             else
             {
-                assert.Equal(testObject.expectedErrors, result.errors, testErrorPrefix + "had a different set of validation errors than were expected.");
+                if(testObject.expectedErrors.length !== result.errors.length)
+                {
+                    var errorMessage = "There were a different number of expected errors (" + testObject.expectedErrors.length + ") than there were actual errors (" + result.errors.length + ")";
+                    assert.Fail(assert.ExpectedActualString(testObject.expectedErrors, result.errors, errorMessage));
+                }
+                else
+                {
+                    for(var errorIndex = 0; errorIndex < testObject.expectedErrors.length; ++errorIndex)
+                    {
+                        var expectedError = testObject.expectedErrors[errorIndex];
+                        var resultError = result.errors[errorIndex];
+                        
+                        assert.Equal(expectedError.message, resultError.message, "The error message for error " + (errorIndex + 1) + " was not the expected error.");
+                        assert.Equal(expectedError.dataPath, resultError.dataPath, "The error dataPath for error " + (errorIndex + 1) + " was not the expected dataPath.");
+                    }
+                }
             }
         });
     }

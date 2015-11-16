@@ -80,6 +80,12 @@ function stripUTF8BOM(value)
 
 module.exports.readJSONPath = readJSONPath;
 function readJSONPath(jsonUri, schemaFolderPath) {
+    
+    if(schemaFolderPath && (!schemaFolderPath.endsWith('/') && !schemaFolderPath.endsWith('\\')))
+    {
+        schemaFolderPath += "/";
+    }
+    
     var retval;
 
     var azurePrefix = "http://schema.management.azure.com/schemas/";

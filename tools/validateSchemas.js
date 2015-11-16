@@ -62,22 +62,21 @@ for(var schemaFilePathIndex in schemaFilePaths)
     {
         var metaSchema = metaSchemas[metaSchemaIndex];
         
-        //console.log("schemasFolderPath: \"" + schemasFolderPath + "\"");
         var validationResult = validator.validate(schemaJSON, metaSchema.json, schemasFolderPath);
         
-        console.log("\tUsing schema: \"" + metaSchema.path + "\"");
+        console.log("    Using schema: \"" + metaSchema.path + "\"");
         if(!validationResult.valid)
         {
-            console.log("\t\tFailed");
+            console.log("        Failed");
             for(var errorIndex in validationResult.errors)
             {
                 var error = validationResult.errors[errorIndex];
-                console.log("\t\t" + (parseInt(errorIndex) + 1) + ". Error at \"" + error.dataPath + "\" - " + error.message);
+                console.log("        " + (parseInt(errorIndex) + 1) + ". Error at \"" + error.dataPath + "\" - " + error.message);
             }
         }
         else
         {
-            console.log("\t\tPassed");
+            console.log("        Passed");
         }
     }
 }

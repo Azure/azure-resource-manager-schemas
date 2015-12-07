@@ -63,7 +63,6 @@ function runTests()
 
     testPass({}, {});
     testPass({}, 5);
-    testPass({}, "meta-schema");
     testErrorLog({}, "", "ERROR: Cannot use an empty schema for validation.");
     
     testErrorLog(null, null, "ERROR: Cannot validate a null json object.");

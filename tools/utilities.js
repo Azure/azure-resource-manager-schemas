@@ -98,7 +98,6 @@ function readJSONPath(jsonUri, schemaFolderPath) {
     }
     
     if (jsonPath.startsWith("http:") || jsonPath.startsWith("https:")) {
-        //console.log("Retrieving " + jsonUri + " from network...");
         retval = readJSONUri(jsonPath);
     }
     else
@@ -112,7 +111,6 @@ function readJSONPath(jsonUri, schemaFolderPath) {
 module.exports.readJSONFile = readJSONFile;
 function readJSONFile(filePath)
 {
-    //console.log("Reading JSON file at file path: \"" + filePath + "\"");
     var fileContents = fs.readFileSync(filePath, "utf8");
     var fileContentsWithoutBOM = stripUTF8BOM(fileContents);
     return JSON.parse(fileContentsWithoutBOM);

@@ -173,7 +173,7 @@ function repeat(value, count)
     return result;
 }
 
-var singleIndentSpaceCount = 4;
+var singleIndentSpaceCount = 2;
 var singleIndent = repeat(" ", singleIndentSpaceCount);
 
 module.exports.toString = toString;

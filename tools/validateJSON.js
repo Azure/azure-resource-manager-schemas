@@ -105,14 +105,8 @@ function validate(json, schema, missingSchemaFolderPath)
   }
   else
   {
-    if(typeof json === "object")
-    {
-      tv4.addSchema(json);
-    }
-    if(typeof schema === "object")
-    {
-      tv4.addSchema(schema);
-    }
+    tv4.addSchema(json);
+    tv4.addSchema(schema);
     addMissingSchemas(tv4.getMissingUris(), missingSchemaFolderPath);
     
     var result = convertTv4ValidationResult(tv4.validateMultiple(json, schema));

@@ -89,14 +89,21 @@ function readJSONPath(jsonUri, schemaFolderPath) {
     var retval;
 
     var azurePrefix = "http://schema.management.azure.com/schemas/";
+    var jsonPath;
     if (jsonUri.startsWith(azurePrefix) && schemaFolderPath && pathExists(schemaFolderPath)) {
-        var jsonFilePath = jsonUri.replace(azurePrefix, schemaFolderPath);
-        //console.log("Retrieving " + jsonUri + " from disk (" + jsonFilePath + ")...");
-        retval = readJSONFile(jsonFilePath);
+        jsonPath = jsonUri.replace(azurePrefix, schemaFolderPath);
     }
     else {
+        jsonPath = jsonUri;
+    }
+    
+    if (jsonPath.startsWith("http:") || jsonPath.startsWith("https:")) {
         //console.log("Retrieving " + jsonUri + " from network...");
-        retval = readJSONUri(jsonUri);
+        retval = readJSONUri(jsonPath);
+    }
+    else
+    {
+        retval = readJSONFile(jsonPath);
     }
 
     return retval;

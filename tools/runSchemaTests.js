@@ -15,6 +15,7 @@ utilities.forEachFile(testsFolderPath, function (filePath) {
         testFiles.push(filePath);
     }
 });
+testFiles.push("./ResourceMetaSchema.tests.json");
 
 var singleIndent = utilities.repeat(" ", 4);
 

@@ -21,31 +21,55 @@
           "type": "object",
           "properties": {
             "sku": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "enum": [
-                    "Free",
-                    "Standard",
-                    "Premium"
-                  ]
-                }
-              },
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "oneOf": [
+                        {
+                          "enum": [
+                            "Free",
+                            "Standard",
+                            "Premium"
+                          ]
+                        },
+                        { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+                      ]
+                    }
+                  }
+                },
+                { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+              ],
               "description": "Microsoft.Scheduler/jobCollections: Job Collection sku"
             },
             "quota": {
-              "type": "object",
-              "properties": {
-                "maxJobCount": {
-                  "type": "integer",
-                  "minimum": 1,
-                  "description": "Microsoft.Scheduler/jobCollections/quota: The maximum number of jobs that can be created in this job collection.  Default value based on sku."
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "maxJobCount": {
+                      "oneOf": [
+                        {
+                          "type": "integer",
+                          "minimum": 1
+                        },
+                        { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+                      ],
+                      "description": "Microsoft.Scheduler/jobCollections/quota: The maximum number of jobs that can be created in this job collection.  Default value based on sku."
+                    },
+                    "maxRecurrence": {
+                      "oneOf": [
+                        { "$ref": "#/definitions/recurrenceFrequency" },
+                        { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+                      ],
+                      "description": "Microsoft.Scheduler/jobCollections/quota: The maximum recurrence frequency that a job can execute at. Default value based on sku."
+                    }
+                  }
                 },
-                "maxRecurrence": {
-                  "$ref": "#/definitions/recurrenceFrequency",
-                  "description": "Microsoft.Scheduler/jobCollections/quota: The maximum recurrence frequency that a job can execute at. Default value based on sku."
-                }
-              }
+                { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+              ],
+            "description": "Microsoft.Scheduler/jobCollections/quota"
             }
           },
           "required": [
@@ -92,74 +116,119 @@
           "type": "object",
           "properties": {
             "startTime": {
-              "$ref": "#/definitions/UTC",
+              "oneOf": [
+                { "$ref": "#/definitions/UTC" },
+                { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+              ],
               "description": "Microsoft.Scheduler/jobCollections/jobs: For simple scheduler startTime will be the first occurrence and for complex schedules the job will start no sooner than startTime."
             },
             "recurrence": {
-              "$ref": "#/definitions/recurrence",
+              "oneOf": [
+                { "$ref": "#/definitions/recurrence" },
+                { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+              ],
               "description": "Microsoft.Scheduler/jobCollections/jobs: The recurrence schedule the job will execute."
             },
             "state": {
-              "enum": [
-                "Enabled",
-                "Disabled"
+              "oneOf": [
+                {
+                  "enum": [
+                    "Enabled",
+                    "Disabled"
+                  ]
+                },
+                { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
               ],
               "description": "Microsoft.Scheduler/jobCollections/jobs: Running state of the job."
             },
             "action": {
-              "anyOf": [
+              "oneOf": [
                 {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "enum": [
-                        "HTTP",
-                        "HTTPS"
-                      ],
-                      "description": "Microsoft.Scheduler/jobCollections/jobs: Type of job action"
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "oneOf": [
+                            {
+                              "enum": [
+                                "HTTP",
+                                "HTTPS"
+                              ]
+                            },
+                            { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+                          ],
+                          "description": "Microsoft.Scheduler/jobCollections/jobs: Type of job action"
+                        },
+                        "request": {
+                          "oneOf": [
+                            { "$ref": "#/definitions/httpActionRequest" },
+                            { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+                          ]
+                        },
+                        "retryPolicy": {
+                          "oneOf": [
+                            { "$ref": "#/definitions/retryPolicy" },
+                            { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+                          ]
+                        },
+                        "errorAction": {
+                          "oneOf": [
+                            { "$ref": "#/definitions/errorAction" },
+                            { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "type",
+                        "request"
+                      ]
                     },
-                    "request": {
-                      "$ref": "#/definitions/httpActionRequest"
-                    },
-                    "retryPolicy": {
-                      "$ref": "#/definitions/retryPolicy"
-                    },
-                    "errorAction": {
-                      "$ref": "#/definitions/errorAction"
+                    {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "oneOf": [
+                            {
+                              "enum": [
+                                "STORAGEQUEUE"
+                              ]
+                            },
+                            { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+                          ],
+                          "description": "Microsoft.Scheduler/jobCollections/jobs: Type of job action"
+                        },
+                        "queueMessage": {
+                          "oneOf": [
+                            { "$ref": "#/definitions/storageQueueActionQueueMessage" },
+                            { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+                          ]
+                        },
+                        "retryPolicy": {
+                          "oneOf": [
+                            { "$ref": "#/definitions/retryPolicy" },
+                            { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+                          ]
+                        },
+                        "errorAction": {
+                          "oneOf": [
+                            { "$ref": "#/definitions/errorAction" },
+                            { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false,
+                      "required": [
+                        "type",
+                        "queueMessage"
+                      ]
                     }
-                  },
-                  "additionalProperties": false,
-                  "required": [
-                    "type",
-                    "request"
-                  ]
+                  ] 
                 },
-                {
-                  "type": "object",
-                  "properties": {
-                    "type": {
-                      "enum": [
-                        "STORAGEQUEUE"
-                      ],
-                      "description": "Microsoft.Scheduler/jobCollections/jobs: Type of job action"
-                    },
-                    "queueMessage": {
-                      "$ref": "#/definitions/storageQueueActionQueueMessage"
-                    },
-                    "retryPolicy": {
-                      "$ref": "#/definitions/retryPolicy"
-                    },
-                    "errorAction": {
-                      "$ref": "#/definitions/errorAction"
-                    }
-                  },
-                  "additionalProperties": false,
-                  "required": [
-                    "type",
-                    "queueMessage"
-                  ]
-                }
-              ],
+                { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+              ]
+              ,
               "description": "Microsoft.Scheduler/jobCollections/jobs: Action to perform on the prescribed schedule"
             }
           }
@@ -178,38 +247,56 @@
       "type": "object",
       "properties": {
         "uri": {
-          "type": "string",
-          "maxLength": 2048,
+          "oneOf": [
+            {
+              "type": "string",
+              "maxLength": 2048
+            },
+            { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+          ],
           "description": "Microsoft.Scheduler/jobCollections/jobs: URI of the endpoint to call"
         },
         "method": {
-          "anyOf": [
+          "oneOf": [
             {
-              "type": "string"
-            },
-            {
-              "enum": [
-                "GET",
-                "PUT",
-                "POST",
-                "PATCH",
-                "DELETE",
-                "HEAD",
-                "TRACE",
-                "CONNECT",
-                "OPTIONS"
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "enum": [
+                    "GET",
+                    "PUT",
+                    "POST",
+                    "PATCH",
+                    "DELETE",
+                    "HEAD",
+                    "TRACE",
+                    "CONNECT",
+                    "OPTIONS"
+                  ]
+                }
               ]
-            }
+            },
+            { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
           ],
           "description": "Microsoft.Scheduler/jobCollections/jobs: HTTP method used to communicate with the endpoint"
         },
         "headers": {
-          "type": "object",
+          "oneOf": [
+            { "type": "object" },
+            { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+          ],
           "description": "Microsoft.Scheduler/jobCollections/jobs: Dictionary HTTP request headers. Limited to 50 headers."
         },
         "body": {
-          "type": "string",
-          "maxLength": 8192,
+          "oneOf": [
+            {
+              "type": "string",
+              "maxLength": 8192
+            },
+            { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+          ],
           "description": "Microsoft.Scheduler/jobCollections/jobs: HTTP request body"
         },
         "authentication": {
@@ -480,23 +567,39 @@
           "type": "object",
           "properties": {
             "count": {
-              "type": "integer",
+              "oneOf": [
+                { "type": "integer" },
+                { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+              ],
               "description": "Microsoft.Scheduler/jobCollections/jobs: Number of times this job should run before completing"
             },
             "endTime": {
-              "$ref": "#/definitions/UTC",
+              "oneOf": [
+                { "$ref": "#/definitions/UTC" },
+                { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+              ],
               "description": "Microsoft.Scheduler/jobCollections/jobs: Job should not execute past this time"
             },
             "interval": {
-              "type": "integer",
-              "minimum": 1,
+              "oneOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+              ],
               "description": "Microsoft.Scheduler/jobCollections/jobs: Interval for the frequency that determines how often the job will run"
             },
             "frequency": {
-              "enum": [
-                "Day",
-                "Week",
-                "Month"
+              "oneOf": [
+                {
+                  "enum": [
+                    "Day",
+                    "Week",
+                    "Month"
+                  ]
+                },
+                { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
               ],
               "description": "Microsoft.Scheduler/jobCollections/jobs: Frequency at which this job will run"
             },
@@ -504,70 +607,98 @@
               "type": "object",
               "properties": {
                 "minutes": {
-                  "anyOf": [
+                  "oneOf": [
                     {
-                      "type": "integer"
+                      "anyOf": [
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "integer"
+                          }
+                        }
+                      ]
                     },
-                    {
-                      "type": "array",
-                      "items": {
-                        "type": "integer"
-                      }
-                    }
+                    { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
                   ],
                   "description": "Minutes of the hour at which the job will run"
                 },
                 "hours": {
-                  "anyOf": [
+                  "oneOf": [
                     {
-                      "type": "integer"
+                      "anyOf": [
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "integer"
+                          }
+                        }
+                      ]
                     },
-                    {
-                      "type": "array",
-                      "items": {
-                        "type": "integer"
-                      }
-                    }
+                    { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
                   ],
                   "description": "Hours of the day at which the job will run"
                 },
                 "weekDays": {
-                  "anyOf": [
+                  "oneOf": [
                     {
-                      "$ref": "#/definitions/dayOfWeek"
+                      "anyOf": [
+                        {
+                          "$ref": "#/definitions/dayOfWeek"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/definitions/dayOfWeek"
+                          },
+                          "uniqueItems": true,
+                          "maxItems": 7
+                        }
+                      ]
                     },
-                    {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/definitions/dayOfWeek"
-                      },
-                      "uniqueItems": true,
-                      "maxItems": 7
-                    }
+                    { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
                   ],
                   "description": "Days of the week the job will run.  Can only be specified with a weekly frequency."
                 },
                 "monthlyOccurrences": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "day": {
-                        "$ref": "#/definitions/dayOfWeek",
-                        "description": "Day of the week the job will run, e.g. {Sunday} is every Sunday of the month."
-                      },
-                      "occurrence": {
-                        "type": "integer",
-                        "minimum": -5,
-                        "maximum": 5,
-                        "description": "Occurrence of the day during the month, e.g. {Sunday, -1} is the last Sunday of the month. Optional."
+                  "oneOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "day": {
+                            "oneOf": [
+                              { "$ref": "#/definitions/dayOfWeek" },
+                              { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+                            ],
+                            "description": "Day of the week the job will run, e.g. {Sunday} is every Sunday of the month."
+                          },
+                          "occurrence": {
+                            "oneOf": [
+                              {
+                                "type": "integer",
+                                "minimum": -5,
+                                "maximum": 5
+                              },
+                              { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+                            ],
+                            "description": "Occurrence of the day during the month, e.g. {Sunday, -1} is the last Sunday of the month. Optional."
+                          }
+                        },
+                        "required": [
+                          "day"
+                        ],
+                        "description": "Determines which days of the month the job will run.  Can only be specified with a monthly frequency."
                       }
                     },
-                    "required": [
-                      "day"
-                    ],
-                    "description": "Determines which days of the month the job will run.  Can only be specified with a monthly frequency."
-                  }
+                    { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+                  ]
                 },
                 "monthDays": {
                   "anyOf": [

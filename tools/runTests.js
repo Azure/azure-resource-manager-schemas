@@ -6,6 +6,7 @@ var testFiles =
     "Tests/assertTests.js",
     "Tests/tv4Tests.js",
     "Tests/validateJSONTests.js",
+    "Tests/utilitiesTests.js",
 ];
 
 function resolve(filePath)

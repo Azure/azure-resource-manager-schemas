@@ -1,5 +1,6 @@
 var tv4 = require("tv4");
 
+var assert = require("./assert.js");
 var utilities = require("./utilities.js");
     
 module.exports.logger = console.log;
@@ -110,11 +111,10 @@ function validate(json, schema, missingSchemaFolderPath)
     addMissingSchemas(tv4.getMissingUris(), missingSchemaFolderPath);
     
     var result = convertTv4ValidationResult(tv4.validateMultiple(json, schema));
-    while(result.missingSchemas && result.missingSchemas.length > 0)
+    while (result.missingSchemas && result.missingSchemas.length > 0)
     {
-      addMissingSchemas(result.missingSchemas, missingSchemaFolderPath);
-      
-      result = convertTv4ValidationResult(tv4.validateMultiple(json, schema));
+        addMissingSchemas(result.missingSchemas, missingSchemaFolderPath);
+        result = convertTv4ValidationResult(tv4.validateMultiple(json, schema));
     }
     
     return result;
@@ -123,16 +123,14 @@ function validate(json, schema, missingSchemaFolderPath)
 
 function convertTv4ValidationResult(tv4ValidationResult)
 {
-  var result = { valid: tv4ValidationResult.valid, errors: [], missingSchemas: [] }
+  var result = { valid: tv4ValidationResult.valid, errors: [], missingSchemas: [] };
   
   for(var missingSchemaIndex in tv4ValidationResult.missing)
   {
     var missingSchema = tv4ValidationResult.missing[missingSchemaIndex];
-    
-    if(missingSchema && missingSchema.length > 0)
-    {
-      result.missingSchemas.push(missingSchema);
-    }
+    assert.NotEmpty(missingSchema, "tv4ValidationResult should not have had any empty missing schemas: " + utilities.toString(tv4ValidationResult.missing));
+
+    result.missingSchemas.push(missingSchema);
   }
   
   for(var errorIndex in tv4ValidationResult.errors)

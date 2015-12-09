@@ -44,7 +44,10 @@ function testErrorLog(json, schema, expectedMessage)
         
         test.run(function()
         {
-            assert.Throws(function() { vrs.validate(json, schema); });
+            var result = vrs.validate(json, schema);
+            assert.NotNull(result);
+            assert.NotNull(result.errors);
+            assert.Equal(1, result.errors.length);
         
             assert.Equal(1, errors.length);
             assert.Equal(expectedMessage, errors[0]);

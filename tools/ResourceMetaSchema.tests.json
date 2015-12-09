@@ -42,6 +42,11 @@
       "definition": "./ResourceMetaSchema.json#/definitions/resourceMetaSchema",
       "expectedErrors": [
         {
+          "message": "String is too short (0 chars), minimum 1",
+          "dataPath": "/description",
+          "schemaPath": "/properties/description/minLength"
+        },
+        {
           "message": "Too few properties defined (0), minimum 1",
           "dataPath": "/resourceDefinitions"
         },
@@ -91,11 +96,13 @@
         }
       ],
       "json": {
-        "$schema": "http://json-schema.org/draft-04/schema",
+        "$schema": "http://json-schema.org/draft-04/schema#",
         "title": "Test Title",
         "description": "hello",
         "resourceDefinitions": {
-          "mockResource": { }
+          "mockResource": {
+            "description": "Mock Resource Description"
+          }
         },
         "extraProperty": "Shouldn't be here"
       }
@@ -104,6 +111,12 @@
     {
       "name": "resourceMetaSchema - Empty resource definition",
       "definition": "./ResourceMetaSchema.json#/definitions/resourceMetaSchema",
+      "expectedErrors": [
+        {
+          "message": "Missing required property: description",
+          "dataPath": "/resourceDefinitions/mockResource"
+        }
+      ],
       "json": {
         "$schema": "http://json-schema.org/draft-04/schema",
         "title": "Test Title",
@@ -148,7 +161,7 @@
       "json": {
         "description": "Test Resource Description",
         "properties": {
-          "type": { "enum": "Microsoft.Dan/TestType" }
+          "type": { "enum": [ "Microsoft.Dan/TestType" ] }
         }
       }
     },
@@ -165,7 +178,7 @@
       "json": {
         "description": "Test Resource Description",
         "properties": {
-          "apiVersion": "2015-12-02"
+          "apiVersion": { "enum": [ "2015-12-02" ] }
         }
       }
     },
@@ -176,10 +189,8 @@
       "json": {
         "description": "Test Resource Description",
         "properties": {
-          "apiVersion": "2015-12-02",
-          "type": {
-            "enum": [ "Microsoft.Dan/TestResourceType" ]
-          }
+          "apiVersion": { "enum": [ "2015-12-02" ] },
+          "type": { "enum": [ "Microsoft.Dan/TestResourceType" ] }
         }
       }
     },
@@ -190,10 +201,8 @@
       "json": {
         "description": "Test Resource Description",
         "properties": {
-          "apiVersion": "2015-12-02",
-          "type": {
-            "enum": [ "Microsoft.Dan/TestResourceType" ]
-          },
+          "apiVersion": { "enum": [ "2015-12-02" ] },
+          "type": { "enum": [ "Microsoft.Dan/TestResourceType" ] },
           "resources": { }
         }
       }
@@ -205,10 +214,8 @@
       "json": {
         "description": "Test Resource Description",
         "properties": {
-          "apiVersion": "2015-12-02",
-          "type": {
-            "enum": [ "Microsoft.Dan/TestResourceType" ]
-          },
+          "apiVersion": { "enum": [ "2015-12-02" ] },
+          "type": { "enum": [ "Microsoft.Dan/TestResourceType" ] },
           "properties": { }
         }
       }
@@ -217,13 +224,18 @@
     {
       "name": "resource - Resource properties with string-valued property",
       "definition": "./ResourceMetaSchema.json#/definitions/resource",
+      "expectedErrors": [
+        {
+          "message": "Additional properties not allowed",
+          "dataPath": "/properties/properties/testPropertyName",
+          "schemaPath": "/properties/properties/properties/properties/additionalProperties"
+        }
+      ],
       "json": {
         "description": "Test Resource Description",
         "properties": {
-          "apiVersion": "2015-12-02",
-          "type": {
-            "enum": [ "Microsoft.Dan/TestResourceType" ]
-          },
+          "apiVersion": { "enum": [ "2015-12-02" ] },
+          "type": { "enum": [ "Microsoft.Dan/TestResourceType" ] },
           "properties": {
             "testPropertyName": "TestName"
           }
@@ -234,13 +246,17 @@
     {
       "name": "resource - Resource properties with empty object-valued property",
       "definition": "./ResourceMetaSchema.json#/definitions/resource",
+      "expectedErrors": [
+        {
+          "message": "Additional properties not allowed",
+          "dataPath": "/properties/properties/testPropertyName"
+        }
+      ],
       "json": {
         "description": "Test Resource Description",
         "properties": {
-          "apiVersion": "2015-12-02",
-          "type": {
-            "enum": [ "Microsoft.Dan/TestResourceType" ]
-          },
+          "apiVersion": { "enum": [ "2015-12-02" ] },
+          "type": { "enum": [ "Microsoft.Dan/TestResourceType" ] },
           "properties": {
             "testPropertyName": { }
           }
@@ -425,8 +441,7 @@
       "json": {
         "type": "object",
         "properties": {
-          "description": {
-            "type": "string",
+          "testResourceProperty": {
             "description": "Microsoft.DataConnect/connectionManagers: The description of the connectionManager."
           }
         }
@@ -439,12 +454,10 @@
       "json": {
         "type": "object",
         "properties": {
-          "description": {
-            "type": "string",
+          "testResourceProperty1": {
             "description": "Description1"
           },
-          "description2": {
-            "type": "string",
+          "testResourceProperty2": {
             "description": "Description2"
           }
         }
@@ -473,7 +486,7 @@
         }
       ],
       "json": {
-        "anyOf": [
+        "oneOf": [
           { "type": "string" },
           { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
         ]
@@ -484,7 +497,7 @@
       "name": "resourceProperty - String type",
       "definition": "./ResourceMetaSchema.json#/definitions/resourceProperty",
       "json": {
-        "anyOf": [
+        "oneOf": [
           { "type": "string" },
           { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
         ],
@@ -496,7 +509,7 @@
       "name": "resourceProperty - Number type without expression option",
       "definition": "./ResourceMetaSchema.json#/definitions/resourceProperty",
       "json": {
-        "anyOf": [
+        "oneOf": [
           { "type": "number" },
           { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
         ],

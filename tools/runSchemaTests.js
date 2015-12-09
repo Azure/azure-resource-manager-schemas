@@ -19,32 +19,6 @@ testFiles.push("./ResourceMetaSchema.tests.json");
 
 var singleIndent = utilities.repeat(" ", 4);
 
-function getProperty(sourceJSON, propertyPath)
-{
-    var hashIndex = propertyPath.indexOf("#");
-    if (hashIndex !== -1)
-    {
-        propertyPath = propertyPath.substring(hashIndex + 1);
-    }
-    if (propertyPath.startsWith("/")) {
-        propertyPath = propertyPath.substring(1);
-    }
-
-    var result = sourceJSON;
-
-    var propertyPathParts = propertyPath.split("/");
-    for (var propertyPathPartsIndex in propertyPathParts) {
-        var propertyPathPart = propertyPathParts[propertyPathPartsIndex];
-        result = result[propertyPathPart];
-
-        if (!result) {
-            assert.Fail("Could not find definition \"" + propertyPath + "\".");
-        }
-    }
-
-    return result;
-}
-
 for(var testFileIndex in testFiles)
 {
     var testFilePath = testFiles[testFileIndex];
@@ -73,9 +47,9 @@ for(var testFileIndex in testFiles)
                 var definitionSchemaFullJSON = utilities.readJSONPath(definitionSchemaUri, schemasFolderPath);
 
                 var definitionSchemaPath = definitionSchemaLocation.substring(definitionSchemaLocationHashIndex + 1);
-                definitionSchemaJSON = getProperty(definitionSchemaFullJSON, definitionSchemaPath);
+                definitionSchemaJSON = utilities.getProperty(definitionSchemaPath, definitionSchemaFullJSON);
 
-
+                definitionSchemaJSON = utilities.resolveSchemaLocalReferences(definitionSchemaJSON, definitionSchemaFullJSON);
             }
             
             var result = validator.validate(testObject.json, definitionSchemaJSON, schemasFolderPath);

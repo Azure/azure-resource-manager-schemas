@@ -94,7 +94,8 @@ function getErrorMessage(prefix, value, suffix)
 module.exports.validate = validate;
 function validate(json, schema, missingSchemaFolderPath)
 {
-  if(!json)
+  if (json === null ||
+      json === undefined)
   {
     logError(getErrorMessage("Cannot validate a", json, "json object."));
     return { valid: false, errors: [ { message: "Invalid JSON" } ], missingSchemas: [] };

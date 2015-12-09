@@ -29,9 +29,8 @@
         },
         "definitions": {
           "type": "object",
-          "properties": { },
           "minProperties": 1,
-          "additionalProperties": { "$ref": "http://json-schema.org/draft-04/schema#" }
+          "additionalProperties": { "$ref": "#/definitions/definition" }
         }
       },
       "required": [ "$schema", "title", "description", "resourceDefinitions" ],
@@ -103,6 +102,10 @@
           "type": "integer",
           "minimum": 1
         },
+        "maxLength": {
+          "type": "integer",
+          "minimum": 1
+        },
         "description": { "$ref": "#/definitions/description" }
       },
       "required": [ "description" ],
@@ -116,9 +119,21 @@
         "oneOf": [
           {
             "properties": {
-              "type": { "$ref": "http://json-schema.org/draft-04/schema#/definitions/simpleTypes" }
+              "type": {
+                "allOf": [
+                  { "$ref": "http://json-schema.org/draft-04/schema#/definitions/simpleTypes" },
+                  { "not": { "enum": [ "string" ] } }
+                ]
+              }
             },
             "required": [ "type" ]
+          },
+          {
+            "properties": {
+              "type": { "enum": [ "string" ] },
+              "pattern": { "$ref": "http://json-schema.org/draft-04/schema#/properties/pattern" }
+            },
+            "required": [ "type", "pattern" ]
           },
           {
             "properties": {
@@ -134,8 +149,7 @@
           },
           {
             "properties": {
-              "oneOf": { "$ref": "#/definitions/resourcePropertyDefinitionOptions" },
-              "anyOf": { "$ref": "#/definitions/resourcePropertyDefinitionOptions" }
+              "oneOf": { "$ref": "#/definitions/resourcePropertyDefinitionOptions" }
             },
             "minProperties": 1,
             "maxProperties": 1,
@@ -178,6 +192,9 @@
         }
       },
       "additionalProperties": false
+    },
+    "definition": {
+      "$ref": "http://json-schema.org/draft-04/schema#"
     }
   }
 }

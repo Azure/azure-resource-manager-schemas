@@ -487,7 +487,7 @@
       ],
       "json": {
         "oneOf": [
-          { "type": "string" },
+          { "type": "integer" },
           { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
         ]
       }
@@ -497,10 +497,7 @@
       "name": "resourceProperty - String type",
       "definition": "./ResourceMetaSchema.json#/definitions/resourceProperty",
       "json": {
-        "oneOf": [
-          { "type": "string" },
-          { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
-        ],
+        "type": "string",
         "description": "Test description that describes this property."
       }
     },
@@ -508,11 +505,14 @@
     {
       "name": "resourceProperty - Number type without expression option",
       "definition": "./ResourceMetaSchema.json#/definitions/resourceProperty",
+      "expectedErrors": [
+        {
+          "message": "No enum match for: \"number\"",
+          "dataPath": "/type"
+        }
+      ],
       "json": {
-        "oneOf": [
-          { "type": "number" },
-          { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
-        ],
+        "type": "number",
         "description": "Test description that describes this property."
       }
     },
@@ -562,13 +562,57 @@
     },
 
     {
-      "name": "resourcePropertyDefinitionOptions - Expression reference and boolean type options",
+      "name": "resourcePropertyDefinitionOptions - Expression reference and boolean type",
       "definition": "./ResourceMetaSchema.json#/definitions/resourcePropertyDefinitionOptions",
       "json": [
         { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" },
         { "type": "boolean" }
       ]
     },
+
+    {
+      "name": "resourcePropertyDefinitionOptions - Two expression references",
+      "definition": "./ResourceMetaSchema.json#/definitions/resourcePropertyDefinitionOptions",
+      "expectedErrors": [
+        {
+          "message": "Array items are not unique (indices 0 and 1)",
+          "dataPath": "/"
+        }
+      ],
+      "json": [
+        { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" },
+        { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+      ]
+    },
+
+    {
+      "name": "resourcePropertyDefinitionOptions - Expression reference and string type",
+      "definition": "./ResourceMetaSchema.json#/definitions/resourcePropertyDefinitionOptions",
+      "expectedErrors": [
+        {
+          "message": "Data does not match any schemas from \"oneOf\"",
+          "dataPath": "/1"
+        }
+      ],
+      "json": [
+        { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" },
+        { "type": "string" }
+      ]
+    },
+
+    {
+      "name": "resourcePropertyDefinitionOptions - Expression reference and string type with pattern",
+      "definition": "./ResourceMetaSchema.json#/definitions/resourcePropertyDefinitionOptions",
+      "json": [
+        { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" },
+        {
+          "type": "string",
+          "pattern": "Regular Expression Pattern"
+        }
+      ]
+    },
+
+
 
 
     {

@@ -36,6 +36,8 @@ function runTests()
     test.run(function () { assert.Equal([], []); });
     test.run(function () { assert.Equal([1], [1]); });
     test.run(function () { assert.Throws(function () { assert.Equal([1], [1, 2]); }); });
+    test.run(function () { assert.Equal({ "a": { "b": "bValue" } }, { "a": { "b": "bValue" } }); });
+    test.run(function () { assert.Throws(function () { assert.Equal({ "a": { "b": "bValue" } }, { "a": { "b": "notBValue" } }); }); });
 }
 
 if(require.main === module)

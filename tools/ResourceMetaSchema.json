@@ -1,108 +1,200 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Azure Resource Meta-schema",
+      
+  "allOf": [
+    {
+      "$ref": "http://json-schema.org/draft-04/schema#"
+    },
+    {
+      "$ref": "#/definitions/resourceMetaSchema"
+    }
+  ],
 
-    "allOf": [
-        {
-            "$ref": "http://json-schema.org/draft-04/schema#"
+  "definitions": {
+    "resourceMetaSchema": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "$schema": {
+          "type": "string",
+          "format": "uri"
         },
-        {
-            "$ref": "#/definitions/resourceMetaSchema"
+        "title": { "type": "string" },
+        "description": { "$ref": "#/definitions/description" },
+        "resourceDefinitions": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "$ref": "#/definitions/resource" }
+        },
+        "definitions": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "$ref": "#/definitions/definition" }
         }
-    ],
-
-    "definitions": {
-        "resourceMetaSchema": {
-            "title": "Azure Resource Meta-schema",
-            "type": "object",
-            "properties": {
-                "id": { "type": "string" },
-                "$schema": {
-                    "type": "string",
-                    "format": "uri"
-                },
-                "title": { "type": "string" },
-                "description": { "$ref": "#/definitions/description" },
-                "resourceDefinitions": {
-                    "type": "object",
-                    "minProperties": 1,
-                    "additionalProperties": { "$ref": "#/definitions/resource" }
-                },
-                "definitions": {
-                    "type": "object",
-                    "minProperties": 1,
-                    "additionalProperties": { "$ref": "http://json-schema.org/draft-04/schema#" }
-                }
-            },
-            "required": [ "$schema", "title", "description", "resourceDefinitions" ],
-            "additionalProperties": false
-        },
-        "resource": {
-            "type": "object",
-            "properties": {
-                "type": { "enum": [ "object" ] },
-                "description": { "$ref": "#/definitions/description" },
-                "required": { "$ref": "#/definitions/stringArrayEmptyOkay" },
-                "properties": {
-                    "type": "object",
-                    "minProperties": 1,
-                    "properties": {
-                        "type": { },
-                        "apiVersion": { "$ref": "#/definitions/apiVersionProperty" },
-                        "resources": { "$ref": "#/definitions/childResources" },
-                        "properties": { }
-                    },
-                    "required": [ "apiVersion", "type" ],
-                    "additionalProperties": { "$ref": "#/definitions/resourceProperty" }
-                }
-            },
-            "required": [ "description", "properties" ]
-        },
-        "resourceProperty": {
-            "allOf": [
-                { "$ref": "http://json-schema.org/draft-04/schema#" },
-                {
-                    "type": "object",
-                    "properties": {
-                        "description": { "$ref": "#/definitions/description" }
-                    },
-                    "required": [ "description" ],
-                    "additionalProperties": true
-                }
-            ]
-        },
-        "childResources": {
-            "type": "object",
-            "required": [ "type", "items", "description" ],
-            "properties": {
-                "type": { "enum": [ "array" ] },
-                "description": { "$ref": "#/definitions/description" },
-                "items": { "type": "object" }
-            }
-        },
-        "description": {
+      },
+      "required": [ "$schema", "title", "description", "resourceDefinitions" ],
+      "additionalProperties": false
+    },
+    "resource": {
+      "type": "object",
+      "properties": {
+        "type": { "enum": [ "object" ] },
+        "description": { "$ref": "#/definitions/description" },
+        "required": { "$ref": "#/definitions/stringArrayEmptyOkay" },
+        "properties": {
+          "type": "object",
+          "minProperties": 1,
+          "properties": {
+            "type": { "$ref": "#/definitions/resourceTypeProperty" },
+            "apiVersion": { "$ref": "#/definitions/apiVersionProperty" },
+            "resources": { "$ref": "#/definitions/childResources" },
+            "properties": { "$ref": "#/definitions/resourceProperties" }
+          },
+          "required": [ "apiVersion", "type" ]
+        }
+      },
+      "required": [ "description" ]
+    },
+    "resourceTypeProperty": {
+      "type": "object",
+      "properties": {
+        "enum": {
+          "type": "array",
+          "items": {
             "type": "string",
             "minLength": 1
-        },
-        "stringArrayEmptyOkay": {
-            "anyOf": [
-                { "$ref": "http://json-schema.org/draft-04/schema#/definitions/stringArray" },
-                {
-                    "minLength": 0
-                }
-            ]
-        },
-        "apiVersionProperty": {
-            "type": "object",
-            "properties": {
-                "enum": {
-                    "type": "array",
-                    "items": { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/apiVersion" },
-                    "minItems": 1,
-                    "uniqueItems": true,
-                    "additionalItems": false
-                }
-            },
-            "additionalProperties": true
+          },
+          "minItems": 1
         }
+      },
+      "required": [ "enum" ],
+      "additionalProperties": false
+    },
+    "resourceProperties": {
+      "type": "object",
+      "properties": {
+        "type": { "enum": [ "object" ] },
+        "$ref": {
+          "type": "string",
+          "format": "uri"
+        },
+        "properties": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/definitions/resourceProperty" }
+        },
+        "required": { "$ref": "#/definitions/stringArrayEmptyOkay" },
+        "additionalProperties": { "$ref": "http://json-schema.org/draft-04/schema#/properties/additionalProperties" }
+      },
+      "additionalProperties": false
+    },
+    "resourceProperty": {
+      "type": "object",
+      "properties": {
+        "$ref": {
+          "type": "string",
+          "format": "uri"
+        },
+        "items": { "$ref": "http://json-schema.org/draft-04/schema#/properties/items" },
+        "oneOf": { "$ref": "#/definitions/resourcePropertyDefinitionOptions" },
+        "type": { "enum": [ "string" ] },
+        "minLength": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxLength": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "description": { "$ref": "#/definitions/description" }
+      },
+      "required": [ "description" ],
+      "additionalProperties": false
+    },
+    "resourcePropertyDefinitionOptions": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "properties": {
+              "type": {
+                "allOf": [
+                  { "$ref": "http://json-schema.org/draft-04/schema#/definitions/simpleTypes" },
+                  { "not": { "enum": [ "string", "number" ] } }
+                ]
+              }
+            },
+            "required": [ "type" ]
+          },
+          {
+            "properties": {
+              "type": { "enum": [ "string" ] },
+              "pattern": { "$ref": "http://json-schema.org/draft-04/schema#/properties/pattern" }
+            },
+            "required": [ "type", "pattern" ]
+          },
+          {
+            "properties": {
+              "enum": { "$ref": "http://json-schema.org/draft-04/schema#/properties/enum" }
+            },
+            "required": [ "enum" ]
+          },
+          {
+            "properties": {
+              "$ref": { "format": "uri" }
+            },
+            "required": [ "$ref" ]
+          },
+          {
+            "properties": {
+              "oneOf": { "$ref": "#/definitions/resourcePropertyDefinitionOptions" }
+            },
+            "minProperties": 1,
+            "maxProperties": 1,
+            "additionalProperties": false
+          }
+        ]
+      },
+      "minItems": 2
+    },
+    "childResources": {
+      "type": "object"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stringArrayEmptyOkay": {
+      "anyOf": [
+        { "$ref": "http://json-schema.org/draft-04/schema#/definitions/stringArray" },
+        {
+          "type": "array",
+          "minLength": 0
+        }
+      ]
+    },
+    "apiVersionProperty": {
+      "type": "object",
+      "properties": {
+        "enum": {
+          "type": "array",
+          "items": {
+            "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/apiVersion"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "$ref": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "additionalProperties": false
+    },
+    "definition": {
+      "$ref": "http://json-schema.org/draft-04/schema#"
     }
+  }
 }

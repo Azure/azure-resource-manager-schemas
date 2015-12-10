@@ -44,7 +44,10 @@ function testErrorLog(json, schema, expectedMessage)
         
         test.run(function()
         {
-            assert.Throws(function() { vrs.validate(json, schema); });
+            var result = vrs.validate(json, schema);
+            assert.NotNull(result);
+            assert.NotNull(result.errors);
+            assert.Equal(1, result.errors.length);
         
             assert.Equal(1, errors.length);
             assert.Equal(expectedMessage, errors[0]);
@@ -63,7 +66,6 @@ function runTests()
 
     testPass({}, {});
     testPass({}, 5);
-    testPass({}, "meta-schema");
     testErrorLog({}, "", "ERROR: Cannot use an empty schema for validation.");
     
     testErrorLog(null, null, "ERROR: Cannot validate a null json object.");

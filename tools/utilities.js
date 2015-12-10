@@ -148,23 +148,6 @@ function repeat(value, count) {
   return result;
 }
 
-module.exports.count = count;
-function count(value, valueToCount) {
-  var result = 0;
-  
-  if(value && valueToCount) {
-    var valueToCountLength = valueToCount.length;
-    
-    for(var valueIndex = 0; valueIndex + valueToCountLength <= value.length; ++valueIndex) {
-      if(value.slice(valueIndex, valueIndex + valueToCountLength) === valueToCount) {
-        ++result;
-      }
-    }
-  }
-  
-  return result;
-}
-
 var singleIndentSpaceCount = 2;
 var singleIndent = repeat(" ", singleIndentSpaceCount);
 

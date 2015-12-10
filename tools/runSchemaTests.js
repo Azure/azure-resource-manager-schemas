@@ -17,7 +17,7 @@ utilities.forEachFile(testsFolderPath, function (filePath) {
 });
 testFiles.push("./ResourceMetaSchema.tests.json");
 
-var singleIndent = utilities.repeat(" ", 4);
+var singleIndent = utilities.repeat(" ", 2);
 
 for(var testFileIndex in testFiles)
 {
@@ -47,14 +47,9 @@ for(var testFileIndex in testFiles)
                 var definitionSchemaFullJSON = utilities.readJSONPath(definitionSchemaUri, schemasFolderPath);
 
                 var definitionSchemaPath = definitionSchemaLocation.substring(definitionSchemaLocationHashIndex + 1);
-                var unresolvedSchemaJSON = utilities.getProperty(definitionSchemaPath, definitionSchemaFullJSON);
-                var resolvedSchemaJSON = utilities.resolveSchemaLocalReferences(unresolvedSchemaJSON, definitionSchemaFullJSON);
+                definitionSchemaJSON = utilities.getProperty(definitionSchemaPath, definitionSchemaFullJSON);
                 
-                definitionSchemaJSON = resolvedSchemaJSON;
-                if(testObject.name === "resourcePropertyDefinitionOptions - Expression reference and boolean type")
-                {
-                  var neverUsed = true;
-                }
+                definitionSchemaJSON = utilities.resolveSchemaLocalReferences(definitionSchemaJSON, definitionSchemaFullJSON);
             }
             
             var result = validator.validate(testObject.json, definitionSchemaJSON, schemasFolderPath);

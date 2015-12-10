@@ -148,6 +148,23 @@ function repeat(value, count) {
   return result;
 }
 
+module.exports.count = count;
+function count(value, valueToCount) {
+  var result = 0;
+  
+  if(value && valueToCount) {
+    var valueToCountLength = valueToCount.length;
+    
+    for(var valueIndex = 0; valueIndex + valueToCountLength <= value.length; ++valueIndex) {
+      if(value.slice(valueIndex, valueIndex + valueToCountLength) === valueToCount) {
+        ++result;
+      }
+    }
+  }
+  
+  return result;
+}
+
 var singleIndentSpaceCount = 2;
 var singleIndent = repeat(" ", singleIndentSpaceCount);
 
@@ -256,9 +273,11 @@ function getProperty(propertyPath, sourceJSON) {
 
 module.exports.resolveSchemaLocalReferences = resolveSchemaLocalReferences;
 function resolveSchemaLocalReferences(partialSchemaJson, fullSchemaJson, currentPath, resolvedPaths) {
-  var result = partialSchemaJson;
+  var result = {};
 
-  if (partialSchemaJson && typeof partialSchemaJson === "object" &&
+  var resultChanged = false;
+  if (partialSchemaJson !== fullSchemaJson &&
+      partialSchemaJson && typeof partialSchemaJson === "object" &&
       fullSchemaJson && typeof fullSchemaJson === "object") {
 
     if (!currentPath) {
@@ -269,28 +288,40 @@ function resolveSchemaLocalReferences(partialSchemaJson, fullSchemaJson, current
       resolvedPaths = {};
     }
 
-    for (var index in result) {
-      var indexValue = result[index];
+    for (var index in partialSchemaJson) {
+      var indexValue = partialSchemaJson[index];
       var indexPath = currentPath + "/" + index;
 
       if (index === "$ref" && typeof indexValue === "string" && indexValue.startsWith("#/")) {
-
+        resultChanged = true;
+        
         if (contains(resolvedPaths, indexValue)) {
           result[index] = resolvedPaths[indexValue];
         }
         else {
           resolvedPaths[indexValue] = currentPath;
 
-          var referenceObject = clone(getProperty(result[index], fullSchemaJson));
+          var referenceObject = clone(getProperty(indexValue, fullSchemaJson));
           result = resolveSchemaLocalReferences(referenceObject, fullSchemaJson, indexPath, resolvedPaths);
 
           break;
         }
       }
       else {
-        result[index] = resolveSchemaLocalReferences(indexValue, fullSchemaJson, indexPath, resolvedPaths);
+        var resolvedIndexValue = resolveSchemaLocalReferences(indexValue, fullSchemaJson, indexPath, resolvedPaths);
+        if(resolvedIndexValue != indexValue)
+        {
+          resultChanged = true;
+        } 
+        
+        result[index] = resolvedIndexValue;
       }
     }
+  }
+  
+  if(resultChanged === false)
+  {
+    result = partialSchemaJson;
   }
 
   return result;

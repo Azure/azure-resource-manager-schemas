@@ -47,9 +47,14 @@ for(var testFileIndex in testFiles)
                 var definitionSchemaFullJSON = utilities.readJSONPath(definitionSchemaUri, schemasFolderPath);
 
                 var definitionSchemaPath = definitionSchemaLocation.substring(definitionSchemaLocationHashIndex + 1);
-                definitionSchemaJSON = utilities.getProperty(definitionSchemaPath, definitionSchemaFullJSON);
-
-                definitionSchemaJSON = utilities.resolveSchemaLocalReferences(definitionSchemaJSON, definitionSchemaFullJSON);
+                var unresolvedSchemaJSON = utilities.getProperty(definitionSchemaPath, definitionSchemaFullJSON);
+                var resolvedSchemaJSON = utilities.resolveSchemaLocalReferences(unresolvedSchemaJSON, definitionSchemaFullJSON);
+                
+                definitionSchemaJSON = resolvedSchemaJSON;
+                if(testObject.name === "resourcePropertyDefinitionOptions - Expression reference and boolean type")
+                {
+                  var neverUsed = true;
+                }
             }
             
             var result = validator.validate(testObject.json, definitionSchemaJSON, schemasFolderPath);

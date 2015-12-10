@@ -273,7 +273,13 @@ function getProperty(propertyPath, sourceJSON) {
 
 module.exports.resolveSchemaLocalReferences = resolveSchemaLocalReferences;
 function resolveSchemaLocalReferences(partialSchemaJson, fullSchemaJson, currentPath, resolvedPaths) {
-  var result = {};
+  var result;
+  if(Array.isArray(partialSchemaJson)) {
+    result = [];
+  }
+  else if(typeof partialSchemaJson === "object") {
+    result = {};
+  }
 
   var resultChanged = false;
   if (partialSchemaJson !== fullSchemaJson &&
@@ -312,15 +318,13 @@ function resolveSchemaLocalReferences(partialSchemaJson, fullSchemaJson, current
         if(resolvedIndexValue != indexValue)
         {
           resultChanged = true;
-        } 
-        
-        result[index] = resolvedIndexValue;
+        }
+        result[index] = resolvedIndexValue; 
       }
     }
   }
   
-  if(resultChanged === false)
-  {
+  if(!resultChanged) {
     result = partialSchemaJson;
   }
 

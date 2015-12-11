@@ -59,12 +59,12 @@ function runTests() {
 
     var resolvedSchemaJson = utilities.resolveSchemaLocalReferences(fullSchemaJson.b, fullSchemaJson);
     assert.NotSame(resolvedSchemaJson, fullSchemaJson);
+    assert.Equal(fullSchemaJsonBackup, fullSchemaJson);
 
     var expectedResolvedSchemaJson = {
       "a": "aValue"
     };
     assert.Equal(expectedResolvedSchemaJson, resolvedSchemaJson);
-    assert.Equal(fullSchemaJsonBackup, fullSchemaJson);
   });
   
   test.run(function () {
@@ -93,7 +93,6 @@ function runTests() {
       }
     };
     assert.Equal(expectedResolvedSchemaJson, resolvedSchemaJson);
-    assert.Equal(fullSchemaJsonBackup, fullSchemaJson);
   });
   
   test.run(function () {
@@ -120,7 +119,40 @@ function runTests() {
       ]
     };
     assert.Equal(expectedResolvedSchemaJson, resolvedSchemaJson);
+  });
+  
+  test.run(function () {
+    var fullSchemaJson = {
+      "a": {
+        "b": {
+          "c": {
+            "d": {
+              "$ref": "#/a/b"
+            }
+          }
+        }
+      }
+    };
+    var fullSchemaJsonBackup = utilities.clone(fullSchemaJson);
+    
+    var resolvedSchemaJson = utilities.resolveSchemaLocalReferences(fullSchemaJson.a, fullSchemaJson);
+    assert.NotSame(resolvedSchemaJson, fullSchemaJson);
     assert.Equal(fullSchemaJsonBackup, fullSchemaJson);
+    
+    var expectedResolvedSchemaJson = {
+      "b": {
+        "c": {
+          "d": {
+            "c": {
+              "d": {
+                "$ref": "#/b/c/d"
+              }
+            }
+          }
+        }
+      }
+    };
+    assert.Equal(expectedResolvedSchemaJson, resolvedSchemaJson);
   });
 }
 

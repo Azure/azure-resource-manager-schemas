@@ -65,7 +65,7 @@ for(var schemaFilePathIndex in schemaFilePaths)
         
         var validationResult = validator.validate(schemaJSON, metaSchema.json, schemasFolderPath);
         
-        console.log("    Using schema: \"" + metaSchema.path + "\"");
+        console.log("    Using schema: " + metaSchema.path);
         if(!validationResult.valid)
         {
             console.log(clc.red("        Failed"));

@@ -45,6 +45,7 @@ function runTests()
     testPass({}, {});
     testPass({}, 5);
     testPass({}, "meta-schema");
+    testPass("hello", { "type": "string" });
     testFail({}, "",
     {
         schemaPath: "",

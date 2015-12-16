@@ -19,12 +19,14 @@
         },
         "name": {
           "type": "string",
+          "minLength": 1,
           "description": "Name of the deployment"
         },
         "dependsOn": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": "Collection of resources this deployment depends on"
         },
@@ -32,23 +34,42 @@
           "type": "object",
           "properties": {
             "mode": {
-              "enum": [ "Incremental", "Complete" ],
+              "oneOf": [
+                { "enum": [ "Incremental", "Complete" ] },
+                { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+              ],
               "description": "Deployment mode"
             },
             "templateLink": {
-              "$ref": "#/definitions/templateLink"
+              "oneOf": [
+                { "$ref": "#/definitions/templateLink" },
+                { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+              ],
+              "description": "Deployment template link"
             },
             "template": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1,
+              "description": "Deployment template"
             },
             "parametersLink": {
-              "$ref": "#/definitions/parametersLink"
+              "oneOf": [
+                { "$ref": "#/definitions/parametersLink" },
+                { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+              ],
+              "description": "Deployment parameters link"
             },
             "parameters": {
-              "type": "object",
-              "additionalProperties": {
-                "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#/definitions/parameter"
-              }
+              "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#/definitions/parameter"
+                  }
+                },
+                { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+              ],
+              "description": "Deployment parameters"
             }
           },
           "required": [ "mode" ]
@@ -59,7 +80,8 @@
         "apiVersion",
         "name",
         "properties"
-      ]
+      ],
+      "description": "Microsoft.Resources/deployments"
     },
     "links": {
       "type": "object",
@@ -76,13 +98,15 @@
         },
         "name": {
           "type": "string",
+          "minLength": 1,
           "maxLength": 64,
           "description": "Name of the link"
         },
         "dependsOn": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           },
           "description": "Collection of resources this link depends on"
         },
@@ -91,10 +115,12 @@
           "properties": {
             "targetId": {
               "type": "string",
+              "minLength": 1,
               "description": "Target resource id to link to"
             },
             "notes": {
               "type": "string",
+              "minLength": 1,
               "maxLength": 512,
               "description": "Notes for this link"
             }
@@ -109,7 +135,8 @@
         "apiVersion",
         "name",
         "properties"
-      ]
+      ],
+      "description": "Microsoft.Resources/links"
     }
   },
   "definitions": {
@@ -118,6 +145,7 @@
       "properties": {
         "uri": {
           "type": "string",
+          "minLength": 1,
           "description": "URI referencing the deployment template"
         },
         "contentVersion": {
@@ -134,6 +162,7 @@
       "properties": {
         "uri": {
           "type": "string",
+          "minLength": 1,
           "description": "URI referencing the deployment template parameters"
         },
         "contentVersion": {

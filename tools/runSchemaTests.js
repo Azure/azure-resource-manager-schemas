@@ -15,6 +15,7 @@ utilities.forEachFile(testsFolderPath, function (filePath) {
         testFiles.push(filePath);
     }
 });
+testFiles.push("./ResourceMetaSchema.tests.json");
 
 var singleIndent = utilities.repeat(" ", 4);
 
@@ -43,21 +44,12 @@ for(var testFileIndex in testFiles)
             else
             {
                 var definitionSchemaUri = definitionSchemaLocation.substring(0, definitionSchemaLocationHashIndex);
-                definitionSchemaJSON = utilities.readJSONPath(definitionSchemaUri, schemasFolderPath);
+                var definitionSchemaFullJSON = utilities.readJSONPath(definitionSchemaUri, schemasFolderPath);
 
                 var definitionSchemaPath = definitionSchemaLocation.substring(definitionSchemaLocationHashIndex + 1);
-                if (definitionSchemaPath.startsWith("/")) {
-                    definitionSchemaPath = definitionSchemaPath.substring(1);
-                }
-                var definitionSchemaPathParts = definitionSchemaPath.split("/");
-                for (var definitionSchemaPathPartIndex in definitionSchemaPathParts) {
-                    var definitionSchemaPathPart = definitionSchemaPathParts[definitionSchemaPathPartIndex];
-                    definitionSchemaJSON = definitionSchemaJSON[definitionSchemaPathPart];
+                definitionSchemaJSON = utilities.getProperty(definitionSchemaPath, definitionSchemaFullJSON);
 
-                    if (!definitionSchemaJSON) {
-                        assert.Fail("Could not find definition \"" + definitionSchemaPath + "\" in schema \"" + definitionSchemaUri + "\"");
-                    }
-                }
+                definitionSchemaJSON = utilities.resolveSchemaLocalReferences(definitionSchemaJSON, definitionSchemaFullJSON);
             }
             
             var result = validator.validate(testObject.json, definitionSchemaJSON, schemasFolderPath);

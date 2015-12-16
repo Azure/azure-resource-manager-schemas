@@ -1,3 +1,4 @@
+var clc = require("cli-color");
 var path = require("path");
 
 var utilities = require("./utilities.js");
@@ -67,16 +68,16 @@ for(var schemaFilePathIndex in schemaFilePaths)
         console.log("    Using schema: \"" + metaSchema.path + "\"");
         if(!validationResult.valid)
         {
-            console.log("        Failed");
+            console.log(clc.red("        Failed"));
             for(var errorIndex in validationResult.errors)
             {
                 var error = validationResult.errors[errorIndex];
-                console.log("        " + (parseInt(errorIndex) + 1) + ". Error at \"" + error.dataPath + "\" - " + error.message);
+                console.log(clc.red("        " + (parseInt(errorIndex) + 1) + ". Error at \"" + error.dataPath + "\" - " + error.message));
             }
         }
         else
         {
-            console.log("        Passed");
+            console.log(clc.green("        Passed"));
         }
     }
 }

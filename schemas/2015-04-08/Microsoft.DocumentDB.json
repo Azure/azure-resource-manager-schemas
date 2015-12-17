@@ -46,30 +46,10 @@
             "consistencyPolicy": {
               "oneOf": [
                 {
-                  "type": "object",
-                  "properties": {
-                    "defaultConsistencyLevel": {
-                      "enum": [
-                        "Strong",
-                        "Eventual",
-                        "Session",
-                        "BoundedStaleness"
-                      ]
-                    },
-                    "maxStalenessPrefix": {
-                      "maximum": 1000,
-                      "minimum": 10,
-                      "type": "integer"
-                    },
-                    "maxIntervalInSeconds": {
-                      "type": "integer",
-                      "minimum": 5,
-                      "maximum": 600
-                    }
-                  },
-                  "required": [
-                    "defaultConsistencyLevel"
-                  ]
+                  "$ref": "#/definitions/consistencyOther"
+                },
+                {
+                  "$ref": "#/definitions/consistencyBoundedStaleness"
                 },
                 { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
               ],
@@ -88,6 +68,69 @@
         "properties",
         "location"
       ]
+    }
+  },
+  "definitions": {
+    "consistencyBoundedStaleness": {
+      "type": "object",
+      "properties": {
+        "defaultConsistencyLevel": {
+          "oneOf": [
+            {
+              "enum": [
+                "BoundedStaleness"
+              ]
+            },
+            { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+          ]
+        },
+        "maxStalenessPrefix": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 10
+            },
+            { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+          ]
+        },
+        "maxIntervalInSeconds": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "maximum": 600,
+              "minimum": 5
+            },
+            { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+          ]
+        }
+      },
+      "required": [
+        "defaultConsistencyLevel",
+        "maxIntervalInSeconds",
+        "maxStalenessPrefix"
+      ]
+    },
+    "consistencyOther": {
+      "type": "object",
+      "properties": {
+        "defaultConsistencyLevel": {
+          "oneOf": [
+            {
+              "enum": [
+                "Strong",
+                "Session",
+                "Eventual"
+              ]
+            },
+            { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+          ]
+        }
+      },
+      "required": [
+        "defaultConsistencyLevel"
+      ],
+      "additionalProperties": false
     }
   }
 }

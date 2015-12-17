@@ -66,11 +66,11 @@ function runTests()
 
     testPass({}, {});
     testPass({}, 5);
+    testErrorLog("", null, "ERROR: Cannot use a null schema for validation.");
     testErrorLog({}, "", "ERROR: Cannot use an empty schema for validation.");
     
     testErrorLog(null, null, "ERROR: Cannot validate a null json object.");
     testErrorLog(undefined, null, "ERROR: Cannot validate an undefined json object.");
-    testErrorLog("", null, "ERROR: Cannot validate an empty json object.");
     testErrorLog("I'm not a schema!", null, "ERROR: Cannot use a null schema for validation.");
     testErrorLog(null, {}, "ERROR: Cannot validate a null json object.");
     testErrorLog({}, null, "ERROR: Cannot use a null schema for validation.");

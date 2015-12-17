@@ -17,7 +17,7 @@ utilities.forEachFile(testsFolderPath, function (filePath) {
 });
 testFiles.push("./ResourceMetaSchema.tests.json");
 
-var singleIndent = utilities.repeat(" ", 4);
+var singleIndent = utilities.repeat(" ", 2);
 
 for(var testFileIndex in testFiles)
 {
@@ -48,7 +48,7 @@ for(var testFileIndex in testFiles)
 
                 var definitionSchemaPath = definitionSchemaLocation.substring(definitionSchemaLocationHashIndex + 1);
                 definitionSchemaJSON = utilities.getProperty(definitionSchemaPath, definitionSchemaFullJSON);
-
+                
                 definitionSchemaJSON = utilities.resolveSchemaLocalReferences(definitionSchemaJSON, definitionSchemaFullJSON);
             }
             

@@ -23,8 +23,8 @@ function runTests() {
 
   // utilities.resolveSchemaLocalReferences() tests
   test.run(function () { assert.Equal("hello", utilities.resolveSchemaLocalReferences("hello", "there")); });
-  test.run(function () { assert.Equal("hello", utilities.resolveSchemaLocalReferences("hello")); })
-  test.run(function () { assert.Equal("hello", utilities.resolveSchemaLocalReferences("hello", null)); })
+  test.run(function () { assert.Equal("hello", utilities.resolveSchemaLocalReferences("hello")); });
+  test.run(function () { assert.Equal("hello", utilities.resolveSchemaLocalReferences("hello", null)); });
 
   test.run(function () {
     var fullSchemaJson = {
@@ -66,7 +66,7 @@ function runTests() {
     };
     assert.Equal(expectedResolvedSchemaJson, resolvedSchemaJson);
   });
-  
+
   test.run(function () {
     var fullSchemaJson = {
       "a": "aValue",
@@ -82,11 +82,11 @@ function runTests() {
       }
     };
     var fullSchemaJsonBackup = utilities.clone(fullSchemaJson);
-    
+
     var resolvedSchemaJson = utilities.resolveSchemaLocalReferences(fullSchemaJson.c, fullSchemaJson);
     assert.NotSame(resolvedSchemaJson, fullSchemaJson);
     assert.Equal(fullSchemaJsonBackup, fullSchemaJson);
-    
+
     var expectedResolvedSchemaJson = {
       "b": {
         "a": "aValue"
@@ -94,7 +94,7 @@ function runTests() {
     };
     assert.Equal(expectedResolvedSchemaJson, resolvedSchemaJson);
   });
-  
+
   test.run(function () {
     var fullSchemaJson = {
       "a": "aValue",
@@ -107,20 +107,20 @@ function runTests() {
       }
     };
     var fullSchemaJsonBackup = utilities.clone(fullSchemaJson);
-    
+
     var resolvedSchemaJson = utilities.resolveSchemaLocalReferences(fullSchemaJson.c, fullSchemaJson);
     assert.NotSame(resolvedSchemaJson, fullSchemaJson);
     assert.Equal(fullSchemaJsonBackup, fullSchemaJson);
-    
+
     var expectedResolvedSchemaJson = {
       "oneOf": [
-         "aValue",
-         "bValue"
+        "aValue",
+        "bValue"
       ]
     };
     assert.Equal(expectedResolvedSchemaJson, resolvedSchemaJson);
   });
-  
+
   test.run(function () {
     var fullSchemaJson = {
       "a": {
@@ -134,11 +134,11 @@ function runTests() {
       }
     };
     var fullSchemaJsonBackup = utilities.clone(fullSchemaJson);
-    
+
     var resolvedSchemaJson = utilities.resolveSchemaLocalReferences(fullSchemaJson.a, fullSchemaJson);
     assert.NotSame(resolvedSchemaJson, fullSchemaJson);
     assert.Equal(fullSchemaJsonBackup, fullSchemaJson);
-    
+
     var expectedResolvedSchemaJson = {
       "b": {
         "c": {

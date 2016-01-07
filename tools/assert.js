@@ -12,28 +12,28 @@ function Fail(message) {
 
 module.exports.True = True;
 function True(condition, message) {
-  if (!(condition === true)) {
+  if (condition !== true) {
     Fail(ExpectedActualString(true, condition, message));
   }
 }
 
 module.exports.False = False;
 function False(condition, message) {
-  if (!(condition === false)) {
+  if (condition !== false) {
     Fail(ExpectedActualString(false, condition, message));
   }
 }
 
 module.exports.Null = Null;
 function Null(value, message) {
-  if (!(value === null)) {
+  if (value !== null) {
     Fail(ExpectedActualString(null, value, message));
   }
 }
 
 module.exports.NotNull = NotNull;
 function NotNull(value, message) {
-  if (!(value !== null)) {
+  if (value === null) {
     Fail(ExpectedActualString("not null", value, message));
   }
 }

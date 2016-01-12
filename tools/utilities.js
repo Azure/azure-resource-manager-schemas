@@ -79,6 +79,9 @@ function readJSONPath(jsonUri, schemaFolderPath) {
   var jsonPath;
   if (jsonUri.startsWith(azurePrefix) && schemaFolderPath && pathExists(schemaFolderPath)) {
     jsonPath = jsonUri.replace(azurePrefix, schemaFolderPath);
+    if (jsonPath.endsWith('#')) {
+      jsonPath = jsonPath.substring(0, jsonPath.length - 1);
+    }
   }
   else {
     jsonPath = jsonUri;
@@ -158,9 +161,9 @@ function toString(value, indent) {
   }
 
   var result;
+  var addComma = false;
   if (Array.isArray(value)) {
     result = indent + "[";
-    var addComma = false;
     for (var index in value) {
       if (addComma) {
         result += ",";
@@ -177,7 +180,6 @@ function toString(value, indent) {
   }
   else if (typeof value === "object" && value !== null) {
     result = "{";
-    var addComma = false;
     for (var propertyName in value) {
       if (addComma) {
         result += ",";
@@ -256,10 +258,18 @@ function getProperty(propertyPath, sourceJSON) {
 
 module.exports.resolveSchemaLocalReferences = resolveSchemaLocalReferences;
 function resolveSchemaLocalReferences(partialSchemaJson, fullSchemaJson, currentPath, resolvedPaths) {
-  var result = partialSchemaJson;
+  var result;
+  if (Array.isArray(partialSchemaJson)) {
+    result = [];
+  }
+  else if (typeof partialSchemaJson === "object") {
+    result = {};
+  }
 
-  if (partialSchemaJson && typeof partialSchemaJson === "object" &&
-      fullSchemaJson && typeof fullSchemaJson === "object") {
+  var resultChanged = false;
+  if (partialSchemaJson !== fullSchemaJson &&
+    partialSchemaJson && typeof partialSchemaJson === "object" &&
+    fullSchemaJson && typeof fullSchemaJson === "object") {
 
     if (!currentPath) {
       currentPath = "#";
@@ -269,11 +279,12 @@ function resolveSchemaLocalReferences(partialSchemaJson, fullSchemaJson, current
       resolvedPaths = {};
     }
 
-    for (var index in result) {
-      var indexValue = result[index];
+    for (var index in partialSchemaJson) {
+      var indexValue = partialSchemaJson[index];
       var indexPath = currentPath + "/" + index;
 
       if (index === "$ref" && typeof indexValue === "string" && indexValue.startsWith("#/")) {
+        resultChanged = true;
 
         if (contains(resolvedPaths, indexValue)) {
           result[index] = resolvedPaths[indexValue];
@@ -281,16 +292,24 @@ function resolveSchemaLocalReferences(partialSchemaJson, fullSchemaJson, current
         else {
           resolvedPaths[indexValue] = currentPath;
 
-          var referenceObject = clone(getProperty(result[index], fullSchemaJson));
+          var referenceObject = clone(getProperty(indexValue, fullSchemaJson));
           result = resolveSchemaLocalReferences(referenceObject, fullSchemaJson, indexPath, resolvedPaths);
 
           break;
         }
       }
       else {
-        result[index] = resolveSchemaLocalReferences(indexValue, fullSchemaJson, indexPath, resolvedPaths);
+        var resolvedIndexValue = resolveSchemaLocalReferences(indexValue, fullSchemaJson, indexPath, resolvedPaths);
+        if (resolvedIndexValue != indexValue) {
+          resultChanged = true;
+        }
+        result[index] = resolvedIndexValue;
       }
     }
+  }
+
+  if (!resultChanged) {
+    result = partialSchemaJson;
   }
 
   return result;
@@ -302,7 +321,7 @@ function clone(value) {
   var result;
 
   // Handle the 3 simple types, and null or undefined
-  if (null == value || "object" != typeof value) return value;
+  if (null === value || "object" != typeof value) return value;
 
   // Handle Date
   if (value instanceof Date) {

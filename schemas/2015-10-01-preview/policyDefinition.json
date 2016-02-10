@@ -1,0 +1,165 @@
+{
+  "id": "http://schema.management.azure.com/schemas/2015-10-01-preview/policyDefinition.json#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Policy Definition",
+  "description": "This schema defines Azure resource policy definition, please see https://azure.microsoft.com/en-us/documentation/articles/resource-manager-policy/ for more details.",
+  "type": "object",
+  "properties": {
+    "if": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/condition"
+        },
+        {
+          "$ref": "#/definitions/operatorNot"
+        },
+        {
+          "$ref": "#/definitions/operatorOneOf"
+        },
+        {
+          "$ref": "#/definitions/operatorAllOf"
+        }
+      ]
+    },
+    "then": {
+      "type": "object",
+      "properties": {
+        "effect": {
+          "type": "string",
+          "enum": ["append","audit","deny"]
+        }
+      }
+    }
+  },
+  "required": [ "if", "then" ],
+  "definitions": {
+    "condition": {
+      "allOf": [
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "source": { "type": "string" }
+              },
+              "required": [ "source" ]
+            },
+            {
+              "properties": {
+                "field": { "type": "string" }
+              },
+              "required": [ "field" ]
+            }
+          ]
+        },
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "equals": { "type": "string" }
+              },
+              "required": [ "equals" ]
+            },
+            {
+              "properties": {
+                "like": { "type": "string" }
+              },
+              "required": [ "like" ]
+            },
+            {
+              "properties": {
+                "contains": { "type": "string" }
+              },
+              "required": [ "contains" ]
+            },
+            {
+              "properties": {
+                "in": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              },
+              "required": [ "in" ]
+            },
+            {
+              "properties": {
+                "containsKey": { "type": "string" }
+              },
+              "required": [ "containsKey" ]
+            },
+            {
+              "properties": {
+                "exists": { "type": "boolean" }
+              },
+              "required": [ "exists" ]
+            }
+          ]
+        }
+      ]
+    },
+    "operatorNot": {
+      "properties": {
+        "not": {
+          "anyOf": [
+            { "$ref": "#/definitions/condition" },
+            { "$ref": "#/definitions/operatorNot" },
+            {
+              "$ref": "#/definitions/operatorOneOf"
+            },
+            {
+              "$ref": "#/definitions/operatorAllOf"
+            }
+
+          ]
+
+        }
+      },
+
+      "required": [ "not" ],
+      "additionalProperties": false
+    },
+    "operatorOneOf": {
+      "properties": {
+        "oneOf": {
+          "items": {
+            "oneOf": [
+              { "$ref": "#/definitions/condition" },
+              { "$ref": "#/definitions/operatorNot" },
+              {
+                "$ref": "#/definitions/operatorOneOf"
+              },
+              {
+                "$ref": "#/definitions/operatorAllOf"
+              }
+            ]
+          }
+
+        }
+
+      },
+      "required": [ "oneOf" ],
+      "additionalProperties": false
+    },
+    "operatorAllOf": {
+      "properties": {
+        "allOf": {
+          "items": {
+            "oneOf": [
+              { "$ref": "#/definitions/condition" },
+              { "$ref": "#/definitions/operatorNot" },
+              {
+                "$ref": "#/definitions/operatorOneOf"
+              },
+              {
+                "$ref": "#/definitions/operatorAllOf"
+              }
+            ]
+          }
+
+        }
+
+      },
+      "required": [ "allOf" ],
+      "additionalProperties": false
+    }
+  }
+}

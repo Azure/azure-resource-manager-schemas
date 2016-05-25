@@ -176,8 +176,7 @@
             }
           },
           "required": [
-            "name",
-            "properties",
+            "name",           
             "runbookType",
             "publishedContentLink"
           ]
@@ -218,14 +217,7 @@
               "description": "True or false indicating whether the module is a global Automation module or is a user module.  Select False to specify that the module is a user module."
             },
             "version": {
-              "oneOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-                }
-              ],
+              "type": "string",
               "description": "The PowerShell module version number."
             },
             "sizeInBytes": {
@@ -239,41 +231,55 @@
               ],
               "description": "The size of the PowerShell module."
             },
-            "activityCount": {
-              "oneOf": [
+            "contentLink": {
+             "oneOf": [
                 {
-                  "type": "integer"
-                },
+                  "type": "object",
+                  "properties": {
+                    "uri": {
+                      "type": "string",
+                      "description": "Public location of an existing modulle file. This location can be any public URL. If using Azure Storage, make sure the blob is public, or use a SAS link to the Azure Storage blob."
+                    },
+                    "version": {
+                      "type": "string",
+                      "description": "module content version value."
+                    },
+                    "contentHash": {
+                      "type": "object",
+                      "properties": {
+                        "algorithm": {
+                          "type": "string",
+                          "description": "The encryption algorithm used to create the hash."
+                        },
+                        "value": {
+                          "type": "string",
+                          "description": "Base64-encoded hash value of the of the content at the content link."
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "uri"
+                  ]
+                  },
                 {
                   "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
                 }
-              ],
-              "description": "The number of activities in the PowerShell module."
+                ],
+              "description": "A PowerShell module."
+                }
             },
-            "creationTime": {
-              "type": "string",
-              "description": "The time the PowerShell module was first imported to the Automation account."
-            },
-            "lastModifiedTime": {
-              "type": "string",
-              "description": "The time the PowerShell module was last modified in the Automation account."
-            },
-            "provisioningState": {
-              "type": "string",
-              "description": "The current status of the PowerShell module stating whether the module has successfully extracted, is currently extracting, or has failed to extract the module's cmdlets."
-            }
-          }
-        }
-      },
       "required": [
         "name",
         "properties"
-      ],
+      ]
+      }
+      },      
       "description": "A PowerShell module."
     },
     "certificates": {
       "type": "object",
-      "properties": {
+      "properties": {        
         "type": {
           "enum": [
             "Microsoft.Automation/automationAccounts/certificates",
@@ -295,35 +301,15 @@
             "description": {
               "type": "string",
               "description": "The description for the certificate."
-            },
-            "isExportable": {
-              "oneOf": [
-                {
-                  "type": "boolean"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-                }
-              ],
-              "description": "True/False indicating whether the certificate is exportable or not."
-            },
-            "thumbprint": {
+            },            
+            "base64Value": {
               "type": "string",
-              "description":  "The thumbprint for the certificate."
-            },
-            "expiryTime": {
-              "type": "string",
-              "description": "The expiration time for the certificate."
-            },
-            "creationTime": {
-              "type": "string",
-              "description": "The time the certificate was created in the Automation account."
-            },
-            "lastModifiedTime": {
-              "type": "string",
-              "description": "The time the certificate was last modified in the Automation account. "
+              "description":  "The base 64 value for the certificate."
             }
-          }
+            },
+            "required": [
+              "base64Value"
+            ]          
         }
       },
       "required": [
@@ -335,6 +321,7 @@
     "connections": {
       "type": "object",
       "properties": {
+        "type": "object",
         "type": {
           "enum": [
             "Microsoft.Automation/automationAccounts/connections",
@@ -352,15 +339,8 @@
         },
         "properties": {
           "type": "object",
-          "properties": {
-            "creationTime": {
-              "type": "string",
-              "description": "The time the connection was created in the Automation account."
-            },
-            "lastModifiedTime": {
-              "type": "string",
-              "description": "The time the connection was last modified in the Automation account."
-            },
+          "properties": {     
+            "type": "object",
             "description": {
               "type": "string",
               "description": "The description for the connection."
@@ -381,19 +361,110 @@
                 }
               ],
               "description": "The type of the connection."
-            }
-          }
+            },
+            "fieldDefinitionValues": {
+               "oneOf": [
+                {
+                  "type":  "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "The name for the field."
+                        }
+                    }
+                  },
+                 {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ],
+              "description": "The name for the field."
+              },
+              "IsEncrypted": {
+                "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+                ],
+                      "description": "Indicator whether the connection should be stored in an encrypted form. The default is False."
+                 },
+               "IsGlobal": {
+                  "oneOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                  }
+                  ],
+                        "description": "Indicates whether the field is global.  Default is false."
+                   },
+               "IsOptional": {
+                  "oneOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                  }
+                  ],
+                        "description": "Indicates whether the field is optional. Default is false."
+                   },
+               "type": {"oneOf": [
+                {
+                  "type":  "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "The type of the field."
+                        }
+                    }
+                  },
+                 {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                 }
+                ],
+                "description": "The type of the field."              
+               }, 
+               "value": {"oneOf": [
+               {
+                 "type":  "object",
+                 "properties": {
+                   "name": {
+                     "type": "string",
+                     "description": "The value of the field."
+                       }
+                   }
+                 },
+                 {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                 }
+                ],
+                "description": "The value of the field."              
+               }
+               },                
+               "required": [
+                  "name",
+                  "type",
+                  "value"
+                ],                                  
+          "required": [
+                "connectionType",
+                "fieldDefinitionValues"
+              ]
         }
       },
       "required": [
-        "name",
+        "name",       
         "properties"
       ],
       "description": "A connection asset."
     },
     "variables": {
       "type": "object",
-      "properties": {
+      "properties": {        
         "type": {
           "enum": [
             "Microsoft.Automation/automationAccounts/variables",
@@ -409,17 +480,9 @@
             "2015-10-31"
           ]
         },
-        "properties": {
-          "type": "object",
-          "properties": {
-            "creationTime": {
-              "type": "string",
-              "description": "The time the variable was created in the Automation account."
-            },
-            "lastModifiedTime": {
-              "type": "string",
-              "description": "The time the variable was last modified in the Automation account."
-            },
+        "properties": {   
+          "type": "object",  
+          "properties": {            
             "isEncrypted": {
               "oneOf": [
                 {
@@ -438,19 +501,23 @@
             "description": {
               "type": "string",
               "description": "The description for the variable."
-            }
-          }
-        }
-      },
+              }
+            },             
+             "required": [
+                "value"
+              ]
+        },            
       "required": [
         "name",
         "properties"
-      ],
+      ]
+      },     
       "description": "A variable asset."
     },
     "schedules": {
       "type": "object",
       "properties": {
+        "type": "object",
         "type": {
           "enum": [
             "Microsoft.Automation/automationAccounts/schedules",
@@ -503,26 +570,25 @@
               "description": "The interval for the schedule to recur on."
             },
             "frequency": {
-              "type": "string",
+              "oneOf": [
+                {
+                  "enum": [
+                    "OneTime",
+                    "Hour",
+                    "Day"
+                  ]
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ],
               "description": "The schedule frequency.  This can be one time, hourly, or daily"
-            },
-            "creationTime": {
-              "type": "string",
-              "description": "The time the schedule was created in the Automation account."
-            },
-            "lastModifiedTime": {
-              "type": "string",
-              "description": "The last time the schedule was modified in the Automation account."
-            },
-            "nextRun": {
-              "type": "string",
-              "description": "The time of the next run."
-            },
-            "timeZone": {
-              "type": "string",
-              "description": "The time zone the schedule will run in.  Automation uses IANA time zones."
             }
-          }
+            },
+             "required": [
+              "startTime",
+              "frequency"
+            ]          
         }
       },
       "required": [
@@ -533,7 +599,7 @@
     },
     "jobs": {
       "type": "object",
-      "properties": {
+      "properties": {       
         "type": {
           "enum": [
             "Microsoft.Automation/automationAccounts/jobs",
@@ -545,13 +611,13 @@
             "2015-10-31"
           ]
         },
+        "jobId": {
+            "type": "string",
+            "description": "The GUID for the runbook job ID"
+          },
         "properties": {
           "type": "object",
-          "properties": {
-            "jobId": {
-              "type": "string",
-              "description": "The GUID for the runbook job ID"
-            },
+          "properties": {          
             "runbook": {
               "oneOf": [
                 {
@@ -568,13 +634,35 @@
                 }
               ],
               "description": "The runbook used to start the job."
+            },
+            "parameters": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ],
+              "description": "Runbook parameters key-value pairs."
+            },                          
+            "runOn":  {
+              "type": "string",
+              "description": "The on-prem machine name where the job will run; used in hybrid scenarios."
             }
-          }
-        }
-      },
-      "required": [
-        "properties"
-      ],
+          },          
+          "required": [
+              "runbook"
+            ]
+         },      
+        "required": [
+          "jobId",
+          "properties"
+         ]
+       },
       "description": "A runbook job."
     },
     "jobSchedules": {
@@ -591,13 +679,13 @@
             "2015-10-31"
           ]
         },
-        "properties": {
-          "type": "object",
-          "properties": {
-            "jobScheduleId": {
+        "jobScheduleId": {
               "type": "string",
               "description": "The GUID id for the job schedule instance."
             },
+        "properties": {
+          "type": "object",
+          "properties": {            
             "runbook": {
               "oneOf": [
                 {
@@ -632,16 +720,31 @@
               ],
               "description": "The schedule to link to the runbook-schedule job instance."
             },
-            "runOn": {
-              "type": "string",
-              "description": "The location to run the scheduled runbook on.  The scheduled job will either run in Azure or on the Hybrid Runbook Worker Group specified."
-            }           
-          }
-        }
-      },
-      "required": [
-        "properties"
-      ],
+            "parameters": {               
+                "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ],
+                "description": "Runbook parameters key-value pairs."
+                }
+            },
+            "required": [
+              "runbook",
+              "schedule"
+            ]          
+        },
+        "required": [
+          "jobScheduleId",
+          "properties"
+        ]       
+      },      
       "description": "An Automation job schedule.  Creating a job schedule links a runbook to an Automation schedule asset.  The runbook will then start at the scheduled times."
     }
   }

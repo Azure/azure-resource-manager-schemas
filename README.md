@@ -17,4 +17,4 @@ Node validateJSON.js ..\schemas\2015-08-01\Microsoft.Compute.json ResourceMetaSc
   2. [tools\runSchemaTests.js](https://github.com/Azure/azure-resource-manager-schemas/blob/master/tools/runSchemaTests.js)  
 The script uses all test JSON files under [tests](https://github.com/Azure/azure-resource-manager-schemas/tree/master/tests) folder to test against the schema files.  
 **Usage:**   
-Node validateJSON.js
+Node runSchemaTests.js

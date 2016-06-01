@@ -1,0 +1,87 @@
+{
+  "tests": [
+	{
+      "name": "loadbalancer tests ",
+      "definition": "http://schema.management.azure.com/schemas/2015-08-01/Microsoft.Network.json#/resourceDefinitions/loadBalancers",
+      "json": {
+			"apiVersion": "2016-03-30",
+			"name": "[variables('loadBalancerName')]",
+			"type": "Microsoft.Network/loadBalancers",
+			"location": "[resourceGroup().location]",
+			"properties": {
+				"frontendIPConfigurations": [
+				{
+					"name": "loadBalancerFrontEnd1",
+					"properties": {
+						"publicIPAddress": {
+							"id": "[variables('publicIPAddressID1')]"
+						}
+					}
+				},
+				{
+					"name": "loadBalancerFrontEnd2",
+					"properties": {
+						"publicIPAddress": {
+							"id": "[variables('publicIPAddressID2')]"
+						}
+					}
+				}
+				],
+				"backendAddressPools": [
+				{
+					"name": "loadBalancerBackEnd"
+				}
+				],
+				"loadBalancingRules": [
+				{
+					"name": "LBRuleForVIP1",
+					"properties": {
+						"frontendIPConfiguration": {
+							"id": "[variables('frontEndIPConfigID1')]"
+						},
+						"backendAddressPool": {
+							"id": "[variables('lbBackendPoolID')]"
+						},
+						"protocol": "tcp",
+						"frontendPort": 443,
+						"backendPort": 443,
+						"probe": {
+							"id": "[variables('lbProbeID')]"
+						}
+					}
+				},
+				{
+					"name": "LBRuleForVIP2",
+					"properties": {
+						"frontendIPConfiguration": {
+							"id": "[variables('frontEndIPConfigID2')]"
+						},
+						"backendAddressPool": {
+							"id": "[variables('lbBackendPoolID')]"
+						},
+						"protocol": "tcp",
+						"frontendPort": 443,
+						"backendPort": 444,
+						"probe": {
+							"id": "[variables('lbProbeID')]"
+						}
+					}
+				}
+				],
+				"probes": [
+				{
+					"name": "tcpProbe",
+					"properties": {
+					"protocol": "tcp",
+					"port": 445,
+					"intervalInSeconds": 5,
+					"numberOfProbes": 2
+					}
+				}
+				]
+			}
+		}
+	}
+  ]
+}
+

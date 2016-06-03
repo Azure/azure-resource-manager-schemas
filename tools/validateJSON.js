@@ -106,13 +106,27 @@ function convertTv4ValidationResult(tv4ValidationResult) {
     }
 
     for (const error of tv4ValidationResult.errors) {
-        const resultError = error;
-        if (!resultError.dataPath) {
-            resultError.dataPath = "/";
-        }
-        result.errors.push(resultError);
+        result.errors.push(cleanValidationErrorProperties(error));
     }
 
+    return result;
+}
+
+function cleanValidationErrorProperties(tv4ValidationError) {
+    const result = {};
+    if (tv4ValidationError) {
+        result.message = tv4ValidationError.message;
+        result.dataPath = tv4ValidationError.dataPath ? tv4ValidationError.dataPath : "/";
+        result.schemaPath = tv4ValidationError.schemaPath;
+        
+        if (tv4ValidationError.subErrors) {
+            result.subErrors = [];
+            
+            for (const subError of tv4ValidationError.subErrors) {
+                result.subErrors.push(cleanValidationErrorProperties(subError));
+            }
+        }
+    }
     return result;
 }
 

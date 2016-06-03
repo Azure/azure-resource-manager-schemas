@@ -90,7 +90,8 @@ function resolveSchemaLocalReferences(partialSchemaJson, fullSchemaJson, current
                     resolvedPaths[propertyValue] = currentPath;
 
                     const propertyPath = propertyValue.substring(2); // Skip the initial "#/"
-                    result = resolveSchemaLocalReferences(getProperty(propertyPath, fullSchemaJson), fullSchemaJson, propertyPath, resolvedPaths);
+                    const referencedProperty = getProperty(propertyPath, fullSchemaJson);
+                    result = resolveSchemaLocalReferences(referencedProperty, fullSchemaJson, currentPath, resolvedPaths);
                 }
             }
             else {
@@ -124,7 +125,7 @@ function getDefinitionSchemaJSON(definitionSchemaPath, schemasFolderPath) {
         definitionSchemaJSON = getProperty(definitionSchemaPath, definitionSchemaFullJSON);
         definitionSchemaJSON = resolveSchemaLocalReferences(definitionSchemaJSON, definitionSchemaFullJSON);
     }
-    
+
     return definitionSchemaJSON;
 }
 
@@ -144,7 +145,7 @@ if (require.main === module) {
             console.log(`  Running test "${test.name}"`);
 
             try {
-                const definitionSchemaJSON = getDefinitionSchemaJSON(test.definition);
+                const definitionSchemaJSON = getDefinitionSchemaJSON(test.definition, schemasFolderPath);
 
                 const result = validator.validate(test.json, definitionSchemaJSON, schemasFolderPath);
 
@@ -171,7 +172,19 @@ if (require.main === module) {
                 ++testsPassed;
             }
             catch (error) {
-                console.log(chalk.red(error.stack));
+                if (error.expected) {
+                    if (error.message) {
+                        console.log(chalk.red("Message: " + error.message));
+                    }
+                    console.log(chalk.red("Expected: " + utilities.toString(error.expected)));
+                    if (error.actual) {
+                        console.log(chalk.red("Actual: " + utilities.toString(error.actual)));
+                    }
+                }
+                else {
+                    console.log(chalk.red("Message: " + error.actual));
+                }
+                ++testsFailed;
             }
         }
     }

@@ -1,352 +1,219 @@
-var fs = require("fs");
-var path = require("path");
-var syncRequest = require("sync-request")
+"use strict";
 
-var assert = require("./assert.js");
+const assert = require("assert");
+const fs = require("fs");
+const path = require("path");
 
-var currentFileDirectory = __dirname;
-
-module.exports.getSchemasFolderPath = getSchemasFolderPath;
-function getSchemasFolderPath() {
-  return path.join(currentFileDirectory, "../schemas/");
-}
-
-module.exports.getTestsFolderPath = getTestsFolderPath;
-function getTestsFolderPath() {
-  return path.join(currentFileDirectory, "../tests/");
-}
-
-module.exports.pathExists = pathExists;
-function pathExists(path) {
-  var result = true;
-  try {
-    fs.statSync(path);
-  }
-  catch (e) {
-    result = false;
-  }
-  return result;
-}
+const syncRequest = require("sync-request");
 
 module.exports.forEachFile = forEachFile;
-function forEachFile(folder, callback) {
-  var files = fs.readdirSync(folder);
-  for (var fileIndex in files) {
-    var filePath = path.join(folder, files[fileIndex]);
+/**
+ * Execute the provided callback for each of the files recursively found in the provided folderPath.
+ * @param {String} folderPath The path to recursively find files in.
+ * @param callback (filePath: string) => void, The callback to call for each file.
+ */
+function forEachFile(folderPath, callback) {
+    const folderEntryNames = fs.readdirSync(folderPath);
+    for (const entryName of folderEntryNames) {
+        const entryPath = path.join(folderPath, entryName);
 
-    var fileStats = fs.statSync(filePath);
-    if (fileStats.isDirectory()) {
-      forEachFile(filePath, callback);
+        const entryStats = fs.statSync(entryPath);
+        if (entryStats.isDirectory()) {
+            forEachFile(entryPath, callback);
+        }
+        else {
+            assert(entryStats.isFile());
+            callback(entryPath);
+        }
     }
-    else if (fileStats.isFile()) {
-      callback(filePath);
-    }
-  }
 }
 
 module.exports.getFiles = getFiles;
-function getFiles(folder, filterFunction) {
-  var files = [];
-
-  if (typeof filterFunction === "string") {
-    var fileExtension = filterFunction;
-    filterFunction = function (filePath) { return filePath.endsWith(fileExtension); };
-  }
-
-  forEachFile(folder, function (filePath) {
-    if (filterFunction(filePath)) {
-      files.push(filePath);
-    }
-  });
-
-  return files;
+/**
+ * Recursively get the files in the provided folder path that match the provided filter callback.
+ * @param {string} folderPath The path to the folder to recursively search.
+ * @param filterCallback (filePath: string) => boolean, Whether to return a given file or not.
+ * @returns {string[]} The files in the provided folder path that match the filter callback.
+ */
+function getFiles(folderPath, filterCallback) {
+    const result = [];
+    
+    forEachFile(folderPath, function(filePath) {
+        if (filterCallback(filePath)) {
+            result.push(filePath);
+        }
+    });
+    
+    return result;
 }
 
+
+
+module.exports.findFileOrFolder = findFileOrFolder;
+/**
+ * Look for a file or folder off of the provided startFolderPath and each of its parent folders as
+ * well.
+ * @param {String} entryName The name of the file or folder to look for.
+ * @param {String} [startFolderPath=__dirname] The folder path to start looking in.
+ * @returns {String} The found file or folder's path, or null if the entry wasn't found.
+ */
+function findFileOrFolder(entryName, startFolderPath) {
+    if (!startFolderPath) {
+        startFolderPath = __dirname;
+    }
+    
+    /** @type {String} */
+    let result = null;
+
+    let folderPath = startFolderPath;
+    while (folderPath) {
+        result = path.join(folderPath, entryName);
+        if (pathExists(result)) {
+            break;
+        }
+        else {
+            let lastSlash = folderPath.lastIndexOf("/");
+            if (lastSlash === -1) {
+                lastSlash = folderPath.lastIndexOf("\\");
+            }
+
+            if (lastSlash === -1) {
+                result = null;
+                folderPath = "";
+            }
+            else {
+                folderPath = folderPath.substring(0, lastSlash);
+            }
+        }
+    }
+
+    return result;
+}
+
+module.exports.getSchemasFolderPath = getSchemasFolderPath;
+function getSchemasFolderPath() {
+    return findFileOrFolder("schemas");
+}
+
+module.exports.pathExists = pathExists;
+/**
+ * Determine if the provided path (file or folder) exists.
+ * @param {string} path The path to check.
+ * @returns {boolean} Whether the path exists or not.
+ */
+function pathExists(path) {
+    assert(path, "Cannot check if a null, undefined, or empty path exists.");
+
+    let result = true;
+    try {
+        fs.statSync(path);
+    }
+    catch (error) {
+        result = false;
+    }
+    return result;
+}
+
+module.exports.stripUTF8BOM = stripUTF8BOM;
+/**
+ * Strip away the UTF-8 Byte Order Mark (BOM) from the provided string.
+ * @param {string} value The string value to remove the UTF-8 BOM from.
+ * @returns {string} The provided value without a UTF-8 BOM, if it had one.
+ */
 function stripUTF8BOM(value) {
-  return value.replace(/^\uFEFF/, '');
+    return value ? value.replace(/^\uFEFF/, '') : value;
 }
 
 module.exports.readJSONPath = readJSONPath;
+/**
+ * Read the JSON file that is at the provided path.
+ * @param {string} jsonUri The uri or file path to the JSON file.
+ * @param {string} [schemaFolderPath] The path to the local schemas folder that can be used if an
+ *          Azure resource schema is being requested.
+ */
 function readJSONPath(jsonUri, schemaFolderPath) {
-
-  if (schemaFolderPath && (!schemaFolderPath.endsWith('/') && !schemaFolderPath.endsWith('\\'))) {
-    schemaFolderPath += "/";
-  }
-
-  var retval;
-
-  var azurePrefix = "http://schema.management.azure.com/schemas/";
-  var jsonPath;
-  if (jsonUri.startsWith(azurePrefix) && schemaFolderPath && pathExists(schemaFolderPath)) {
-    jsonPath = jsonUri.replace(azurePrefix, schemaFolderPath);
-    if (jsonPath.endsWith('#')) {
-      jsonPath = jsonPath.substring(0, jsonPath.length - 1);
+    if (schemaFolderPath && (!schemaFolderPath.endsWith('/') && !schemaFolderPath.endsWith('\\'))) {
+        schemaFolderPath += "/";
     }
-  }
-  else {
-    jsonPath = jsonUri;
-  }
 
-  if (jsonPath.startsWith("http:") || jsonPath.startsWith("https:")) {
-    retval = readJSONUri(jsonPath);
-  }
-  else {
-    retval = readJSONFile(jsonPath);
-  }
+    const azurePrefix = /^https?:\/\/schema.management.azure.com\/schemas\//
 
-  return retval;
-}
-
-module.exports.readJSONFile = readJSONFile;
-function readJSONFile(filePath) {
-  var fileContents = fs.readFileSync(filePath, "utf8");
-  var fileContentsWithoutBOM = stripUTF8BOM(fileContents);
-  return JSON.parse(fileContentsWithoutBOM);
-}
-
-module.exports.readJSONUri = readJSONUri;
-function readJSONUri(uri) {
-  var response = syncRequest("GET", uri);
-  var responseBody = stripUTF8BOM(response.getBody("utf8"));
-  return JSON.parse(responseBody);
-}
-
-module.exports.contains = contains;
-function contains(container, value, comparisonFunction) {
-  if (!comparisonFunction) {
-    comparisonFunction = function (lhs, rhs) { return lhs === rhs; };
-  }
-
-  var result = false;
-
-  for (var containerValue in container) {
-    if (comparisonFunction(containerValue, value)) {
-      result = true;
-      break;
+    const hashIndex = jsonUri.indexOf("#");
+    if (hashIndex !== -1) {
+        jsonUri = jsonUri.substring(0, hashIndex);
     }
-  }
 
-  return result;
-}
-
-module.exports.unique = unique;
-function unique(array) {
-  var result = [];
-
-  for (var i = 0; i < this.length; ++i) {
-    if (!contains(result, array[i])) {
-      result.push(array[i]);
-    }
-  }
-
-  return result;
-}
-
-module.exports.repeat = repeat;
-function repeat(value, count) {
-  var result = value;
-  for (var i = 1; i < count; ++i) {
-    result += value;
-  }
-  return result;
-}
-
-var singleIndentSpaceCount = 2;
-var singleIndent = repeat(" ", singleIndentSpaceCount);
-
-module.exports.toString = toString;
-function toString(value, indent) {
-  if (!indent) {
-    indent = "";
-  }
-
-  var result;
-  var addComma = false;
-  if (Array.isArray(value)) {
-    result = indent + "[";
-    for (var index in value) {
-      if (addComma) {
-        result += ",";
-      }
-      else {
-        addComma = true;
-      }
-
-      var elementIndent = indent + singleIndent;
-      var elementString = toString(value[index], elementIndent);
-      result += "\n" + elementIndent + elementString;
-    }
-    result += "\n" + indent + "]";
-  }
-  else if (typeof value === "object" && value !== null) {
-    result = "{";
-    for (var propertyName in value) {
-      if (addComma) {
-        result += ",";
-      }
-      else {
-        addComma = true;
-      }
-
-      var propertyIndent = indent + singleIndent;
-      var propertyValueString = toString(value[propertyName], propertyIndent);
-      result += "\n" + propertyIndent + "\"" + propertyName + "\": " + propertyValueString;
-    }
-    result += "\n" + indent + "}";
-  }
-  else {
-    if (value === undefined) {
-      result = "undefined";
+    let jsonPath;
+    if (jsonUri.match(azurePrefix) && schemaFolderPath && pathExists(schemaFolderPath)) {
+        jsonPath = jsonUri.replace(azurePrefix, schemaFolderPath);
     }
     else {
-      result = JSON.stringify(value);
+        jsonPath = jsonUri;
     }
-  }
 
-  return result;
+    let jsonContents;
+    if (jsonPath.startsWith("http:") || jsonPath.startsWith("https:")) {
+        jsonContents = syncRequest("GET", jsonPath).getBody("utf8");
+    }
+    else {
+        jsonContents = fs.readFileSync(jsonPath, "utf8");
+    }
+
+    return JSON.parse(stripUTF8BOM(jsonContents));
 }
 
-module.exports.equals = equals;
-function equals(lhs, rhs) {
-  var result = (lhs === rhs);
+const singleIndent = "  ";
 
-  if (!result && typeof lhs === typeof rhs) {
-    if (typeof lhs === "object") {
-      result = true;
-      for (var lhsPropertyName in lhs) {
-        if (!equals(lhs[lhsPropertyName], rhs[lhsPropertyName])) {
-          result = false;
-          break;
-        }
-      }
-      for (var rhsPropertyName in rhs) {
-        if (!equals(lhs[rhsPropertyName], rhs[rhsPropertyName])) {
-          result = false;
-          break;
-        }
-      }
-    }
-  }
-
-  return result;
-}
-
-module.exports.getProperty = getProperty;
-function getProperty(propertyPath, sourceJSON) {
-  var hashIndex = propertyPath.indexOf("#");
-  if (hashIndex !== -1) {
-    propertyPath = propertyPath.substring(hashIndex + 1);
-  }
-  if (propertyPath.startsWith("/")) {
-    propertyPath = propertyPath.substring(1);
-  }
-
-  var result = sourceJSON;
-
-  var propertyPathParts = propertyPath.split("/");
-  for (var propertyPathPartsIndex in propertyPathParts) {
-    var propertyPathPart = propertyPathParts[propertyPathPartsIndex];
-    result = result[propertyPathPart];
-
-    if (!result) {
-      assert.Fail("Could not find definition \"" + propertyPath + "\".");
-    }
-  }
-
-  return result;
-}
-
-module.exports.resolveSchemaLocalReferences = resolveSchemaLocalReferences;
-function resolveSchemaLocalReferences(partialSchemaJson, fullSchemaJson, currentPath, resolvedPaths) {
-  var result;
-  if (Array.isArray(partialSchemaJson)) {
-    result = [];
-  }
-  else if (typeof partialSchemaJson === "object") {
-    result = {};
-  }
-
-  var resultChanged = false;
-  if (partialSchemaJson !== fullSchemaJson &&
-    partialSchemaJson && typeof partialSchemaJson === "object" &&
-    fullSchemaJson && typeof fullSchemaJson === "object") {
-
-    if (!currentPath) {
-      currentPath = "#";
+module.exports.toString = toString;
+/**
+ * Convert the provided value to a string with the provided indentation.
+ * @param {any} value The value to convert to a string.
+ * @param {string} [indent=""] The indentation to apply to the generated string.
+ * @returns {string} The string version of the provided value.
+ */
+function toString(value, indent) {
+    if (!indent) {
+        indent = "";
     }
 
-    if (!resolvedPaths) {
-      resolvedPaths = {};
+    let result;
+    let addComma = false;
+    if (Array.isArray(value)) {
+        result = indent + "[";
+
+        for (let index = 0; index < value.length; ++index) {
+            if (index > 0) {
+                result += ",";
+            }
+
+            const elementIndent = indent + singleIndent;
+            const elementString = toString(value[index], elementIndent);
+            result += `\n${elementIndent}${elementString}`;
+        }
+        result += `\n${indent}]`;
+    }
+    else if (typeof value === "object" && value) {
+        result = "{";
+        for (const propertyName in value) {
+            if (addComma) {
+                result += ",";
+            }
+            else {
+                addComma = true;
+            }
+
+            const propertyIndent = indent + singleIndent;
+            const propertyValueString = toString(value[propertyName], propertyIndent);
+            result += `\n${propertyIndent}"${propertyName}": ${propertyValueString}`;
+        }
+        result += "\n" + indent + "}";
+    }
+    else if (value === undefined) {
+        result = "undefined";
+    }
+    else {
+        result = JSON.stringify(value);
     }
 
-    for (var index in partialSchemaJson) {
-      var indexValue = partialSchemaJson[index];
-      var indexPath = currentPath + "/" + index;
-
-      if (index === "$ref" && typeof indexValue === "string" && indexValue.startsWith("#/")) {
-        resultChanged = true;
-
-        if (contains(resolvedPaths, indexValue)) {
-          result[index] = resolvedPaths[indexValue];
-        }
-        else {
-          resolvedPaths[indexValue] = currentPath;
-
-          var referenceObject = clone(getProperty(indexValue, fullSchemaJson));
-          result = resolveSchemaLocalReferences(referenceObject, fullSchemaJson, indexPath, resolvedPaths);
-
-          break;
-        }
-      }
-      else {
-        var resolvedIndexValue = resolveSchemaLocalReferences(indexValue, fullSchemaJson, indexPath, resolvedPaths);
-        if (resolvedIndexValue != indexValue) {
-          resultChanged = true;
-        }
-        result[index] = resolvedIndexValue;
-      }
-    }
-  }
-
-  if (!resultChanged) {
-    result = partialSchemaJson;
-  }
-
-  return result;
-}
-
-// This code was borrowed from: http://stackoverflow.com/questions/728360/most-elegant-way-to-clone-a-javascript-object
-module.exports.clone = clone;
-function clone(value) {
-  var result;
-
-  // Handle the 3 simple types, and null or undefined
-  if (null === value || "object" != typeof value) return value;
-
-  // Handle Date
-  if (value instanceof Date) {
-    result = new Date();
-    result.setTime(value.getTime());
     return result;
-  }
-
-  // Handle Array
-  if (value instanceof Array) {
-    result = [];
-    for (var i = 0, len = value.length; i < len; i++) {
-      result[i] = clone(value[i]);
-    }
-    return result;
-  }
-
-  // Handle Object
-  if (value instanceof Object) {
-    result = {};
-    for (var attr in value) {
-      if (value.hasOwnProperty(attr)) result[attr] = clone(value[attr]);
-    }
-    return result;
-  }
-
-  throw new Error("Unable to copy value! Its type (" + typeof value + ") isn't supported.");
 }

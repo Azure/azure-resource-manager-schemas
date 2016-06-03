@@ -1,75 +1,181 @@
-var path = require("path");
+"use strict";
 
-var assert = require("./assert.js");
-var test = require("./test.js");
-var utilities = require("./utilities.js");
-var validator = require("./validateJSON.js");
+const assert = require("assert");
+const chalk = require("chalk");
+const fs = require("fs");
+const path = require("path");
 
-var schemasFolderPath = utilities.getSchemasFolderPath();
+const utilities = require("./utilities");
+const validator = require("./validateJSON");
 
-var testsFolderPath = utilities.getTestsFolderPath();
+module.exports.getProperty = getProperty;
+/**
+ * Get the property at the provided propertyPath for the provided jsonValue. An error will be thrown
+ * if a property at the provided path doesn't exist.
+ * @param propertyPath {String} The path (i.e. - a/b/c) to the property.
+ * @param jsonValue {any} The value to get the property from.
+ */
+function getProperty(propertyPath, jsonValue) {
+    let result = jsonValue;
 
-var testFiles = [];
-utilities.forEachFile(testsFolderPath, function (filePath) {
-  if (filePath.endsWith(".tests.json")) {
-    testFiles.push(filePath);
-  }
-});
-testFiles.push("./ResourceMetaSchema.tests.json");
+    const propertyNamesInPath = propertyPath.split("/");
+    for (const propertyName of propertyNamesInPath) {
+        result = result[propertyName];
 
-var singleIndent = utilities.repeat(" ", 2);
-
-for (var testFileIndex in testFiles) {
-  var testFilePath = testFiles[testFileIndex];
-  console.log("Running test file \"" + testFilePath + "\"");
-
-  var testFileJSON = utilities.readJSONFile(testFilePath);
-
-  for (var testIndex in testFileJSON.tests) {
-    var testObject = testFileJSON.tests[testIndex];
-    console.log(singleIndent + "Running test \"" + testObject.name + "\"");
-
-    test.run(function () {
-      var definitionSchemaLocation = testObject.definition;
-      var definitionSchemaLocationHashIndex = definitionSchemaLocation.indexOf("#");
-
-      var definitionSchemaJSON;
-      if (definitionSchemaLocationHashIndex === -1 || definitionSchemaLocationHashIndex === definitionSchemaLocation.length - 1) {
-        definitionSchemaJSON = utilities.readJSONPath(definitionSchemaLocation, schemasFolderPath);
-      }
-      else {
-        var definitionSchemaUri = definitionSchemaLocation.substring(0, definitionSchemaLocationHashIndex);
-        var definitionSchemaFullJSON = utilities.readJSONPath(definitionSchemaUri, schemasFolderPath);
-
-        var definitionSchemaPath = definitionSchemaLocation.substring(definitionSchemaLocationHashIndex + 1);
-        definitionSchemaJSON = utilities.getProperty(definitionSchemaPath, definitionSchemaFullJSON);
-
-        definitionSchemaJSON = utilities.resolveSchemaLocalReferences(definitionSchemaJSON, definitionSchemaFullJSON);
-      }
-
-      var result = validator.validate(testObject.json, definitionSchemaJSON, schemasFolderPath);
-
-      var testErrorPrefix = "Test \"" + testObject.name + "\" ";
-      if (!testObject.expectedErrors || testObject.expectedErrors.length === 0) {
-        assert.Empty(result.errors, testErrorPrefix + "had no expected errors, but the validation result contained errors.");
-      }
-      else {
-        if (testObject.expectedErrors.length !== result.errors.length) {
-          var errorMessage = "There were a different number of expected errors (" + testObject.expectedErrors.length + ") than there were actual errors (" + result.errors.length + ")";
-          assert.Fail(assert.ExpectedActualString(testObject.expectedErrors, result.errors, errorMessage));
+        if (result === undefined) {
+            assert.fail(`Could not find definition "${propertyPath}".`);
         }
-        else {
-          for (var errorIndex = 0; errorIndex < testObject.expectedErrors.length; ++errorIndex) {
-            var expectedError = testObject.expectedErrors[errorIndex];
-            var resultError = result.errors[errorIndex];
+    }
 
-            assert.Equal(expectedError.message, resultError.message, "The error message for error " + (errorIndex + 1) + " was not the expected error.");
-            assert.Equal(expectedError.dataPath, resultError.dataPath, "The error dataPath for error " + (errorIndex + 1) + " was not the expected dataPath.");
-          }
-        }
-      }
-    });
-  }
+    return result;
 }
 
-test.showResults();
+module.exports.getTestFiles = getTestFiles;
+/**
+ * Get the test files to run.
+ * @returns {String[]}
+ */
+function getTestFiles() {
+    /** @type {String[]} */
+    const testsFolderPath = utilities.findFileOrFolder("tests");
+    const testFiles = utilities.getFiles(testsFolderPath, function (filePath) { return filePath.endsWith(".tests.json"); });
+    testFiles.push(utilities.findFileOrFolder("ResourceMetaSchema.tests.json"));
+    return testFiles;
+}
+
+module.exports.resolveSchemaLocalReferences = resolveSchemaLocalReferences;
+/**
+ * Recursively resolve any $ref properties that point to properties inside of fullSchemaJson.
+ * @param {any} partialSchemaJson The subsection of fullSchemaJson to resolve.
+ * @param {any} fullSchemaJson The supersection of partialSchemaJson that partialSchemaJson will be
+ *      resolved against.
+ * @param {String} [currentPath="#"] The current path of the resolution process.
+ * @param {Object} [resolvedPaths={}] The current set of paths that have been resolved.
+ */
+function resolveSchemaLocalReferences(partialSchemaJson, fullSchemaJson, currentPath, resolvedPaths) {
+    let result = partialSchemaJson;
+
+    if (partialSchemaJson !== fullSchemaJson &&
+        partialSchemaJson && typeof partialSchemaJson === "object" &&
+        fullSchemaJson && typeof fullSchemaJson === "object") {
+
+        if (Array.isArray(partialSchemaJson)) {
+            result = [];
+        }
+        else {
+            assert.deepStrictEqual(typeof partialSchemaJson, "object");
+            result = {};
+        }
+
+        if (currentPath === undefined) {
+            currentPath = "#";
+        }
+
+        if (resolvedPaths === undefined) {
+            resolvedPaths = {};
+        }
+
+        for (const propertyName in partialSchemaJson) {
+            const propertyValue = partialSchemaJson[propertyName];
+            const propertyPath = currentPath + "/" + propertyName;
+
+            if (propertyName === "$ref" && typeof propertyValue === "string" && propertyValue.startsWith("#/")) {
+                // assert.deepStrictEqual(Object.keys(partialSchemaJson).length, 1, `A JSON object that contains a $ref property (${propertyValue}) shouldn't have any other properties (${JSON.stringify(Object.keys(partialSchemaJson))}).`);
+
+                if (propertyValue in resolvedPaths) {
+                    result[propertyName] = resolvedPaths[propertyValue];
+                }
+                else {
+                    assert.deepStrictEqual(propertyValue.substring(0, 2), "#/");
+                    resolvedPaths[propertyValue] = currentPath;
+
+                    const propertyPath = propertyValue.substring(2); // Skip the initial "#/"
+                    result = resolveSchemaLocalReferences(getProperty(propertyPath, fullSchemaJson), fullSchemaJson, propertyPath, resolvedPaths);
+                }
+            }
+            else {
+                result[propertyName] = resolveSchemaLocalReferences(propertyValue, fullSchemaJson, propertyPath, resolvedPaths);
+            }
+        }
+    }
+
+    return result;
+}
+
+module.exports.getDefinitionSchemaJSON = getDefinitionSchemaJSON;
+/**
+ * Get the JSON schema at the provided definitionSchemaPath.
+ * @param {string} definitionSchemaPath The path to the definition schema. This should be a uri.
+ * @param {string} [schemasFolderPath] The path to the local copy of the schemas repository.
+ * @returns {Object} The definition schema JSON object.
+ */
+function getDefinitionSchemaJSON(definitionSchemaPath, schemasFolderPath) {
+    const locationHashIndex = definitionSchemaPath.indexOf("#");
+
+    let definitionSchemaJSON = utilities.readJSONPath(definitionSchemaPath, schemasFolderPath);
+    if (0 <= locationHashIndex && locationHashIndex < definitionSchemaPath.length - 1) {
+        const definitionSchemaFullJSON = definitionSchemaJSON;
+
+        definitionSchemaPath = definitionSchemaPath.substring(locationHashIndex + 1);
+        if (definitionSchemaPath.startsWith("/")) {
+            definitionSchemaPath = definitionSchemaPath.substring(1);
+        }
+
+        definitionSchemaJSON = getProperty(definitionSchemaPath, definitionSchemaFullJSON);
+        definitionSchemaJSON = resolveSchemaLocalReferences(definitionSchemaJSON, definitionSchemaFullJSON);
+    }
+    
+    return definitionSchemaJSON;
+}
+
+if (require.main === module) {
+    let testsPassed = 0;
+    let testsFailed = 0;
+
+    const schemasFolderPath = utilities.getSchemasFolderPath();
+    assert(schemasFolderPath, "Could not find a 'schemas' folder.");
+
+    for (const testFilePath of getTestFiles()) {
+        console.log(`Running test file "${testFilePath}"`);
+
+        const testFile = utilities.readJSONPath(testFilePath);
+
+        for (const test of testFile.tests) {
+            console.log(`  Running test "${test.name}"`);
+
+            try {
+                const definitionSchemaJSON = getDefinitionSchemaJSON(test.definition);
+
+                const result = validator.validate(test.json, definitionSchemaJSON, schemasFolderPath);
+
+                if (!test.expectedErrors || test.expectedErrors.length === 0) {
+                    assert.deepStrictEqual(result.errors, [], `There were no expected errors, but the validation result contained errors.`);
+                }
+                else {
+                    if (test.expectedErrors.length !== result.errors.length) {
+                        const errorMessage = `There were a different number of expected errors (${test.expectedErrors.length}) than there were actual errors (${result.errors.length})`;
+                        assert.deepStrictEqual(test.expectedErrors, result.errors, errorMessage);
+                    }
+                    else {
+                        for (let errorIndex = 0; errorIndex < test.expectedErrors.length; ++errorIndex) {
+                            const expectedError = test.expectedErrors[errorIndex];
+                            const resultError = result.errors[errorIndex];
+
+                            const errorNumber = errorIndex + 1;
+                            assert.deepStrictEqual(resultError.message, expectedError.message, `The error message for error ${errorNumber} was not the expected error.`);
+                            assert.deepStrictEqual(resultError.dataPath, expectedError.dataPath, `The error dataPath for error ${errorNumber} was not the expected dataPath.`);
+                        }
+                    }
+                }
+
+                ++testsPassed;
+            }
+            catch (error) {
+                console.log(chalk.red(error.stack));
+            }
+        }
+    }
+
+    console.log(`${testsPassed} tests passed`);
+    console.log(`${testsFailed} tests failed`);
+}

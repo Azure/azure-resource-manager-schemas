@@ -1,1 +1,1 @@
-node_modules\.bin\mocha --ui tdd %*
+call %~dp0\node_modules\.bin\_mocha.cmd --ui tdd %*

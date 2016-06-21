@@ -1,71 +1,65 @@
-var clc = require("cli-color");
-var path = require("path");
+"use strict";
 
-var utilities = require("./utilities.js");
-var validator = require("./validateJSON.js");
+const chalk = require("chalk");
+const path = require("path");
 
-var schemasFolderPath = utilities.getSchemasFolderPath();
-var schemaFilePaths = utilities.getFiles(schemasFolderPath, function (filePath) {
-  var result = false;
-  if (filePath.endsWith(".json")) {
-    var schemaFileName = path.basename(filePath);
-    result = schemaFileName !== "deploymentParameters.json" &&
-    schemaFileName !== "deploymentTemplate.json";
-  }
-  return result;
-});
+const utilities = require("./utilities.js");
+const validator = require("./validateJSON.js");
 
-function getMetaSchemas(metaSchemaPaths) {
-  var result = [];
+if (require.main === module) {
+    const schemasFolderPath = utilities.getSchemasFolderPath();
 
-  for (var i in metaSchemaPaths) {
-    var metaSchemaPath = metaSchemaPaths[i];
+    const schemaFilePaths = utilities.getFiles(schemasFolderPath, function (filePath) {
+        let result = false;
+        if (filePath.endsWith(".json")) {
+            const schemaFileName = path.basename(filePath);
+            result = (schemaFileName !== "deploymentParameters.json" &&
+                schemaFileName !== "deploymentTemplate.json" &&
+                schemaFileName !== "policyDefinition.json");
+        }
+        return result;
+    });
 
-    var metaSchemaJson;
-    if (utilities.pathExists(metaSchemaPath)) {
-      metaSchemaJson = utilities.readJSONFile(metaSchemaPath);
+    const metaSchemaPaths = [
+        path.join(__dirname, "ResourceMetaSchema.json"),
+        "http://json-schema.org/draft-04/schema"
+    ];
+
+    const metaSchemas = [];
+    for (const metaSchemaPath of metaSchemaPaths) {
+        metaSchemas.push({
+            path: metaSchemaPath,
+            json: utilities.readJSONPath(metaSchemaPath)
+        });
     }
-    else {
-      metaSchemaJson = utilities.readJSONUri(metaSchemaPath);
+
+    for (let schemaFilePathIndex = 0; schemaFilePathIndex < schemaFilePaths.length; ++schemaFilePathIndex) {
+        var schemaFilePath = schemaFilePaths[schemaFilePathIndex];
+
+        if (schemaFilePathIndex > 0) {
+            console.log();
+        }
+
+        console.log(schemaFilePath);
+
+        const schemaJSON = utilities.readJSONPath(schemaFilePath);
+
+        for (const metaSchema of metaSchemas) {
+            const validationResult = validator.validate(schemaJSON, metaSchema.json, schemasFolderPath);
+
+            console.log(`    Using schema: ${metaSchema.path}`);
+            if (!validationResult.valid) {
+                console.log(chalk.red("        Failed"));
+                for (let errorIndex = 0; errorIndex < validationResult.errors.length; ++errorIndex) {
+                    const error = validationResult.errors[errorIndex];
+                    console.log(chalk.red(`        ${errorIndex + 1}. Error at "${error.dataPath}" - ${error.message}`));
+                }
+            }
+            else {
+                console.log(chalk.green("        Passed"));
+            }
+        }
     }
-
-    result.push({ "path": metaSchemaPath, "json": metaSchemaJson });
-  }
-
-  return result;
 }
-var metaSchemas = getMetaSchemas(
-  [
-    path.join(__dirname, "ResourceMetaSchema.json"),
-    "http://json-schema.org/draft-04/schema"
-  ]);
 
-for (var schemaFilePathIndex in schemaFilePaths) {
-  var schemaFilePath = schemaFilePaths[schemaFilePathIndex];
 
-  if (schemaFilePathIndex > 0) {
-    console.log();
-  }
-
-  console.log(schemaFilePath);
-
-  var schemaJSON = utilities.readJSONFile(schemaFilePath);
-
-  for (var metaSchemaIndex in metaSchemas) {
-    var metaSchema = metaSchemas[metaSchemaIndex];
-
-    var validationResult = validator.validate(schemaJSON, metaSchema.json, schemasFolderPath);
-
-    console.log("    Using schema: " + metaSchema.path);
-    if (!validationResult.valid) {
-      console.log(clc.red("        Failed"));
-      for (var errorIndex in validationResult.errors) {
-        var error = validationResult.errors[errorIndex];
-        console.log(clc.red("        " + (parseInt(errorIndex) + 1) + ". Error at \"" + error.dataPath + "\" - " + error.message));
-      }
-    }
-    else {
-      console.log(clc.green("        Passed"));
-    }
-  }
-}

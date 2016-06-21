@@ -18,3 +18,6 @@ Node validateJSON.js ..\schemas\2015-08-01\Microsoft.Compute.json ResourceMetaSc
 The script uses all test JSON files under [tests](https://github.com/Azure/azure-resource-manager-schemas/tree/master/tests) folder to test against the schema files.  
 **Usage:**   
 Node runSchemaTests.js
+
+---
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.

@@ -15,7 +15,10 @@ if (require.main === module) {
             const schemaFileName = path.basename(filePath);
             result = (schemaFileName !== "deploymentParameters.json" &&
                 schemaFileName !== "deploymentTemplate.json" &&
-                schemaFileName !== "policyDefinition.json");
+                schemaFileName !== "policyDefinition.json" &&
+                schemaFileName !== "CreateUIDefinition.CommonControl.json" &&
+                schemaFileName !== "CreateUIDefinition.MultiVm.json" &&
+                schemaFileName !== "CreateUIDefinition.ProviderControl.json");
         }
         return result;
     });

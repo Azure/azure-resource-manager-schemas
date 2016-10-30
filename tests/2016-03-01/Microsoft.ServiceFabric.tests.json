@@ -2,23 +2,37 @@
   "tests": [
     {
       "name": "clusters - Missing properties",
+      "expectedErrors": [
+        {
+          "message": "Data does not match any schemas from \"oneOf\"",
+          "dataPath": "/properties",
+          "schemaPath": "/properties/properties/oneOf",
+          "subErrors": [
+            {
+              "message": "Missing required property: nodeTypes",
+              "dataPath": "/properties",
+              "schemaPath": "/properties/properties/oneOf/0/required/0"
+            },
+            {
+              "message": "Missing required property: managementEndpoint",
+              "dataPath": "/properties",
+              "schemaPath": "/properties/properties/oneOf/0/required/1"
+            },
+            {
+              "message": "Invalid type: object (expected string)",
+              "dataPath": "/properties",
+              "schemaPath": "/properties/properties/oneOf/1/type"
+            }
+          ]
+        }
+      ],
       "definition": "http://schema.management.azure.com/schemas/2016-03-01/Microsoft.ServiceFabric.json#/resourceDefinitions/clusters",
       "json": {
         "type": "Microsoft.ServiceFabric/clusters",
         "apiVersion": "2016-03-01",
         "location": "West Us",
         "properties": {}
-      },
-      "expectedErrors": [
-        {
-          "message": "Missing required property: managementEndpoint",
-          "dataPath": "/"
-        },
-        {
-          "message": "Missing required property: nodeTypes",
-          "dataPath": "/"
-        }
-      ]
+      }
     },
     {
       "name": "clusters - Many properties",
@@ -27,22 +41,22 @@
         "type": "Microsoft.ServiceFabric/clusters",
         "apiVersion": "2016-03-01",
         "location": "West Us",
-        "properties": {
+        "properties": {          
           "certificate": {
             "thumbprint": "[parameters('certificateThumbprint')]",
-            "x509StoreName": "[parameters('certificateStoreValue')]"
+            "x509StoreName": "[parameters('certificateStoreName')]"
           },
           "clientCertificateCommonNames": [
             {
-              "isAdmin": "false",
+              "isAdmin": false,
               "certificateCommonName": "randomCommonName",
               "certificateIssuerThumbprint": "randomIssuerThumprintValue"
             }
           ],
           "clientCertificateThumbprints": [
             {
-              "isAdmin": "false",
-              "CertificateThumbprint": "randomThumprintValue"
+              "isAdmin": false,
+              "certificateThumbprint": "randomThumprintValue"
             }
           ],
           "diagnosticsStorageAccountConfig": {
@@ -67,22 +81,14 @@
           "nodeTypes": [
             {
               "name": "[variables('vmNodeType0Name')]",
-              "placementProperties": [
-                {
-                  "color": "blue"
-                },
-                {
-                  "size": "large"
-                }
-              ],
-              "capacities": [
-                {
-                  "color": "blue"
-                },
-                {
-                  "size": "large"
-                }
-              ],
+              "placementProperties": {
+                "color": "blue",
+                "size": "large"
+              },
+              "capacities": {
+                "color": "blue",
+                "size": "large"
+              },
               "applicationPorts": {
                 "endPort": "[variables('nt0applicationEndPort')]",
                 "startPort": "[variables('nt0applicationStartPort')]"
@@ -95,7 +101,8 @@
               },
               "httpGatewayEndpointPort": "[variables('nt0fabricHttpGatewayPort')]",
               "isPrimary": true,
-              "vmInstanceCount": "[parameters('nt0InstanceCount')]"
+              "vmInstanceCount": "[parameters('nt0InstanceCount')]",
+              "httpApplicationGatewayEndpointPort": 9000
             }
           ],
           "reliabilityLevel": "Silver",
@@ -110,77 +117,90 @@
         "type": "Microsoft.ServiceFabric/clusters",
         "apiVersion": "2016-03-01",
         "location": "West Us",
-        "properties": {          
-          "diagnosticsStorageAccountConfig": {
-            "blobEndpoint": "[reference(concat('Microsoft.Storage/storageAccounts/', variables('supportLogStorageAccountName')), variables('storageApiVersion')).primaryEndpoints.blob]",
-            "protectedAccountKeyName": "StorageAccountKey1",
-            "queueEndpoint": "[reference(concat('Microsoft.Storage/storageAccounts/', variables('supportLogStorageAccountName')), variables('storageApiVersion')).primaryEndpoints.queue]",
-            "storageAccountName": "[variables('supportLogStorageAccountName')]",
-            "tableEndpoint": "[reference(concat('Microsoft.Storage/storageAccounts/', variables('supportLogStorageAccountName')), variables('storageApiVersion')).primaryEndpoints.table]"
-          },          
+        "properties": {
           "managementEndpoint": "[concat('http://',reference(concat(variables('lbIPName'),'-','0')).dnsSettings.fqdn,':',variables('nt0fabricHttpGatewayPort'))]",
           "nodeTypes": [
             {
               "name": "[variables('vmNodeType0Name')]",
-              "applicationPorts": {
-                "endPort": "[variables('nt0applicationEndPort')]",
-                "startPort": "[variables('nt0applicationStartPort')]"
-              },
               "clientConnectionEndpointPort": "[variables('nt0fabricTcpGatewayPort')]",
-              "durabilityLevel": "Bronze",
-              "ephemeralPorts": {
-                "endPort": "[variables('nt0ephemeralEndPort')]",
-                "startPort": "[variables('nt0ephemeralStartPort')]"
-              },
               "httpGatewayEndpointPort": "[variables('nt0fabricHttpGatewayPort')]",
               "isPrimary": true,
               "vmInstanceCount": "[parameters('nt0InstanceCount')]"
             }
-          ]          
+          ]
         }
       }
     },
-        {
+    {
       "name": "clusters - Missing required property in node type",
+      "expectedErrors": [
+        {
+          "message": "Data does not match any schemas from \"oneOf\"",
+          "dataPath": "/properties",
+          "schemaPath": "/properties/properties/oneOf",
+          "subErrors": [
+            {
+              "message": "Data does not match any schemas from \"oneOf\"",
+              "dataPath": "/properties/nodeTypes",
+              "schemaPath": "/properties/properties/oneOf/0/properties/nodeTypes/oneOf",
+              "subErrors": [
+                {
+                  "message": "Missing required property: vmInstanceCount",
+                  "dataPath": "/properties/nodeTypes/0",
+                  "schemaPath": "/properties/properties/oneOf/0/properties/nodeTypes/oneOf/0/items/required/0"
+                },
+                {
+                  "message": "Missing required property: name",
+                  "dataPath": "/properties/nodeTypes/0",
+                  "schemaPath": "/properties/properties/oneOf/0/properties/nodeTypes/oneOf/0/items/required/1"
+                },
+                {
+                  "message": "Invalid type: array (expected string)",
+                  "dataPath": "/properties/nodeTypes",
+                  "schemaPath": "/properties/properties/oneOf/0/properties/nodeTypes/oneOf/1/type"
+                }
+              ]
+            },
+            {
+              "message": "Invalid type: object (expected string)",
+              "dataPath": "/properties",
+              "schemaPath": "/properties/properties/oneOf/1/type"
+            }
+          ]
+        }
+      ],
       "definition": "http://schema.management.azure.com/schemas/2016-03-01/Microsoft.ServiceFabric.json#/resourceDefinitions/clusters",
       "json": {
         "type": "Microsoft.ServiceFabric/clusters",
         "apiVersion": "2016-03-01",
         "location": "West Us",
-        "properties": {          
+        "properties": {
           "diagnosticsStorageAccountConfig": {
             "blobEndpoint": "RandomEndpoint",
             "protectedAccountKeyName": "StorageAccountKey1",
             "queueEndpoint": "RandomEndpoint",
             "storageAccountName": "RandomAccountName",
             "tableEndpoint": "RandomEndpoint"
-          },          
+          },
           "managementEndpoint": "RandomManagementEndpoint",
           "nodeTypes": [
-            {              
+            {
               "applicationPorts": {
-                "endPort": "10000",
-                "startPort": "20000"
+                "startPort": 10000,
+                "endPort": 20000
               },
               "clientConnectionEndpointPort": "[variables('nt0fabricTcpGatewayPort')]",
               "durabilityLevel": "Bronze",
               "ephemeralPorts": {
-                "endPort": "30000",
-                "startPort": "40000"
+                "startPort": 30000,
+                "endPort": 40000
               },
-              "httpGatewayEndpointPort": "19080",
-              "isPrimary": true,
-              "vmInstanceCount": "5"
+              "httpGatewayEndpointPort": 19080,
+              "isPrimary": true
             }
-          ]          
+          ]
         }
-      },      
-      "expectedErrors": [
-        {
-          "message": "Missing required property: name",
-          "dataPath": "/"
-        }
-      ]
+      }
     }
   ]
 }

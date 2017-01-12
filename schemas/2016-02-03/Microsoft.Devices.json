@@ -120,6 +120,207 @@
         }
       }
     },
+    "RoutingProperties": {
+      "description": "The Routing properties.",
+      "type": "object",
+      "properties": {
+        "endpoints": {
+            "$ref": "#/definitions/RoutingEndpoints"
+        },
+        "routes": {
+          "oneOf": [
+            {
+              "type": "array",
+              "maxItems": 100,
+              "items": {
+                "$ref": "#/definitions/RouteProperties"
+              }
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The Routing Rules for IotHub."
+        },
+        "fallbackRoute": {
+            "$ref": "#/definitions/RouteProperties"
+        }
+      }
+    },
+    "RoutingEndpoints": {
+      "description": "The Routing Endpoints property.",
+      "type": "object",
+      "maxItems": 10,
+      "properties": {
+        "eventHubs": {
+            "$ref": "#/definitions/EventHubRoutingEndpoints"
+        },
+        "serviceBusQueues": {
+            "$ref": "#/definitions/ServiceBusRoutingEndpoints"
+        },
+        "serviceBusTopics": {
+            "$ref": "#/definitions/ServiceBusRoutingEndpoints"
+        }
+      }
+    },
+    "EventHubRoutingEndpoints": {
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RoutingEventHubProperties"
+          }
+        },
+        {
+          "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+        }
+      ],
+      "description": "The list of eventHub routing endpoints."
+    },
+    "ServiceBusRoutingEndpoints": {
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RoutingServiceBusProperties"
+          }
+        },
+        {
+          "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+        }
+      ],
+      "description": "The list of servicebus routing endpoints."
+    },    
+    "RoutingEventHubProperties": {
+      "type": "object",
+      "description": "Event Hub Properties",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the event hub"
+        },
+        "connectionString": {
+          "type": "string",
+          "description": "The connectionString of the event hub with send permissions"
+        },
+        "subscriptionId": {
+          "type": "string",
+          "description": "The subscriptionId of the servicebus namespace with send permissions"
+        },
+        "resourceGroup": {
+          "type": "string",
+          "description": "The resourceGroup of the servicebus namespace with send permissions"
+        },
+        "id": {
+          "type": "string",
+          "description": "The identifier for the route. This will be set by the server. Override this will cause create/ update IoT hub operations to fail. Do not pass an 'id' when attempting to create the IoT hub as this will cause a failure. When attempting to update the IoT hub pass in the same id that you get from IoT hub"
+        }
+      },
+      "required": [
+        "name",
+        "connectionString"
+      ]
+    },
+    "RoutingServiceBusProperties": {
+      "type": "object",
+      "description": "Service Bus properties",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of serviceBus"
+        },      
+        "connectionString": {
+          "type": "string",
+          "description": "The connectionstring for servicebus with send permissions"
+        },
+        "subscriptionId": {
+          "type": "string",
+          "description": "The subscriptionId for servicebus with send permissions"
+        },
+        "resourceGroup": {
+          "type": "string",
+          "description": "The resourceGroup for servicebus with send permissions"
+        },
+        "id": {
+          "type": "string",
+          "description": "The identifier for the route. This will be set by the server. Override this will cause create/ update IoT hub operations to fail. Do not pass an 'id' on CreateHub scenarios as this will cause create to fail. On UpdateHub scenario pass in the same id that you get from iotHub"
+        }
+      },
+      "required": [
+        "name",
+        "connectionString"
+      ]
+    },
+    "RouteProperties": {
+      "description": "Route Properties",
+      "type": "object",
+      "properties": {
+        "name": {
+          "oneOf": [
+            {
+              "description": "The route name. Route name has to be unique and cannot start with a $, also route name should not exceed 64 characters",
+              "type": "string"
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" 
+            }
+          ]
+        },
+        "source": {
+          "oneOf": [
+            {
+              "description": "The source from which the rule should run on e.g. DeviceMessages",
+              "type": "string"
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" 
+            }
+          ]
+        },
+        "endpointNames": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/EndpointNames"
+              }
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The Routing Rules for IotHub."
+        },    
+        "isEnabled": {
+          "oneOf": [
+            {
+              "description": "Set if the rule should be enabled or disabled",
+              "type": "boolean"
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" 
+            }
+          ]          
+        }        
+      },
+      "required": [
+        "name",
+        "endpointNames",
+        "source",
+        "isEnabled"
+      ]
+    },
+    "EndpointNames": {
+      "oneOf": [
+        {
+          "description": "The endpoint name for the rule.",
+          "type": "string"
+        },
+        {
+          "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" 
+        }
+      ]
+    },
     "EventHubProperties": {
       "type": "object",
       "properties": {
@@ -218,7 +419,7 @@
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "The list of storage end points where files can be uploaded. Currently only one storage account can be configured."
+          "description": "The list of storage endpoints where files can be uploaded. Currently only one storage account can be configured."
         },
         "enableFileUploadNotifications": {
           "oneOf": [
@@ -255,6 +456,9 @@
             }
           ],
           "description": "The IP filter rules. Each rule specifies if a source IP address or a range of source IP addresses should be accepted or rejected when connecting to a IotHub."
+        },
+        "routing": {
+          "$ref": "#/definitions/RoutingProperties"
         },
         "comments": {
           "description": "The comments.",

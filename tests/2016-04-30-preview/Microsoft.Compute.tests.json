@@ -1,0 +1,283 @@
+{
+  "tests": [
+    {
+      "name": "VirtualMachines - Basic",
+      "definition": "http://schema.management.azure.com/schemas/2016-04-30-preview/Microsoft.Compute.json#/resourceDefinitions/virtualMachines",
+      "json": {
+        "apiVersion": "2016-04-30-preview",
+        "type": "Microsoft.Compute/virtualMachines",
+        "name": "[concat(variables('vmName'), copyindex())]",
+        "location": "[variables('location')]",
+        "tags": {
+          "Tag1": "ManagedVM"
+        },
+        "copy": {
+          "name": "VMLoop",
+          "count": "[parameters('numberOfVMInstances')]"
+        },
+        "tags": {
+          "Tag1": "ManagedVM"
+        },
+        "dependsOn": [
+          "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'), copyindex())]"
+        ],
+        "properties": {
+          "availabilitySet": {
+            "id": "[resourceId('Microsoft.Compute/availabilitySets', 'availabilitySet1')]"
+          },
+          "hardwareProfile": {
+            "vmSize": "[variables('vmSize')]"
+          },
+          "osProfile": {
+            "computerName": "[concat(variables('vmName'), copyindex())]",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminPassword": "[parameters('adminPassword')]"
+          },
+          "storageProfile": {
+            "imageReference": {
+              "publisher": "[variables('imagePublisher')]",
+              "offer": "[variables('imageOffer')]",
+              "sku": "[parameters('windowsOSVersion')]",
+              "version": "latest"
+            },
+            "dataDisks": [
+              {
+                "lun": 0,
+                "createOption": "Empty",
+                "diskSizeGB": 1023
+              }
+            ]
+          },
+          "networkProfile": {
+            "networkInterfaces": [
+              {
+                "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicName'), copyindex()))]"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "AvailabilitySet",
+      "definition": "http://schema.management.azure.com/schemas/2016-04-30-preview/Microsoft.Compute.json#/resourceDefinitions/availabilitySets",
+      "json": {
+        "type": "Microsoft.Compute/availabilitySets",
+        "name": "availabilitySet1",
+        "apiVersion": "2016-04-30-preview",
+        "location": "[variables('location')]",
+        "properties": {
+          "platformFaultDomainCount": 2,
+          "platformUpdateDomainCount": 2,
+          "managed": true
+        }
+      }
+    },
+    {
+      "name": "Managed Data Disk",
+      "definition": "http://schema.management.azure.com/schemas/2016-04-30-preview/Microsoft.Compute.json#/resourceDefinitions/disks",
+      "json": {
+        "type": "Microsoft.Compute/disks",
+        "name": "myManagedDataDisk",
+        "apiVersion": "2016-04-30-preview",
+        "location": "[variables('location')]",
+        "properties": {
+          "creationData": {
+            "createOption": "Empty"
+          },
+          "accountType": "[variables('storageAccountType')]",
+          "diskSizeGB": 64
+        }
+      }
+    },
+    {
+      "name": "Snapshots",
+      "definition": "http://schema.management.azure.com/schemas/2016-04-30-preview/Microsoft.Compute.json#/resourceDefinitions/snapshots",
+      "json": {
+        "type": "Microsoft.Compute/snapshots",
+        "name": "myManagedDataDiskSnapshot",
+        "apiVersion": "2016-04-30-preview",
+        "location": "[variables('location')]",
+        "properties": {
+          "creationData": {
+            "createOption": "Copy",
+            "sourceUri": "[resourceId('Microsoft.Compute/disks','myManagedDataDisk')]"
+          }
+        },
+        "dependsOn": [
+          "[concat('Microsoft.Compute/disks/', 'myManagedDataDisk')]",
+          "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+        ]
+      }
+    },
+    {
+      "name": "Images",
+      "definition": "http://schema.management.azure.com/schemas/2016-04-30-preview/Microsoft.Compute.json#/resourceDefinitions/images",
+      "json": {
+        "type": "Microsoft.Compute/images",
+        "apiVersion": "2016-04-30-preview",
+        "name": "[parameters('imageName')]",
+        "location": "[variables('location')]",
+        "properties": {
+          "storageProfile": {
+            "osDisk": {
+              "osType": "Windows",
+              "osState": "Generalized",
+              "blobUri": "[parameters('imageOSDiskBlobUri')]",
+              "caching": "ReadWrite",
+              "storageAccountType": "Standard_LRS"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "VirtualMachineScaleSets with Managed Data Disks",
+      "definition": "http://schema.management.azure.com/schemas/2016-04-30-preview/Microsoft.Compute.json#/resourceDefinitions/virtualMachineScaleSets",
+      "json": {
+        "type": "Microsoft.Compute/virtualMachineScaleSets",
+        "name": "[variables('namingInfix')]",
+        "location": "[resourceGroup().location]",
+        "apiVersion": "2016-04-30-preview",
+        "dependsOn": [
+          "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
+          "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+        ],
+        "sku": {
+          "name": "[parameters('vmSku')]",
+          "tier": "Standard",
+          "capacity": "[parameters('instanceCount')]"
+        },
+        "properties": {
+          "overprovision": true,
+          "upgradePolicy": {
+            "mode": "Manual"
+          },
+          "virtualMachineProfile": {
+            "storageProfile": {
+              "osDisk": {
+                "createOption": "FromImage"
+              },
+              "imageReference": "[variables('imageReference')]",
+              "dataDisks": [
+                {
+                  "lun": 2,
+                  "name": "myManagedDataDisk",
+                  "createOption": "Attach",
+                  "managedDisk": {
+                    "id": "[resourceId('Microsoft.Compute/disks', 'myManagedDataDisk')]"
+                  }
+                },
+                {
+                  "lun": 3,
+                  "name": "myManagedDataDisk1",
+                  "createOption": "Attach",
+                  "managedDisk": {
+                    "id": "[resourceId('Microsoft.Compute/disks', 'myManagedDataDisk1')]"
+                  }
+                }
+              ]
+            },
+            "osProfile": {
+              "computerNamePrefix": "[variables('namingInfix')]",
+              "adminUsername": "[parameters('adminUsername')]",
+              "adminPassword": "[parameters('adminPassword')]"
+            },
+            "networkProfile": {
+              "networkInterfaceConfigurations": [
+                {
+                  "name": "[variables('nicName')]",
+                  "properties": {
+                    "primary": true,
+                    "ipConfigurations": [
+                      {
+                        "name": "[variables('ipConfigName')]",
+                        "properties": {
+                          "subnet": {
+                            "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'), '/subnets/', variables('subnetName'))]"
+                          },
+                          "loadBalancerBackendAddressPools": [
+                            {
+                              "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/backendAddressPools/', variables('bePoolName'))]"
+                            }
+                          ],
+                          "loadBalancerInboundNatPools": [
+                            {
+                              "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/inboundNatPools/', variables('natPoolName'))]"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "VM with Managed Data Disk",
+      "definition": "http://schema.management.azure.com/schemas/2016-04-30-preview/Microsoft.Compute.json#/resourceDefinitions/virtualMachines",
+      "json": {
+        "type": "Microsoft.Compute/virtualMachines",
+        "name": "[variables('vmName')]",
+        "apiVersion": "2016-04-30-preview",
+        "location": "[variables('location')]",
+        "properties": {
+          "hardwareProfile": {
+            "vmSize": "[variables('vmSize')]"
+          },
+          "osProfile": {
+            "computerName": "[variables('vmName')]",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminPassword": "[parameters('adminPassword')]"
+          },
+          "storageProfile": {
+            "imageReference": {
+              "publisher": "[variables('imagePublisher')]",
+              "offer": "[variables('imageOffer')]",
+              "sku": "[parameters('windowsOSVersion')]",
+              "version": "latest"
+            },
+            "osDisk": {
+              "name": "myOSDisk",
+              "createOption": "FromImage"
+            },
+            "dataDisks": [
+              {
+                "lun": 2,
+                "name": "myManagedDataDisk",
+                "createOption": "Attach",
+                "managedDisk": {
+                  "id": "[resourceId('Microsoft.Compute/disks', 'myManagedDataDisk')]"
+                }
+              },
+              {
+                "lun": 3,
+                "name": "myManagedDataDisk1",
+                "createOption": "Attach",
+                "managedDisk": {
+                  "id": "[resourceId('Microsoft.Compute/disks', 'myManagedDataDisk1')]"
+                }
+              }
+            ]
+          },
+          "networkProfile": {
+            "networkInterfaces": [
+              {
+                "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+              }
+            ]
+          }
+        },
+        "dependsOn": [
+          "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
+          "Microsoft.Compute/disks/myManagedDataDisk",
+          "Microsoft.Compute/disks/myManagedDataDisk1"
+        ]
+      }
+    }
+  ]
+}

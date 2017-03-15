@@ -258,7 +258,7 @@ suite("runSchemaTests", () => {
                 });
         });
 
-        test("with Microsoft.Network.json#/resourceDefinitions/connections", () => {
+        test("with diamond references", () => {
             const fullSchemaJson = {
                 a: {
                     $ref: "#/c/d"

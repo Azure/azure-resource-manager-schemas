@@ -1,0 +1,197 @@
+{
+  "id": "http://schema.management.azure.com/schemas/2017-03-01-preview/Microsoft.Insights.ActivityLogAlert.json#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Microsoft.Insights Activity Log Alerts",
+  "description": "Microsoft Insights Resource Types",
+  "resourceDefinitions": {
+    "activityLogAlerts": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Insights/activityLogAlerts"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2017-03-01-preview"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ActivityLogAlert"
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.Insights/activityLogAlerts"
+    }
+  },
+  "definitions": {
+    "ActivityLogAlert": {
+      "type": "object",
+      "properties": {
+        "scopes": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "A list of resourceIds that will be used as prefixes. The alert will only apply to activityLogs with resourceIds that fall under one of these prefixes. This list must include at least one item."
+        },
+        "enabled": {
+          "oneOf": [
+            {
+              "type": "boolean",
+              "enum": [
+                true,
+                false
+              ]
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates whether this activity log alert is enabled. If an activity log alert is not enabled, then none of its actions will be activated."
+        },
+        "condition": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ActivityLogAlertAllOfCondition"
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The conditon that will cause this alert to activate."
+        },
+        "actions": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ActivityLogAlertActionList"
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The actions that will activate when the condition is met."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of this activity log alert."
+        }
+      },
+      "required": [
+        "scopes",
+        "condition",
+        "actions"
+      ],
+      "description": "An Azure activity log alert."
+    },
+    "ActivityLogAlertActionGroup": {
+      "type": "object",
+      "properties": {
+        "actionGroupId": {
+          "type": "string",
+          "description": "The resourceId of the action group. This cannot be null or empty."
+        },
+        "webhookProperties": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "the dictionary of custom properties to include with the post operation. These data are appended to the webhook payload."
+        }
+      },
+      "required": [
+        "actionGroupId"
+      ],
+      "description": "A pointer to an Azure Action Group."
+    },
+    "ActivityLogAlertActionList": {
+      "type": "object",
+      "properties": {
+        "actionGroups": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ActivityLogAlertActionGroup"
+              }
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of activity log alerts."
+        }
+      },
+      "description": "A list of activity log alert actions."
+    },
+    "ActivityLogAlertAllOfCondition": {
+      "type": "object",
+      "properties": {
+        "allOf": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ActivityLogAlertLeafCondition"
+              }
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of activity log alert conditions."
+        }
+      },
+      "required": [
+        "allOf"
+      ],
+      "description": "An Activity Log alert condition that is met when all its member conditions are met."
+    },
+    "ActivityLogAlertLeafCondition": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "The name of the field that this condition will examine. The possible values for this field are (case-insensitive): 'resourceId', 'category', 'caller', 'level', 'operationName', 'resourceGroup', 'resourceProvider', 'status', 'subStatus', 'resourceType', or anything beginning with 'properties.'."
+        },
+        "equals": {
+          "type": "string",
+          "description": "The field value will be compared to this value (case-insensitive) to determine if the condition is met."
+        }
+      },
+      "required": [
+        "field",
+        "equals"
+      ],
+      "description": "An Activity Log alert condition that is met by comparing an activity log field and value."
+    }
+  }
+}

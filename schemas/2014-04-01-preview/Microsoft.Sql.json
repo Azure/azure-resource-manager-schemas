@@ -28,7 +28,9 @@
                     "12.0"
                   ]
                 },
-                { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
+                {
+                  "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
               ],
               "description": "Microsoft.Sql/server: Azure SQL DB server version"
             },
@@ -57,9 +59,15 @@
               },
               {
                 "oneOf": [
-                  { "$ref": "#/resourceDefinitions/databasesChild" },
-                  { "$ref": "#/resourceDefinitions/firewallrulesChild" },
-                  { "$ref": "#/resourceDefinitions/administratorsChild" }
+                  {
+                    "$ref": "#/definitions/databasesChild"
+                  },
+                  {
+                    "$ref": "#/definitions/firewallrulesChild"
+                  },
+                  {
+                    "$ref": "#/definitions/administratorsChild"
+                  }
                 ]
               }
             ]
@@ -74,30 +82,6 @@
         "location"
       ],
       "description": "Microsoft.Sql/servers"
-    },
-    "databasesChild": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "enum": [
-            "databases"
-          ]
-        },
-        "apiVersion": {
-          "enum": [
-            "2014-04-01-preview"
-          ]
-        },
-        "properties": {
-          "$ref": "#/definitions/databasesBase"
-        }
-      },
-      "required": [
-        "type",
-        "apiVersion",
-        "properties"
-      ],
-      "description": "Microsoft.Sql/databasesChild"
     },
     "databases": {
       "type": "object",
@@ -123,30 +107,6 @@
       ],
       "description": "Microsoft.Sql/databases"
     },
-    "firewallrulesChild": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "enum": [
-            "firewallrules"
-          ]
-        },
-        "apiVersion": {
-          "enum": [
-            "2014-04-01-preview"
-          ]
-        },
-        "properties": {
-          "$ref": "#/definitions/firewallrulesBase"
-        }
-      },
-      "required": [
-        "type",
-        "apiVersion",
-        "properties"
-      ],
-      "description": "Microsoft.Sql/firewallrulesChild"
-    },
     "firewallrules": {
       "type": "object",
       "properties": {
@@ -170,30 +130,6 @@
         "properties"
       ],
       "description": "Microsoft.Sql/firewallrules"
-    },
-    "administratorsChild": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "enum": [
-            "administrators"
-          ]
-        },
-        "apiVersion": {
-          "enum": [
-            "2014-04-01-preview"
-          ]
-        },
-        "properties": {
-          "$ref": "#/definitions/administratorsBase"
-        }
-      },
-      "required": [
-        "type",
-        "apiVersion",
-        "properties"
-      ],
-      "description": "Microsoft.Sql/administratorsChild"
     },
     "administrators": {
       "type": "object",
@@ -221,6 +157,51 @@
     }
   },
   "definitions": {
+    "databasesBase": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/databasesBaseCommon"
+        },
+        {
+          "$ref": "#/definitions/databasesBaseAll"
+        }
+      ]
+    },
+    "databasesBaseAll": {
+      "type": "object",
+      "properties": {
+        "createMode": {
+          "oneOf": [
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            },
+            {
+              "enum": [
+                "Copy",
+                "OnlineSecondary",
+                "OfflineSecondary",
+                "Recovery",
+                "PointInTimeRestore",
+                "Restore"
+              ]
+            }
+          ],
+          "description": "Microsoft.Sql/server/databases: Defines that databases is created as a Point-In-Time restoration of another database."
+        },
+        "sourceDatabaseId": {
+          "type": "string",
+          "description": "Microsoft.Sql/server/databases: The URI of the source database."
+        },
+        "restorePointInTime": {
+          "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/UTC",
+          "description": "Microsoft.Sql/server/databases: The point in time for the restore."
+        },
+        "sourceDatabaseDeletionDate": {
+          "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/UTC",
+          "description": "Microsoft.Sql/server/databases: The deletion date time of the source database."
+        }
+      }
+    },
     "databasesBaseCommon": {
       "type": "object",
       "properties": {
@@ -373,51 +354,29 @@
         }
       }
     },
-    "databasesBaseAll": {
+    "databasesChild": {
       "type": "object",
       "properties": {
-        "createMode": {
-          "oneOf": [
-            {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            },
-            {
-              "enum": [
-                "Copy",
-                "OnlineSecondary",
-                "OfflineSecondary",
-                "Recovery",
-                "PointInTimeRestore",
-                "Restore"
-              ]
-            }
-          ],
-          "description": "Microsoft.Sql/server/databases: Defines that databases is created as a Point-In-Time restoration of another database."
+        "type": {
+          "enum": [
+            "databases"
+          ]
         },
-        "sourceDatabaseId": {
-          "type": "string",
-          "description": "Microsoft.Sql/server/databases: The URI of the source database."
+        "apiVersion": {
+          "enum": [
+            "2014-04-01-preview"
+          ]
         },
-        "restorePointInTime": {
-          "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/UTC",
-          "description": "Microsoft.Sql/server/databases: The point in time for the restore."
-        },
-        "sourceDatabaseDeletionDate": {
-          "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/UTC",
-          "description": "Microsoft.Sql/server/databases: The deletion date time of the source database."
+        "properties": {
+          "$ref": "#/definitions/databasesBase"
         }
-
-      }
-    },
-    "databasesBase": {
-      "allOf": [
-        {
-          "$ref": "#/definitions/databasesBaseCommon"
-        },
-        {
-          "$ref": "#/definitions/databasesBaseAll"
-        }
-      ]
+      },
+      "required": [
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.Sql/databasesChild"
     },
     "firewallrulesBase": {
       "type": "object",
@@ -433,6 +392,30 @@
           "description": "Microsoft.Sql/server/firewallrules: starting IP address"
         }
       }
+    },
+    "firewallrulesChild": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "firewallrules"
+          ]
+        },
+        "apiVersion": {
+          "enum": [
+            "2014-04-01-preview"
+          ]
+        },
+        "properties": {
+          "$ref": "#/definitions/firewallrulesBase"
+        }
+      },
+      "required": [
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.Sql/firewallrulesChild"
     },
     "administratorsBase": {
       "type": "object",
@@ -457,8 +440,31 @@
           "minLength": 1,
           "description": "The Tenant Id that the administrator Azure AD object belongs to."
         }
-
       }
+    },
+    "administratorsChild": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "administrators"
+          ]
+        },
+        "apiVersion": {
+          "enum": [
+            "2014-04-01-preview"
+          ]
+        },
+        "properties": {
+          "$ref": "#/definitions/administratorsBase"
+        }
+      },
+      "required": [
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.Sql/administratorsChild"
     }
   }
 }

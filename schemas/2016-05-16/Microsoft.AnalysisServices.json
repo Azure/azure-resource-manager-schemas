@@ -2,11 +2,14 @@
   "id": "http://schema.management.azure.com/schemas/2016-05-16/Microsoft.AnalysisServices.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.AnalysisServices",
-  "description": "SQL Analysis Services on Azure",
+  "description": "Microsoft AnalysisServices Resource Types",
   "resourceDefinitions": {
     "servers": {
       "type": "object",
       "properties": {
+        "name": {
+          "type": "string"
+        },
         "type": {
           "type": "string",
           "enum": [
@@ -21,7 +24,18 @@
         },
         "location": {
           "type": "string",
-          "description": "Server location"
+          "description": "Location of the Analysis Services resource."
+        },
+        "sku": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ResourceSku"
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The SKU of the Analysis Services resource."
         },
         "tags": {
           "oneOf": [
@@ -35,31 +49,22 @@
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Server tags"
+          "description": "Key-value pairs of additional resource provisioning properties."
         },
-        "sku": {
+        "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/Sku"
+              "$ref": "#/definitions/AnalysisServicesServerProperties"
             },
             {
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "The SKU (pricing tier) of the Analysis Services instance."
-        },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ServerProperties"
-            },
-            {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ]
+          "description": "Properties of the provision operation request."
         }
       },
       "required": [
+        "name",
         "type",
         "apiVersion",
         "location",
@@ -70,7 +75,55 @@
     }
   },
   "definitions": {
-    "Sku": {
+    "AnalysisServicesServerProperties": {
+      "type": "object",
+      "properties": {
+        "asAdministrators": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ServerAdministrators"
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ]
+        },
+        "backupConfiguration": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BackupConfiguration"
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "description": "Properties of Analysis Services resource."
+    },
+    "BackupConfiguration": {
+      "type": "object",
+      "properties": {
+        "storageAccount": {
+          "type": "string",
+          "description": "Storage account full resource id for backup configuration"
+        },
+        "blobContainer": {
+          "type": "string",
+          "description": "The name of blob container for backup configuration"
+        },
+        "accessKey": {
+          "type": "string",
+          "description": "The access key of storage account used for backup configuration"
+        }
+      },
+      "required": [
+        "storageAccount",
+        "blobContainer"
+      ],
+      "description": "An object that represents backup configurations"
+    },
+    "ResourceSku": {
       "type": "object",
       "properties": {
         "name": {
@@ -78,57 +131,62 @@
             {
               "type": "string",
               "enum": [
-                "D1",
+                "B1",
+                "B2",
+                "S0",
                 "S1",
                 "S2",
-                "S4"
+                "S4",
+                "D1"
               ]
             },
             {
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Name of the pricing tier. Possible values include: 'D1', 'S1', 'S2', 'S4'"
-        }
-      },
-      "description": "The SKU (pricing tier) of the Analysis Services instance."
-    },
-    "ServerProperties": {
-      "type": "object",
-      "properties": {
-        "asAdministrators": {
+          "description": "Name of the SKU level for the server being provisioned."
+        },
+        "tier": {
           "oneOf": [
             {
-              "type": "object",
-              "properties": {
-                "members": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/administrator"
-                  }
-                }
+              "type": "string",
+              "enum": [
+                "Development",
+                "Basic",
+                "Standard"
+              ]
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the Azure pricing tier to which the SKU applies."
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "Represents the SKU name and Azure pricing tier for Analysis Services resource."
+    },
+    "ServerAdministrators": {
+      "type": "object",
+      "properties": {
+        "members": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
               }
             },
             {
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }           
+            }
           ],
-          "required": [
-            "members"
-          ],
-          "description": "Microsoft.AnalysisServices/servers: Login names of administrators"
-        },
-        "managedMode": {
-          "type": "integer",
-          "enum": [ 0, 1 ],
-          "description": "The managed mode of the server(0 = not managed, 1 = managed)."
+          "description": "An array of administrator user identities."
         }
-      }
-    },
-    "administrator": {
-      "type": "string",
-      "minLength": 1,
-      "description": "The UPN of the Analysis Services instance administrator."
+      },
+      "description": "An array of administrator user identities"
     }
   }
 }

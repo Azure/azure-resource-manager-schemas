@@ -6,131 +6,208 @@
   "resourceDefinitions": {
     "databaseAccounts": {
       "type": "object",
-      "description": "Microsoft.DocumentDB: A Database Account",
       "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 50,
+          "description": "DocumentDB database account name."
+        },
         "type": {
+          "type": "string",
           "enum": [
             "Microsoft.DocumentDB/databaseAccounts"
           ]
         },
         "apiVersion": {
+          "type": "string",
           "enum": [
-            "2014-04-01",
             "2015-04-08"
           ]
         },
-        "properties": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "oneOf": [
-                {
-                  "type": "string",
-                  "pattern": "^[a-z][a-z0-9-]*$"
-                },
-                { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
-              ],
-              "description": "Microsoft.DocumentDB/databaseAccounts: Name of the database account."
+        "location": {
+          "type": "string",
+          "description": "The location of the resource group to which the resource belongs."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
             },
-            "databaseAccountOfferType": {
-              "oneOf": [
-                {
-                  "enum": [
-                    "Standard"
-                  ]
-                },
-                { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
-              ],
-              "description": "Microsoft.DocumentDB/databaseAccounts: Database account offer type"
-            },
-            "consistencyPolicy": {
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/consistencyOther"
-                },
-                {
-                  "$ref": "#/definitions/consistencyBoundedStaleness"
-                },
-                { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
-              ],
-              "description": "Microsoft.DocumentDB/databaseAccounts: Consistency policy"
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
-          },
-          "required": [
-            "name",
-            "databaseAccountOfferType"
+          ]
+        },
+        "kind": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "GlobalDocumentDB",
+                "MongoDB",
+                "Parse"
+              ]
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates the type of database account. This can only be set at database account creation."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DatabaseAccountCreateUpdateProperties"
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
           ]
         }
       },
       "required": [
+        "name",
         "type",
         "apiVersion",
-        "properties",
-        "location"
-      ]
+        "location",
+        "properties"
+      ],
+      "description": "Microsoft.DocumentDB/databaseAccounts"
     }
   },
   "definitions": {
-    "consistencyBoundedStaleness": {
+    "ConsistencyPolicy": {
       "type": "object",
       "properties": {
         "defaultConsistencyLevel": {
           "oneOf": [
             {
+              "type": "string",
               "enum": [
-                "BoundedStaleness"
+                "Eventual",
+                "Session",
+                "BoundedStaleness",
+                "Strong"
               ]
             },
-            { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
-          ]
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The default consistency level and configuration settings of the DocumentDB account."
         },
         "maxStalenessPrefix": {
           "oneOf": [
             {
               "type": "integer",
-              "maximum": 1000,
-              "minimum": 10
+              "minimum": 1,
+              "maximum": 2147483647
             },
-            { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
-          ]
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "When used with the Bounded Staleness consistency level, this value represents the number of stale requests tolerated. Accepted range for this value is 1 – 2,147,483,647. Required when defaultConsistencyPolicy is set to 'BoundedStaleness'."
         },
         "maxIntervalInSeconds": {
           "oneOf": [
             {
               "type": "integer",
-              "maximum": 600,
-              "minimum": 5
+              "minimum": 1,
+              "maximum": 100
             },
-            { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
-          ]
-        }
-      },
-      "required": [
-        "defaultConsistencyLevel",
-        "maxIntervalInSeconds",
-        "maxStalenessPrefix"
-      ]
-    },
-    "consistencyOther": {
-      "type": "object",
-      "properties": {
-        "defaultConsistencyLevel": {
-          "oneOf": [
             {
-              "enum": [
-                "Strong",
-                "Session",
-                "Eventual"
-              ]
-            },
-            { "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" }
-          ]
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "When used with the Bounded Staleness consistency level, this value represents the time amount of staleness (in seconds) tolerated. Accepted range for this value is 1 - 100. Required when defaultConsistencyPolicy is set to 'BoundedStaleness'."
         }
       },
       "required": [
         "defaultConsistencyLevel"
       ],
-      "additionalProperties": false
+      "description": "The consistency policy for the DocumentDB database account."
+    },
+    "DatabaseAccountCreateUpdateProperties": {
+      "type": "object",
+      "properties": {
+        "consistencyPolicy": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ConsistencyPolicy"
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The consistency policy for the DocumentDB account."
+        },
+        "locations": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Location"
+              }
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "An array that contains the georeplication locations enabled for the DocumentDB account."
+        },
+        "databaseAccountOfferType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Standard"
+              ]
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ]
+        },
+        "ipRangeFilter": {
+          "type": "string",
+          "description": "DocumentDB Firewall Support: This value specifies the set of IP addresses or IP address ranges in CIDR form to be included as the allowed list of client IPs for a given database account. IP addresses/ranges must be comma separated and must not contain any spaces."
+        }
+      },
+      "required": [
+        "locations",
+        "databaseAccountOfferType"
+      ],
+      "description": "Properties to create and update Azure DocumentDB database accounts."
+    },
+    "Location": {
+      "type": "object",
+      "properties": {
+        "locationName": {
+          "type": "string",
+          "description": "The name of the region."
+        },
+        "provisioningState": {
+          "type": "string"
+        },
+        "failoverPriority": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The failover priority of the region. A failover priority of 0 indicates a write region. The maximum value for a failover priority = (total number of regions - 1). Failover priority values must be unique for each of the regions in which the database account exists."
+        }
+      },
+      "description": "A region in which the Azure DocumentDB database account is deployed."
     }
   }
 }

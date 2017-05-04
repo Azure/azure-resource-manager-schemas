@@ -1,12 +1,16 @@
-﻿{
+{
   "id": "http://schema.management.azure.com/schemas/2016-05-01-preview/Microsoft.MachineLearning.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.MachineLearning",
   "description": "Microsoft MachineLearning Resource Types",
   "resourceDefinitions": {
-    "commitmentPlans" : {
+    "commitmentPlans": {
       "type": "object",
       "properties": {
+        "name": {
+          "type": "string",
+          "description": "The Azure ML commitment plan name."
+        },
         "type": {
           "type": "string",
           "enum": [
@@ -19,20 +23,55 @@
             "2016-05-01-preview"
           ]
         },
+        "location": {
+          "type": "string",
+          "description": "Resource location."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "User-defined tags for the resource."
+        },
+        "etag": {
+          "type": "string",
+          "description": "An entity tag used to enforce optimistic concurrency."
+        },
         "sku": {
-          "$ref": "#/definitions/sku"
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ResourceSku"
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The commitment plan SKU."
         }
       },
       "required": [
+        "name",
         "type",
         "apiVersion",
-        "sku"
+        "location"
       ],
       "description": "Microsoft.MachineLearning/commitmentPlans"
     },
     "webServices": {
       "type": "object",
       "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the web service."
+        },
         "type": {
           "type": "string",
           "enum": [
@@ -45,6 +84,24 @@
             "2016-05-01-preview"
           ]
         },
+        "location": {
+          "type": "string",
+          "description": "Specifies the location of the resource."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Contains resource tags defined as key/value pairs."
+        },
         "properties": {
           "oneOf": [
             {
@@ -54,27 +111,23 @@
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Web service resource properties."
+          "description": "Contains the property payload that describes the web service."
         }
       },
       "required": [
+        "name",
         "type",
         "apiVersion",
+        "location",
         "properties"
       ],
       "description": "Microsoft.MachineLearning/webServices"
     }
   },
   "definitions": {
-    "sku": {
+    "ResourceSku": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string"
-        },
-        "tier": {
-          "type": "string"
-        },
         "capacity": {
           "oneOf": [
             {
@@ -83,14 +136,19 @@
             {
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The scale-out capacity of the resource. 1 is 1x, 2 is 2x, etc. This impacts the quantities and cost of any commitment plan resource."
+        },
+        "name": {
+          "type": "string",
+          "description": "The SKU name. Along with tier, uniquely identifies the SKU."
+        },
+        "tier": {
+          "type": "string",
+          "description": "The SKU tier. Along with name, uniquely identifies the SKU."
         }
       },
-      "required": [
-        "name",
-        "tier",
-        "capacity"
-      ]
+      "description": "The SKU of a resource."
     },
     "AssetItem": {
       "type": "object",
@@ -224,7 +282,10 @@
               "enum": [
                 "Byte",
                 "Char",
-                "Datetime",
+                "Complex64",
+                "Complex128",
+                "Date-time",
+                "Date-timeOffset",
                 "Double",
                 "Duration",
                 "Float",
@@ -248,9 +309,7 @@
           "oneOf": [
             {
               "type": "array",
-              "items": {
-                "type": "object"
-              }
+              "items": {}
             },
             {
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -291,7 +350,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The commitment plan ARM resource  id."
+          "description": "Specifies the Azure Resource Manager ID of the commitment plan associated with the web service."
         }
       },
       "required": [
@@ -316,12 +375,12 @@
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Level of tracing to be used: None - disables tracing; Error - collects only error (stderr) traces; All - collects all traces (stdout and stderr)."
+          "description": "Specifies the verbosity of the diagnostic output. Valid values are: None - disables tracing; Error - collects only error (stderr) traces; All - collects all traces (stdout and stderr)."
         },
         "expiry": {
           "type": "string",
           "format": "date-time",
-          "description": "Moment of time after which diagnostics are no longer collected. If null, diagnostic collection is not time limited."
+          "description": "Specifies the date and time when the logging will cease. If null, diagnostic collection is not time limited."
         }
       },
       "required": [
@@ -340,22 +399,7 @@
                 "type": "array",
                 "items": {
                   "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "number"
-                      },
-                      {
-                        "type": "boolean"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  }
+                  "items": {}
                 }
               }
             },
@@ -369,9 +413,7 @@
           "oneOf": [
             {
               "type": "object",
-              "additionalProperties": {
-                "type": "object"
-              }
+              "additionalProperties": {}
             },
             {
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -381,6 +423,23 @@
         }
       },
       "description": "Sample input data for the service's input(s)."
+    },
+    "Graph": {
+      "type": "object",
+      "properties": {
+        "package": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/GraphPackage"
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The definition of the graph package making up this web service."
+        }
+      },
+      "description": "Properties specific to a Graph based web service."
     },
     "GraphEdge": {
       "type": "object",
@@ -566,7 +625,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "The workspace ARM resource id."
+          "description": "Specifies the workspace ID of the machine learning workspace associated with the web service"
         }
       },
       "required": [
@@ -586,7 +645,7 @@
             {
               "type": "array",
               "items": {
-                "type": "object"
+                "$ref": "#/definitions/ModuleAssetParameter"
               }
             },
             {
@@ -653,7 +712,7 @@
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Maximum number of concurrent calls allowed on the realtime endpoint."
+          "description": "Specifies the maximum concurrent calls that can be made to the web service. Minimum value: 4, Maximum value: 200."
         }
       },
       "description": "Holds the available configuration options for an Azure ML web service endpoint."
@@ -663,11 +722,11 @@
       "properties": {
         "title": {
           "type": "string",
-          "description": "Swagger schema title."
+          "description": "The title of your Swagger schema."
         },
         "description": {
           "type": "string",
-          "description": "Swagger schema description."
+          "description": "The description of the Swagger schema."
         },
         "type": {
           "type": "string",
@@ -688,7 +747,7 @@
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Map of name to swagger schema for each input or output of the web service."
+          "description": "Specifies a collection that contains the column schema for each input or output of the web service. For more information, see the Swagger specification."
         }
       },
       "required": [
@@ -702,11 +761,11 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "The storage account's name."
+          "description": "Specifies the name of the storage account."
         },
         "key": {
           "type": "string",
-          "description": "The storage account's active key."
+          "description": "Specifies the key used to access the storage account."
         }
       },
       "description": "Access information for a storage account."
@@ -769,189 +828,189 @@
     },
     "WebServiceProperties": {
       "type": "object",
-      "properties": {
-        "title": {
-          "type": "string",
-          "description": "The title of the Azure ML web service."
-        },
-        "description": {
-          "type": "string",
-          "description": "The description of the Azure ML web service."
-        },
-        "keys": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/WebServiceKeys"
-            },
-            {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "The set of access keys for the web service. If not specified at creation time (PUT), they will be generated automatically by the resource provider."
-        },
-        "readOnly": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "If true, the web service can no longer be updated / patched, only removed. Otherwise, the service resource supports changes."
-        },
-        "exposeSampleData": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Flag that controls whether to expose sample data or not in the web service's swagger definition."
-        },
-        "realtimeConfiguration": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/RealtimeConfiguration"
-            },
-            {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Configuration for the service's realtime endpoint."
-        },
-        "diagnostics": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DiagnosticsConfiguration"
-            },
-            {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Settings controlling the diagnostics traces collection for the web service."
-        },
-        "storageAccount": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/StorageAccount"
-            },
-            {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "The storage account associated with the service. This is used to store both datasets and diagnostic traces. This information is required at creation time (PUT) and only the key is updateable after that. The account credentials are hidden on a GET web service call."
-        },
-        "machineLearningWorkspace": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/MachineLearningWorkspace"
-            },
-            {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "This is only populated at creation time (PUT) for web services originating from an AzureML Studio experiment."
-        },
-        "commitmentPlan": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/CommitmentPlan"
-            },
-            {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "The commitment plan associated with this web service. This is required to be specified at creation time (PUT) and is not updateable afterwards."
-        },
-        "input": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ServiceInputOutputSpecification"
-            },
-            {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Swagger schema for the service's input(s), as applicable."
-        },
-        "output": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ServiceInputOutputSpecification"
-            },
-            {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Swagger schema for the service's output(s), as applicable."
-        },
-        "exampleRequest": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ExampleRequest"
-            },
-            {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Sample request data for each of the service's inputs, as applicable."
-        },
-        "assets": {
-          "oneOf": [
-            {
-              "type": "object",
-              "additionalProperties": {
-                "$ref": "#/definitions/AssetItem"
-              }
-            },
-            {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Set of assets associated with the web service."
-        },
-        "parameters": {
-          "oneOf": [
-            {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            },
-            {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "The set of global parameters values defined for the web service, given as a global parameter name to default value map. If no default value is specified, the parameter is considered to be required."
-        },
-        "package": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/GraphPackage"
-            },
-            {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "The definition of the graph package making up this web service."
-        },
-        "packageType": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Graph"
+      "allOf": [
+        {
+          "properties": {
+            "packageType": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "Graph"
+                  ]
+                },
+                {
+                  "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
               ]
             },
+            "title": {
+              "type": "string",
+              "description": "The title of the web service."
+            },
+            "description": {
+              "type": "string",
+              "description": "The description of the web service."
+            },
+            "keys": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/WebServiceKeys"
+                },
+                {
+                  "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ],
+              "description": "Contains the web service provisioning keys. If you do not specify provisioning keys, the Azure Machine Learning system generates them for you. Note: The keys are not returned from calls to GET operations."
+            },
+            "readOnly": {
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ],
+              "description": "When set to true, indicates that the web service is read-only and can no longer be updated or patched, only removed. Default, is false. Note: Once set to true, you cannot change its value."
+            },
+            "exposeSampleData": {
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ],
+              "description": "When set to true, sample data is included in the web service's swagger definition. The default value is true."
+            },
+            "realtimeConfiguration": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/RealtimeConfiguration"
+                },
+                {
+                  "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ],
+              "description": "Contains the configuration settings for the web service endpoint."
+            },
+            "diagnostics": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DiagnosticsConfiguration"
+                },
+                {
+                  "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ],
+              "description": "Settings controlling the diagnostics traces collection for the web service."
+            },
+            "storageAccount": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/StorageAccount"
+                },
+                {
+                  "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ],
+              "description": "Specifies the storage account that Azure Machine Learning uses to store information about the web service. Only the name of the storage account is returned from calls to GET operations. When updating the storage account information, you must ensure that all necessary assets are available in the new storage account or calls to your web service will fail."
+            },
+            "machineLearningWorkspace": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/MachineLearningWorkspace"
+                },
+                {
+                  "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ],
+              "description": "Specifies the Machine Learning workspace containing the experiment that is source for the web service."
+            },
+            "commitmentPlan": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/CommitmentPlan"
+                },
+                {
+                  "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ],
+              "description": "Contains the commitment plan associated with this web service. Set at creation time. Once set, this value cannot be changed. Note: The commitment plan is not returned from calls to GET operations."
+            },
+            "input": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/ServiceInputOutputSpecification"
+                },
+                {
+                  "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ],
+              "description": "Contains the Swagger 2.0 schema describing one or more of the web service's inputs. For more information, see the Swagger specification."
+            },
+            "output": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/ServiceInputOutputSpecification"
+                },
+                {
+                  "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ],
+              "description": "Contains the Swagger 2.0 schema describing one or more of the web service's outputs. For more information, see the Swagger specification."
+            },
+            "exampleRequest": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/ExampleRequest"
+                },
+                {
+                  "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ],
+              "description": "Defines sample input data for one or more of the service's inputs."
+            },
+            "assets": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/definitions/AssetItem"
+                  }
+                },
+                {
+                  "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ],
+              "description": "Contains user defined properties describing web service assets. Properties are expressed as Key/Value pairs."
+            },
+            "parameters": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ],
+              "description": "The set of global parameters values defined for the web service, given as a global parameter name to default value map. If no default value is specified, the parameter is considered to be required."
+            }
+          }
+        },
+        {
+          "anyOf": [
             {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "#/definitions/Graph"
             }
           ]
         }
-      },
+      ],
       "description": "The set of properties specific to the Azure ML web service resource."
     }
   }

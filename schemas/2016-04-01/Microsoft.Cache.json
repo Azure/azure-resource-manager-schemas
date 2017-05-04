@@ -7,6 +7,9 @@
     "Redis": {
       "type": "object",
       "properties": {
+        "name": {
+          "type": "string"
+        },
         "type": {
           "type": "string",
           "enum": [
@@ -19,45 +22,136 @@
             "2016-04-01"
           ]
         },
+        "location": {
+          "type": "string",
+          "description": "Resource location."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Resource tags."
+        },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/RedisProperties"
+              "$ref": "#/definitions/RedisCreateProperties"
             },
             {
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
           "description": "Redis cache properties."
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/Redis_firewallRules_childResource"
+              }
+            ]
+          }
         }
       },
       "required": [
+        "name",
         "type",
         "apiVersion",
+        "location",
         "properties"
       ],
       "description": "Microsoft.Cache/Redis"
-    }
-  },
-  "definitions": {
-    "RedisProperties": {
+    },
+    "Redis_firewallRules": {
       "type": "object",
       "properties": {
-        "redisVersion": {
-          "type": "string",
-          "description": "RedisVersion parameter has been deprecated. As such, it is no longer necessary to provide this parameter and any value specified is ignored."
+        "name": {
+          "type": "string"
         },
-        "sku": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Cache/Redis/firewallRules"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2016-04-01"
+          ]
+        },
+        "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/Sku"
+              "$ref": "#/definitions/RedisFirewallRuleProperties"
             },
             {
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "What sku of redis cache to deploy."
+          "description": "redis cache firewall rule properties"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.Cache/Redis/firewallRules"
+    }
+  },
+  "definitions": {
+    "Redis_firewallRules_childResource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
         },
+        "type": {
+          "type": "string",
+          "enum": [
+            "firewallRules"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2016-04-01"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/RedisFirewallRuleProperties"
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "redis cache firewall rule properties"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.Cache/Redis/firewallRules"
+    },
+    "RedisCreateProperties": {
+      "type": "object",
+      "properties": {
         "redisConfiguration": {
           "oneOf": [
             {
@@ -81,7 +175,7 @@
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "If the value is true, then the non-ssl redis server port (6379) will be enabled."
+          "description": "Specifies whether the non-ssl Redis server port (6379) is enabled."
         },
         "tenantSettings": {
           "oneOf": [
@@ -118,7 +212,7 @@
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "The full resource ID of a subnet in a virtual network to deploy the redis cache in. Example format: /subscriptions/{subid}/resourceGroups/{resourceGroupName}/Microsoft.{Network|ClassicNetwork}/VirtualNetworks/vnet1/subnets/subnet1"
+          "description": "The full resource ID of a subnet in a virtual network to deploy the Redis cache in. Example format: /subscriptions/{subid}/resourceGroups/{resourceGroupName}/Microsoft.{Network|ClassicNetwork}/VirtualNetworks/vnet1/subnets/subnet1"
         },
         "staticIP": {
           "oneOf": [
@@ -130,13 +224,42 @@
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Required when deploying a redis cache inside an existing Azure Virtual Network."
+          "description": "Static IP address. Required when deploying a Redis cache inside an existing Azure Virtual Network."
+        },
+        "sku": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Sku"
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The SKU of the Redis cache to deploy."
         }
       },
       "required": [
         "sku"
       ],
-      "description": "Properties supplied to CreateOrUpdate redis operation."
+      "description": "Properties supplied to Create Redis operation."
+    },
+    "RedisFirewallRuleProperties": {
+      "type": "object",
+      "properties": {
+        "startIP": {
+          "type": "string",
+          "description": "lowest IP address included in the range"
+        },
+        "endIP": {
+          "type": "string",
+          "description": "highest IP address included in the range"
+        }
+      },
+      "required": [
+        "startIP",
+        "endIP"
+      ],
+      "description": "Specifies a range of IP addresses permitted to connect to the cache"
     },
     "Sku": {
       "type": "object",
@@ -155,7 +278,7 @@
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "What type of redis cache to deploy. Valid values: (Basic, Standard, Premium)."
+          "description": "The type of Redis cache to deploy. Valid values: (Basic, Standard, Premium)."
         },
         "family": {
           "oneOf": [
@@ -170,7 +293,7 @@
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Which family to use. Valid values: (C, P)."
+          "description": "The SKU family to use. Valid values: (C, P). (C = Basic/Standard, P = Premium)."
         },
         "capacity": {
           "oneOf": [
@@ -181,7 +304,7 @@
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "What size of redis cache to deploy. Valid values: for C family (0, 1, 2, 3, 4, 5, 6), for P family (1, 2, 3, 4)"
+          "description": "The size of the Redis cache to deploy. Valid values: for C (Basic/Standard) family (0, 1, 2, 3, 4, 5, 6), for P (Premium) family (1, 2, 3, 4)."
         }
       },
       "required": [
@@ -189,7 +312,7 @@
         "family",
         "capacity"
       ],
-      "description": "Sku parameters supplied to the create redis operation."
+      "description": "SKU parameters supplied to the create Redis operation."
     }
   }
 }

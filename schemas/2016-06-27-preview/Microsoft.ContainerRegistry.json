@@ -2,25 +2,30 @@
   "id": "http://schema.management.azure.com/schemas/2016-06-27-preview/Microsoft.ContainerRegistry.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.ContainerRegistry",
-  "description": "Microsoft Container Registry Resource Types",
+  "description": "Microsoft ContainerRegistry Resource Types",
   "resourceDefinitions": {
     "registries": {
       "type": "object",
-      "description": "Microsoft.ContainerRegistry/registries: Azure Container Registry resource.",
       "properties": {
-        "apiVersion": {
-          "enum": [
-            "2016-06-27-preview"
-          ]
+        "name": {
+          "type": "string",
+          "description": "The name of the container registry."
         },
         "type": {
+          "type": "string",
           "enum": [
             "Microsoft.ContainerRegistry/registries"
           ]
         },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2016-06-27-preview"
+          ]
+        },
         "location": {
           "type": "string",
-          "description": "Required. Gets or sets the location of the resource. This will be one of the supported and registered Azure Geo Regions (e.g. West US, East US, Southeast Asia, etc.). The geo region of a resource cannot be changed once it is created, but if an identical geo region is specified on update the request will succeed."
+          "description": "The location of the resource. This cannot be changed after the resource is created."
         },
         "tags": {
           "oneOf": [
@@ -34,60 +39,82 @@
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Gets or sets a list of key value pairs that describe the resource. These tags can be used in viewing and grouping this resource (across resource groups). A maximum of 15 tags can be provided for a resource. Each tag must have a key no greater than 128 characters and value no greater than 256 characters."
+          "description": "The tags of the resource."
         },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/ContainerRegistryProperties"
+              "$ref": "#/definitions/RegistryProperties"
             },
             {
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The properties of the container registry."
         }
       },
       "required": [
-        "apiVersion",
+        "name",
         "type",
+        "apiVersion",
         "location",
         "properties"
-      ]
+      ],
+      "description": "Microsoft.ContainerRegistry/registries"
     }
   },
   "definitions": {
-    "ContainerRegistryProperties": {
+    "RegistryProperties": {
       "type": "object",
       "properties": {
-        "storageAccount": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "accessKey": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "name",
-            "accessKey"
-          ]
-        },
         "adminUserEnabled": {
           "oneOf": [
             {
-              "type": "boolean"
+              "type": "boolean",
+              "enum": [
+                "false"
+              ]
             },
             {
               "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The value that indicates whether the admin user is enabled. This value is false by default."
+        },
+        "storageAccount": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/StorageAccountProperties"
+            },
+            {
+              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties of the storage account for the container registry. If specified, the storage account must be in the same physical location as the container registry."
         }
       },
       "required": [
         "storageAccount"
-      ]
+      ],
+      "description": "The properties of a container registry."
+    },
+    "StorageAccountProperties": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the storage account."
+        },
+        "accessKey": {
+          "type": "string",
+          "description": "The access key to the storage account."
+        }
+      },
+      "required": [
+        "name",
+        "accessKey"
+      ],
+      "description": "The properties of a storage account for a container registry."
     }
   }
 }

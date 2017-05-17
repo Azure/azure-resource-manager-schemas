@@ -1,5 +1,5 @@
 {
-  "id": "http://schema.management.azure.com/schemas/2016-09-01/Microsoft.Authorization.json#",
+  "id": "https://schema.management.azure.com/schemas/2016-09-01/Microsoft.Authorization.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.Authorization",
   "description": "Microsoft Authorization Resource Types",
@@ -7,6 +7,9 @@
     "locks": {
       "type": "object",
       "properties": {
+        "name": {
+          "type": "string"
+        },
         "type": {
           "type": "string",
           "enum": [
@@ -14,9 +17,16 @@
           ]
         },
         "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2016-09-01"
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "2016-09-01"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
           ]
         },
         "properties": {
@@ -25,17 +35,14 @@
               "$ref": "#/definitions/ManagementLockProperties"
             },
             {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
           "description": "The properties of the lock."
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the lock."
         }
       },
       "required": [
+        "name",
         "type",
         "apiVersion",
         "properties"
@@ -44,6 +51,16 @@
     }
   },
   "definitions": {
+    "ManagementLockOwner": {
+      "type": "object",
+      "properties": {
+        "applicationId": {
+          "type": "string",
+          "description": "The application ID of the lock owner."
+        }
+      },
+      "description": "Lock owner properties."
+    },
     "ManagementLockProperties": {
       "type": "object",
       "properties": {
@@ -58,20 +75,34 @@
               ]
             },
             {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "The lock level of the management lock."
+          "description": "The level of the lock. Possible values are: NotSpecified, CanNotDelete, ReadOnly. CanNotDelete means authorized users are able to read and modify the resources, but not delete. ReadOnly means authorized users can only read from a resource, but they can't modify or delete it."
         },
         "notes": {
           "type": "string",
-          "description": "The notes of the management lock."
+          "description": "Notes about the lock. Maximum of 512 characters."
+        },
+        "owners": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ManagementLockOwner"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The owners of the lock."
         }
       },
       "required": [
         "level"
       ],
-      "description": "The management lock properties."
+      "description": "The lock properties."
     }
   }
 }

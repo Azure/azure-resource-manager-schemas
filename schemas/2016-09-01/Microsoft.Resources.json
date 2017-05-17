@@ -1,5 +1,5 @@
 {
-  "id": "http://schema.management.azure.com/schemas/2016-09-01/Microsoft.Resources.json#",
+  "id": "https://schema.management.azure.com/schemas/2016-09-01/Microsoft.Resources.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.Resources",
   "description": "Microsoft Resources Resource Types",
@@ -7,6 +7,9 @@
     "deployments": {
       "type": "object",
       "properties": {
+        "name": {
+          "type": "string"
+        },
         "type": {
           "type": "string",
           "enum": [
@@ -14,9 +17,16 @@
           ]
         },
         "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2016-09-01"
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "2016-09-01"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
           ]
         },
         "properties": {
@@ -25,13 +35,14 @@
               "$ref": "#/definitions/DeploymentProperties"
             },
             {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
           "description": "The deployment properties."
         }
       },
       "required": [
+        "name",
         "type",
         "apiVersion",
         "properties"
@@ -45,7 +56,7 @@
       "properties": {
         "detailLevel": {
           "type": "string",
-          "description": "The debug detail level."
+          "description": "Specifies the type of information to log for debugging. The permitted values are none, requestContent, responseContent, or both requestContent and responseContent separated by a comma. The default is none. When setting this value, carefully consider the type of information you are passing in during deployment. By logging information about the request or response, you could potentially expose sensitive data that is retrieved through the deployment operations."
         }
       }
     },
@@ -53,15 +64,7 @@
       "type": "object",
       "properties": {
         "template": {
-          "oneOf": [
-            {
-              "type": "object"
-            },
-            {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "The template content. It can be a JObject or a well formed JSON string. Use only one of Template or TemplateLink."
+          "description": "The template content. You use this element when you want to pass the template syntax directly in the request rather than link to an existing template. It can be a JObject or well-formed JSON string. Use either the templateLink property or the template property, but not both."
         },
         "templateLink": {
           "oneOf": [
@@ -69,21 +72,13 @@
               "$ref": "#/definitions/TemplateLink"
             },
             {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "The template URI. Use only one of Template or TemplateLink."
+          "description": "The URI of the template. Use either the templateLink property or the template property, but not both."
         },
         "parameters": {
-          "oneOf": [
-            {
-              "type": "object"
-            },
-            {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Deployment parameters. It can be a JObject or a well formed JSON string. Use only one of Parameters or ParametersLink."
+          "description": "Name and value pairs that define the deployment parameters for the template. You use this element when you want to provide the parameter values directly in the request rather than link to an existing parameter file. Use either the parametersLink property or the parameters property, but not both. It can be a JObject or a well formed JSON string."
         },
         "parametersLink": {
           "oneOf": [
@@ -91,10 +86,10 @@
               "$ref": "#/definitions/ParametersLink"
             },
             {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "The parameters URI. Use only one of Parameters or ParametersLink."
+          "description": "The URI of parameters file. You use this element to link to an existing parameters file. Use either the parametersLink property or the parameters property, but not both."
         },
         "mode": {
           "oneOf": [
@@ -106,10 +101,10 @@
               ]
             },
             {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "The deployment mode."
+          "description": "The mode that is used to deploy resources. This value can be either Incremental or Complete. In Incremental mode, resources are deployed without deleting existing resources that are not included in the template. In Complete mode, resources are deployed and existing resources in the resource group that are not included in the template are deleted. Be careful when using Complete mode as you may unintentionally delete resources."
         },
         "debugSetting": {
           "oneOf": [
@@ -117,7 +112,7 @@
               "$ref": "#/definitions/DebugSetting"
             },
             {
-              "$ref": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
           "description": "The debug setting of the deployment."
@@ -133,11 +128,11 @@
       "properties": {
         "uri": {
           "type": "string",
-          "description": "URI referencing the template."
+          "description": "The URI of the parameters file."
         },
         "contentVersion": {
           "type": "string",
-          "description": "If included it must match the ContentVersion in the template."
+          "description": "If included, must match the ContentVersion in the template."
         }
       },
       "required": [
@@ -150,11 +145,11 @@
       "properties": {
         "uri": {
           "type": "string",
-          "description": "URI referencing the template."
+          "description": "The URI of the template to deploy."
         },
         "contentVersion": {
           "type": "string",
-          "description": "If included it must match the ContentVersion in the template."
+          "description": "If included, must match the ContentVersion in the template."
         }
       },
       "required": [

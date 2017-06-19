@@ -25,7 +25,10 @@ To create a Microsoft.Sql/servers/databases resource, add the following JSON to 
     "elasticPoolName": "string",
     "readScale": "string",
     "sampleName": "AdventureWorksLT"
-  }
+  },
+  "resources": [
+    null
+  ]
 }
 ```
 ## Property values
@@ -42,6 +45,7 @@ The following tables describe the values you need to set in the schema.
 |  tags | object | No | Resource tags. |
 |  location | string | Yes | Resource location. |
 |  properties | object | Yes | The properties representing the resource. - [DatabaseProperties object](#DatabaseProperties) |
+|  resources | array | No | [servers_databases_geoBackupPolicies_childResource object](#servers_databases_geoBackupPolicies_childResource) |
 
 
 <a id="DatabaseProperties" />
@@ -77,4 +81,21 @@ Copy, NonReadableSecondary, OnlineSecondary and RestoreLongTermRetentionBackup a
 |  elasticPoolName | string | No | The name of the elastic pool the database is in. If elasticPoolName and requestedServiceObjectiveName are both updated, the value of requestedServiceObjectiveName is ignored. Not supported for DataWarehouse edition. |
 |  readScale | enum | No | Conditional. If the database is a geo-secondary, readScale indicates whether read-only connections are allowed to this database or not. Not supported for DataWarehouse edition. - Enabled or Disabled |
 |  sampleName | enum | No | Indicates the name of the sample schema to apply when creating this database. If createMode is not Default, this value is ignored. Not supported for DataWarehouse edition. - AdventureWorksLT |
+
+
+<a id="servers_databases_geoBackupPolicies_childResource" />
+### servers_databases_geoBackupPolicies_childResource object
+|  Name | Type | Required | Value |
+|  ---- | ---- | ---- | ---- |
+|  name | enum | Yes | The name of the geo backup policy. - Default |
+|  type | enum | Yes | geoBackupPolicies |
+|  apiVersion | enum | Yes | 2014-04-01 |
+|  properties | object | Yes | The properties of the geo backup policy. - [GeoBackupPolicyProperties object](#GeoBackupPolicyProperties) |
+
+
+<a id="GeoBackupPolicyProperties" />
+### GeoBackupPolicyProperties object
+|  Name | Type | Required | Value |
+|  ---- | ---- | ---- | ---- |
+|  state | enum | Yes | The state of the geo backup policy. - Disabled or Enabled |
 

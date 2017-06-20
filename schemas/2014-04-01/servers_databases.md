@@ -45,7 +45,7 @@ The following tables describe the values you need to set in the schema.
 |  tags | object | No | Resource tags. |
 |  location | string | Yes | Resource location. |
 |  properties | object | Yes | The properties representing the resource. - [DatabaseProperties object](#DatabaseProperties) |
-|  resources | array | No | [servers_databases_geoBackupPolicies_childResource object](#servers_databases_geoBackupPolicies_childResource) |
+|  resources | array | No | [servers_databases_geoBackupPolicies_childResource object](#servers_databases_geoBackupPolicies_childResource) [servers_databases_backupLongTermRetentionPolicies_childResource object](#servers_databases_backupLongTermRetentionPolicies_childResource) |
 
 
 <a id="DatabaseProperties" />
@@ -93,9 +93,27 @@ Copy, NonReadableSecondary, OnlineSecondary and RestoreLongTermRetentionBackup a
 |  properties | object | Yes | The properties of the geo backup policy. - [GeoBackupPolicyProperties object](#GeoBackupPolicyProperties) |
 
 
+<a id="servers_databases_backupLongTermRetentionPolicies_childResource" />
+### servers_databases_backupLongTermRetentionPolicies_childResource object
+|  Name | Type | Required | Value |
+|  ---- | ---- | ---- | ---- |
+|  name | string | Yes |  |
+|  type | enum | Yes | backupLongTermRetentionPolicies |
+|  apiVersion | enum | Yes | 2014-04-01 |
+|  properties | object | Yes | The properties of the backup long term retention policy - [BackupLongTermRetentionPolicyProperties object](#BackupLongTermRetentionPolicyProperties) |
+
+
 <a id="GeoBackupPolicyProperties" />
 ### GeoBackupPolicyProperties object
 |  Name | Type | Required | Value |
 |  ---- | ---- | ---- | ---- |
 |  state | enum | Yes | The state of the geo backup policy. - Disabled or Enabled |
+
+
+<a id="BackupLongTermRetentionPolicyProperties" />
+### BackupLongTermRetentionPolicyProperties object
+|  Name | Type | Required | Value |
+|  ---- | ---- | ---- | ---- |
+|  state | enum | Yes | The status of the backup long term retention policy. - Disabled or Enabled |
+|  recoveryServicesBackupPolicyResourceId | string | Yes | The azure recovery services backup protection policy resource id |
 

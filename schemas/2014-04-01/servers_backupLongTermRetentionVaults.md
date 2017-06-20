@@ -32,5 +32,5 @@ The following tables describe the values you need to set in the schema.
 ### BackupLongTermRetentionVaultProperties object
 |  Name | Type | Required | Value |
 |  ---- | ---- | ---- | ---- |
-|  recoveryServicesVaultResourceId | string | No | The azure recovery services vault resource id |
+|  recoveryServicesVaultResourceId | string | Yes | The azure recovery services vault resource id |
 

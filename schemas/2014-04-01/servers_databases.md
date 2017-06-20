@@ -45,7 +45,7 @@ The following tables describe the values you need to set in the schema.
 |  tags | object | No | Resource tags. |
 |  location | string | Yes | Resource location. |
 |  properties | object | Yes | The properties representing the resource. - [DatabaseProperties object](#DatabaseProperties) |
-|  resources | array | No | [servers_databases_geoBackupPolicies_childResource object](#servers_databases_geoBackupPolicies_childResource) [servers_databases_backupLongTermRetentionPolicies_childResource object](#servers_databases_backupLongTermRetentionPolicies_childResource) |
+|  resources | array | No | [servers_databases_extensions_childResource object](#servers_databases_extensions_childResource) [servers_databases_geoBackupPolicies_childResource object](#servers_databases_geoBackupPolicies_childResource) [servers_databases_backupLongTermRetentionPolicies_childResource object](#servers_databases_backupLongTermRetentionPolicies_childResource) |
 
 
 <a id="DatabaseProperties" />
@@ -83,6 +83,16 @@ Copy, NonReadableSecondary, OnlineSecondary and RestoreLongTermRetentionBackup a
 |  sampleName | enum | No | Indicates the name of the sample schema to apply when creating this database. If createMode is not Default, this value is ignored. Not supported for DataWarehouse edition. - AdventureWorksLT |
 
 
+<a id="servers_databases_extensions_childResource" />
+### servers_databases_extensions_childResource object
+|  Name | Type | Required | Value |
+|  ---- | ---- | ---- | ---- |
+|  name | string | Yes |  |
+|  type | enum | Yes | extensions |
+|  apiVersion | enum | Yes | 2014-04-01 |
+|  properties | object | Yes | Represents the properties of the resource. - [ImportExtensionProperties object](#ImportExtensionProperties) |
+
+
 <a id="servers_databases_geoBackupPolicies_childResource" />
 ### servers_databases_geoBackupPolicies_childResource object
 |  Name | Type | Required | Value |
@@ -101,6 +111,19 @@ Copy, NonReadableSecondary, OnlineSecondary and RestoreLongTermRetentionBackup a
 |  type | enum | Yes | backupLongTermRetentionPolicies |
 |  apiVersion | enum | Yes | 2014-04-01 |
 |  properties | object | Yes | The properties of the backup long term retention policy - [BackupLongTermRetentionPolicyProperties object](#BackupLongTermRetentionPolicyProperties) |
+
+
+<a id="ImportExtensionProperties" />
+### ImportExtensionProperties object
+|  Name | Type | Required | Value |
+|  ---- | ---- | ---- | ---- |
+|  storageKeyType | enum | Yes | The type of the storage key to use. - StorageAccessKey or SharedAccessKey |
+|  storageKey | string | Yes | The storage key to use.  If storage key type is SharedAccessKey, it must be preceded with a "?." |
+|  storageUri | string | Yes | The storage uri to use. |
+|  administratorLogin | string | Yes | The name of the SQL administrator. |
+|  administratorLoginPassword | string | Yes | The password of the SQL administrator. |
+|  authenticationType | enum | No | The authentication type. - SQL or ADPassword |
+|  operationMode | enum | Yes | The type of import operation being performed. This is always Import. - Import |
 
 
 <a id="GeoBackupPolicyProperties" />

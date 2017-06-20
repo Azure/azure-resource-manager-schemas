@@ -45,7 +45,7 @@ The following tables describe the values you need to set in the schema.
 |  tags | object | No | Resource tags. |
 |  location | string | Yes | Resource location. |
 |  properties | object | Yes | The properties representing the resource. - [DatabaseProperties object](#DatabaseProperties) |
-|  resources | array | No | [servers_databases_extensions_childResource object](#servers_databases_extensions_childResource) [servers_databases_geoBackupPolicies_childResource object](#servers_databases_geoBackupPolicies_childResource) [servers_databases_backupLongTermRetentionPolicies_childResource object](#servers_databases_backupLongTermRetentionPolicies_childResource) |
+|  resources | array | No | [servers_databases_extensions_childResource object](#servers_databases_extensions_childResource) [servers_databases_geoBackupPolicies_childResource object](#servers_databases_geoBackupPolicies_childResource) [servers_databases_securityAlertPolicies_childResource object](#servers_databases_securityAlertPolicies_childResource) [servers_databases_backupLongTermRetentionPolicies_childResource object](#servers_databases_backupLongTermRetentionPolicies_childResource) |
 
 
 <a id="DatabaseProperties" />
@@ -103,6 +103,16 @@ Copy, NonReadableSecondary, OnlineSecondary and RestoreLongTermRetentionBackup a
 |  properties | object | Yes | The properties of the geo backup policy. - [GeoBackupPolicyProperties object](#GeoBackupPolicyProperties) |
 
 
+<a id="servers_databases_securityAlertPolicies_childResource" />
+### servers_databases_securityAlertPolicies_childResource object
+|  Name | Type | Required | Value |
+|  ---- | ---- | ---- | ---- |
+|  type | enum | Yes | securityAlertPolicies |
+|  apiVersion | enum | Yes | 2014-04-01 |
+|  location | string | No | The geo-location where the resource lives |
+|  properties | object | Yes | [DatabaseSecurityAlertPolicyProperties object](#DatabaseSecurityAlertPolicyProperties) |
+
+
 <a id="servers_databases_backupLongTermRetentionPolicies_childResource" />
 ### servers_databases_backupLongTermRetentionPolicies_childResource object
 |  Name | Type | Required | Value |
@@ -131,6 +141,20 @@ Copy, NonReadableSecondary, OnlineSecondary and RestoreLongTermRetentionBackup a
 |  Name | Type | Required | Value |
 |  ---- | ---- | ---- | ---- |
 |  state | enum | Yes | The state of the geo backup policy. - Disabled or Enabled |
+
+
+<a id="DatabaseSecurityAlertPolicyProperties" />
+### DatabaseSecurityAlertPolicyProperties object
+|  Name | Type | Required | Value |
+|  ---- | ---- | ---- | ---- |
+|  state | enum | Yes | Specifies the state of the policy. If state is Enabled, storageEndpoint and storageAccountAccessKey are required. - New, Enabled, Disabled |
+|  disabledAlerts | string | No | Specifies the semicolon-separated list of alerts that are disabled, or empty string to disable no alerts. Possible values: Sql_Injection; Sql_Injection_Vulnerability; Access_Anomaly; Usage_Anomaly. |
+|  emailAddresses | string | No | Specifies the semicolon-separated list of e-mail addresses to which the alert is sent. |
+|  emailAccountAdmins | enum | No | Specifies that the alert is sent to the account administrators. - Enabled or Disabled |
+|  storageEndpoint | string | No | Specifies the blob storage endpoint (e.g. https://MyAccount.blob.core.windows.net). This blob storage will hold all Threat Detection audit logs. If state is Enabled, storageEndpoint is required. |
+|  storageAccountAccessKey | string | No | Specifies the identifier key of the Threat Detection audit storage account. If state is Enabled, storageAccountAccessKey is required. |
+|  retentionDays | integer | No | Specifies the number of days to keep in the Threat Detection audit logs. |
+|  useServerDefault | enum | No | Specifies whether to use the default server policy. - Enabled or Disabled |
 
 
 <a id="BackupLongTermRetentionPolicyProperties" />

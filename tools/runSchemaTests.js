@@ -155,7 +155,7 @@ if (require.main === module) {
                 else {
                     if (test.expectedErrors.length !== result.errors.length) {
                         const errorMessage = `There were a different number of expected errors (${test.expectedErrors.length}) than there were actual errors (${result.errors.length})`;
-                        assert.deepStrictEqual(test.expectedErrors, result.errors, errorMessage);
+                        assert.deepStrictEqual(result.errors, test.expectedErrors, errorMessage);
                     }
                     else {
                         for (let errorIndex = 0; errorIndex < test.expectedErrors.length; ++errorIndex) {

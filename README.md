@@ -2,7 +2,7 @@
 
 This is the repo for template deployment schemas hosted at:  https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json
 
-Welcome to contribute to template deployment schemas, please send pull request to improve the schemas. We will review the pull request and publish the latest schemas to http://schema.management.azure.com/schemas
+Welcome to contribute to template deployment schemas, please send pull request to improve the schemas. We will review the pull request and publish the latest schemas to https://schema.management.azure.com/schemas
 
 ## Hints:
 * When you add a new resource type in schema, please add it into [schemas\2014-04-01-preview\deploymentTemplate.json](https://github.com/Azure/azure-resource-manager-schemas/blob/master/schemas/2014-04-01-preview/deploymentTemplate.json) and [schemas\2015-01-01\deploymentTemplate.json](https://github.com/Azure/azure-resource-manager-schemas/blob/master/schemas/2015-01-01/deploymentTemplate.json)

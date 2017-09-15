@@ -114,7 +114,7 @@ suite("utilities", () => {
         });
 
         test("with schema folder path and matching uri", () => {
-            const result = utilities.readJSONPath("http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#", "../schemas");
+            const result = utilities.readJSONPath("https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#", "../schemas");
             assert(result);
             assert.deepStrictEqual(typeof result, "object");
         });

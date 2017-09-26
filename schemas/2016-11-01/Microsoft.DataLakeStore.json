@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2015-10-01-preview/Microsoft.DataLakeStore.json#",
+  "id": "https://schema.management.azure.com/schemas/2016-11-01/Microsoft.DataLakeStore.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.DataLakeStore",
   "description": "Microsoft Data Lake Store Resource Types",
@@ -9,10 +9,14 @@
       "description": "Microsoft.DataLakeStore/accounts",
       "properties": {
         "apiVersion": {
-          "enum": ["2015-10-01-preview"]
+          "enum": ["2016-11-01"]
         },
         "type": {
           "enum": ["Microsoft.DataLakeStore/accounts"]
+        },
+        "location": {
+          "description": "Microsoft.DataLakeStore/accounts - Resource location",
+          "type": "string"
         },
         "properties": {
           "type": "object",
@@ -22,7 +26,19 @@
               "type": "string"  
             },
             "firewallState": {
-              "description": "Microsoft.DataLakeStore/accounts - The firewall rules feature state (Enabled/Disabled)",
+              "description": "Microsoft.DataLakeStore/accounts - Firewall rule feature state (Enabled/Disabled)",
+              "oneOf": [{
+                "enum": [
+                  "Enabled",
+                  "Disabled"
+                ]
+              },
+              {
+                "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              }]
+            },
+            "firewallAllowAzureIps": {
+              "description": "Microsoft.DataLakeStore/accounts - Azure IP feature state, if firewall state is enabled (Enabled/Disabled)",
               "oneOf": [{
                 "enum": [
                   "Enabled",
@@ -40,52 +56,37 @@
                 "items": {
                   "description": "Microsoft.DataLakeStore/accounts - Firewall rule",
                   "oneOf": [{
-                    "type": "object",
-                    "properties": {
-                      "name": {
-                        "description": "Microsoft.DataLakeStore/accounts - Name of firewall rule",
-                        "oneOf": [{
-                          "type": "string",
-                          "minLength": 3,
-                          "maxLength": 50,
-                          "pattern": "^[a-zA-Z0-9_-]+$"
-                        },
-                        {
-                          "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-                        }]
-                      },
-                      "properties": {
-                        "description": "Microsoft.DataLakeStore/accounts - Firewall rule object",
-                        "oneOf": [{
-                          "type": "object",
-                          "properties": {
-                            "startIpAddress": {
-                              "description": "Microsoft.DataLakeStore/accounts - Firewall rule start IP address",
-                              "oneOf": [{
-                                "type": "string",
-                                "format": "ipv4"
-                              },
-                              {
-                                "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-                              }]
-                            },
-                            "endIpAddress": {
-                              "description": "Microsoft.DataLakeStore/accounts - Firewall rule end IP address",
-                              "oneOf": [{
-                                "type": "string",
-                                "format": "ipv4"
-                              },
-                              {
-                                "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-                              }]
-                            }
-                          }
-                        },
-                        {
-                          "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-                        }]
-                      }
-                    }
+                    "$ref": "#/definitions/FirewallRule"
+                  },
+                  {
+                    "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                  }]
+                }
+              },
+              {
+                "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              }]
+            },
+            "trustedIdProviderState": {
+              "description": "Microsoft.DataLakeStore/accounts - Trusted identity provider feature state (Enabled/Disabled)",
+              "oneOf": [{
+                "enum": [
+                  "Enabled",
+                  "Disabled"
+                ]
+              },
+              {
+                "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              }]
+            },
+            "trustedIdProviders": {
+              "description": "Microsoft.DataLakeStore/accounts - List of trusted identity providers",
+              "oneOf": [{
+                "type": "array",
+                "items": {
+                  "description": "Microsoft.DataLakeStore/accounts - Trusted identity provider",
+                  "oneOf": [{
+                    "$ref": "#/definitions/TrustedIdProvider"
                   },
                   {
                     "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -105,6 +106,152 @@
         "location",
         "properties"
       ]
+    },
+    "accounts_firewallRules": {
+      "description": "Microsoft.DataLakeStore/accounts/firewallrules",
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "enum": ["2016-11-01"]
+        },
+        "type": {
+          "enum": ["Microsoft.DataLakeStore/accounts/firewallrules"]
+        },
+        "properties": {
+          "description": "Microsoft.DataLakeStore/firewallrules - Firewall rule",
+          "oneOf": [{
+            "$ref": "#/definitions/FirewallRule"
+          },
+          {
+            "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+          }]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "type",
+        "properties"
+      ]
+    },
+    "accounts_trustedIdProviders": {
+      "description": "Microsoft.DataLakeStore/accounts/trustedidproviders",
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "enum": ["2016-11-01"]
+        },
+        "type": {
+          "enum": ["Microsoft.DataLakeStore/accounts/trustedidproviders"]
+        },
+        "properties": {
+          "description": "Microsoft.DataLakeStore/trustedidproviders - Trusted identity provider",
+          "oneOf": [{
+            "$ref": "#/definitions/TrustedIdProvider"
+          },
+          {
+            "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+          }]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "type",
+        "properties"
+      ]
+    }
+  },
+  "definitions": {
+    "FirewallRule": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Name of the firewall rule",
+          "oneOf": [{
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 50,
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          {
+            "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+          }]
+        },
+        "properties": {
+          "description": "Firewall rule object",
+          "oneOf": [{
+            "type": "object",
+            "properties": {
+              "startIpAddress": {
+                "description": "Firewall rule start IP address (ipv4 or ipv6)",
+                "oneOf": [{
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }]
+              },
+              "endIpAddress": {
+                "description": "Firewall rule end IP address (ipv4 or ipv6)",
+                "oneOf": [{
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }]
+              }
+            },
+            "required": [
+              "startIpAddress",
+              "endIpAddress"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+          }]
+        }
+      },
+      "required": [
+        "name",
+        "properties"
+      ],
+      "additionalProperties": false
+    },
+    "TrustedIdProvider": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Name of the trusted identity provider",
+          "type": "string"
+        },
+        "properties": {
+          "description": "Trusted identity provider object",
+          "oneOf": [{
+            "type": "object",
+            "properties": {
+              "idProvider": {
+                "description": "Trusted identity provider URL",
+                "oneOf": [{
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }]
+              }
+            },
+            "required": ["idProvider"],
+            "additionalProperties": false
+          },
+          {
+            "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+          }]
+        }
+      },
+      "required": [
+        "name",
+        "properties"
+      ],
+      "additionalProperties": false
     }
   }
 }

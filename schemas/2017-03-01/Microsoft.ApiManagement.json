@@ -174,6 +174,9 @@
           "items": {
             "oneOf": [
               {
+                "$ref": "#/definitions/service_apis_schemas_childResource"
+              },
+              {
                 "$ref": "#/definitions/service_apis_policies_childResource"
               },
               {
@@ -345,6 +348,53 @@
         "properties"
       ],
       "description": "Microsoft.ApiManagement/service/apis/policies"
+    },
+    "service_apis_schemas": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[^*#&+:<>?]+$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Schema identifier within an API. Must be unique in the current API Management service instance."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ApiManagement/service/apis/schemas"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2017-03-01"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SchemaContractProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the Schema."
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.ApiManagement/service/apis/schemas"
     },
     "service_authorizationServers": {
       "type": "object",
@@ -1388,7 +1438,21 @@
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Custom properties of the API Management service, like disabling TLS 1.0."
+          "description": "Custom properties of the API Management service. Setting `Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Ciphers.TripleDes168` will disable the cipher TLS_RSA_WITH_3DES_EDE_CBC_SHA for all TLS(1.0, 1.1 and 1.2). Setting `Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls11` can be used to disable just TLS 1.1 and setting `Microsoft.WindowsAzure.ApiManagement.Gateway.Security.Protocols.Tls10` can be used to disable TLS 1.0 on an API Management service."
+        },
+        "certificates": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CertificateConfiguration"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "List of Certificates that need to be installed in the API Management service. Max supported certificates that can be installed is 10."
         },
         "virtualNetworkType": {
           "oneOf": [
@@ -1939,7 +2003,7 @@
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Flag indicating whether SSL certificate chain validation should be skipped when using self-signed certificates for this backend host."
+          "description": "Flag indicating whether SSL certificate chain validation should be done when using self-signed certificates for this backend host."
         },
         "validateCertificateName": {
           "oneOf": [
@@ -1954,10 +2018,42 @@
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Flag indicating whether SSL certificate name validation should be skipped when using self-signed certificates for this backend host."
+          "description": "Flag indicating whether SSL certificate name validation should be done when using self-signed certificates for this backend host."
         }
       },
       "description": "Properties controlling TLS Certificate Validation."
+    },
+    "CertificateConfiguration": {
+      "type": "object",
+      "properties": {
+        "encodedCertificate": {
+          "type": "string",
+          "description": "Base64 Encoded certificate."
+        },
+        "certificatePassword": {
+          "type": "string",
+          "description": "Certificate Password."
+        },
+        "storeName": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "CertificateAuthority",
+                "Root"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The local certificate store location. Only Root and CertificateAuthority are valid locations."
+        }
+      },
+      "required": [
+        "storeName"
+      ],
+      "description": "Certificate configuration which consist of non-trusted intermediates and root certificates."
     },
     "CertificateCreateOrUpdateProperties": {
       "type": "object",
@@ -2108,6 +2204,21 @@
         "certificatePassword": {
           "type": "string",
           "description": "Certificate Password."
+        },
+        "defaultSslBinding": {
+          "oneOf": [
+            {
+              "type": "boolean",
+              "enum": [
+                false,
+                true
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Specify true to setup the certificate associated with this Hostname as the Default SSL Certificate. If a client does not send the SNI header, then this will be the certificate that will be challenged. The property is useful if a service has multiple custom hostname enabled and it needs to decide on the default ssl certificate. The setting only applied to Proxy Hostname Type."
         },
         "negotiateClientCertificate": {
           "oneOf": [
@@ -2428,7 +2539,7 @@
       "properties": {
         "policyContent": {
           "type": "string",
-          "description": "Xml Encoded contents of the Policy."
+          "description": "Json escaped Xml Encoded contents of the Policy."
         }
       },
       "required": [
@@ -2705,6 +2816,40 @@
       ],
       "description": "Operation response details."
     },
+    "SchemaContractProperties": {
+      "type": "object",
+      "properties": {
+        "contentType": {
+          "type": "string",
+          "description": "Must be a valid a media type used in a Content-Type header as defined in the RFC 2616. Media type of the schema document (e.g. application/json, application/xml)."
+        },
+        "document": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SchemaDocumentProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the Schema Document."
+        }
+      },
+      "required": [
+        "contentType"
+      ],
+      "description": "Schema contract Properties."
+    },
+    "SchemaDocumentProperties": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "description": "Json escaped string defining the document representing the Schema."
+        }
+      },
+      "description": "Schema Document Properties."
+    },
     "service_apis_childResource": {
       "type": "object",
       "properties": {
@@ -2747,6 +2892,9 @@
           "type": "array",
           "items": {
             "oneOf": [
+              {
+                "$ref": "#/definitions/service_apis_schemas_childResource"
+              },
               {
                 "$ref": "#/definitions/service_apis_policies_childResource"
               },
@@ -2919,6 +3067,53 @@
         "properties"
       ],
       "description": "Microsoft.ApiManagement/service/apis/policies"
+    },
+    "service_apis_schemas_childResource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[^*#&+:<>?]+$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Schema identifier within an API. Must be unique in the current API Management service instance."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "schemas"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2017-03-01"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SchemaContractProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the Schema."
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.ApiManagement/service/apis/schemas"
     },
     "service_authorizationServers_childResource": {
       "type": "object",

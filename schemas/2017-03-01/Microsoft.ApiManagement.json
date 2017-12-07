@@ -67,6 +67,17 @@
           ],
           "description": "SKU properties of the API Management service."
         },
+        "identity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ApiManagementServiceIdentity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Managed service identity of the Api Management service."
+        },
         "location": {
           "type": "string",
           "description": "Resource location."
@@ -1372,12 +1383,53 @@
             }
           ],
           "description": "Format of the Content in which the API is getting imported."
+        },
+        "wsdlSelector": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ApiCreateOrUpdateProperties_wsdlSelector"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Criteria to limit import of WSDL to a subset of the document."
         }
       },
       "required": [
         "path"
       ],
       "description": "Api Create or Update Properties."
+    },
+    "ApiCreateOrUpdateProperties_wsdlSelector": {
+      "type": "object",
+      "properties": {
+        "wsdlServiceName": {
+          "type": "string",
+          "description": "Name of service to import from WSDL"
+        },
+        "wsdlEndpointName": {
+          "type": "string",
+          "description": "Name of endpoint(port) to import from WSDL"
+        }
+      },
+      "description": "Criteria to limit import of WSDL to a subset of the document."
+    },
+    "ApiManagementServiceIdentity": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "SystemAssigned"
+          ],
+          "description": "The identity type. Currently the only supported type is 'SystemAssigned'."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Identity properties of the Api Management service resource."
     },
     "ApiManagementServiceProperties": {
       "type": "object",
@@ -1497,7 +1549,8 @@
               "enum": [
                 "Developer",
                 "Standard",
-                "Premium"
+                "Premium",
+                "Basic"
               ]
             },
             {
@@ -1994,10 +2047,7 @@
           "oneOf": [
             {
               "type": "boolean",
-              "enum": [
-                false,
-                true
-              ]
+              "default": true
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -2009,10 +2059,7 @@
           "oneOf": [
             {
               "type": "boolean",
-              "enum": [
-                false,
-                true
-              ]
+              "default": true
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -2197,6 +2244,10 @@
           "type": "string",
           "description": "Hostname to configure on the Api Management service."
         },
+        "keyVaultId": {
+          "type": "string",
+          "description": "Url to the KeyVault Secret containing the Ssl Certificate. If absolute Url containing version is provided, auto-update of ssl certificate will not work. This requires Api Management service to be configured with MSI. The secret should be of type *application/x-pkcs12*"
+        },
         "encodedCertificate": {
           "type": "string",
           "description": "Base64 Encoded certificate."
@@ -2209,10 +2260,7 @@
           "oneOf": [
             {
               "type": "boolean",
-              "enum": [
-                false,
-                true
-              ]
+              "default": false
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -2224,10 +2272,7 @@
           "oneOf": [
             {
               "type": "boolean",
-              "enum": [
-                false,
-                true
-              ]
+              "default": false
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"

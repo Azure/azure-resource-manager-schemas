@@ -356,6 +356,7 @@
                 "Lookup",
                 "SqlServerStoredProcedure",
                 "Custom",
+                "ExecuteSSISPackage",
                 "HDInsightSpark",
                 "HDInsightStreaming",
                 "HDInsightMapReduce",
@@ -4214,6 +4215,85 @@
       ],
       "description": "Execute pipeline activity properties."
     },
+    "ExecuteSSISPackage": {
+      "type": "object",
+      "allOf": [
+        {
+          "properties": {
+            "typeProperties": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/ExecuteSSISPackageActivityTypeProperties"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ],
+              "description": "Execute SSIS package activity properties."
+            }
+          },
+          "required": [
+            "typeProperties"
+          ]
+        }
+      ],
+      "description": "Execute SSIS package activity."
+    },
+    "ExecuteSSISPackageActivityTypeProperties": {
+      "type": "object",
+      "properties": {
+        "packageLocation": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SSISPackageLocation"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "SSIS package location."
+        },
+        "runtime": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "x64",
+                "x86"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies the runtime to execute SSIS package."
+        },
+        "loggingLevel": {
+          "type": "string",
+          "description": "The logging level of SSIS package execution."
+        },
+        "environmentPath": {
+          "type": "string",
+          "description": "The environment path to execution the SSIS package."
+        },
+        "connectVia": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/IntegrationRuntimeReference"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The integration runtime reference."
+        }
+      },
+      "required": [
+        "packageLocation",
+        "connectVia"
+      ],
+      "description": "Execute SSIS package activity properties."
+    },
     "Execution": {
       "type": "object",
       "allOf": [
@@ -4230,6 +4310,7 @@
                 "Lookup",
                 "SqlServerStoredProcedure",
                 "Custom",
+                "ExecuteSSISPackage",
                 "HDInsightSpark",
                 "HDInsightStreaming",
                 "HDInsightMapReduce",
@@ -4288,6 +4369,9 @@
             },
             {
               "$ref": "#/definitions/Custom"
+            },
+            {
+              "$ref": "#/definitions/ExecuteSSISPackage"
             },
             {
               "$ref": "#/definitions/HDInsightSpark"
@@ -6932,6 +7016,21 @@
             }
           ],
           "description": "Catalog information for managed dedicated integration runtime."
+        },
+        "licenseType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "BasePrice",
+                "LicenseIncluded"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "License type for bringing your own license scenario."
         }
       },
       "description": "SSIS properties for managed integration runtime."
@@ -9288,6 +9387,21 @@
           "properties": {
             "query": {
               "description": "Database query. Type: string (or Expression with resultType string)."
+            },
+            "readBehavior": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "Query",
+                    "QueryAll"
+                  ]
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ],
+              "description": "The read behavior for the operation. Default is Query."
             }
           }
         }
@@ -10497,6 +10611,19 @@
         }
       ],
       "description": "A copy activity Square Serivce source."
+    },
+    "SSISPackageLocation": {
+      "type": "object",
+      "properties": {
+        "packagePath": {
+          "type": "string",
+          "description": "The SSIS package path."
+        }
+      },
+      "required": [
+        "packagePath"
+      ],
+      "description": "SSIS package location."
     },
     "StagingSettings": {
       "type": "object",

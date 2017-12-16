@@ -1,0 +1,917 @@
+{
+  "tests": [
+    {
+      "name": "Data Factory: top-level resource only",
+      "definition": "http://schema.management.azure.com/schemas/2017-09-01-preview/Microsoft.DataFactory.json#/resourceDefinitions/factories",
+      "json": {
+        "type": "Microsoft.DataFactory/factories",
+        "apiVersion": "2017-09-01-preview",
+        "name": "dataFactoryName",
+        "location": "WestUS",
+        "properties": {}
+      }
+    },
+    {
+      "name": "Data Factory: complex w/ trigger",
+      "definition": "http://schema.management.azure.com/schemas/2017-09-01-preview/Microsoft.DataFactory.json#/resourceDefinitions/factories",
+      "json": {
+        "apiVersion": "2017-09-01-preview",
+        "type": "Microsoft.DataFactory/factories",
+        "name": "dataFactoryName",
+        "location": "WestUS",
+        "properties": {},
+        "resources": [
+          {
+            "type": "linkedservices",
+            "name": "onpremSQLLinkedServiceName",
+            "dependsOn": [
+              "dataFactoryName"
+            ],
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "type": "SqlServer",
+              "typeProperties": {
+                "connectionString": {
+                  "type": "SecureString",
+                  "value": "sqlConnString"
+                }
+              },
+              "connectVia": {
+                "type": "IntegrationRuntimeReference",
+                "referenceName": "irName"
+              }
+            }
+          },
+          {
+            "type": "linkedservices",
+            "name": "adlsLinkedServiceName",
+            "dependsOn": [
+              "dataFactoryName"
+            ],
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "type": "AzureDataLakeStore",
+              "typeProperties": {
+                "dataLakeStoreUri": "adl://nprodp2peqanalyticsdls01.azuredatalakestore.net",
+                "servicePrincipalId": "****",
+                "servicePrincipalKey": {
+                  "type": "SecureString",
+                  "value": "*****"
+                },
+                "tenant": "7275f0e5-8364-4ca2-8e54-6482cff5601e",
+                "subscriptionId": "****",
+                "resourceGroupName": "Nprod-p2p_eq_analytics_RG"
+              }
+            }
+          },
+          {
+            "type": "linkedservices",
+            "name": "azureDWLinkedServiceName",
+            "dependsOn": [
+              "dataFactoryName"
+            ],
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "type": "AzureSqlDW",
+              "typeProperties": {
+                "connectionString": {
+                  "type": "SecureString",
+                  "value": "****"
+                }
+              }
+            }
+          },
+          {
+            "type": "linkedservices",
+            "name": "adlaLinkedServiceName",
+            "dependsOn": [
+              "dataFactoryName"
+            ],
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "type": "AzureDataLakeAnalytics",
+              "typeProperties": {
+                "accountName": "*****",
+                "servicePrincipalId": "****",
+                "servicePrincipalKey": {
+                  "type": "SecureString",
+                  "value": "****"
+                },
+                "tenant": "*****",
+                "subscriptionId": "*****",
+                "resourceGroupName": "Nprod-p2p_eq_analytics_RG",
+                "dataLakeAnalyticsUri": "azuredatalakeanalytics.net"
+              }
+            }
+          },
+          {
+            "type": "linkedservices",
+            "name": "usqlStorageLinkedServiceName",
+            "dependsOn": [
+              "dataFactoryName"
+            ],
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "type": "AzureStorage",
+              "typeProperties": {
+                "connectionString": {
+                  "type": "SecureString",
+                  "value": "*******"
+                }
+              }
+            }
+          },
+          {
+            "type": "datasets",
+            "name": "onpremSQLDatasetName",
+            "dependsOn": [
+              "dataFactoryName",
+              "onpremSQLLinkedServiceName"
+            ],
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "type": "SqlServerTable",
+              "typeProperties": {
+                "tableName": {
+                  "value": "@dataset().SqlTableName",
+                  "type": "Expression"
+                }
+              },
+              "linkedServiceName": {
+                "referenceName": "onpremSQLLinkedServiceName",
+                "type": "LinkedServiceReference"
+              },
+              "parameters": {
+                "SqlTableName": {
+                  "type": "String"
+                }
+              }
+            }
+          },
+          {
+            "type": "datasets",
+            "name": "azureDWDatasetName",
+            "dependsOn": [
+              "dataFactoryName",
+              "azureDWLinkedServiceName"
+            ],
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "type": "AzureSqlDWTable",
+              "typeProperties": {
+                "tableName": {
+                  "value": "@dataset().AzureDWTableName",
+                  "type": "Expression"
+                }
+              },
+              "linkedServiceName": {
+                "referenceName": "azureDWLinkedServiceName",
+                "type": "LinkedServiceReference"
+              },
+              "parameters": {
+                "AzureDWTableName": {
+                  "type": "String"
+                }
+              }
+            }
+          },
+          {
+            "type": "datasets",
+            "name": "adlsDatasetName",
+            "dependsOn": [
+              "dataFactoryName",
+              "adlsLinkedServiceName"
+            ],
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "type": "AzureDataLakeStoreFile",
+              "typeProperties": {
+                "folderPath": {
+                  "type": "Expression",
+                  "value": "@dataset().FolderPath"
+                },
+                "fileName": {
+                  "type": "Expression",
+                  "value": "@dataset().FileName"
+                },
+                "format": {
+                  "type": "TextFormat",
+                  "columnDelimiter": "|"
+                }
+              },
+              "parameters": {
+                "FileName": {
+                  "type": "String"
+                },
+                "FolderPath": {
+                  "type": "String"
+                }
+              },
+              "linkedServiceName": {
+                "referenceName": "adlsLinkedServiceName",
+                "type": "LinkedServiceReference"
+              }
+            }
+          },
+          {
+            "type": "pipelines",
+            "name": "processpipelineName",
+            "dependsOn": [
+              "dataFactoryName",
+              "azureDWDatasetName",
+              "adlsDatasetName",
+              "usqlStorageLinkedServiceName",
+              "adlaLinkedServiceName"
+            ],
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "activities": [
+                {
+                  "type": "ForEach",
+                  "typeProperties": {
+                    "isSequential": false,
+                    "items": {
+                      "value": "@pipeline().parameters.usqlInputs",
+                      "type": "Expression"
+                    },
+                    "activities": [
+                      {
+                        "type": "DataLakeAnalyticsU-SQL",
+                        "typeProperties": {
+                          "scriptPath": {
+                            "value": "@item().usqlScriptPath",
+                            "type": "Expression"
+                          },
+                          "scriptLinkedService": {
+                            "referenceName": "usqlStorageLinkedServiceName",
+                            "type": "LinkedServiceReference"
+                          },
+                          "degreeOfParallelism": {
+                            "value": "@item().usqlScriptParallelism",
+                            "type": "Expression"
+                          },
+                          "priority": 100,
+                          "parameters": {},
+                          "compilationMode": "Full"
+                        },
+                        "linkedServiceName": {
+                          "referenceName": "adlaLinkedServiceName",
+                          "type": "LinkedServiceReference"
+                        },
+                        "name": "ADLAnalyticsActivity",
+                        "dependsOn": []
+                      }
+                    ]
+                  },
+                  "name": "UsqlForEachActivity",
+                  "dependsOn": []
+                },
+                {
+                  "type": "ForEach",
+                  "typeProperties": {
+                    "isSequential": false,
+                    "items": {
+                      "value": "@pipeline().parameters.azureDWInputs",
+                      "type": "Expression"
+                    },
+                    "activities": [
+                      {
+                        "type": "Copy",
+                        "typeProperties": {
+                          "source": {
+                            "type": "AzureDataLakeStoreSource"
+                          },
+                          "sink": {
+                            "type": "SqlDWSink",
+                            "allowPolyBase": true
+                          }
+                        },
+                        "inputs": [
+                          {
+                            "referenceName": "adlsDatasetName",
+                            "parameters": {
+                              "FileName": {
+                                "value": "@item().sourceFileName",
+                                "type": "Expression"
+                              },
+                              "FolderPath": {
+                                "value": "@item().sourceFolderPath",
+                                "type": "Expression"
+                              }
+                            },
+                            "type": "DatasetReference"
+                          }
+                        ],
+                        "outputs": [
+                          {
+                            "referenceName": "azureDWDatasetName",
+                            "parameters": {
+                              "AzureDWTableName": {
+                                "value": "@item().sinkTableName",
+                                "type": "Expression"
+                              }
+                            },
+                            "type": "DatasetReference"
+                          }
+                        ],
+                        "policy": {
+                          "retry": 2,
+                          "retryIntervalInSeconds": 600
+                        },
+                        "name": "AzureDWCopyActivity"
+                      }
+                    ]
+                  },
+                  "name": "AzureDWCopyForEachActivity",
+                  "dependsOn": [
+                    {
+                      "activity": "UsqlForEachActivity",
+                      "dependencyConditions": [
+                        "Succeeded"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": {
+                "usqlInputs": {
+                  "type": "Array"
+                },
+                "azureDWInputs": {
+                  "type": "Array"
+                }
+              },
+              "concurrency": 1
+            }
+          },
+          {
+            "type": "pipelines",
+            "name": "copypipelineName",
+            "dependsOn": [
+              "dataFactoryName",
+              "onpremSQLDatasetName",
+              "adlsDatasetName",
+              "processpipelineName"
+            ],
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "activities": [
+                {
+                  "type": "ForEach",
+                  "typeProperties": {
+                    "isSequential": false,
+                    "items": {
+                      "value": "@pipeline().parameters.tableInputs",
+                      "type": "Expression"
+                    },
+                    "activities": [
+                      {
+                        "type": "Copy",
+                        "typeProperties": {
+                          "source": {
+                            "type": "SqlSource"
+                          },
+                          "sink": {
+                            "type": "AzureDataLakeStoreSink"
+                          }
+                        },
+                        "inputs": [
+                          {
+                            "referenceName": "onpremSQLDatasetName",
+                            "parameters": {
+                              "SqlTableName": {
+                                "value": "@item().sourceTableName",
+                                "type": "Expression"
+                              }
+                            },
+                            "type": "DatasetReference"
+                          }
+                        ],
+                        "outputs": [
+                          {
+                            "referenceName": "adlsDatasetName",
+                            "parameters": {
+                              "FileName": {
+                                "value": "@item().sinkFileName",
+                                "type": "Expression"
+                              },
+                              "FolderPath": {
+                                "value": "@item().sinkFolderPath",
+                                "type": "Expression"
+                              }
+                            },
+                            "type": "DatasetReference"
+                          }
+                        ],
+                        "name": "CopyActivity"
+                      }
+                    ]
+                  },
+                  "name": "CopyForEachActivity"
+                },
+                {
+                  "type": "ExecutePipeline",
+                  "typeProperties": {
+                    "pipeline": {
+                      "referenceName": "processpipelineName",
+                      "type": "PipelineReference"
+                    },
+                    "parameters": {
+                      "usqlInputs": [
+                        {
+                          "usqlScriptPath": "poc/POC_stgAccountBalance.usql",
+                          "usqlScriptParallelism": 3
+                        },
+                        {
+                          "usqlScriptPath": "poc/POC_stgEncounter.usql",
+                          "usqlScriptParallelism": 3
+                        },
+                        {
+                          "usqlScriptPath": "poc/POC_stgProvider.usql",
+                          "usqlScriptParallelism": 3
+                        }
+                      ],
+                      "azureDWInputs": [
+                        {
+                          "sourceFileName": "stgProvider.txt",
+                          "sourceFolderPath": "POC/STG",
+                          "sinkTableName": "stgProvider"
+                        },
+                        {
+                          "sourceFileName": "stgAccountBalance.txt",
+                          "sourceFolderPath": "POC/STG",
+                          "sinkTableName": "stgAccountBalance"
+                        },
+                        {
+                          "sourceFileName": "stgEncounter.txt",
+                          "sourceFolderPath": "POC/STG",
+                          "sinkTableName": "stgEncounter"
+                        }
+                      ]
+                    },
+                    "waitOnCompletion": false
+                  },
+                  "name": "StartProcessPipeline",
+                  "dependsOn": [
+                    {
+                      "activity": "CopyForEachActivity",
+                      "dependencyConditions": [
+                        "Succeeded"
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": {
+                "tableInputs": {
+                  "type": "Array"
+                }
+              }
+            }
+          },
+          {
+            "type": "triggers",
+            "name": "triggerName",
+            "dependsOn": [
+              "dataFactoryName",
+              "copypipelineName"
+            ],
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "type": "TumblingWindowTrigger",
+              "typeProperties": {
+                "frequency": "Hour",
+                "interval": 24,
+                "startTime": "2017-11-01T00:00:00Z",
+                "endTime": "2017-11-05T00:00:00Z",
+                "delay": "00:00:01",
+                "retryPolicy": {
+                  "count": 2,
+                  "intervalInSeconds": 600
+                },
+                "maxConcurrency": 1
+              },
+              "pipeline": {
+                "pipelineReference": {
+                  "type": "PipelineReference",
+                  "referenceName": "copypipelineName"
+                },
+                "parameters": {
+                  "tableInputs": [
+                    {
+                      "sourceTableName": "db_0677_01_ODS_01.ods.PhysicianCodesX",
+                      "sinkFileName": "PhysicianCodesX.txt",
+                      "sinkFolderPath": "POC/ODS"
+                    },
+                    {
+                      "sourceTableName": "db_0677_01_ODS_01.ods.FacilityCodesX",
+                      "sinkFileName": "FacilityCodesX.txt",
+                      "sinkFolderPath": "POC/ODS"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Data Factory: sample from tutorial",
+      "definition": "http://schema.management.azure.com/schemas/2017-09-01-preview/Microsoft.DataFactory.json#/resourceDefinitions/factories",
+      "json": {
+        "name": "dataFactoryName",
+        "apiVersion": "2017-09-01-preview",
+        "type": "Microsoft.DataFactory/factories",
+        "location": "WestUS",
+        "properties": {
+          "loggingStorageAccountName": "storageAccountName",
+          "loggingStorageAccountKey": "storageAccountKey"
+        },
+        "resources": [
+          {
+            "type": "linkedservices",
+            "name": "azureStorageLinkedServiceName",
+            "dependsOn": [
+              "dataFactoryName"
+            ],
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "type": "AzureStorage",
+              "description": "Azure Storage linked service",
+              "typeProperties": {
+                "connectionString": {
+                  "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',storageAccountName,';AccountKey=','storageAccountKey')]",
+                  "type": "SecureString"
+                }
+              }
+            }
+          },
+          {
+            "type": "datasets",
+            "name": "inputDatasetName",
+            "dependsOn": [
+              "dataFactoryName",
+              "azureStorageLinkedServiceName"
+            ],
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "type": "AzureBlob",
+              "typeProperties": {
+                "folderPath": "blobContainer/inputBlobFolder/",
+                "fileName": "inputBlobName"
+              },
+              "linkedServiceName": {
+                "referenceName": "azureStorageLinkedServiceName",
+                "type": "LinkedServiceReference"
+              }
+            }
+          },
+          {
+            "type": "datasets",
+            "name": "outputDatasetName",
+            "dependsOn": [
+              "dataFactoryName",
+              "azureStorageLinkedServiceName"
+            ],
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "type": "AzureBlob",
+              "typeProperties": {
+                "folderPath": "blobContainer/outputBlobFolder/",
+                "fileName": "outputBlobName"
+              },
+              "linkedServiceName": {
+                "referenceName": "azureStorageLinkedServiceName",
+                "type": "LinkedServiceReference"
+              }
+            }
+          },
+          {
+            "type": "pipelines",
+            "name": "pipelineName",
+            "dependsOn": [
+              "dataFactoryName",
+              "azureStorageLinkedServiceName",
+              "inputDatasetName",
+              "outputDatasetName"
+            ],
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "activities": [
+                {
+                  "type": "Copy",
+                  "typeProperties": {
+                    "source": {
+                      "type": "BlobSource"
+                    },
+                    "sink": {
+                      "type": "BlobSink"
+                    }
+                  },
+                  "name": "copyActivity",
+                  "inputs": [
+                    {
+                      "referenceName": "inputDatasetName",
+                      "type": "DatasetReference"
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "referenceName": "outputDatasetName",
+                      "type": "DatasetReference"
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "type": "triggers",
+            "name": "triggerName",
+            "dependsOn": [
+              "dataFactoryName",
+              "azureStorageLinkedServiceName",
+              "inputDatasetName",
+              "outputDatasetName",
+              "pipelineName"
+            ],
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "type": "ScheduleTrigger",
+              "typeProperties": {
+                "recurrence": {
+                  "frequency": "Hour",
+                  "interval": 1,
+                  "startTime": "triggerStartTime",
+                  "endTime": "triggerEndTime",
+                  "timeZone": "UTC"
+                }
+              },
+              "pipelines": [
+                {
+                  "pipelineReference": {
+                    "type": "PipelineReference",
+                    "referenceName": "ArmtemplateSampleCopyPipeline"
+                  },
+                  "parameters": {}
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Data Factory: top-level and child resources - Azure Blob Copy",
+      "definition": "http://schema.management.azure.com/schemas/2017-09-01-preview/Microsoft.DataFactory.json#/resourceDefinitions/factories",
+      "json": {
+        "name": "dataFactoryName",
+        "apiVersion": "2017-09-01-preview",
+        "type": "Microsoft.DataFactory/factories",
+        "location": "WestUS",
+        "properties": {},
+        "resources": [
+          {
+            "type": "linkedservices",
+            "name": "azureStorageLinkedServiceName",
+            "dependsOn": [
+              "dataFactoryName"
+            ],
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "type": "AzureStorage",
+              "description": "Azure Storage linked service",
+              "typeProperties": {
+                "connectionString": {
+                  "value": "DefaultEndpointsProtocol=https;AccountName=storageAccountName;AccountKey=storageAccountKey",
+                  "type": "SecureString"
+                }
+              }
+            }
+          },
+          {
+            "type": "datasets",
+            "name": "inputDatasetName",
+            "dependsOn": [
+              "dataFactoryName",
+              "azureStorageLinkedServiceName"
+            ],
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "type": "AzureBlob",
+              "typeProperties": {
+                "format": {
+                  "type": "TextFormat",
+                  "columnDelimiter": ",",
+                  "nullValue": "\\N",
+                  "treatEmptyAsNull": false,
+                  "firstRowAsHeader": false
+                },
+                "folderPath": "blobContainer/inputBlobFolder/",
+                "fileName": "inputBlobName"
+              },
+              "linkedServiceName": {
+                "referenceName": "azureStorageLinkedServiceName",
+                "type": "LinkedServiceReference"
+              }
+            }
+          },
+          {
+            "type": "datasets",
+            "name": "outputDatasetName",
+            "dependsOn": [
+              "dataFactoryName",
+              "azureStorageLinkedServiceName"
+            ],
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "type": "AzureBlob",
+              "typeProperties": {
+                "format": {
+                  "type": "TextFormat",
+                  "columnDelimiter": ",",
+                  "nullValue": "\\N",
+                  "treatEmptyAsNull": false,
+                  "firstRowAsHeader": false
+                },
+                "folderPath": "blobContainer/outputBlobFolder/",
+                "fileName": "outputBlobName"
+              },
+              "linkedServiceName": {
+                "referenceName": "azureStorageLinkedServiceName",
+                "type": "LinkedServiceReference"
+              }
+            }
+          },
+          {
+            "type": "pipelines",
+            "name": "pipelineName",
+            "dependsOn": [
+              "dataFactoryName",
+              "azureStorageLinkedServiceName",
+              "inputDatasetName",
+              "outputDatasetName"
+            ],
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "activities": [
+                {
+                  "type": "Copy",
+                  "typeProperties": {
+                    "source": {
+                      "type": "BlobSource"
+                    },
+                    "sink": {
+                      "type": "BlobSink"
+                    }
+                  },
+                  "name": "copyActivity",
+                  "inputs": [
+                    {
+                      "referenceName": "inputDatasetName",
+                      "type": "DatasetReference"
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "referenceName": "outputDatasetName",
+                      "type": "DatasetReference"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Data Factory: top-level and child resources",
+      "definition": "http://schema.management.azure.com/schemas/2017-09-01-preview/Microsoft.DataFactory.json#/resourceDefinitions/factories",
+      "json": {
+        "name": "connectedCarDataFactory",
+        "apiVersion": "2017-09-01-preview",
+        "type": "Microsoft.DataFactory/factories",
+        "location": "NorthEurope",
+        "properties": {},
+        "resources": [
+          {
+            "type": "linkedservices",
+            "name": "azureSqlLinkedServiceName",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "type": "AzureSqlDatabase",
+              "typeProperties": {
+                "connectionString": "[concat('Server=tcp:',parameters('sqlServerName'),'.database.windows.net,1433;Database=connectedcar;User ID=',parameters('sqlServerUserName'),';Password=',parameters('sqlServerPassword'),';Trusted_Connection=False;Encrypt=True;Connection Timeout=30')]"
+              }
+            }
+          },
+          {
+            "type": "datasets",
+            "name": "AggresiveDrivingModelReportName",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "structure": [
+                {
+                  "name": "vin",
+                  "type": "String"
+                },
+                {
+                  "name": "model",
+                  "type": "String"
+                },
+                {
+                  "name": "timestamp",
+                  "type": "String"
+                },
+                {
+                  "name": "city",
+                  "type": "String"
+                },
+                {
+                  "name": "speed",
+                  "type": "String"
+                },
+                {
+                  "name": "transmission_gear_position",
+                  "type": "String"
+                },
+                {
+                  "name": "brake_pedal_status",
+                  "type": "String"
+                },
+                {
+                  "name": "Year",
+                  "type": "String"
+                },
+                {
+                  "name": "Month",
+                  "type": "String"
+                }
+              ],
+              "type": "AzureSqlTable",
+              "linkedServiceName": {
+                "referenceName": "AzureSqlLinkedService",
+                "type": "LinkedServiceReference"
+              },
+              "typeProperties": {
+                "tableName": "AggresiveDrivingModelReport"
+              },
+              "availability": {
+                "frequency": "Month",
+                "interval": 1,
+                "style": "StartOfInterval"
+              }
+            }
+          },
+          {
+            "type": "pipelines",
+            "name": "PartitionCarEventsPipelineName",
+            "apiVersion": "2017-09-01-preview",
+            "properties": {
+              "description": "This is a sample pipeline to prepare the car events data for further processing",
+              "activities": [
+                {
+                  "name": "BlobPartitionHiveActivity",
+                  "inputs": [
+                    {
+                      "name": "RawCarEventsTable"
+                    }
+                  ],
+                  "outputs": [
+                    {
+                      "name": "PartitionedCarEventsTable"
+                    }
+                  ],
+                  "linkedServiceName": {
+                    "referenceName": "hdInsightLinkedServiceName",
+                    "type": "LinkedServiceReference"
+                  },
+                  "type": "HDInsightHive",
+                  "typeProperties": {
+                    "scriptPath": "connectedcar\\scripts\\partitioncarevents.hql",
+                    "scriptLinkedService": "StorageLinkedService",
+                    "defines": {
+                      "RAWINPUT": "[concat('wasb://connectedcar@',parameters('storageAccountName'),'.blob.core.windows.net/rawcarevents/')]",
+                      "PARTITIONEDOUTPUT": "[concat('wasb://connectedcar@',parameters('storageAccountName'),'.blob.core.windows.net/partitionedcarevents/')]",
+                      "Year": "$$Text.Format('{0:yyyy}',SliceStart)",
+                      "Month": "$$Text.Format('{0:%M}',SliceStart)",
+                      "Day": "$$Text.Format('{0:%d}',SliceStart)"
+                    }
+                  },
+                  "policy": {
+                    "concurrency": 1,
+                    "executionPriorityOrder": "NewestFirst",
+                    "retry": 2,
+                    "timeout": "01:00:00"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

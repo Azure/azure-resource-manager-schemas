@@ -1,14 +1,14 @@
 "use strict";
 
-const assert = require('assert')
-const path = require('path')
-const fs = require('fs')
-const url = require('url')
-const SchemaService = require("vscode-json-languageservice");
-const Types = require('vscode-languageserver-types');
-const forEach = require('mocha-each');
+var assert = require('assert')
+var path = require('path')
+var fs = require('fs')
+var url = require('url')
+var SchemaService = require("vscode-json-languageservice");
+var Types = require('vscode-languageserver-types');
+var forEach = require('mocha-each');
 
-let normalizedSchemaId = function (id) {
+function normalizedSchemaId (id) {
 	if (id.length && id[id.length - 1] === '#') {
 		id = id.substr(0, id.length - 1);
 	}
@@ -16,16 +16,16 @@ let normalizedSchemaId = function (id) {
 	return id;
 }
 
-let requestServiceMock = function (uri) {
-  let schemaRootUri = 'https://schema.management.azure.com/schemas';
+function requestServiceMock (uri) {
+  var schemaRootUri = 'https://schema.management.azure.com/schemas';
   uri = normalizedSchemaId(uri);
 
 	if (uri.startsWith(schemaRootUri)) {
-		let relativePath = uri.substr(schemaRootUri.length);
+		var relativePath = uri.substr(schemaRootUri.length);
 
 		if (relativePath) {
 			return new Promise((resolve, reject) => {
-				let filePath = path.join(__dirname, '../schemas', relativePath);
+				var filePath = path.join(__dirname, '../schemas', relativePath);
 
 				fs.readFile(filePath, 'UTF-8', (err, result) => {
 					err ? reject('Resource not found.') : resolve(result.toString());
@@ -37,32 +37,32 @@ let requestServiceMock = function (uri) {
 	return Promise.reject('Resource not found.');
 };
 
-let workspaceContext = {
+var workspaceContext = {
 	resolveRelativePath: (relativePath, resource) => {
 		return url.resolve(resource, relativePath);
 	}
 };
 
-let parameters = {
+var parameters = {
 	schemaRequestService: requestServiceMock,
 	workspaceContext: workspaceContext
 };
 
-let service = SchemaService.getLanguageService(parameters);
-let testFolder = './templateFiles';
+var service = SchemaService.getLanguageService(parameters);
+var testFolder = './templateFiles';
 
-let validateTemplateWithSchema = function (file) {
-	let filePath = path.join(__dirname, testFolder, file);
-	let content = fs.readFileSync(filePath, 'utf8');
+function validateTemplateWithSchema(file) {
+	var filePath = path.join(__dirname, testFolder, file);
+	var content = fs.readFileSync(filePath, 'utf8');
 
-	let textDocument = Types.TextDocument.create(filePath, 'json', 0, content);
-	let jsonDocument = service.parseJSONDocument(textDocument);
+	var textDocument = Types.TextDocument.create(filePath, 'json', 0, content);
+	var jsonDocument = service.parseJSONDocument(textDocument);
 
 	return service.doValidation(textDocument, jsonDocument);
 };
 
 describe('validate template files with schema - ', () => {
-	let files = fs.readdirSync(testFolder);
+	var files = fs.readdirSync(testFolder);
 
 	// // it.each(files, "running schema validation on '%s'", ['element'], function (element) {
 	// // 	this.timeout(5000);

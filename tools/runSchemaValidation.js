@@ -24,10 +24,10 @@ function requestServiceMock (uri) {
 		var relativePath = uri.substr(schemaRootUri.length);
 
 		if (relativePath) {
-			return new Promise((resolve, reject) => {
+			return new Promise(function (resolve, reject) {
 				var filePath = path.join(__dirname, '../schemas', relativePath);
 
-				fs.readFile(filePath, 'UTF-8', (err, result) => {
+				fs.readFile(filePath, 'UTF-8', function (err, result) {
 					err ? reject('Resource not found.') : resolve(result.toString());
 				});
 			});
@@ -38,7 +38,7 @@ function requestServiceMock (uri) {
 };
 
 var workspaceContext = {
-	resolveRelativePath: (relativePath, resource) => {
+	resolveRelativePath: function (relativePath, resource) {
 		return url.resolve(resource, relativePath);
 	}
 };
@@ -61,7 +61,7 @@ function validateTemplateWithSchema(file) {
 	return service.doValidation(textDocument, jsonDocument);
 };
 
-describe('validate template files with schema - ', () => {
+describe('validate template files with schema - ', function() {
 	var files = fs.readdirSync(testFolder);
 
 	// // it.each(files, "running schema validation on '%s'", ['element'], function (element) {
@@ -93,8 +93,8 @@ describe('validate template files with schema - ', () => {
 					assert.deepEqual(result, [], 'there are validation errors.');
 				}
 			).then(
-        () => done(), 
-        (error) => done(error)
+        function () { done() }, 
+        function(error) { done(error) }
       );
 	});
 });

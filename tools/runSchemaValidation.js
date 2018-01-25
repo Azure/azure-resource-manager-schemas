@@ -49,10 +49,10 @@ let parameters = {
 };
 
 let service = SchemaService.getLanguageService(parameters);
-let testFolder = './templateFiles';
+let templateFolder = './templateFiles';
 
 let validateTemplateWithSchema = function (file) {
-	let filePath = path.join(__dirname, testFolder, file);
+	let filePath = path.join(__dirname, templateFolder, file);
 	let content = fs.readFileSync(filePath, 'utf8');
 
 	let textDocument = Types.TextDocument.create(filePath, 'json', 0, content);
@@ -62,35 +62,14 @@ let validateTemplateWithSchema = function (file) {
 };
 
 describe('validate template files with schema - ', () => {
-	let files = fs.readdirSync(testFolder);
-
-	// // it.each(files, "running schema validation on '%s'", ['element'], function (element) {
-	// // 	this.timeout(5000);
-
-	// // 	validateTemplateWithSchema(element)
-	// // 	.then(
-	// // 		function(result) {
-	// // 			//assert.fail("test failed");
-	// // 			assert.deepEqual(result, [], 'test failed');
-
-	// // 			//console.log(JSON.stringify(result, null, 2));
-	// // 			//next();
-	// // 		});
-	// // 	// .then(() => testDone(), (error) => {
-	// // 	// 	testDone(error);
-	// // 	// })
-	// // 	//.catch((err) => { console.log(err); })
-	// // 	//.then(() => next());
-
-	// // 	// console.log(validateResult);
-	// // });
+	let files = fs.readdirSync(templateFolder);
 
 	forEach(files).it("running schema validation on '%s'", function (file, done) {
 		this.timeout(5000);
 
 		validateTemplateWithSchema(file)
 			.then(function (result) {
-					assert.deepEqual(result, [], 'there are validation errors.');
+					assert.deepEqual(result, [], `there are validation errors in template '${file}'.`);
 				}
 			).then(
         () => done(), 

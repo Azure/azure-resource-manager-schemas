@@ -1,0 +1,108 @@
+{
+  "tests": [
+    {
+      "name": "Test cluster with all features",
+      "definition": "https://schema.management.azure.com/schemas/2018-03-01/Microsoft.BatchAI.json#/resourceDefinitions/clusters",
+      "json": {
+        "type": "Microsoft.BatchAI/clusters",
+        "name": "[variables('cluster_name')]",
+        "apiVersion": "2018-03-01",
+        "location": "[parameters('location')]",
+        "properties": {
+          "vmSize": "STANDARD_D1",
+          "userAccountSettings": {
+            "adminUserName": "adminuser",
+            "adminUserPassword": "mypassword",
+            "adminUserSshPublicKey": "[variables('cluster_name')]"
+          },
+          "virtualMachineConfiguration": {
+            "imageReference": {
+              "publisher": "Canonical",
+              "offer": "UbuntuServer",
+              "sku": "16.04-lts",
+              "version": "latest",
+              "virtualMachineImageId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/demorg/providers/Microsoft.Compute/images/image"
+            }
+          },
+          "scaleSettings": {
+            "manual": {
+              "targetNodeCount": 1
+            }
+          },
+          "nodeSetup": {
+            "mountVolumes": {
+              "azureFileShares": [
+                {
+                  "accountName": "mystorageaccnt",
+                  "azureFileUrl": "https://mystorageaccnt.file.core.windows.net/share",
+                  "relativeMountPath": "afs",
+                  "credentials": {
+                    "accountKey": "secret"
+                  }
+                }
+              ],
+              "azureBlobFileSystems": [
+                {
+                  "accountName": "mystorageaccnt",
+                  "containerName": "container",
+                  "relativeMountPath": "bfs",
+                  "credentials": {
+                    "accountKeySecretReference": {
+                      "secretUrl": "https://keyvaults.vault.azure.net/secrets/secret",
+                      "sourceVault": {
+                        "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/keyvault/providers/Microsoft.KeyVault/vaults/keyvault"
+                      }
+                    }
+                  }
+                }
+              ],
+              "fileServers": [
+                {
+                  "fileServer": {
+                    "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/demorg/providers/Microsoft.BatchAI/fileservers/nfs"
+                  },
+                  "relativeMountPath": "nfs",
+                  "sourceDirectory": "/data/mydata"
+                }
+              ]
+            },
+            "setupTask": {
+              "commandLine": "echo hello",
+              "runElevated": true,
+              "stdOutErrPathPrefix": "$AZ_BATCHAI_MOUNT_ROOT/afs",
+              "environmentVariables": [
+                {
+                  "name": "ENV1",
+                  "value": "Value"
+                }
+              ],
+              "secrets": [
+                {
+                  "name": "SECRET1",
+                  "value": "SecretValue"
+                },
+                {
+                  "name": "SECRET2",
+                  "valueSecretReference": {
+                    "secretUrl": "https://keyvaults.vault.azure.net/secrets/secret",
+                    "sourceVault": {
+                      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/keyvault/providers/Microsoft.KeyVault/vaults/keyvault"
+                    }
+                  }
+                }
+              ]
+            },
+            "performanceCountersSettings": {
+              "appInsightsReference": {
+                "component": {
+                  "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/demorg/providers/microsoft.insights/components/mine"
+                },
+                "instrumentationKey": "secret"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

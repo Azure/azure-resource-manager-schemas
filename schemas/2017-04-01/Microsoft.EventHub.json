@@ -7,6 +7,12 @@
     "namespaces": {
       "type": "object",
       "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 6,
+          "maxLength": 50,
+          "description": "The Namespace name"
+        },
         "type": {
           "type": "string",
           "enum": [
@@ -21,17 +27,7 @@
         },
         "location": {
           "type": "string",
-          "description": "Namespace location."
-        },
-        "sku": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/Sku"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ]
+          "description": "Resource location"
         },
         "tags": {
           "oneOf": [
@@ -45,17 +41,29 @@
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Namespace tags."
+          "description": "Resource tags"
         },
-        "properties": {
+        "sku": {
           "oneOf": [
             {
-              "$ref": "#/definitions/NamespaceProperties"
+              "$ref": "#/definitions/Sku"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Properties of sku resource"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EHNamespace_properties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Namespace properties supplied for create namespace operation."
         },
         "resources": {
           "type": "array",
@@ -65,6 +73,9 @@
                 "$ref": "#/definitions/namespaces_eventhubs_childResource"
               },
               {
+                "$ref": "#/definitions/namespaces_disasterRecoveryConfigs_childResource"
+              },
+              {
                 "$ref": "#/definitions/namespaces_AuthorizationRules_childResource"
               }
             ]
@@ -72,9 +83,9 @@
         }
       },
       "required": [
+        "name",
         "type",
         "apiVersion",
-        "location",
         "properties"
       ],
       "description": "Microsoft.EventHub/namespaces"
@@ -82,6 +93,11 @@
     "namespaces_AuthorizationRules": {
       "type": "object",
       "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The authorization rule name."
+        },
         "type": {
           "type": "string",
           "enum": [
@@ -94,35 +110,75 @@
             "2017-04-01"
           ]
         },
-        "location": {
-          "type": "string",
-          "description": "data center location."
-        },
-        "name": {
-          "type": "string",
-          "description": "Name of the AuthorizationRule."
-        },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/SharedAccessAuthorizationRuleProperties"
+              "$ref": "#/definitions/AuthorizationRule_properties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Properties supplied to create or update AuthorizationRule"
         }
       },
       "required": [
+        "name",
         "type",
         "apiVersion",
         "properties"
       ],
       "description": "Microsoft.EventHub/namespaces/AuthorizationRules"
     },
+    "namespaces_disasterRecoveryConfigs": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50,
+          "description": "The Disaster Recovery configuration name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.EventHub/namespaces/disasterRecoveryConfigs"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2017-04-01"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ArmDisasterRecovery_properties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties required to the Create Or Update Alias(Disaster Recovery configurations)"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.EventHub/namespaces/disasterRecoveryConfigs"
+    },
     "namespaces_eventhubs": {
       "type": "object",
       "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The Event Hub name"
+        },
         "type": {
           "type": "string",
           "enum": [
@@ -135,23 +191,16 @@
             "2017-04-01"
           ]
         },
-        "location": {
-          "type": "string",
-          "description": "Location of the resource."
-        },
-        "name": {
-          "type": "string",
-          "description": "Name of the Event Hub."
-        },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/EventHubProperties"
+              "$ref": "#/definitions/Eventhub_properties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Properties supplied to the Create Or Update Event Hub operation."
         },
         "resources": {
           "type": "array",
@@ -168,6 +217,7 @@
         }
       },
       "required": [
+        "name",
         "type",
         "apiVersion",
         "properties"
@@ -177,6 +227,11 @@
     "namespaces_eventhubs_authorizationRules": {
       "type": "object",
       "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The authorization rule name."
+        },
         "type": {
           "type": "string",
           "enum": [
@@ -189,26 +244,20 @@
             "2017-04-01"
           ]
         },
-        "location": {
-          "type": "string",
-          "description": "data center location."
-        },
-        "name": {
-          "type": "string",
-          "description": "Name of the AuthorizationRule."
-        },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/SharedAccessAuthorizationRuleProperties"
+              "$ref": "#/definitions/AuthorizationRule_properties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Properties supplied to create or update AuthorizationRule"
         }
       },
       "required": [
+        "name",
         "type",
         "apiVersion",
         "properties"
@@ -218,6 +267,12 @@
     "namespaces_eventhubs_consumergroups": {
       "type": "object",
       "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 50,
+          "description": "The consumer group name"
+        },
         "type": {
           "type": "string",
           "enum": [
@@ -230,26 +285,20 @@
             "2017-04-01"
           ]
         },
-        "location": {
-          "type": "string",
-          "description": "Location of the resource."
-        },
-        "name": {
-          "type": "string",
-          "description": "Name of the consumer group."
-        },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/ConsumerGroupProperties"
+              "$ref": "#/definitions/ConsumerGroup_properties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Single item in List or Get Consumer group operation"
         }
       },
       "required": [
+        "name",
         "type",
         "apiVersion",
         "properties"
@@ -258,341 +307,21 @@
     }
   },
   "definitions": {
-    "ConsumerGroupProperties": {
+    "ArmDisasterRecovery_properties": {
       "type": "object",
       "properties": {
-        "createdAt": {
+        "partnerNamespace": {
           "type": "string",
-          "format": "date-time",
-          "description": "Exact time the message was created."
+          "description": "ARM Id of the Primary/Secondary eventhub namespace name, which is part of GEO DR pairning"
         },
-        "eventHubPath": {
+        "alternateName": {
           "type": "string",
-          "description": "The path of the event hub."
-        },
-        "updatedAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "The exact time the message has been updated."
-        },
-        "userMetadata": {
-          "type": "string",
-          "description": "The user metadata."
-        }
-      }
-    },
-    "EventHubProperties": {
-      "type": "object",
-      "properties": {
-        "partitionIds": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "type": "integer"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Current number of shards on the Event Hub."
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Exact time the Event was created."
-        },
-        "updatedAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "The exact time the message has been updated."
-        },
-        "messageRetentionInDays": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Number of days to retain the events for this Event Hub."
-        },
-        "partitionCount": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Number of partitions created for EventHub."
-        },
-        "status": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Active",
-                "Disabled",
-                "Restoring",
-                "SendDisabled",
-                "ReceiveDisabled",
-                "Creating",
-                "Deleting",
-                "Renaming",
-                "Unknown"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Enumerates the possible values for the status of the EventHub."
-        },
-        "captureDescription": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/CaptureDescription"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Properties supplied to the Create Or Update Event Hub operation."
-        }
-      }
-    },
-    "NamespaceProperties": {
-      "type": "object",
-      "properties": {
-        "provisioningState": {
-          "type": "string",
-          "description": "Provisioning state of the Namespace."
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "The time the namespace was created."
-        },
-        "updatedAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "The time the namespace was updated."
-        },
-        "serviceBusEndpoint": {
-          "type": "string",
-          "description": "Endpoint you can use to perform ServiceBus operations."
-        },
-        "metricId": {
-          "type": "string",
-          "description": "Identifier for Azure Insights metrics."
-        },
-        "isAutoInflateEnabled": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Value that indicates whether AutoInflate is enabled for eventhub namespace."
-        },
-        "maximumThroughputUnits": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Upper limit of throughput units when AutoInflate is enabled, vaule should be within 0 to 20 throughput units. ( '0' if AutoInflateEnabled = true)"
+          "description": "Alternate name specified when alias and namespace names are same."
         }
       },
-      "description": "Properties of the Namespace."
+      "description": "Properties required to the Create Or Update Alias(Disaster Recovery configurations)"
     },
-    "namespaces_AuthorizationRules_childResource": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "AuthorizationRules"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2017-04-01"
-          ]
-        },
-        "location": {
-          "type": "string",
-          "description": "data center location."
-        },
-        "name": {
-          "type": "string",
-          "description": "Name of the AuthorizationRule."
-        },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/SharedAccessAuthorizationRuleProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "required": [
-        "type",
-        "apiVersion",
-        "properties"
-      ],
-      "description": "Microsoft.EventHub/namespaces/AuthorizationRules"
-    },
-    "namespaces_eventhubs_authorizationRules_childResource": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "authorizationRules"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2017-04-01"
-          ]
-        },
-        "location": {
-          "type": "string",
-          "description": "data center location."
-        },
-        "name": {
-          "type": "string",
-          "description": "Name of the AuthorizationRule."
-        },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/SharedAccessAuthorizationRuleProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "required": [
-        "type",
-        "apiVersion",
-        "properties"
-      ],
-      "description": "Microsoft.EventHub/namespaces/eventhubs/authorizationRules"
-    },
-    "namespaces_eventhubs_childResource": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "eventhubs"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2017-04-01"
-          ]
-        },
-        "location": {
-          "type": "string",
-          "description": "Location of the resource."
-        },
-        "name": {
-          "type": "string",
-          "description": "Name of the Event Hub."
-        },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/EventHubProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ]
-        },
-        "resources": {
-          "type": "array",
-          "items": {
-            "oneOf": [
-              {
-                "$ref": "#/definitions/namespaces_eventhubs_consumergroups_childResource"
-              },
-              {
-                "$ref": "#/definitions/namespaces_eventhubs_authorizationRules_childResource"
-              }
-            ]
-          }
-        }
-      },
-      "required": [
-        "type",
-        "apiVersion",
-        "properties"
-      ],
-      "description": "Microsoft.EventHub/namespaces/eventhubs"
-    },
-    "namespaces_eventhubs_consumergroups_childResource": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "consumergroups"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2017-04-01"
-          ]
-        },
-        "location": {
-          "type": "string",
-          "description": "Location of the resource."
-        },
-        "name": {
-          "type": "string",
-          "description": "Name of the consumer group."
-        },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ConsumerGroupProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "required": [
-        "type",
-        "apiVersion",
-        "properties"
-      ],
-      "description": "Microsoft.EventHub/namespaces/eventhubs/consumergroups"
-    },
-    "SharedAccessAuthorizationRuleProperties": {
+    "AuthorizationRule_properties": {
       "type": "object",
       "properties": {
         "rights": {
@@ -615,64 +344,10 @@
           "description": "The rights associated with the rule."
         }
       },
-      "required": [
-        "rights"
-      ],
-      "description": "SharedAccessAuthorizationRule properties."
-    },
-    "Sku": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Basic",
-                "Standard",
-                "Premium"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Name of this Sku."
-        },
-        "tier": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Basic",
-                "Standard",
-                "Premium"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "The tier of this particular SKU."
-        },
-        "capacity": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "The eventhub throughput units"
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "description": "Sku of the Namespace."
+      "description": "Properties supplied to create or update AuthorizationRule"
     },
     "CaptureDescription": {
+      "type": "object",
       "properties": {
         "enabled": {
           "oneOf": [
@@ -699,12 +374,13 @@
             }
           ],
           "description": "Enumerates the possible values for the encoding format of capture description."
-
         },
         "intervalInSeconds": {
           "oneOf": [
             {
-              "type": "integer"
+              "type": "integer",
+              "minimum": 60,
+              "maximum": 900
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -715,7 +391,9 @@
         "sizeLimitInBytes": {
           "oneOf": [
             {
-              "type": "integer"
+              "type": "integer",
+              "minimum": 10485760,
+              "maximum": 524288000
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -737,29 +415,407 @@
       },
       "description": "Properties to configure capture description for eventhub"
     },
+    "ConsumerGroup_properties": {
+      "type": "object",
+      "properties": {
+        "userMetadata": {
+          "type": "string",
+          "description": "Usermetadata is a placeholder to store user-defined string data with maximum length 1024. e.g. it can be used to store descriptive data, such as list of teams and their contact information also user-defined configuration settings can be stored."
+        }
+      },
+      "description": "Single item in List or Get Consumer group operation"
+    },
     "Destination": {
+      "type": "object",
       "properties": {
         "name": {
           "type": "string",
           "description": "Name for capture destination"
         },
         "properties": {
-          "storageAccountResourceId": {
-            "type": "string",
-            "description": "Resource id of the storage account to be used to create the blobs"
-          },
-          "blobContainer": {
-            "type": "string",
-            "description": "Blob container Name"
-          },
-          "archiveNameFormat": {
-            "type": "string",
-            "description": "Blob naming convention for archive, e.g. {Namespace}/{EventHub}/{PartitionId}/{Year}/{Month}/{Day}/{Hour}/{Minute}/{Second}. Here all the parameters (Namespace,EventHub .. etc) are mandatory irrespective of order"
-          },
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Destination_properties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
           "description": "Properties describing the storage account, blob container and acrchive anme format for capture destination"
         }
       },
       "description": "Capture storage details for capture description"
+    },
+    "Destination_properties": {
+      "type": "object",
+      "properties": {
+        "storageAccountResourceId": {
+          "type": "string",
+          "description": "Resource id of the storage account to be used to create the blobs"
+        },
+        "blobContainer": {
+          "type": "string",
+          "description": "Blob container Name"
+        },
+        "archiveNameFormat": {
+          "type": "string",
+          "description": "Blob naming convention for archive, e.g. {Namespace}/{EventHub}/{PartitionId}/{Year}/{Month}/{Day}/{Hour}/{Minute}/{Second}. Here all the parameters (Namespace,EventHub .. etc) are mandatory irrespective of order"
+        }
+      },
+      "description": "Properties describing the storage account, blob container and acrchive anme format for capture destination"
+    },
+    "EHNamespace_properties": {
+      "type": "object",
+      "properties": {
+        "isAutoInflateEnabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Value that indicates whether AutoInflate is enabled for eventhub namespace."
+        },
+        "maximumThroughputUnits": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Upper limit of throughput units when AutoInflate is enabled, vaule should be within 0 to 20 throughput units. ( '0' if AutoInflateEnabled = true)"
+        }
+      },
+      "description": "Namespace properties supplied for create namespace operation."
+    },
+    "Eventhub_properties": {
+      "type": "object",
+      "properties": {
+        "messageRetentionInDays": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Number of days to retain the events for this Event Hub, value should be 1 to 7 days"
+        },
+        "partitionCount": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Number of partitions created for the Event Hub, allowed values are from 1 to 32 partitions."
+        },
+        "status": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Active",
+                "Disabled",
+                "Restoring",
+                "SendDisabled",
+                "ReceiveDisabled",
+                "Creating",
+                "Deleting",
+                "Renaming",
+                "Unknown"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Enumerates the possible values for the status of the Event Hub."
+        },
+        "captureDescription": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CaptureDescription"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of capture description"
+        }
+      },
+      "description": "Properties supplied to the Create Or Update Event Hub operation."
+    },
+    "namespaces_AuthorizationRules_childResource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The authorization rule name."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "AuthorizationRules"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2017-04-01"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AuthorizationRule_properties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties supplied to create or update AuthorizationRule"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.EventHub/namespaces/AuthorizationRules"
+    },
+    "namespaces_disasterRecoveryConfigs_childResource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The Disaster Recovery configuration name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "disasterRecoveryConfigs"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2017-04-01"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ArmDisasterRecovery_properties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties required to the Create Or Update Alias(Disaster Recovery configurations)"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.EventHub/namespaces/disasterRecoveryConfigs"
+    },
+    "namespaces_eventhubs_authorizationRules_childResource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The authorization rule name."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "authorizationRules"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2017-04-01"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AuthorizationRule_properties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties supplied to create or update AuthorizationRule"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.EventHub/namespaces/eventhubs/authorizationRules"
+    },
+    "namespaces_eventhubs_childResource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The Event Hub name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "eventhubs"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2017-04-01"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Eventhub_properties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties supplied to the Create Or Update Event Hub operation."
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/namespaces_eventhubs_consumergroups_childResource"
+              },
+              {
+                "$ref": "#/definitions/namespaces_eventhubs_authorizationRules_childResource"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.EventHub/namespaces/eventhubs"
+    },
+    "namespaces_eventhubs_consumergroups_childResource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The consumer group name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "consumergroups"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2017-04-01"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ConsumerGroup_properties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Single item in List or Get Consumer group operation"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.EventHub/namespaces/eventhubs/consumergroups"
+    },
+    "Sku": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Basic",
+                "Standard"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Name of this SKU."
+        },
+        "tier": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Basic",
+                "Standard"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The billing tier of this particular SKU."
+        },
+        "capacity": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 20
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The Event Hubs throughput units, vaule should be 0 to 20 throughput units."
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "SKU parameters supplied to the create namespace operation"
     }
   }
 }

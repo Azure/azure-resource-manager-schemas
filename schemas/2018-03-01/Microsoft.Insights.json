@@ -36,6 +36,64 @@
         "properties"
       ],
       "description": "Microsoft.Insights/actionGroups"
+    },
+    "metricAlerts": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the rule."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Insights/metricAlerts"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-03-01"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Resource location"
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Resource tags"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MetricAlertProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The alert rule properties of the resource."
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "location",
+        "properties"
+      ],
+      "description": "Microsoft.Insights/metricAlerts"
     }
   },
   "definitions": {
@@ -414,6 +472,316 @@
 			"httpTriggerUrl"
 	  ],
       "description": "A azure function receiver."
+    },
+    "Action": {
+      "type": "object",
+      "properties": {
+        "actionGroupId": {
+          "type": "string",
+          "description": "the id of the action group to use."
+        },
+        "webhookProperties": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "description": "An alert action."
+    },
+    "MetricAlertCriteria": {
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "odata.type": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "MetricAlertCriteria"
+                  ]
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/MetricAlertSingleResourceMultipleMetricCriteria"
+            }
+          ],
+          "properties": {
+            "odata.type": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                  ]
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "properties": {
+        "additionalProperties": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Unmatched properties from the message are deserialized this collection"
+        },
+        "odata.type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "odata.type"
+      ],
+      "description": "The rule criteria that defines the conditions of the alert rule."
+    },
+    "MetricAlertProperties": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "the description of the metric alert that will be included in the alert email."
+        },
+        "severity": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Alert severity {0, 1, 2, 3, 4}"
+        },
+        "enabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "the flag that indicates whether the metric alert is enabled."
+        },
+        "scopes": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "the list of resource id's that this metric alert is scoped to."
+        },
+        "evaluationFrequency": {
+          "type": "string",
+          "format": "duration",
+          "description": "how often the metric alert is evaluated represented in ISO 8601 duration format."
+        },
+        "windowSize": {
+          "type": "string",
+          "format": "duration",
+          "description": "the period of time (in ISO 8601 duration format) that is used to monitor alert activity based on the threshold."
+        },
+        "criteria": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MetricAlertCriteria"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "defines the specific alert criteria information."
+        },
+        "actions": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Action"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "the array of actions that are performed when the alert rule becomes active, and when an alert condition is resolved."
+        }
+      },
+      "required": [
+        "description",
+        "severity",
+        "enabled",
+        "evaluationFrequency",
+        "windowSize",
+        "criteria"
+      ],
+      "description": "An alert rule."
+    },
+    "MetricAlertSingleResourceMultipleMetricCriteria": {
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "odata.type": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                  ]
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "properties": {
+        "allOf": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MetricCriteria"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of metric criteria for this 'all of' operation. "
+        },
+        "odata.type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "odata.type"
+      ],
+      "description": "Specifies the metric alert criteria for a single resource that has multiple metric criteria."
+    },
+    "MetricCriteria": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the criteria."
+        },
+        "metricName": {
+          "type": "string",
+          "description": "Name of the metric."
+        },
+        "metricNamespace": {
+          "type": "string",
+          "description": "Namespace of the metric."
+        },
+        "operator": {
+          "description": "the criteria operator."
+        },
+        "timeAggregation": {
+          "description": "the criteria time aggregation types."
+        },
+        "threshold": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "the criteria threshold value that activates the alert."
+        },
+        "dimensions": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MetricDimension"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "List of dimension conditions."
+        }
+      },
+      "required": [
+        "name",
+        "metricName",
+        "operator",
+        "timeAggregation",
+        "threshold"
+      ]
+    },
+    "MetricDimension": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the dimension."
+        },
+        "operator": {
+          "type": "string",
+          "description": "the dimension operator."
+        },
+        "values": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "list of dimension values."
+        }
+      },
+      "required": [
+        "name",
+        "operator",
+        "values"
+      ]
     }
+
   }
 }

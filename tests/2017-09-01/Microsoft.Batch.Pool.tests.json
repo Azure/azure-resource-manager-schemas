@@ -1,0 +1,270 @@
+{
+  "tests": [
+    {
+      "name": "pool_minimal",
+      "definition": "https://schema.management.azure.com/schemas/2017-09-01/Microsoft.Batch.json#/resourceDefinitions/batchAccounts_pools",
+      "expectedErrors": [ ],
+      "json": {
+        "type": "Microsoft.Batch/batchAccounts/pools",
+        "name": "[parameters('newPoolName'))]",
+        "apiVersion": "2017-09-01",
+        "properties": {
+          "vmSize": "STANDARD_D4",
+          "deploymentConfiguration": {
+            "cloudServiceConfiguration": {
+              "osFamily": "5"
+            }
+          },
+          "scaleSettings": {
+            "fixedScale": {
+              "targetDedicatedNodes": 3
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Batch/batchAccounts/', parameters('newBatchAccountName'))]"
+      ]
+    },
+    {
+      "name": "pool_minimalvirtualmachine",
+      "definition": "https://schema.management.azure.com/schemas/2017-09-01/Microsoft.Batch.json#/resourceDefinitions/batchAccounts_pools",
+      "expectedErrors": [ ],
+      "json": {
+        "type": "Microsoft.Batch/batchAccounts/pools",
+        "name": "[parameters('newPoolName'))]",
+        "apiVersion": "2017-09-01",
+        "properties": {
+          "vmSize": "STANDARD_D4",
+          "deploymentConfiguration": {
+            "virtualMachineConfiguration": {
+              "imageReference": {
+                "publisher": "Canonical",
+                "offer": "UbuntuServer",
+                "sku": "14.04.5-LTS",
+                "version": "latest"
+              },
+              "nodeAgentSkuId": "batch.node.ubuntu 14.04"
+            }
+          },
+          "scaleSettings": {
+            "autoScale": {
+              "formula": "$TargetDedicatedNodes=1",
+              "evaluationInterval": "PT5M"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Batch/batchAccounts/', parameters('newBatchAccountName'))]"
+      ]
+    },
+    {
+      "name": "pool_full",
+      "definition": "https://schema.management.azure.com/schemas/2017-09-01/Microsoft.Batch.json#/resourceDefinitions/batchAccounts_pools",
+      "expectedErrors": [ ],
+      "json": {
+        "type": "Microsoft.Batch/batchAccounts/pools",
+        "name": "[parameters('newPoolName'))]",
+        "apiVersion": "2017-09-01",
+        "properties": {
+          "displayName": "[parameters('newPoolName'))]",
+          "vmSize": "STANDARD_D4",
+          "interNodeCommunication": "Enabled",
+          "maxTasksPerNode": 13,
+          "taskSchedulingPolicy": {
+            "nodeFillType": "Pack"
+          },
+          "deploymentConfiguration": {
+            "cloudServiceConfiguration": {
+              "osFamily": "4",
+              "targetOSVersion": "WA-GUEST-OS-4.45_201708-01"
+            }
+          },
+          "networkConfiguration": {
+            "subnetId": "/subscriptions/subid/resourceGroups/rg1234/providers/Microsoft.Network/virtualNetworks/network1234/subnets/subnet123",
+            "endpointConfiguration": {
+              "inboundNatPools": [
+                {
+                  "name": "testnat",
+                  "protocol": "TCP",
+                  "backendPort": 12001,
+                  "frontendPortRangeStart": 15000,
+                  "frontendPortRangeEnd": 15100,
+                  "networkSecurityGroupRules": [
+                    {
+                      "access": "Allow",
+                      "sourceAddressPrefix": "192.100.12.45",
+                      "priority": 150
+                    },
+                    {
+                      "access": "Deny",
+                      "sourceAddressPrefix": "*",
+                      "priority": 3500
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "scaleSettings": {
+            "fixedScale": {
+              "targetDedicatedNodes": 6,
+              "targetLowPriorityNodes": 28,
+              "resizeTimeout": "PT8M",
+              "nodeDeallocationOption": "TaskCompletion"
+            }
+          },
+          "metadata": [
+            {
+              "name": "metadata-1",
+              "value": "value-1"
+            },
+            {
+              "name": "metadata-2",
+              "value": "value-2"
+            }
+          ],
+          "startTask": {
+            "commandLine": "cmd /c SET",
+            "resourceFiles": [
+              {
+                "blobSource": "https://testaccount.blob.core.windows.net/example-blob-file",
+                "filePath": "c:\\temp\\gohere",
+                "fileMode": "777"
+              }
+            ],
+            "environmentSettings": [
+              {
+                "name": "MYSET",
+                "value": "1234"
+              }
+            ],
+            "userIdentity": {
+              "autoUser": {
+                "scope": "Pool",
+                "elevationLevel": "Admin"
+              }
+            },
+            "maxTaskRetryCount": 6,
+            "waitForSuccess": true
+          },
+          "userAccounts": [
+            {
+              "name": "username1",
+              "password": "examplepassword",
+              "elevationLevel": "Admin",
+              "linuxUserConfiguration": {
+                "sshPrivateKey": "sshprivatekeyvalue",
+                "uid": 1234,
+                "gid": 4567
+              }
+            }
+          ],
+          "applicationPackages": [
+            {
+              "id": "/subscriptions/subid/resourceGroups/default-azurebatch-japaneast/providers/Microsoft.Batch/batchAccounts/sampleacct/pools/testpool/applications/app_1234",
+              "version": "asdf"
+            }
+          ],
+          "certificates": [
+            {
+              "id": "/subscriptions/subid/resourceGroups/default-azurebatch-japaneast/providers/Microsoft.Batch/batchAccounts/sampleacct/pools/testpool/certificates/SHA1-1234567",
+              "storeLocation": "LocalMachine",
+              "storeName": "MY",
+              "visibility": [
+                "RemoteUser"
+              ]
+            }
+          ],
+          "applicationLicenses": [
+            "app-license0",
+            "app-license1"
+          ]
+        }
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Batch/batchAccounts/', parameters('newBatchAccountName'))]"
+      ]
+    },
+    {
+      "name": "pool_virtualmachine",
+      "definition": "https://schema.management.azure.com/schemas/2017-09-01/Microsoft.Batch.json#/resourceDefinitions/batchAccounts_pools",
+      "expectedErrors": [ ],
+      "json": {
+        "type": "Microsoft.Batch/batchAccounts/pools",
+        "name": "[parameters('newPoolName'))]",
+        "apiVersion": "2017-09-01",
+        "properties": {
+          "vmSize": "STANDARD_D4",
+          "deploymentConfiguration": {
+            "virtualMachineConfiguration": {
+              "imageReference": {
+                "publisher": "MicrosoftWindowsServer",
+                "offer": "WindowsServer",
+                "sku": "2016-Datacenter-SmallDisk",
+                "version": "latest"
+              },
+              "nodeAgentSkuId": "batch.node.windows amd64",
+              "osDisk": {
+                "caching": "ReadWrite"
+              },
+              "windowsConfiguration": {
+                "enableAutomaticUpdates": false
+              },
+              "licenseType": "Windows_Server",
+              "dataDisks": [
+                {
+                  "lun": 0,
+                  "caching": "ReadWrite",
+                  "diskSizeGB": 30,
+                  "storageAccountType": "Premium_LRS"
+                },
+                {
+                  "lun": 1,
+                  "caching": "None",
+                  "diskSizeGB": 200,
+                  "storageAccountType": "Standard_LRS"
+                }
+              ]
+            }
+          },
+          "networkConfiguration": {
+            "endpointConfiguration": {
+              "inboundNatPools": [
+                {
+                  "name": "testnat",
+                  "protocol": "TCP",
+                  "backendPort": 12001,
+                  "frontendPortRangeStart": 15000,
+                  "frontendPortRangeEnd": 15100,
+                  "networkSecurityGroupRules": [
+                    {
+                      "access": "Allow",
+                      "sourceAddressPrefix": "192.100.12.45",
+                      "priority": 150
+                    },
+                    {
+                      "access": "Deny",
+                      "sourceAddressPrefix": "*",
+                      "priority": 3500
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "scaleSettings": {
+            "autoScale": {
+              "formula": "$TargetDedicatedNodes=1",
+              "evaluationInterval": "PT5M"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Batch/batchAccounts/', parameters('newBatchAccountName'))]"
+      ]
+    }
+  ]
+}

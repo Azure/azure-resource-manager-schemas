@@ -178,6 +178,93 @@
       }
     },
     {
+      "name": "VirtualMachineScaleSets with Managed Data Disks and Low-Priority",
+      "definition": "https://schema.management.azure.com/schemas/2017-12-01/Microsoft.Compute.json#/resourceDefinitions/virtualMachineScaleSets",
+      "json": {
+        "type": "Microsoft.Compute/virtualMachineScaleSets",
+        "name": "[variables('namingInfix')]",
+        "location": "[resourceGroup().location]",
+        "apiVersion": "2017-12-01",
+        "dependsOn": [
+          "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
+          "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+        ],
+        "sku": {
+          "name": "[parameters('vmSku')]",
+          "tier": "Standard",
+          "capacity": "[parameters('instanceCount')]"
+        },
+        "properties": {
+          "overprovision": true,
+          "upgradePolicy": {
+            "mode": "Manual"
+          },
+          "virtualMachineProfile": {
+            "storageProfile": {
+              "osDisk": {
+                "createOption": "FromImage"
+              },
+              "imageReference": "[variables('imageReference')]",
+              "dataDisks": [
+                {
+                  "lun": 2,
+                  "name": "myManagedDataDisk",
+                  "createOption": "Attach",
+                  "managedDisk": {
+                    "id": "[resourceId('Microsoft.Compute/disks', 'myManagedDataDisk')]"
+                  }
+                },
+                {
+                  "lun": 3,
+                  "name": "myManagedDataDisk1",
+                  "createOption": "Attach",
+                  "managedDisk": {
+                    "id": "[resourceId('Microsoft.Compute/disks', 'myManagedDataDisk1')]"
+                  }
+                }
+              ]
+            },
+            "osProfile": {
+              "computerNamePrefix": "[variables('namingInfix')]",
+              "adminUsername": "[parameters('adminUsername')]",
+              "adminPassword": "[parameters('adminPassword')]"
+            },
+            "priority": "Low",
+            "networkProfile": {
+              "networkInterfaceConfigurations": [
+                {
+                  "name": "[variables('nicName')]",
+                  "properties": {
+                    "primary": true,
+                    "ipConfigurations": [
+                      {
+                        "name": "[variables('ipConfigName')]",
+                        "properties": {
+                          "subnet": {
+                            "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'), '/subnets/', variables('subnetName'))]"
+                          },
+                          "loadBalancerBackendAddressPools": [
+                            {
+                              "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/backendAddressPools/', variables('bePoolName'))]"
+                            }
+                          ],
+                          "loadBalancerInboundNatPools": [
+                            {
+                              "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/inboundNatPools/', variables('natPoolName'))]"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
       "name": "VM with Managed Data Disk",
       "definition": "https://schema.management.azure.com/schemas/2017-12-01/Microsoft.Compute.json#/resourceDefinitions/virtualMachines",
       "json": {

@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2018-05-01/Microsoft.IoTCentral.json#",
+  "id": "https://schema.management.azure.com/schemas/2017-07-01-privatepreview/Microsoft.IoTCentral.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.IoTCentral",
   "description": "Microsoft IoTCentral Resource Types",
@@ -15,15 +15,15 @@
         },
         "name": {
           "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
           "description": "The name of IoT Central application"
         },
-        "url": {
+        "subdomain": {
           "oneOf": [
             {
               "type": "string",
-              "pattern": "^([a-z0-9-])+$",
-              "minLength": 1,
-              "maxLength": 63
+              "pattern": "^[a-z0-9-]{1,63}$"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -34,7 +34,7 @@
         "sku": {
           "oneOf": [
             {
-              "$ref": "#/definitions/IoTAppSku"
+              "$ref": "#/definitions/AppSku"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -44,7 +44,7 @@
         "template": {
           "oneOf": [
             {
-              "$ref": "#/definitions/IoTAppTemplate"
+              "$ref": "#/definitions/AppTemplate"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -53,20 +53,13 @@
           "description": "Predefined IoT Central application template"
         },
         "location": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/IoTAppLocation"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "The location of IoT Central application resource type"
+          "type": "string",
+          "description": "The location where IoT Central application resource will be created"
         },
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-05-01"
+            "2017-07-01-privatepreview"
           ]
         },
         "tags": {
@@ -86,19 +79,19 @@
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/IoTAppProperties"
+              "$ref": "#/definitions/AppProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "The rule properties of the resource"
+          "description": "The properties of IoT Central application resource"
         }
       },
       "required": [
         "type",
         "name",
-        "url",
+        "subdomain",
         "sku",
         "template",
         "location",
@@ -109,9 +102,8 @@
     }
   },
   "definitions": {
-    "IoTAppSku": {
+    "AppSku": {
       "type": "object",
-      "description": "List of possible IoT Central application SKUs",
       "properties": {
         "name": {
           "oneOf": [
@@ -131,70 +123,55 @@
           "type": "string",
           "readOnly": true,
           "description": "Pricing tier of the IoT Central application"
-        }
-      },
-      "required": [
-        "name"
-      ]
-    },
-    "IoTAppTemplate": {
-      "type": "object",
-      "description": "List of available IoT Central application templates",
-      "properties": {
-        "name": {
+        },
+        "capacity": {
           "oneOf": [
             {
-              "type": "string",
-              "enum": [
-                "Contoso",
-                "Devkits",
-                "Custom"
-              ]
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The number of units being provisioned"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "The SKU information of IoT Central application"
+    },
+    "AppTemplate": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of IoT Central application template"
         },
         "version": {
           "type": "string",
           "description": "The version of IoT Central application template"
         }
       },
-      "required": [
-        "name"
-      ]
+      "description": "The template of IoT Central application"
     },
-    "IoTAppLocation": {
+    "AppProperties": {
       "type": "object",
-      "description": "List of available locations for IoT Central application",
       "properties": {
-        "name": {
+        "displayName": {
           "oneOf": [
             {
               "type": "string",
-              "enum": [
-                "West Europe",
-                "West US",
-                "North Europe",
-                "East US",
-                "East US 2"
-              ]
+              "pattern": "^.{1,200}$"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
-          ]
-        }
-      },
-      "required": [
-        "name"
-      ]
-    },
-    "IoTAppProperties": {
-      "type": "object",
-      "properties": {
+          ],
+          "description": "The display name of IoT Central application"
+        },
         "policies": {},
+        "models": {},
         "rules": {},
         "actions": {}
       },

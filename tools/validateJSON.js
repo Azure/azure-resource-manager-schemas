@@ -80,7 +80,6 @@ function validate(json, schema, schemaFolderPath) {
     else {
         tv4.addSchema(json);
         tv4.addSchema(schema);
-       console.log("%s %s %s", json, schema, schemaFolderPath);
         addMissingSchemas(tv4.getMissingUris(), schemaFolderPath);
         result = convertTv4ValidationResult(tv4.validateMultiple(json, schema));
 
@@ -138,8 +137,7 @@ function cleanValidationErrorProperties(tv4ValidationError) {
 function addMissingSchemas(missingUris, schemaFolderPath) {
     while (missingUris && missingUris.length > 0) {
         var missingUri = missingUris.pop();
-       console.log(missingUri);
-        if (missingUri && missingUri.length > 0 && missingUri != 'https://schema.management.azure.com/schemas/2017-10-01/microsoft.insights.json' && missingUri != 'https://schema.management.azure.com/schemas/2016-03-01/microsoft.insights.json') {
+        if (missingUri && missingUri.length > 0) {
             tv4.addSchema(missingUri, utilities.readJSONPath(missingUri, schemaFolderPath));
 
             missingUris = tv4.getMissingUris();

@@ -4,6 +4,86 @@
   "title": "Microsoft.Sql",
   "description": "Microsoft Sql Resource Types",
   "resourceDefinitions": {
+    "managedInstances": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the managed instance."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Sql/managedInstances"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2015-05-01-preview"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Resource location."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Resource tags."
+        },
+        "identity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ResourceIdentity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The Azure Active Directory identity of the managed instance."
+        },
+        "sku": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Sku"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Managed instance sku"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ManagedInstanceProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Resource properties."
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "location",
+        "properties"
+      ],
+      "description": "Microsoft.Sql/managedInstances"
+    },
     "servers": {
       "type": "object",
       "properties": {
@@ -77,6 +157,9 @@
                 "$ref": "#/definitions/servers_keys_childResource"
               },
               {
+                "$ref": "#/definitions/servers_firewallRules_childResource"
+              },
+              {
                 "$ref": "#/definitions/servers_failoverGroups_childResource"
               },
               {
@@ -99,7 +182,15 @@
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the blob auditing policy."
         },
         "type": {
           "type": "string",
@@ -313,6 +404,44 @@
       ],
       "description": "Microsoft.Sql/servers/failoverGroups"
     },
+    "servers_firewallRules": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Sql/servers/firewallRules"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2015-05-01-preview"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ServerFirewallRuleProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Resource properties."
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.Sql/servers/firewallRules"
+    },
     "servers_keys": {
       "type": "object",
       "properties": {
@@ -482,7 +611,7 @@
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Specifies the Actions and Actions-Groups to audit."
+          "description": "Specifies the Actions-Groups and Actions to audit.\r\n\r\nThe recommended set of action groups to use is the following combination - this will audit all the queries and stored procedures executed against the database, as well as successful and failed logins:\r\n\r\nBATCH_COMPLETED_GROUP,\r\nSUCCESSFUL_DATABASE_AUTHENTICATION_GROUP,\r\nFAILED_DATABASE_AUTHENTICATION_GROUP.\r\n\r\nThis above combination is also the set that is configured by default when enabling auditing from the Azure portal.\r\n\r\nThe supported action groups to audit are (note: choose only specific groups that cover your auditing needs. Using unnecessary groups could lead to very large quantities of audit records):\r\n\r\nAPPLICATION_ROLE_CHANGE_PASSWORD_GROUP\r\nBACKUP_RESTORE_GROUP\r\nDATABASE_LOGOUT_GROUP\r\nDATABASE_OBJECT_CHANGE_GROUP\r\nDATABASE_OBJECT_OWNERSHIP_CHANGE_GROUP\r\nDATABASE_OBJECT_PERMISSION_CHANGE_GROUP\r\nDATABASE_OPERATION_GROUP\r\nDATABASE_PERMISSION_CHANGE_GROUP\r\nDATABASE_PRINCIPAL_CHANGE_GROUP\r\nDATABASE_PRINCIPAL_IMPERSONATION_GROUP\r\nDATABASE_ROLE_MEMBER_CHANGE_GROUP\r\nFAILED_DATABASE_AUTHENTICATION_GROUP\r\nSCHEMA_OBJECT_ACCESS_GROUP\r\nSCHEMA_OBJECT_CHANGE_GROUP\r\nSCHEMA_OBJECT_OWNERSHIP_CHANGE_GROUP\r\nSCHEMA_OBJECT_PERMISSION_CHANGE_GROUP\r\nSUCCESSFUL_DATABASE_AUTHENTICATION_GROUP\r\nUSER_CHANGE_PASSWORD_GROUP\r\nBATCH_STARTED_GROUP\r\nBATCH_COMPLETED_GROUP\r\n\r\nThese are groups that cover all sql statements and stored procedures executed against the database, and should not be used in combination with other groups as this will result in duplicate audit logs.\r\n\r\nFor more information, see [Database-Level Audit Action Groups](https://docs.microsoft.com/en-us/sql/relational-databases/security/auditing/sql-server-audit-action-groups-and-actions#database-level-audit-action-groups).\r\n\r\nFor Database auditing policy, specific Actions can also be specified (note that Actions cannot be specified for Server auditing policy). The supported actions to audit are:\r\nSELECT\r\nUPDATE\r\nINSERT\r\nDELETE\r\nEXECUTE\r\nRECEIVE\r\nREFERENCES\r\n\r\nThe general form for defining an action to be audited is:\r\n<action> ON <object> BY <principal>\r\n\r\nNote that <object> in the above format can refer to an object like a table, view, or stored procedure, or an entire database or schema. For the latter cases, the forms DATABASE::<db_name> and SCHEMA::<schema_name> are used, respectively.\r\n\r\nFor example:\r\nSELECT on dbo.myTable by public\r\nSELECT on DATABASE::myDatabase by public\r\nSELECT on SCHEMA::mySchema by public\r\n\r\nFor more information, see [Database-Level Audit Actions](https://docs.microsoft.com/en-us/sql/relational-databases/security/auditing/sql-server-audit-action-groups-and-actions#database-level-audit-actions)"
         },
         "storageAccountSubscriptionId": {
           "oneOf": [
@@ -505,7 +634,7 @@
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Specifies whether storageAccountAccessKey value is the storage’s secondary key."
+          "description": "Specifies whether storageAccountAccessKey value is the storage's secondary key."
         }
       },
       "required": [
@@ -657,6 +786,50 @@
       ],
       "description": "Read-write endpoint of the failover group instance."
     },
+    "ManagedInstanceProperties": {
+      "type": "object",
+      "properties": {
+        "administratorLogin": {
+          "type": "string",
+          "description": "Administrator username for the managed instance. Can only be specified when the managed instance is being created (and is required for creation)."
+        },
+        "administratorLoginPassword": {
+          "type": "string",
+          "description": "The administrator login password (required for managed instance creation)."
+        },
+        "subnetId": {
+          "type": "string",
+          "description": "Subnet resource ID for the managed instance."
+        },
+        "licenseType": {
+          "type": "string",
+          "description": "The license type. Possible values are 'LicenseIncluded' and 'BasePrice'."
+        },
+        "vCores": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The number of VCores."
+        },
+        "storageSizeInGB": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The maximum storage size in GB."
+        }
+      },
+      "description": "The properties of a managed instance."
+    },
     "PartnerInfo": {
       "type": "object",
       "properties": {
@@ -682,6 +855,20 @@
         }
       },
       "description": "Azure Active Directory identity configuration for a resource."
+    },
+    "ServerFirewallRuleProperties": {
+      "type": "object",
+      "properties": {
+        "startIpAddress": {
+          "type": "string",
+          "description": "The start IP address of the firewall rule. Must be IPv4 format. Use value '0.0.0.0' for all Azure-internal IP addresses."
+        },
+        "endIpAddress": {
+          "type": "string",
+          "description": "The end IP address of the firewall rule. Must be IPv4 format. Must be greater than or equal to startIpAddress. Use value '0.0.0.0' for all Azure-internal IP addresses."
+        }
+      },
+      "description": "The properties of a server firewall rule."
     },
     "ServerKeyProperties": {
       "type": "object",
@@ -870,6 +1057,44 @@
       ],
       "description": "Microsoft.Sql/servers/failoverGroups"
     },
+    "servers_firewallRules_childResource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "firewallRules"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2015-05-01-preview"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ServerFirewallRuleProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Resource properties."
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.Sql/servers/firewallRules"
+    },
     "servers_keys_childResource": {
       "type": "object",
       "properties": {
@@ -987,6 +1212,42 @@
         "properties"
       ],
       "description": "Microsoft.Sql/servers/virtualNetworkRules"
+    },
+    "Sku": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the SKU. Ex - P3. It is typically a letter+number code"
+        },
+        "tier": {
+          "type": "string",
+          "description": "This field is required to be implemented by the Resource Provider if the service has more than one tier, but is not required on a PUT."
+        },
+        "size": {
+          "type": "string",
+          "description": "The SKU size. When the name field is the combination of tier and some other value, this would be the standalone code. "
+        },
+        "family": {
+          "type": "string",
+          "description": "If the service has different generations of hardware, for the same SKU, then that can be captured here."
+        },
+        "capacity": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "If the SKU supports scale out/in then the capacity integer should be included. If scale out/in is not possible for the resource this may be omitted."
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "The resource model definition representing SKU"
     },
     "SyncAgentProperties": {
       "type": "object",
@@ -1193,9 +1454,23 @@
       "properties": {
         "virtualNetworkSubnetId": {
           "type": "string",
-          "description": "The resource ID of the virtual network subnet"
+          "description": "The ARM resource id of the virtual network subnet."
+        },
+        "ignoreMissingVnetServiceEndpoint": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Create firewall rule before the virtual network has vnet service endpoint enabled."
         }
       },
+      "required": [
+        "virtualNetworkSubnetId"
+      ],
       "description": "Properties of a virtual network rule."
     }
   }

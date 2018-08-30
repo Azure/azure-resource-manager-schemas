@@ -15,6 +15,8 @@ if (require.main === module) {
             const schemaFileName = path.basename(filePath);
             result = (schemaFileName !== "deploymentParameters.json" &&
                 schemaFileName !== "deploymentTemplate.json" &&
+                schemaFileName !== "subscriptionDeploymentParameters.json" &&
+                schemaFileName !== "subscriptionDeploymentTemplate.json" &&
                 schemaFileName !== "policyDefinition.json" &&
                 schemaFileName !== "CreateUIDefinition.CommonControl.json" &&
                 schemaFileName !== "CreateUIDefinition.MultiVm.json" &&

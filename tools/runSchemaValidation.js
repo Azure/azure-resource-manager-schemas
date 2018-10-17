@@ -65,7 +65,7 @@ describe('validate template files with schema - ', () => {
 	let files = fs.readdirSync(templateFolder);
 
 	forEach(files).it("running schema validation on '%s'", function (file, done) {
-		this.timeout(5000);
+		this.timeout(10000);
 
 		validateTemplateWithSchema(file)
 			.then(function (result) {

@@ -93,6 +93,16 @@
             }
           ],
           "description": "The parameters used to create the storage account."
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/storageAccounts_blobServices_childResource"
+              }
+            ]
+          }
         }
       },
       "required": [
@@ -104,6 +114,64 @@
         "location"
       ],
       "description": "Microsoft.Storage/storageAccounts"
+    },
+    "storageAccounts_blobServices": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "default"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the blob Service within the specified storage account. Blob Service Name must be 'default'"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Storage/storageAccounts/blobServices"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-07-01"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BlobServicePropertiesProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties of a storage account’s Blob service."
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/storageAccounts_blobServices_containers_childResource"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion"
+      ],
+      "description": "Microsoft.Storage/storageAccounts/blobServices"
     },
     "storageAccounts_blobServices_containers": {
       "type": "object",
@@ -199,13 +267,44 @@
       "required": [
         "name",
         "type",
-        "apiVersion",
-        "properties"
+        "apiVersion"
       ],
       "description": "Microsoft.Storage/storageAccounts/blobServices/containers/immutabilityPolicies"
     }
   },
   "definitions": {
+    "BlobServicePropertiesProperties": {
+      "type": "object",
+      "properties": {
+        "cors": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CorsRules"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies CORS rules for the Blob service. You can include up to five CorsRule elements in the request. If no CorsRule elements are included in the request body, all CORS rules will be deleted, and CORS will be disabled for the Blob service."
+        },
+        "defaultServiceVersion": {
+          "type": "string",
+          "description": "DefaultServiceVersion indicates the default version to use for requests to the Blob service if an incoming request’s version is not specified. Possible values include version 2008-10-27 and all more recent versions."
+        },
+        "deleteRetentionPolicy": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DeleteRetentionPolicy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The blob service properties for soft delete."
+        }
+      },
+      "description": "The properties of a storage account’s Blob service."
+    },
     "ContainerProperties": {
       "type": "object",
       "properties": {
@@ -242,6 +341,115 @@
       },
       "description": "The properties of a container."
     },
+    "CorsRule": {
+      "type": "object",
+      "properties": {
+        "allowedOrigins": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Required if CorsRule element is present. A list of origin domains that will be allowed via CORS, or \"*\" to allow all domains"
+        },
+        "allowedMethods": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "DELETE",
+                  "GET",
+                  "HEAD",
+                  "MERGE",
+                  "POST",
+                  "OPTIONS",
+                  "PUT"
+                ]
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Required if CorsRule element is present. A list of HTTP methods that are allowed to be executed by the origin."
+        },
+        "maxAgeInSeconds": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Required if CorsRule element is present. The number of seconds that the client/browser should cache a preflight response."
+        },
+        "exposedHeaders": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Required if CorsRule element is present. A list of response headers to expose to CORS clients."
+        },
+        "allowedHeaders": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Required if CorsRule element is present. A list of headers allowed to be part of the cross-origin request."
+        }
+      },
+      "required": [
+        "allowedOrigins",
+        "allowedMethods",
+        "maxAgeInSeconds",
+        "exposedHeaders",
+        "allowedHeaders"
+      ],
+      "description": "Specifies a CORS rule for the Blob service."
+    },
+    "CorsRules": {
+      "type": "object",
+      "properties": {
+        "corsRules": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CorsRule"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The List of CORS rules. You can include up to five CorsRule elements in the request. "
+        }
+      },
+      "description": "Sets the CORS rules. You can include up to five CorsRule elements in the request. "
+    },
     "CustomDomain": {
       "type": "object",
       "properties": {
@@ -265,6 +473,36 @@
         "name"
       ],
       "description": "The custom domain assigned to this storage account. This can be set via Update."
+    },
+    "DeleteRetentionPolicy": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates whether DeleteRetentionPolicy is enabled for the Blob service."
+        },
+        "days": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 365
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates the number of days that the deleted blob should be retained. The minimum specified value can be 1 and the maximum value can be 365."
+        }
+      },
+      "description": "The blob service properties for soft delete."
     },
     "Encryption": {
       "type": "object",
@@ -657,6 +895,112 @@
       },
       "description": "The parameters used to create the storage account."
     },
+    "storageAccounts_blobServices_childResource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "default"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the blob Service within the specified storage account. Blob Service Name must be 'default'"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "blobServices"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-07-01"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BlobServicePropertiesProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties of a storage account’s Blob service."
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/storageAccounts_blobServices_containers_childResource"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion"
+      ],
+      "description": "Microsoft.Storage/storageAccounts/blobServices"
+    },
+    "storageAccounts_blobServices_containers_childResource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the blob container within the specified storage account. Blob container names must be between 3 and 63 characters in length and use numbers, lower-case letters and dash (-) only. Every dash (-) character must be immediately preceded and followed by a letter or number."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "containers"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-07-01"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the blob container."
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/storageAccounts_blobServices_containers_immutabilityPolicies_childResource"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion"
+      ],
+      "description": "Microsoft.Storage/storageAccounts/blobServices/containers"
+    },
     "storageAccounts_blobServices_containers_immutabilityPolicies_childResource": {
       "type": "object",
       "properties": {
@@ -701,8 +1045,7 @@
       "required": [
         "name",
         "type",
-        "apiVersion",
-        "properties"
+        "apiVersion"
       ],
       "description": "Microsoft.Storage/storageAccounts/blobServices/containers/immutabilityPolicies"
     },

@@ -37,9 +37,25 @@ module.exports.getTestFiles = getTestFiles;
  */
 function getTestFiles() {
     /** @type {String[]} */
-    const testsFolderPath = utilities.findFileOrFolder("tests");
+    let customTestFolder = process.argv[2];
+
+    let testsFolderPath = utilities.findFileOrFolder("tests")
+    if (customTestFolder && customTestFolder !== "-AssertSubErrors") {
+        if (customTestFolder.startsWith("../") || customTestFolder.startsWith("..\\")) {
+            customTestFolder = customTestFolder.substring(3);
+        }
+        testsFolderPath = utilities.findFileOrFolder(customTestFolder);
+
+        if (!testsFolderPath) {
+            console.log(chalk.red("Path not found: " + process.argv[2]));
+            return "";
+        }
+    }
+
     const testFiles = utilities.getFiles(testsFolderPath, function (filePath) { return filePath.endsWith(".tests.json"); });
-    testFiles.push(utilities.findFileOrFolder("ResourceMetaSchema.tests.json"));
+    if (!customTestFolder) {
+        testFiles.push(utilities.findFileOrFolder("ResourceMetaSchema.tests.json"));
+    }
     return testFiles;
 }
 
@@ -129,6 +145,42 @@ function getDefinitionSchemaJSON(definitionSchemaPath, schemasFolderPath) {
     return definitionSchemaJSON;
 }
 
+module.exports.assertErrors = assertErrors;
+/**
+ * Compare the expected and actual errors.
+ * @param {error[]} expectedErrors List of expected errors.
+ * @param {error[]} actualErrors List of actual errors.
+ * @param {bool} assertSubErrors True if we want to assert subErrors.
+ * @param {string} errorPrefix This is the prefix before error number in messages. If recursive then each level will add to this string.
+ * @returns nothing.
+ */
+function assertErrors(expectedErrors, actualErrors, assertSubErrors, errorPrefix) {
+    if (!expectedErrors || expectedErrors.length === 0) {
+        assert.deepStrictEqual(actualErrors, [], `There were no expected errors, but the validation result contained errors.`);
+    }
+    else {
+        if (expectedErrors.length !== actualErrors.length) {
+            const errorMessage = `There were a different number of expected errors (${expectedErrors.length}) than there were actual errors (${actualErrors.length})`;
+            assert.deepStrictEqual(actualErrors, expectedErrors, errorMessage);
+        }
+        else {
+            for (let errorIndex = 0; errorIndex < expectedErrors.length; ++errorIndex) {
+                const expectedError = expectedErrors[errorIndex];
+                const actualError = actualErrors[errorIndex];
+
+                const errorNumber = errorPrefix + (errorIndex + 1).toString();
+                assert.deepStrictEqual(actualError.message, expectedError.message, `The error message for error ${errorNumber} was not the expected error.`);
+                assert.deepStrictEqual(actualError.dataPath, expectedError.dataPath, `The error dataPath for error ${errorNumber} was not the expected dataPath.`);
+
+                // Assert sub errors if the -AssertSubErrors parameter is used and there are expected sub errors
+                if (assertSubErrors && expectedError.subErrors && expectedError.subErrors.length > 0) {
+                    assertErrors(expectedError.subErrors, actualError.subErrors, assertSubErrors, errorNumber + ".");
+                }
+            }
+        }
+    }
+}
+
 module.exports.runSchemaTests = runSchemaTests;
 
 function runSchemaTests() {
@@ -137,6 +189,11 @@ function runSchemaTests() {
         testsFailed: 0,
         testcases: []
     };
+
+    let assertSubErrors = false;
+    if ((process.argv[2] && process.argv[2] === "-AssertSubErrors") || (process.argv[3] && process.argv[3] === "-AssertSubErrors")) {
+        assertSubErrors = true;
+    }
 
     const schemasFolderPath = utilities.getSchemasFolderPath();
     assert(schemasFolderPath, "Could not find a 'schemas' folder.");
@@ -152,25 +209,7 @@ function runSchemaTests() {
 
                 const result = validator.validate(test.json, definitionSchemaJSON, schemasFolderPath);
 
-                if (!test.expectedErrors || test.expectedErrors.length === 0) {
-                    assert.deepStrictEqual(result.errors, [], `There were no expected errors, but the validation result contained errors.`);
-                }
-                else {
-                    if (test.expectedErrors.length !== result.errors.length) {
-                        const errorMessage = `There were a different number of expected errors (${test.expectedErrors.length}) than there were actual errors (${result.errors.length})`;
-                        assert.deepStrictEqual(result.errors, test.expectedErrors, errorMessage);
-                    }
-                    else {
-                        for (let errorIndex = 0; errorIndex < test.expectedErrors.length; ++errorIndex) {
-                            const expectedError = test.expectedErrors[errorIndex];
-                            const resultError = result.errors[errorIndex];
-
-                            const errorNumber = errorIndex + 1;
-                            assert.deepStrictEqual(resultError.message, expectedError.message, `The error message for error ${errorNumber} was not the expected error.`);
-                            assert.deepStrictEqual(resultError.dataPath, expectedError.dataPath, `The error dataPath for error ${errorNumber} was not the expected dataPath.`);
-                        }
-                    }
-                }
+                assertErrors(test.expectedErrors, result.errors, assertSubErrors, "");
 
                 testResult.testcases.push({
                     valid: true,
@@ -194,7 +233,12 @@ function runSchemaTests() {
                     }
                 }
                 else {
-                    message += `Message: ${error.actual}`;
+                    if (error.actual) {
+                        message += `Message: ${error.actual}`;
+                    } 
+                    else {
+                        message += `Message: ${error}`;
+                    }
                 }
 
                 testResult.testcases.push({

@@ -7,6 +7,8 @@ const url = require('url')
 const SchemaService = require("vscode-json-languageservice");
 const Types = require('vscode-languageserver-types');
 const forEach = require('mocha-each');
+const schemaTest01 = require("./validateSchemas.js");
+const schemaTest02 = require("./runSchemaTests.js");
 
 let normalizedSchemaId = function (id) {
 	if (id.length && id[id.length - 1] === '#') {
@@ -61,7 +63,7 @@ let validateTemplateWithSchema = function (file) {
 	return service.doValidation(textDocument, jsonDocument);
 };
 
-describe('validate template files with schema - ', () => {
+describe('validate test templates with local schemas - ', () => {
 	let files = fs.readdirSync(templateFolder);
 
 	forEach(files).it("running schema validation on '%s'", function (file, done) {
@@ -75,5 +77,44 @@ describe('validate template files with schema - ', () => {
         () => done(), 
         (error) => done(error)
       );
+	});
+});
+
+describe('validate schema files - ', () => {
+	it("running validation on schema files", function() {
+        this.timeout(20000);
+
+		let validationResult = schemaTest01.validateSchemas();
+		
+		if (!validationResult.valid) {
+			let message = `there are errors in schema file validation: ` + 
+						  `\n     ${validationResult.schemaFilePath}` +
+						  `\n     ${validationResult.metaSchema}`+
+						  `\n${validationResult.message}`;
+            assert.fail(message);
+		}
+	});
+});
+
+describe('run schema tests - ', () => {
+	it("running schema test cases", function() {
+        this.timeout(20000);
+
+		let testResult = schemaTest02.runSchemaTests();
+
+        if (testResult.testsFailed > 0) {
+			let message = `there are failing schema test cases: `;
+
+			for (const testcase of testResult.testcases) {
+				if (!testcase.valid) {
+					message += "\n";
+					message += `\n     Test file: ${testcase.testFile}`;
+					message += `\n     Test name: ${testcase.testName}`;
+					message += `\n     ${testcase.message}`;
+				}
+			}
+
+			assert.fail(message);
+		}
 	});
 });

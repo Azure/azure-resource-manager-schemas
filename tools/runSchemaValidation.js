@@ -102,8 +102,6 @@ describe('run schema tests - ', () => {
 
 		let testResult = schemaTest02.runSchemaTests();
 
-		assert.fail(`failed = ${testResult.testsFailed}`);
-
         if (testResult.testsFailed > 0) {
 			let message = `there are failing schema test cases: `;
 

@@ -6,7 +6,8 @@ const path = require("path");
 const utilities = require("./utilities.js");
 const validator = require("./validateJSON.js");
 
-if (require.main === module) {
+module.exports.validateSchemas = validateSchemas;
+function validateSchemas() {
     const schemasFolderPath = utilities.getSchemasFolderPath();
 
     const schemaFilePaths = utilities.getFiles(schemasFolderPath, function (filePath) {
@@ -41,30 +42,41 @@ if (require.main === module) {
     for (let schemaFilePathIndex = 0; schemaFilePathIndex < schemaFilePaths.length; ++schemaFilePathIndex) {
         var schemaFilePath = schemaFilePaths[schemaFilePathIndex];
 
-        if (schemaFilePathIndex > 0) {
-            console.log();
-        }
-
-        console.log(schemaFilePath);
-
         const schemaJSON = utilities.readJSONPath(schemaFilePath);
 
         for (const metaSchema of metaSchemas) {
             const validationResult = validator.validate(schemaJSON, metaSchema.json, schemasFolderPath);
 
-            console.log(`    Using schema: ${metaSchema.path}`);
             if (!validationResult.valid) {
-                console.log(chalk.red("        Failed"));
+                let errorMessage = "\n        Failed";
+                
                 for (let errorIndex = 0; errorIndex < validationResult.errors.length; ++errorIndex) {
                     const error = validationResult.errors[errorIndex];
-                    console.log(chalk.red(`        ${errorIndex + 1}. Error at "${error.dataPath}" - ${error.message}`));
+                    errorMessage += `\n        ${errorIndex + 1}. Error at "${error.dataPath}" - ${error.message}`;
                 }
-            }
-            else {
-                console.log(chalk.green("        Passed"));
+
+                return {
+                   valid: validationResult.valid,
+                   schemaFilePath: schemaFilePath,
+                   metaSchema: metaSchema.path,
+                   message: errorMessage
+                };
             }
         }
     }
+
+    return { valid: true };
 }
 
-
+let validationResult = validateSchemas();
+if (require.main == module) {
+    if (!validationResult.valid) {
+        console.log(chalk.red("validation error:"));
+        console.log(chalk.red(validationResult.schemaFilePath));
+        console.log(chalk.red(`Using schema: ${validationResult.metaSchema}`));
+        console.log(chalk.red(validationResult.message));
+    }
+    else {
+        console.log(chalk.green("All Passed"));
+    }
+}

@@ -129,20 +129,23 @@ function getDefinitionSchemaJSON(definitionSchemaPath, schemasFolderPath) {
     return definitionSchemaJSON;
 }
 
-if (require.main === module) {
-    let testsPassed = 0;
-    let testsFailed = 0;
+module.exports.runSchemaTests = runSchemaTests;
+
+function runSchemaTests() {
+    let testResult = {
+        testsPassed: 0,
+        testsFailed: 0,
+        testcases: []
+    };
 
     const schemasFolderPath = utilities.getSchemasFolderPath();
     assert(schemasFolderPath, "Could not find a 'schemas' folder.");
 
     for (const testFilePath of getTestFiles()) {
-        console.log(`Running test file "${testFilePath}"`);
 
         const testFile = utilities.readJSONPath(testFilePath);
 
         for (const test of testFile.tests) {
-            console.log(`  Running test "${test.name}"`);
 
             try {
                 const definitionSchemaJSON = getDefinitionSchemaJSON(test.definition, schemasFolderPath);
@@ -169,26 +172,59 @@ if (require.main === module) {
                     }
                 }
 
-                ++testsPassed;
+                testResult.testcases.push({
+                    valid: true,
+                    testFile: testFilePath,
+                    testName: test.name
+                });
+                ++testResult.testsPassed;
             }
             catch (error) {
+                
+
+                let message = "";
+
                 if (error.expected) {
                     if (error.message) {
-                        console.log(chalk.red("Message: " + error.message));
+                        message += `Message: ${error.message}`;
                     }
-                    console.log(chalk.red("Expected: " + utilities.toString(error.expected)));
+                    message += `\nExpected: ${utilities.toString(error.expected)}`;
                     if (error.actual) {
-                        console.log(chalk.red("Actual: " + utilities.toString(error.actual)));
+                        message += `\nActual: ${utilities.toString(error.actual)}`;
                     }
                 }
                 else {
-                    console.log(chalk.red("Message: " + error.actual));
+                    message += `Message: ${error.actual}`;
                 }
-                ++testsFailed;
+
+                testResult.testcases.push({
+                    valid: false,
+                    testFile: testFilePath,
+                    testName: test.name,
+                    message: message
+                });
+
+                ++testResult.testsFailed;
             }
         }
     }
 
-    console.log(`${testsPassed} tests passed`);
-    console.log(`${testsFailed} tests failed`);
+    return testResult;
+}
+
+let testResult = runSchemaTests();
+
+if (require.main == module) {
+    for (const testcase of testResult.testcases) {
+        if (!testcase.valid) {
+            console.log(chalk.red(""));
+            console.log(chalk.red(`test file: ${testcase.testFile}`));
+            console.log(chalk.red(`test name: ${testcase.testName}`));
+            console.log(chalk.red(testcase.message));
+        }
+    };
+    
+    console.log();
+    console.log(`${testResult.testsPassed} tests passed`);
+    console.log(`${testResult.testsFailed} tests failed`);
 }

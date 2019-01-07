@@ -105,14 +105,14 @@ describe('run schema tests - ', () => {
         if (testResult.testsFailed > 0) {
 			let message = `there are failing schema test cases: `;
 
-			for (const testcase of testResult.testcases) {
-				if (!testcase.valid) {
-					message += "\n";
-					message += `\n     Test file: ${testcase.testFile}`;
-					message += `\n     Test name: ${testcase.testName}`;
-					message += `\n     ${testcase.message}`;
-				}
-			}
+			// for (const testcase of testResult.testcases) {
+			// 	if (!testcase.valid) {
+			// 		message += `\n`;
+			// 		message += `\n     Test file: ${testcase.testFile}`;
+			// 		message += `\n     Test name: ${testcase.testName}`;
+			// 		message += `\n     ${testcase.message}`;
+			// 	}
+			// }
 
 			assert.fail(message);
 		}

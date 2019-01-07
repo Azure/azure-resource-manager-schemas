@@ -37,10 +37,15 @@ module.exports.getTestFiles = getTestFiles;
  */
 function getTestFiles() {
     /** @type {String[]} */
-    let customTestFolder = process.argv[2];
+    let customTestFolder = null;
+    for (let i = 1; i < process.argv.length - 1; i++){
+        if (process.argv[i] === "--dir") {
+            customTestFolder = process.argv[i + 1];
+        }
+    }
 
     let testsFolderPath = utilities.findFileOrFolder("tests")
-    if (customTestFolder && customTestFolder !== "-AssertSubErrors") {
+    if (customTestFolder) {
         if (customTestFolder.startsWith("../") || customTestFolder.startsWith("..\\")) {
             customTestFolder = customTestFolder.substring(3);
         }
@@ -191,8 +196,10 @@ function runSchemaTests() {
     };
 
     let assertSubErrors = false;
-    if ((process.argv[2] && process.argv[2] === "-AssertSubErrors") || (process.argv[3] && process.argv[3] === "-AssertSubErrors")) {
-        assertSubErrors = true;
+    for (let i = 1; i < process.argv.length; i++){
+        if (process.argv[i] === "--AssertSubErrors") {
+            assertSubErrors = true;
+        }
     }
 
     const schemasFolderPath = utilities.getSchemasFolderPath();

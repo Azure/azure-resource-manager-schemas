@@ -107,7 +107,7 @@ describe('run schema tests - ', () => {
 
 			for (const testcase of testResult.testcases) {
 				if (!testcase.valid) {
-					message += `\n`;
+					message += "\n";
 					message += `\n     Test file: ${testcase.testFile}`;
 					message += `\n     Test name: ${testcase.testName}`;
 					message += `\n     ${testcase.message}`;

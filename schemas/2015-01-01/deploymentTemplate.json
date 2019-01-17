@@ -1,4 +1,4 @@
-﻿{
+{
   "id": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Template",
@@ -1221,7 +1221,7 @@
           "description": "Type of input parameter"
         },
         "defaultValue": {
-          "$ref": "#/definitions/parameterValueTypes",
+          "$ref": "#/definitions/parameterDefaultValueTypes",
           "description": "Default value to be used if one is not provided"
         },
         "allowedValues": {
@@ -1273,6 +1273,17 @@
     "parameterValueTypes": {
       "type": [ "string", "boolean", "integer", "number", "object", "array", "null" ]
     },
+    "parameterDefaultValueTypes": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/parameterDefaultValueExpression"
+        },
+        {
+          "type": [ "boolean", "integer", "number", "object", "array", "null" ]
+        }
+      ],
+      "description": "parameter default value contents"
+    },
     "keyVaultReference": {
       "type": "object",
       "properties": {
@@ -1311,6 +1322,23 @@
       "oneOf": [
         { "type": "number" },
         { "$ref": "#/definitions/expression" }
+      ]
+    },
+    "expressionWithNonDeterministicFunctions": {
+      "type": "string",
+      "pattern": "^\\[(dateTime|newGuid|[\\w\\$]+\\.[\\w\\$]+)\\(.*\\).*\\]$",
+      "description": "Deployment template expression with non-deterministic functions. Expressions are enclosed in [] and must start with a function of newGuid(), dateTime()"
+    },
+    "nonExpressionString": {
+      "type": "string",
+      "pattern": "^[^[].*[^]]$",
+      "description": "A string value that is not an expression"
+    },
+    "parameterDefaultValueExpression": {
+      "oneOf": [
+        { "$ref": "#/definitions/expression" },
+        { "$ref": "#/definitions/expressionWithNonDeterministicFunctions" },
+        { "$ref": "#/definitions/nonExpressionString" }
       ]
     },
     "Iso8601Duration": {

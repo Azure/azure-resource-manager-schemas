@@ -31,7 +31,7 @@
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Gets or sets the SKU."
+          "description": "The SKU that defines the tier and type of the peering."
         },
         "kind": {
           "oneOf": [
@@ -66,7 +66,7 @@
         },
         "eTag": {
           "type": "string",
-          "description": "Gets or sets the entity tag."
+          "description": "Gets or sets the entity tag. Not set by frontend (readonly by user)"
         },
         "tags": {
           "oneOf": [
@@ -88,6 +88,9 @@
             "oneOf": [
               {
                 "$ref": "#/definitions/peerings_prefixes_childResource"
+              },
+              {
+                "$ref": "#/definitions/peerings_bgpCommunityLists_childResource"
               }
             ]
           }
@@ -100,6 +103,32 @@
         "properties"
       ],
       "description": "Microsoft.Peering/peerings"
+    },
+    "peerings_bgpCommunityLists": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Peering/peerings/bgpCommunityLists"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-10-01-preview"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion"
+      ],
+      "description": "Microsoft.Peering/peerings/bgpCommunityLists"
     },
     "peerings_prefixes": {
       "type": "object",
@@ -136,7 +165,7 @@
         },
         "eTag": {
           "type": "string",
-          "description": "Gets or sets the entity tag."
+          "description": "Gets or sets the entity tag. Not set by frontend (readonly by user)"
         },
         "tags": {
           "oneOf": [
@@ -175,9 +204,111 @@
           "description": "Gets or sets the metro."
         }
       },
-      "description": "The peering prefix class."
+      "description": "The BGP community class."
     },
-    "DirectSessionConfiguration": {
+    "BgpSession": {
+      "type": "object",
+      "properties": {
+        "sessionPrefixV4": {
+          "type": "string",
+          "description": "Gets or sets the IP v4 session prefix. Sample formats: \"192.168.1.0/31\"; \"192.168.1.0/30\".\r\nSessionPrefixV4 ends with 00 or 11, Peer will end with 01 and Microsoft will end with 10\r\nSessionPrefixV4 ends with 01 or 10, Peer will match sessionPrefix and Microsoft will be inverse\r\nSessionPrefixV4 ends with 0 or 1 (/31), Peer will match sessionPrefix and Microsoft will be inverse"
+        },
+        "sessionPrefixV6": {
+          "type": "string",
+          "description": "Gets or sets the IP v6 session prefix. Sample formats: \"fd00::0/127\"; \"fd00::0/126\""
+        },
+        "microsoftSessionIPv4Address": {
+          "type": "string",
+          "description": "Gets derived value from SessionIP, or custom value if set."
+        },
+        "microsoftSessionIPv6Address": {
+          "type": "string",
+          "description": "Gets derived value from SessionIP, or custom value if set."
+        },
+        "peerSessionIPv4Address": {
+          "type": "string",
+          "description": "Gets derived value from SessionIP, or custom value if set."
+        },
+        "peerSessionIPv6Address": {
+          "type": "string",
+          "description": "Gets derived value from SessionIP, or custom value if set."
+        },
+        "sessionStateV4": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "None",
+                "Idle",
+                "Connect",
+                "Active",
+                "OpenSent",
+                "OpenConfirm",
+                "Established",
+                "PendingAdd",
+                "PendingUpdate",
+                "PendingRemove"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Gets or sets the IP v4 BGP Session state. Not set by frontend (readonly to user)."
+        },
+        "sessionStateV6": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "None",
+                "Idle",
+                "Connect",
+                "Active",
+                "OpenSent",
+                "OpenConfirm",
+                "Established",
+                "PendingAdd",
+                "PendingUpdate",
+                "PendingRemove"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Gets or sets the IP v6 BGP Session state. Not set by frontend (readonly to user)."
+        },
+        "maxPrefixesAdvertisedV4": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Gets or sets the Max Prefix Advertised v4. Optionally set by frontend, default to 20,000 (readonly to user)"
+        },
+        "maxPrefixesAdvertisedV6": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Gets or sets the Max Prefix Advertised v6. Optionally set by frontend, default to 20,000 (readonly to user)"
+        },
+        "md5AuthenticationKey": {
+          "type": "string",
+          "description": "Gets or sets the MD5 authentication key. Optionally set by frontend, default to empty string (readonly to user)"
+        }
+      },
+      "description": "The peering session configuration class."
+    },
+    "DirectConnection": {
       "type": "object",
       "properties": {
         "bandwidthInMbps": {
@@ -191,54 +322,6 @@
           ],
           "description": "Gets or sets the bandwidth in Mbps."
         },
-        "sessionIPv4Prefix": {
-          "type": "string",
-          "description": "Gets or sets the IP v4 session prefix."
-        },
-        "sessionIPv6Prefix": {
-          "type": "string",
-          "description": "Gets or sets the IP v6 session prefix."
-        },
-        "sessionIPv4State": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "None",
-                "Idle",
-                "Connect",
-                "Active",
-                "OpenSent",
-                "OpenConfirm",
-                "Established"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Gets or sets the IP v4 BGP Session state."
-        },
-        "sessionIPv6State": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "None",
-                "Idle",
-                "Connect",
-                "Active",
-                "OpenSent",
-                "OpenConfirm",
-                "Established"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Gets or sets the IP v6 BGP Session state."
-        },
         "peeringDBFacilityId": {
           "oneOf": [
             {
@@ -248,88 +331,46 @@
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Gets or sets the facility id."
+          "description": "Gets or sets the facility id. Set by frontend on add. Cannot be updated."
         },
-        "md5AuthenticationKey": {
-          "type": "string",
-          "description": "Gets or sets the MD5 authentication key."
+        "connectionState": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "None",
+                "PendingApproval",
+                "Approved",
+                "ProvisioningStarted",
+                "ProvisioningFailed",
+                "ProvisioningCompleted",
+                "Validating",
+                "Active"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The state of the connection with Microsoft."
+        },
+        "bgpSession": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BgpSession"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Gets or sets the BGP session."
         }
       },
       "description": "The peering session configuration class."
     },
-    "ExchangeSessionConfiguration": {
+    "ExchangeConnection": {
       "type": "object",
       "properties": {
-        "maxPrefixesAdvertisedIPv4": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Gets or sets the Max Prefix Advertised IP v4."
-        },
-        "maxPrefixesAdvertisedIPv6": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Gets or sets the Max Prefix Advertised IP v6."
-        },
-        "sessionIPv4Prefix": {
-          "type": "string",
-          "description": "Gets or sets the IP v4 session prefix."
-        },
-        "sessionIPv6Prefix": {
-          "type": "string",
-          "description": "Gets or sets the IP v6 session prefix."
-        },
-        "sessionIPv4State": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "None",
-                "Idle",
-                "Connect",
-                "Active",
-                "OpenSent",
-                "OpenConfirm",
-                "Established"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Gets or sets the IP v4 BGP Session state."
-        },
-        "sessionIPv6State": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "None",
-                "Idle",
-                "Connect",
-                "Active",
-                "OpenSent",
-                "OpenConfirm",
-                "Established"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Gets or sets the IP v6 BGP Session state."
-        },
         "peeringDBFacilityId": {
           "oneOf": [
             {
@@ -339,14 +380,81 @@
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Gets or sets the facility id."
+          "description": "Gets or sets the facility id. Set by frontend on add. Cannot be updated."
         },
-        "md5AuthenticationKey": {
-          "type": "string",
-          "description": "Gets or sets the MD5 authentication key."
+        "connectionState": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "None",
+                "PendingApproval",
+                "Approved",
+                "ProvisioningStarted",
+                "ProvisioningFailed",
+                "ProvisioningCompleted",
+                "Validating",
+                "Active"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The state of the connection with Microsoft."
+        },
+        "bgpSession": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BgpSession"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Gets or sets the BGP session."
         }
       },
       "description": "The peering session configuration class."
+    },
+    "PeeringPrefix": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PeeringPrefixProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Gets or sets the peering prefix properties."
+        },
+        "location": {
+          "type": "string",
+          "description": "Gets or sets the location."
+        },
+        "eTag": {
+          "type": "string",
+          "description": "Gets or sets the entity tag. Not set by frontend (readonly by user)"
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Gets or sets the tags."
+        }
+      },
+      "description": "The peering prefix class."
     },
     "PeeringPrefixProperties": {
       "type": "object",
@@ -405,7 +513,7 @@
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Gets or sets the provisioning state."
+          "description": "Gets or sets the provisioning state. Not set by frontend (readonly by user)."
         }
       },
       "description": "The peering prefix properties class."
@@ -450,32 +558,6 @@
           "type": "string",
           "description": "Gets or sets the peering location."
         },
-        "peeringState": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "None",
-                "Active",
-                "PendingAdd",
-                "PendingUpdate",
-                "PendingRemove",
-                "ProvisioningStarted",
-                "ProvisioningCompleted",
-                "ProvisioningFailed",
-                "Removed",
-                "Succeeded",
-                "Enabled",
-                "Disabled",
-                "CarrierApproved"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Gets or sets the peering state."
-        },
         "provisioningState": {
           "oneOf": [
             {
@@ -491,7 +573,7 @@
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Gets or sets the provisioning state."
+          "description": "Gets or sets the provisioning state. Not set by frontend (readonly by user)."
         }
       },
       "description": "The peering properties class."
@@ -504,7 +586,7 @@
             {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/DirectSessionConfiguration"
+                "$ref": "#/definitions/DirectConnection"
               }
             },
             {
@@ -523,20 +605,6 @@
             }
           ],
           "description": "Gets or sets a value indicating whether or not to use this for partner peering service."
-        },
-        "bgpCommunities": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/BgpCommunity"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Gets or sets the BGP communities."
         }
       },
       "description": "The peering properties direct class."
@@ -549,7 +617,7 @@
             {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/ExchangeSessionConfiguration"
+                "$ref": "#/definitions/ExchangeConnection"
               }
             },
             {
@@ -570,7 +638,7 @@
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Gets or sets the BGP communities."
+          "description": "Gets or sets the BGP communities. Set not by AddOrUpdate (hidden to user in AddOrUpdate)"
         }
       },
       "description": "The peering exchange properties class."
@@ -584,10 +652,50 @@
         },
         "serviceTag": {
           "type": "string",
-          "description": "Gets or sets the service tag."
+          "description": "Gets or sets the service tag. Not set by frontend (readonly to user)"
+        },
+        "prefixes": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/PeeringPrefix"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Gets or sets the list of prefixes. Set not by AddOrUpdate (hidden to user in AddOrUpdate)"
         }
       },
       "description": "The peering properties carrier class."
+    },
+    "peerings_bgpCommunityLists_childResource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "bgpCommunityLists"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-10-01-preview"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion"
+      ],
+      "description": "Microsoft.Peering/peerings/bgpCommunityLists"
     },
     "peerings_prefixes_childResource": {
       "type": "object",
@@ -624,7 +732,7 @@
         },
         "eTag": {
           "type": "string",
-          "description": "Gets or sets the entity tag."
+          "description": "Gets or sets the entity tag. Not set by frontend (readonly by user)"
         },
         "tags": {
           "oneOf": [
@@ -660,7 +768,8 @@
                 "Basic_Exchange_Free",
                 "Basic_Direct_Free",
                 "Premium_Direct_Free",
-                "Premium_Partner_Metered"
+                "Premium_Partner_Metered",
+                "Premium_Exchange_Metered"
               ]
             },
             {

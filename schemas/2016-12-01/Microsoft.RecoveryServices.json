@@ -193,6 +193,62 @@
         "properties"
       ],
       "description": "Microsoft.RecoveryServices/vaults/backupPolicies"
+    },
+    "vaults_backupstorageconfig": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.RecoveryServices/vaults/backupstorageconfig"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2016-12-01"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Resource location."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Resource tags."
+        },
+        "eTag": {
+          "type": "string",
+          "description": "Optional ETag."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BackupResourceConfig"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "BackupResourceConfigResource properties"
+        }
+      },
+      "required": [
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.RecoveryServices/vaults/backupstorageconfig"
     }
   },
   "definitions": {
@@ -218,76 +274,6 @@
         }
       ],
       "properties": {
-        "canReRegister": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Specifies whether the container is re-registrable."
-        },
-        "containerId": {
-          "type": "string",
-          "description": "ID of container."
-        },
-        "protectedItemCount": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Number of protected items in the BackupEngine"
-        },
-        "dpmAgentVersion": {
-          "type": "string",
-          "description": "Backup engine Agent version"
-        },
-        "dpmServers": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "List of BackupEngines protecting the container"
-        },
-        "upgradeAvailable": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "To check if upgrade available"
-        },
-        "protectionStatus": {
-          "type": "string",
-          "description": "Protection status of the container."
-        },
-        "extendedInfo": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DPMContainerExtendedInfo"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Extended Info of the container."
-        },
         "containerType": {
           "type": "string"
         }
@@ -441,8 +427,32 @@
       ],
       "properties": {
         "workLoadType": {
-          "type": "string",
-          "description": "Type of workload for the backup management"
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Invalid",
+                "VM",
+                "FileFolder",
+                "AzureSqlDb",
+                "SQLDB",
+                "Exchange",
+                "Sharepoint",
+                "VMwareVM",
+                "SystemState",
+                "Client",
+                "GenericDataSource",
+                "SQLDataBase",
+                "AzureFileShare",
+                "SAPHanaDatabase",
+                "SAPAseDatabase"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Type of workload for the backup management."
         },
         "schedulePolicy": {
           "oneOf": [
@@ -880,6 +890,17 @@
           ],
           "description": "Retention policy with the details on backup copy retention ranges."
         },
+        "instantRpRetentionRangeInDays": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Instant RP retention policy range in days"
+        },
         "timeZone": {
           "type": "string",
           "description": "TimeZone optional input as string. For example: TimeZone = \"Pacific Standard Time\"."
@@ -1173,43 +1194,17 @@
       ],
       "description": "Container for SQL workloads under Azure Virtual Machines."
     },
-    "AzureVmWorkloadProtectedItemExtendedInfo": {
-      "type": "object",
-      "properties": {
-        "oldestRecoveryPoint": {
-          "type": "string",
-          "format": "date-time",
-          "description": "The oldest backup copy available for this backup item."
-        },
-        "recoveryPointCount": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Number of backup copies available for this backup item."
-        },
-        "policyState": {
-          "type": "string",
-          "description": "Indicates consistency of policy object and policy applied to this backup item."
-        }
-      },
-      "description": "Additional information on Azure Workload for SQL specific backup item."
-    },
-    "AzureVmWorkloadProtectionPolicy": {
+    "AzureVmWorkloadProtectedItem": {
       "type": "object",
       "oneOf": [
         {
           "properties": {
-            "backupManagementType": {
+            "protectedItemType": {
               "oneOf": [
                 {
                   "type": "string",
                   "enum": [
-                    "AzureWorkload"
+                    "AzureVmWorkloadProtectedItem"
                   ]
                 },
                 {
@@ -1218,51 +1213,57 @@
               ]
             }
           }
-        }
-      ],
-      "properties": {
-        "workLoadType": {
-          "type": "string",
-          "description": "Type of workload for the backup management"
         },
-        "settings": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/Settings"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Common settings for the backup management"
-        },
-        "subProtectionPolicy": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/SubProtectionPolicy"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "List of sub-protection policies which includes schedule and retention"
-        },
-        "backupManagementType": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "backupManagementType"
-      ],
-      "description": "Azure VM (Mercury) workload-specific backup policy."
-    },
-    "AzureVmWorkloadSQLDatabaseProtectedItem": {
-      "type": "object",
-      "oneOf": [
         {
+          "allOf": [
+            {
+              "$ref": "#/definitions/AzureVmWorkloadSAPAseDatabaseProtectedItem"
+            }
+          ],
+          "properties": {
+            "protectedItemType": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "AzureVmWorkloadSAPAseDatabase"
+                  ]
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/AzureVmWorkloadSAPHanaDatabaseProtectedItem"
+            }
+          ],
+          "properties": {
+            "protectedItemType": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "AzureVmWorkloadSAPHanaDatabase"
+                  ]
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/AzureVmWorkloadSQLDatabaseProtectedItem"
+            }
+          ],
           "properties": {
             "protectedItemType": {
               "oneOf": [
@@ -1295,7 +1296,7 @@
         },
         "parentType": {
           "type": "string",
-          "description": "Parent type of DB, SQLAG or StandAlone"
+          "description": "Parent type of protected item, example: for a DB, standalone server or distributed"
         },
         "protectionStatus": {
           "type": "string",
@@ -1393,6 +1394,209 @@
       "required": [
         "protectedItemType"
       ],
+      "description": "Azure VM workload-specific protected item."
+    },
+    "AzureVmWorkloadProtectedItemExtendedInfo": {
+      "type": "object",
+      "properties": {
+        "oldestRecoveryPoint": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The oldest backup copy available for this backup item."
+        },
+        "recoveryPointCount": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Number of backup copies available for this backup item."
+        },
+        "policyState": {
+          "type": "string",
+          "description": "Indicates consistency of policy object and policy applied to this backup item."
+        }
+      },
+      "description": "Additional information on Azure Workload for SQL specific backup item."
+    },
+    "AzureVmWorkloadProtectionPolicy": {
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "backupManagementType": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "AzureWorkload"
+                  ]
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "properties": {
+        "workLoadType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Invalid",
+                "VM",
+                "FileFolder",
+                "AzureSqlDb",
+                "SQLDB",
+                "Exchange",
+                "Sharepoint",
+                "VMwareVM",
+                "SystemState",
+                "Client",
+                "GenericDataSource",
+                "SQLDataBase",
+                "AzureFileShare",
+                "SAPHanaDatabase",
+                "SAPAseDatabase"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Type of workload for the backup management."
+        },
+        "settings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Settings"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Common settings for the backup management"
+        },
+        "subProtectionPolicy": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SubProtectionPolicy"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "List of sub-protection policies which includes schedule and retention"
+        },
+        "backupManagementType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "backupManagementType"
+      ],
+      "description": "Azure VM (Mercury) workload-specific backup policy."
+    },
+    "AzureVmWorkloadSAPAseDatabaseProtectedItem": {
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "protectedItemType": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "AzureVmWorkloadSAPAseDatabase"
+                  ]
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "properties": {
+        "protectedItemType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "protectedItemType"
+      ],
+      "description": "Azure VM workload-specific protected item representing SAP ASE Database."
+    },
+    "AzureVmWorkloadSAPHanaDatabaseProtectedItem": {
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "protectedItemType": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "AzureVmWorkloadSAPHanaDatabase"
+                  ]
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "properties": {
+        "protectedItemType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "protectedItemType"
+      ],
+      "description": "Azure VM workload-specific protected item representing SAP HANA Database."
+    },
+    "AzureVmWorkloadSQLDatabaseProtectedItem": {
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "protectedItemType": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "AzureVmWorkloadSQLDatabase"
+                  ]
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "properties": {
+        "protectedItemType": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "protectedItemType"
+      ],
       "description": "Azure VM workload-specific protected item representing SQL Database."
     },
     "AzureWorkloadContainer": {
@@ -1481,6 +1685,50 @@
           ],
           "description": "Additional details of a workload container."
         },
+        "workloadType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Invalid",
+                "VM",
+                "FileFolder",
+                "AzureSqlDb",
+                "SQLDB",
+                "Exchange",
+                "Sharepoint",
+                "VMwareVM",
+                "SystemState",
+                "Client",
+                "GenericDataSource",
+                "SQLDataBase",
+                "AzureFileShare",
+                "SAPHanaDatabase",
+                "SAPAseDatabase"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Workload type for which registration was sent."
+        },
+        "operationType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Invalid",
+                "Register",
+                "Reregister"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Re-Do Operation."
+        },
         "containerType": {
           "type": "string"
         }
@@ -1495,7 +1743,7 @@
       "properties": {
         "hostServerName": {
           "type": "string",
-          "description": "Host Os Name in case of Stand Alone and \r\n            Cluster Name in case of distributed container."
+          "description": "Host Os Name in case of Stand Alone and Cluster Name in case of distributed container."
         },
         "inquiryInfo": {
           "oneOf": [
@@ -1524,6 +1772,60 @@
         }
       },
       "description": "Extended information of the container."
+    },
+    "BackupResourceConfig": {
+      "type": "object",
+      "properties": {
+        "storageModelType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Invalid",
+                "GeoRedundant",
+                "LocallyRedundant"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Storage type."
+        },
+        "storageType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Invalid",
+                "GeoRedundant",
+                "LocallyRedundant"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Storage type."
+        },
+        "storageTypeState": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Invalid",
+                "Locked",
+                "Unlocked"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Locked or Unlocked. Once a machine is registered against a resource, the storageTypeState is always Locked."
+        }
+      },
+      "description": "The resource storage details."
     },
     "ContainerIdentityInfo": {
       "type": "object",
@@ -1635,7 +1937,7 @@
         },
         "status": {
           "type": "string",
-          "description": "Status of this Node.\r\n            Failed | Succeeded"
+          "description": "Status of this Node.\r\nFailed | Succeeded"
         },
         "errorDetail": {
           "oneOf": [
@@ -1654,6 +1956,28 @@
     "DpmContainer": {
       "type": "object",
       "oneOf": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/definitions/AzureBackupServerContainer"
+            }
+          ],
+          "properties": {
+            "containerType": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "enum": [
+                    "AzureBackupServerContainer"
+                  ]
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+                }
+              ]
+            }
+          }
+        },
         {
           "properties": {
             "containerType": {
@@ -2295,7 +2619,7 @@
       "properties": {
         "status": {
           "type": "string",
-          "description": "Inquiry Status for this container such as \r\n            InProgress | Failed | Succeeded"
+          "description": "Inquiry Status for this container such as\r\nInProgress | Failed | Succeeded"
         },
         "errorDetail": {
           "oneOf": [
@@ -2320,7 +2644,7 @@
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Inquiry Details which will have workload specific details. \r\n             For e.g. - For SQL and oracle this will contain different details."
+          "description": "Inquiry Details which will have workload specific details.\r\nFor e.g. - For SQL and oracle this will contain different details."
         }
       },
       "description": "Details about inquired protectable items under a given container."
@@ -2504,7 +2828,7 @@
                 {
                   "type": "string",
                   "enum": [
-                    "MABWindowsContainer"
+                    "Windows"
                   ]
                 },
                 {
@@ -2616,7 +2940,9 @@
                 "Client",
                 "GenericDataSource",
                 "SQLDataBase",
-                "AzureFileShare"
+                "AzureFileShare",
+                "SAPHanaDatabase",
+                "SAPAseDatabase"
               ]
             },
             {
@@ -2990,7 +3316,7 @@
         {
           "allOf": [
             {
-              "$ref": "#/definitions/AzureVmWorkloadSQLDatabaseProtectedItem"
+              "$ref": "#/definitions/AzureVmWorkloadProtectedItem"
             }
           ],
           "properties": {
@@ -2999,7 +3325,7 @@
                 {
                   "type": "string",
                   "enum": [
-                    "AzureVmWorkloadSQLDatabase"
+                    "AzureVmWorkloadProtectedItem"
                   ]
                 },
                 {
@@ -3114,7 +3440,7 @@
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Type of backup managemenent for the backed up item."
+          "description": "Type of backup management for the backed up item."
         },
         "workloadType": {
           "oneOf": [
@@ -3133,7 +3459,9 @@
                 "Client",
                 "GenericDataSource",
                 "SQLDataBase",
-                "AzureFileShare"
+                "AzureFileShare",
+                "SAPHanaDatabase",
+                "SAPAseDatabase"
               ]
             },
             {
@@ -3163,6 +3491,22 @@
           "type": "string",
           "description": "Name of the backup set the backup item belongs to"
         },
+        "createMode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Invalid",
+                "Default",
+                "Recover"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Create mode to indicate recovery of existing soft deleted data source or creation of new data source."
+        },
         "protectedItemType": {
           "type": "string"
         }
@@ -3175,28 +3519,6 @@
     "ProtectionContainer": {
       "type": "object",
       "oneOf": [
-        {
-          "allOf": [
-            {
-              "$ref": "#/definitions/AzureBackupServerContainer"
-            }
-          ],
-          "properties": {
-            "containerType": {
-              "oneOf": [
-                {
-                  "type": "string",
-                  "enum": [
-                    "AzureBackupServerContainer"
-                  ]
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-                }
-              ]
-            }
-          }
-        },
         {
           "allOf": [
             {
@@ -3341,7 +3663,7 @@
                 {
                   "type": "string",
                   "enum": [
-                    "MABWindowsContainer"
+                    "Windows"
                   ]
                 },
                 {
@@ -3394,7 +3716,7 @@
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Type of backup managemenent for the container."
+          "description": "Type of backup management for the container."
         },
         "registrationStatus": {
           "type": "string",
@@ -3599,7 +3921,7 @@
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Count of duration types. Retention duration is obtained by the counting the duration type Count times.\r\n            For example, when Count = 3 and DurationType = Weeks, retention duration will be three weeks."
+          "description": "Count of duration types. Retention duration is obtained by the counting the duration type Count times.\r\nFor example, when Count = 3 and DurationType = Weeks, retention duration will be three weeks."
         },
         "durationType": {
           "oneOf": [
@@ -3811,6 +4133,17 @@
             }
           ],
           "description": "SQL compression flag"
+        },
+        "isCompression": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Workload compression flag. This has been added so that 'isSqlCompression'\r\nwill be deprecated once clients upgrade to consider this flag."
         }
       },
       "description": "Common settings field for backup management"
@@ -3956,8 +4289,22 @@
       "type": "object",
       "properties": {
         "policyType": {
-          "type": "string",
-          "description": "Type of backup policy type"
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Invalid",
+                "Full",
+                "Differential",
+                "Log",
+                "CopyOnlyFull"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Type of backup policy type."
         },
         "schedulePolicy": {
           "oneOf": [
@@ -4081,7 +4428,8 @@
                   "Second",
                   "Third",
                   "Fourth",
-                  "Last"
+                  "Last",
+                  "Invalid"
                 ]
               }
             },

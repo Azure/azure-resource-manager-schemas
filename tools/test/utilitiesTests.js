@@ -118,6 +118,12 @@ suite("utilities", () => {
             assert(result);
             assert.deepStrictEqual(typeof result, "object");
         });
+
+        test("with schema folder path and matching uri", () => {
+            const result = utilities.readJSONPath("https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#", "../schemas");
+            assert(result);
+            assert.deepStrictEqual(typeof result, "object");
+        });
     });
     
     suite("toString(any, string?)", () => {

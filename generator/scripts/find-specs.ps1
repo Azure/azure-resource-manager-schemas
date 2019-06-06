@@ -5,7 +5,7 @@ $ErrorActionPreference  = "stop"
 ## ===========================================================================
 # script
 
-Get-ChildItem -Recurse -Directory -Path "$restSpecs/specification" `
+Get-ChildItem -Recurse -Directory -Path "$restSpecsRepoPath/specification" `
   | Where-Object { $_.Name -match "^\d{4}-\d{2}-\d{2}(|-preview)$" } `
   | Foreach-Object { $_.Parent.Parent } `
   | Where-Object { $_.Parent.Name -eq "resource-manager" } `

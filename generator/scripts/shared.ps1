@@ -1,4 +1,3 @@
-
 ## functions
 
 function ResolvePath {
@@ -24,17 +23,7 @@ function In($location, $scriptblock) {
   }
 }
 
-function write-hostcolor { Param ( $color,  [parameter(ValueFromRemainingArguments=$true)] $content ) write-host -fore $color $content }
-function comment { Param ( [parameter(ValueFromRemainingArguments=$true)] $content ) write-host -fore darkgray $content }
-function action { Param ( [parameter(ValueFromRemainingArguments=$true)] $content ) write-host -fore green $content }
-function warn { Param ( [parameter(ValueFromRemainingArguments=$true)] $content ) write-host -fore yellow $content }
-
-function err { Param ( [parameter(ValueFromRemainingArguments=$true)] $content ) write-host -fore red $content }
-
-new-alias '//'  comment
-new-alias '/#'  comment
-new-alias '=>' action
-new-alias '/$' warn
-new-alias '/!' err
-
-new-alias '==>' write-hostcolor
+function Log-Action { Param ( [parameter(ValueFromRemainingArguments=$true)] $content ) write-host -fore green $content }
+function Log-Info { Param ( [parameter(ValueFromRemainingArguments=$true)] $content ) write-host -fore darkgray $content }
+function Log-Warn { Param ( [parameter(ValueFromRemainingArguments=$true)] $content ) write-host -fore yellow $content }
+function Log-Error { Param ( [parameter(ValueFromRemainingArguments=$true)] $content ) write-host -fore red $content }

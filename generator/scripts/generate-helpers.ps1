@@ -10,8 +10,8 @@ Function ExecAutoRest {
     $params
   )
 
-  => "Running autorest $params"
-  autorest $params | Write-Host
+  Log-Info "Running autorest $params"
+  autorest $params | Out-Host
 
   if (-not $?) {
     throw "Autorest failed for module $modulePath"
@@ -26,7 +26,7 @@ Function GenerateSchema {
   )
 
   $jsonSpecs = Get-ChildItem -File -Recurse -Include '*.json' -Path $modulePath `
-    | Where-Object { (Get-Content -Path $_ | ConvertFrom-Json).swagger -eq "2.0" }
+    | Where-Object { (Get-Content -Path $_ | ConvertFrom-Json -AsHashTable).swagger -eq "2.0" }
 
   if ($jsonSpecs.Count -eq 0) {
     throw "Unable to find any swagger specs in $modulePath"
@@ -85,10 +85,12 @@ Function GenerateSchemaRefs {
     | ForEach-Object { $_.Name } `
     | Foreach-Object { "$outputSchemaUri#/resourceDefinitions/$_"}
 
-  => "Provider namespace $outputNamespace"
-  => "API version $outputApiVersion"
-  => "Resource types: $resourceTypes"
-  => "Resource references: $schemaRefs"
+  Log-Info "Provider namespace: $outputNamespace"
+  Log-Info "API version: $outputApiVersion"
+  Log-Info "Resource types:"
+  $resourceTypes | Foreach-Object { Log-Info "- $_" }
+  Log-Info "Resource references:"
+  $schemaRefs | Foreach-Object { Log-Info "- $_" }
 
   return $schemaRefs
 }
@@ -119,78 +121,7 @@ Function SaveToSchemasDirectory {
     }
   }
 
+  New-Item -Type Directory -Force -Path "$schemasBasePath/$apiVersion" | Out-Null
   Copy-Item -Path $outputFile -Destination $outputSchemaPath -Force -Recurse
   $templateContents | ConvertTo-Json -Depth 10 > $generatedSchemasPath
 }
-
-Function ResetSchemasDirectory {
-  in $schemasBasePath {
-    => "Running git checkout in $schemasBasePath"
-    git checkout -- .;
-    if (-not $?) {
-      /! "Failed to run git checkout in $schemasBasePath"
-    }
-  
-    => "Running git clean in $schemasBasePath"
-    git clean -xfd .;
-    if (-not $?) {
-      /! "Failed to run git clean in $schemasBasePath"
-    }
-  }
-}
-
-Function ProcessAllSchemas {
-  $allModulePaths = @()
-
-  foreach ($moduleBasePath in $apiVersionWhitelist.Keys) {
-    $fullModulePath = "$restSpecsRepoPath/specification/$moduleBasePath"
-    if (-not (Test-Path $fullModulePath)) {
-      /! "Failed to locate module in $fullModulePath"
-    }
-  
-    $foundModulePaths = Get-ChildItem -Recurse -Directory -Path "$fullModulePath" | Where-Object { $_.Name -match "^\d{4}-\d{2}-\d{2}(|-preview)$" }
-  
-    if (-not ($apiVersionWhitelist[$moduleBasePath] -contains '*')) {
-      $foundModulePaths = $foundModulePaths | Where-Object { $apiVersionWhitelist[$moduleBasePath] -contains $_.Name }
-      $foundApiVersions = $foundModulePaths | ForEach-Object { $_.Name }
-  
-      foreach ($apiVersion in $apiVersionWhitelist[$moduleBasePath]) {
-        if (-not ($foundApiVersions -contains $apiVersion)) {
-          /! "Failed to locate api version $apiVersion in module $fullModulePath"
-        }
-      }
-    }
-  
-    $allModulePaths += $foundModulePaths
-  }
-  
-  foreach ($modulePath in $allModulePaths) {
-    $tmpGuid = [guid]::NewGuid()
-    $tmpFolder = "$tmp/generated_$tmpGuid"
-    $apiVersion = $modulePath.Name
-    $namespace = $modulePath.Parent.Parent.Name
-  
-    try {
-      => "Start processing $modulePath"
-
-      $outputFile = GenerateSchema -modulePath $modulePath -tmpFolder $tmpFolder -expectedApiVersion $apiVersion
-      
-      $schemaRefs = GenerateSchemaRefs -modulePath $modulePath -outputFile $outputFile -expectedNamespace $namespace -expectedApiVersion $apiVersion
-  
-      SaveToSchemasDirectory -outputFile $outputFile -schemaRefs $schemaRefs -namespace $namespace -apiVersion $apiVersion
-
-      => "Finished processing $modulePath"
-    }
-    catch
-    {
-      /! "Caught error processing $($modulePath): $_"
-    }
-    finally {
-      Remove-Item -Recurse $tmpFolder -ErrorAction Ignore
-    }
-  }
-}
-
-ResetSchemasDirectory
-
-ProcessAllSchemas

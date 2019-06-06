@@ -1,9 +1,10 @@
 ## ===========================================================================
 # constants
 $generatorRoot = resolvepath $PSScriptRoot/..
-$tmp = resolvepath $generatorRoot/tmp ; mkdir -ea 0  $tmp
+$tmpRoot = resolvepath $generatorRoot/tmp
+New-Item -Type Directory -Force -Path $tmpRoot | Out-Null
 
-$restSpecsRepoPath = resolvepath $tmp/specs
+$restSpecsRepoPath = resolvepath $tmpRoot/specs
 $restSpecsRepoUri = "https://github.com/azure/azure-rest-api-specs"
 $restSpecsRepoCommitHash = "master"
 

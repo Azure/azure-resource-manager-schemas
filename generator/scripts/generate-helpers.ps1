@@ -113,7 +113,7 @@ Function SaveToSchemasDirectory {
   $newRefs = @()
   $newRefs += $currentRefs | Where-Object { $_ -notlike "$outputSchemaUri*" }
   $newRefs += $schemaRefs
-  $newRefs = $newRefs | Get-Unique
+  $newRefs = $newRefs | Get-Unique | Sort-Object
 
   foreach ($schemaRef in $newRefs) {
     $templateContents.allOf[1].oneOf += @{

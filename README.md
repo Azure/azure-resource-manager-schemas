@@ -6,17 +6,23 @@ Welcome to contribute to template deployment schemas, please send pull request t
 
 ## Hints
 * When you add a new resource type in schema, please add it into [schemas\2014-04-01-preview\deploymentTemplate.json](schemas/2014-04-01-preview/deploymentTemplate.json), [schemas\2015-01-01\deploymentTemplate.json](schemas/2015-01-01/deploymentTemplate.json) and [schemas\2019-04-01\deploymentTemplate.json](schemas/2019-04-01/deploymentTemplate.json).
-* Please add or update [tests](tests/) and run the full test suite before submitting your change (see [Running Tests](#running-tests))
+* Please add or update [tests](tests/) and run the full test suite before submitting your change (see [Running the full suite](#running-the-full-suite))
 
-## Running Tests
-### Validating your schema adheres to the schema metaformat
+## Tests
+### Running the full suite
+Use the following to run all of the schema tests:
+* `cd tools`
+* `npm install`
+* `npm test`
+
+### Validating schema against schema metaformat
 You can use [validateJSON.js](tools/validateJSON.js) against [ResourceMetaSchema.json](tools/ResourceMetaSchema.json) to do some basic checks against the new/updated schema file.
 #### Usage
 `node validateJSON.js <schema file path> ResourceMetaSchema.json <schema folder path>`
 #### Sample
 `node validateJSON.js ..\schemas\2015-08-01\Microsoft.Compute.json ResourceMetaSchema.json ..\schemas\`
 
-### Running the full set of schema tests
+### Running individual schema tests
 You can use [runSchemaTests.js](tools/runSchemaTests.js) to test all the JSON files in [tests](tests/) against the schemas.
 #### Usage
 `node runSchemaTests.js [--dir _folder_] [--AssertSubErrors]`

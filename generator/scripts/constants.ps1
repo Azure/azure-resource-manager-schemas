@@ -34,5 +34,6 @@ $apiVersionWhitelist  = @{
   'servicefabricmesh/resource-manager/Microsoft.ServiceFabricMesh' = @('*');
   'labservices/resource-manager/Microsoft.LabServices' = @('*');
   'EnterpriseKnowledgeGraph/resource-manager/Microsoft.EnterpriseKnowledgeGraph' = @('*');
-  'edgegateway/resource-manager/Microsoft.DataBoxEdge' = @('*')
+  'edgegateway/resource-manager/Microsoft.DataBoxEdge' = @('*');
+  'portal/resource-manager/Microsoft.Portal' = @('*')
 };

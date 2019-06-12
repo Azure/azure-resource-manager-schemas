@@ -10,8 +10,8 @@ Function ExecAutoRest {
     $params
   )
 
-  Log-Info "Running autorest $params"
-  autorest $params | Out-Host
+  Log-Info "Running $autoRestExe $params"
+  & $autoRestExe $params | Out-Host
 
   if (-not $?) {
     throw "Autorest failed for module $modulePath"

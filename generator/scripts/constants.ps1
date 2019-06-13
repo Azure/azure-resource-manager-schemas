@@ -8,10 +8,6 @@ $restSpecsRepoPath = resolvepath $tmpRoot/specs
 $restSpecsRepoUri = "https://github.com/azure/azure-rest-api-specs"
 $restSpecsRepoCommitHash = "master"
 
-# Change to local path to use locally-built copy
-$autoRestExe = if ($IsWindows) { "autorest.cmd" } else { "autorest" }
-$autoRestExe = "$generatorRoot/node_modules/.bin/$autoRestExe"
-$autoRestGenerator = "$generatorRoot/node_modules/@microsoft.azure/autorest.azureresourceschema/"
 $autoRestVerboseOutput = $false
 
 $schemasBaseUri = "https://schema.management.azure.com/schemas"

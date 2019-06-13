@@ -10,8 +10,8 @@ Function ExecAutoRest {
     $params
   )
 
-  Log-Info "Running $autoRestExe $params"
-  & $autoRestExe $params | Out-Host
+  Log-Info "Running autorest $params"
+  autorest $params | Out-Host
 
   if (-not $?) {
     throw "Autorest failed for module $modulePath"
@@ -33,7 +33,7 @@ Function GenerateSchema {
   }
 
   $autoRestParams = @(
-    "--use=$autoRestGenerator",
+    "--azureresourceschema",
     "--clear-output-folder"
     "--output-folder=$tmpFolder",
     "--api-version=$expectedApiVersion",

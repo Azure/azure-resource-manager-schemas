@@ -33,5 +33,6 @@ $apiVersionWhitelist  = @{
   'labservices/resource-manager/Microsoft.LabServices' = @('*');
   'EnterpriseKnowledgeGraph/resource-manager/Microsoft.EnterpriseKnowledgeGraph' = @('*');
   'edgegateway/resource-manager/Microsoft.DataBoxEdge' = @('*');
-  'portal/resource-manager/Microsoft.Portal' = @('*')
+  'portal/resource-manager/Microsoft.Portal' = @('*');
+  'cosmos-db/resource-manager/Microsoft.DocumentDB' = @('*')
 };

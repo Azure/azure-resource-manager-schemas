@@ -22,7 +22,8 @@ function validateSchemas() {
                 schemaFileName !== "policyDefinition.json" &&
                 schemaFileName !== "CreateUIDefinition.CommonControl.json" &&
                 schemaFileName !== "CreateUIDefinition.MultiVm.json" &&
-                schemaFileName !== "CreateUIDefinition.ProviderControl.json");
+                schemaFileName !== "CreateUIDefinition.ProviderControl.json" &&
+                schemaFileName !== "ViewDefinition.json");
         }
         return result;
     });

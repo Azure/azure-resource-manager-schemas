@@ -19,7 +19,7 @@ CloneGitRepo -localPath $restSpecsRepoPath -remoteUri $restSpecsRepoUri -commitH
 ResetGitDirectory -localPath $schemasBasePath
 
 $tmpGuid = [guid]::NewGuid()
-$tmpFolder = "$tmpRoot/generated_$tmpGuid"
+$tmpFolder = ResolvePath "$tmpRoot/schm_$tmpGuid"
 $modulePath = Get-ChildItem -Recurse -Directory -Path "$restSpecsRepoPath/specification" `
   | Where-Object { $_.Name -eq $ApiVersion } `
   | Where-Object { $_.Parent.Parent.Name -eq $ProviderNamespace }

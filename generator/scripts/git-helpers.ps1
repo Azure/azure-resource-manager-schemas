@@ -24,10 +24,10 @@ Function CloneGitRepo {
   if (-not $localRepoExists) {
     Log-Info "Cloning from $remoteUri"
     New-Item -Type Directory -Force -Path $localPath | Out-Null
-    git clone $remoteUri $localPath
+    git clone $remoteUri $localPath | Out-Host
     if (-not $?) {
       Remove-Item -Recurse -Force $localPath
-      Log-Error "Failed to clone $remoteUri"
+      throw "Failed to clone $remoteUri"
     }
   }
   
@@ -36,21 +36,21 @@ Function CloneGitRepo {
     git fetch | Out-Host
     if (-not $?) {
       Remove-Item -Recurse -Force $localPath
-      Log-Error "Failed to fetch from $remoteUri"
+      throw "Failed to fetch from $remoteUri"
     }
   
     Log-Info "Cleaning local repo"
     git clean -xfd . | Out-Host
     if (-not $?) {
       Remove-Item -Recurse -Force $localPath
-      Log-Error "Failed to clean local repo"
+      throw "Failed to clean local repo"
     }
   
     Log-Info "Checking out commit hash $commitHash"
     git checkout $commitHash | Out-Host
     if (-not $?) {
       Remove-Item -Recurse -Force $localPath
-      Log-Error "Failed to checkout commit hash $commitHash"
+      throw "Failed to checkout commit hash $commitHash"
     }
   }
 }
@@ -64,13 +64,13 @@ Function ResetGitDirectory {
     Log-Info "Running git checkout in $localPath"
     git checkout -- . | Out-Host
     if (-not $?) {
-      Log-Error "Failed to run git checkout in $localPath"
+      throw "Failed to run git checkout in $localPath"
     }
   
     Log-Info "Running git clean in $localPath"
     git clean -xfd . | Out-Host
     if (-not $?) {
-      Log-Error "Failed to run git clean in $localPath"
+      throw "Failed to run git clean in $localPath"
     }
   }
 }

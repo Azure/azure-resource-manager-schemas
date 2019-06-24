@@ -36,7 +36,7 @@ foreach ($moduleBasePath in $apiVersionWhitelist.Keys) {
 
 foreach ($modulePath in $allModulePaths) {
   $tmpGuid = [guid]::NewGuid()
-  $tmpFolder = "$tmpRoot/generated_$tmpGuid"
+  $tmpFolder = ResolvePath "$tmpRoot/schm_$tmpGuid"
   $apiVersion = $modulePath.Name
   $namespace = $modulePath.Parent.Parent.Name
 

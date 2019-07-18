@@ -1,5 +1,8 @@
 $ErrorActionPreference  = "stop"
 . $PSScriptRoot/shared.ps1
 . $PSScriptRoot/constants.ps1
+. $PSScriptRoot/git-helpers.ps1
 
-Remove-Item -Recurse -Force $tmpRoot
+ResetGitDirectory -localPath $restSpecsRepoPath
+
+ResetGitDirectory -localPath $schemasBasePath

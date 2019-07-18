@@ -2,57 +2,38 @@ $ErrorActionPreference  = "stop"
 . $PSScriptRoot/shared.ps1
 . $PSScriptRoot/constants.ps1
 . $PSScriptRoot/git-helpers.ps1
+. $PSScriptRoot/specs-helpers.ps1
 . $PSScriptRoot/generate-helpers.ps1
 
-## ===========================================================================
-# script
+$readmePaths = CloneAndConfigureSpecs -localPath $restSpecsRepoPath -remoteUri $restSpecsRepoUri -commitHash $restSpecsRepoCommitHash
 
-CloneGitRepo -localPath $restSpecsRepoPath -remoteUri $restSpecsRepoUri -commitHash $restSpecsRepoCommitHash
+$readmes = ValidateAndGetWhitelistedReadmes -readmePaths $readmePaths
 
-ResetGitDirectory -localPath $schemasBasePath
-
-$allModulePaths = @()
-foreach ($moduleBasePath in $apiVersionWhitelist.Keys) {
-  $fullModulePath = "$restSpecsRepoPath/specification/$moduleBasePath"
-  if (-not (Test-Path $fullModulePath)) {
-    Log-Error "Failed to locate module in $fullModulePath"
-  }
-
-  $foundModulePaths = Get-ChildItem -Recurse -Directory -Path "$fullModulePath" | Where-Object { $_.Name -match "^\d{4}-\d{2}-\d{2}(|-preview)$" }
-
-  if (-not ($apiVersionWhitelist[$moduleBasePath] -contains '*')) {
-    $foundModulePaths = $foundModulePaths | Where-Object { $apiVersionWhitelist[$moduleBasePath] -contains $_.Name }
-    $foundApiVersions = $foundModulePaths | ForEach-Object { $_.Name }
-
-    foreach ($apiVersion in $apiVersionWhitelist[$moduleBasePath]) {
-      if (-not ($foundApiVersions -contains $apiVersion)) {
-        Log-Error "Failed to locate api version $apiVersion in module $fullModulePath"
-      }
-    }
-  }
-
-  $allModulePaths += $foundModulePaths
-}
-
-foreach ($modulePath in $allModulePaths) {
+foreach ($readme in $readmes) {
   $tmpGuid = [guid]::NewGuid()
   $tmpFolder = ResolvePath "$tmpRoot/schm_$tmpGuid"
-  $apiVersion = $modulePath.Name
-  $namespace = $modulePath.Parent.Parent.Name
 
   try {
-    Log-Info "Start processing $modulePath"
+    $apiVersions = Get-ChildItem -Recurse -Directory -Path (Resolve-Path "$readme/..") `
+    | Where-Object { $_.Name -match "^\d{4}-\d{2}-\d{2}(|-preview)$" } `
+    | ForEach-Object { $_.Name }
+  
+    Log-Info "Processing '$readme' with api-versions: $($apiVersions -join ', ')"
+  
+    foreach ($apiVersion in $apiVersions) {
+      GenerateSchema -readme $readme -tmpFolder $tmpFolder -apiVersion $apiVersion
+    }
+  
+    $generatedSchemas = GetGeneratedSchemas -tmpFolder $tmpFolder
+  
+    foreach ($generatedSchema in $generatedSchemas) {
+      $namespace = $generatedSchema.BaseName
+      $apiVersion = $generatedSchema.Directory.Name
 
-    $outputFile = GenerateSchema -modulePath $modulePath -tmpFolder $tmpFolder -expectedApiVersion $apiVersion
-    
-    $schemaRefs = GenerateSchemaRefs -modulePath $modulePath -outputFile $outputFile -expectedNamespace $namespace -expectedApiVersion $apiVersion
+      $schemaRefs = GenerateSchemaRefs -outputFile $generatedSchema -namespace $namespace -apiVersion $apiVersion
 
-    SaveToSchemasDirectory -outputFile $outputFile -schemaRefs $schemaRefs -namespace $namespace -apiVersion $apiVersion
-
-    Log-Info "Finished processing $modulePath"
-  }
-  catch {
-    Log-Error "Caught error processing $($modulePath): $_"
+      SaveToSchemasDirectory -outputFile $generatedSchema -schemaRefs $schemaRefs -namespace $namespace -apiVersion $apiVersion
+    }
   }
   finally {
     Remove-Item -Recurse $tmpFolder -ErrorAction Ignore

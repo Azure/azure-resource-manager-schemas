@@ -36,13 +36,13 @@ You can use [runSchemaTests.js](tools/runSchemaTests.js) to test all the JSON fi
 You can use the generator in this repo to automatically generate a schema from a swagger spec checked into the [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) repo. We are working on fully automating this process, but please note that until then, it is your responsibility to ensure that the auto-generated schema has been correctly formatted before submitting a pull request.
 ### Instructions
 1. Fork this repo, and clone it locally.
-2. Run the following commands (replace the provider namespace and api version accordingly):
+2. Run the following commands (replace the base path accordingly - valid paths can be disovered with `npm run list-basepaths`):
     * `cd generator`
     * `npm install`
-    * `npm run generate-single -- -ProviderNamespace Microsoft.MyProvider -ApiVersion 2019-04-01`
+    * `npm run generate-single -- -BasePath myprovider/resource-manager`
 4. Review the generator logs to ensure no errors, and review the changes generated.
 5. Generate a commit and push it to your fork.
-6. Submit a pull request to this repo.
+6. Submit a pull request to this repo. Please include the full command output in a PR comment.
 
 ---
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.

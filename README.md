@@ -44,5 +44,8 @@ You can use the generator in this repo to automatically generate a schema from a
 5. Generate a commit and push it to your fork.
 6. Submit a pull request to this repo. Please include the full command output in a PR comment.
 
+### Other commands
+See [generator/readme.md](generator/readme.md) for more generator-related commands
+
 ---
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.

@@ -15,7 +15,7 @@ CloneAndConfigureSpecs -localPath $restSpecsRepoPath -remoteUri $restSpecsRepoUr
 try {
   $readme = ValidateUserProvidedReadme -readmePath $BasePath
 } catch {
-  throw "Unable to find a readme under '$BasePath'. Please try running 'npm run list-readmes' to find the list of valid paths."
+  throw "Unable to find a readme under '$BasePath'. Please try running 'npm run list-basepaths' to find the list of valid paths."
 }
 
 $tmpGuid = [guid]::NewGuid()

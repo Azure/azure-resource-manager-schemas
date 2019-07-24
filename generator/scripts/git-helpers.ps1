@@ -1,6 +1,35 @@
 $ErrorActionPreference  = "stop"
 . $PSScriptRoot/shared.ps1
 
+Function ResetGitDirectory {
+  Param(
+    $localPath
+  )
+
+  In $localPath {
+    Log-Info "Cleaning git repo in $localPath"
+
+    & git reset . >$null
+    if (-not $?) {
+      Remove-Item -Recurse -Force $localPath
+      throw "Failed to clean git repo in $localPath"
+    }
+
+    & git checkout -- . >$null
+    if (-not $?) {
+      Remove-Item -Recurse -Force $localPath
+      throw "Failed to clean git repo in $localPath"
+    }
+
+    & git clean -fd . >$null
+    if (-not $?) {
+      Remove-Item -Recurse -Force $localPath
+      throw "Failed to clean git repo in $localPath"
+    }
+  }
+}
+
+
 Function CloneGitRepo {
   Param(
     $localPath,
@@ -12,7 +41,7 @@ Function CloneGitRepo {
   if ($localRepoExists) {
     Log-Info "Running fsck for $remoteUri"
     In $localPath {
-      git fsck | Out-Host
+      & git fsck >$null
     }
     if (-not $?) {
       Remove-Item -Recurse -Force $localPath
@@ -24,53 +53,28 @@ Function CloneGitRepo {
   if (-not $localRepoExists) {
     Log-Info "Cloning from $remoteUri"
     New-Item -Type Directory -Force -Path $localPath | Out-Null
-    git clone $remoteUri $localPath
+    & git clone $remoteUri $localPath >$null
     if (-not $?) {
       Remove-Item -Recurse -Force $localPath
-      Log-Error "Failed to clone $remoteUri"
+      throw "Failed to clone $remoteUri"
     }
   }
   
   In $localPath {
     Log-Info "Fetching from $remoteUri"
-    git fetch | Out-Host
+    & git fetch >$null
     if (-not $?) {
       Remove-Item -Recurse -Force $localPath
-      Log-Error "Failed to fetch from $remoteUri"
+      throw "Failed to fetch from $remoteUri"
     }
-  
-    Log-Info "Cleaning local repo"
-    git clean -xfd . | Out-Host
-    if (-not $?) {
-      Remove-Item -Recurse -Force $localPath
-      Log-Error "Failed to clean local repo"
-    }
+
+    ResetGitDirectory -localPath $localPath
   
     Log-Info "Checking out commit hash $commitHash"
-    git checkout $commitHash | Out-Host
+    & git checkout $commitHash >$null
     if (-not $?) {
       Remove-Item -Recurse -Force $localPath
-      Log-Error "Failed to checkout commit hash $commitHash"
-    }
-  }
-}
-
-Function ResetGitDirectory {
-  Param(
-    $localPath
-  )
-
-  In $localPath {
-    Log-Info "Running git checkout in $localPath"
-    git checkout -- . | Out-Host
-    if (-not $?) {
-      Log-Error "Failed to run git checkout in $localPath"
-    }
-  
-    Log-Info "Running git clean in $localPath"
-    git clean -xfd . | Out-Host
-    if (-not $?) {
-      Log-Error "Failed to run git clean in $localPath"
+      throw "Failed to checkout commit hash $commitHash"
     }
   }
 }

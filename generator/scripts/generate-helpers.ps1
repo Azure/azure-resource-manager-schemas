@@ -2,9 +2,6 @@ $ErrorActionPreference  = "stop"
 . $PSScriptRoot/shared.ps1
 . $PSScriptRoot/constants.ps1
 
-## ===========================================================================
-# script
-
 Function ExecAutoRest {
   Param(
     $params
@@ -20,64 +17,42 @@ Function ExecAutoRest {
 
 Function GenerateSchema {
   Param(
-    $modulePath,
+    $readme,
     $tmpFolder,
-    $expectedApiVersion
+    $apiVersion
   )
 
-  $jsonSpecs = Get-ChildItem -File -Recurse -Include '*.json' -Path $modulePath `
-    | Where-Object { (Get-Content -Path $_ | ConvertFrom-Json -AsHashTable).swagger -eq "2.0" }
-
-  if ($jsonSpecs.Count -eq 0) {
-    throw "Unable to find any swagger specs in $modulePath"
-  }
-
   $autoRestParams = @(
-    "--azureresourceschema",
-    "--clear-output-folder"
-    "--output-folder=$tmpFolder",
-    "--api-version=$expectedApiVersion",
-    "--azureresourceschema",
-    "--title=none"
+    "--azureresourceschema";
+    "--output-folder=$tmpFolder";
+    "--api-version=$apiVersion";
+    "--title=none";
+    $readme;
   )
 
   if ($autoRestVerboseOutput) {
     $autoRestParams += "--verbose"
   }
 
-  foreach ($jsonSpec in $jsonSpecs) {
-    $autoRestParams += "--input-file=$jsonSpec"
-  }
-
   ExecAutoRest -params $autoRestParams
+}
 
-  $outputFile = Get-ChildItem -File -Recurse "$tmpFolder"
-  if ($outputFile.Count -ne 1) {
-    throw "Expected 1 file, found $($outputFile.Count)"
-  }
+Function GetGeneratedSchemas {
+  Param(
+    $tmpFolder
+  )
 
-  return $outputFile
+  return Get-ChildItem -File -Recurse "$tmpFolder" -Filter "*.json"
 }
 
 Function GenerateSchemaRefs {
   Param(
-    $modulePath,
     $outputFile,
-    $expectedNamespace,
-    $expectedApiVersion
+    $namespace,
+    $apiVersion
   )
 
-  $outputNamespace = $outputFile.BaseName
-  if (($expectedNamespace -ne $outputNamespace)) {
-    throw "Mismatch between namespace. Expected: $expectedNamespace, Generated: $outputNamespace"
-  }
-
-  $outputApiVersion = $outputFile.Directory.Name
-  if (($expectedApiVersion -ne $outputApiVersion)) {
-    throw "Mismatch between api version. Expected: $expectedApiVersion, Generated: $outputApiVersion"
-  }
-
-  $outputSchemaUri = "$schemasBaseUri/$expectedApiVersion/$expectedNamespace.json"
+  $outputSchemaUri = "$schemasBaseUri/$apiVersion/$namespace.json"
   $outputContents = Get-Content -Path $outputFile | ConvertFrom-Json
   $resourceTypes = $outputContents.resourceDefinitions.PSObject.Properties `
     | ForEach-Object { $_.Value.description }
@@ -85,12 +60,32 @@ Function GenerateSchemaRefs {
     | ForEach-Object { $_.Name } `
     | Foreach-Object { "$outputSchemaUri#/resourceDefinitions/$_"}
 
-  Log-Info "Provider namespace: $outputNamespace"
-  Log-Info "API version: $outputApiVersion"
-  Log-Info "Resource types:"
-  $resourceTypes | Foreach-Object { Log-Info "- $_" }
-  Log-Info "Resource references:"
-  $schemaRefs | Foreach-Object { Log-Info "- $_" }
+  Log-Info "================================================================================================================================"
+
+  Log-Info -NoNewLine "Filename: "
+  Log-Action $outputFile
+
+  Log-Info -NoNewLine "Provider Namespace: "
+  Log-Action $namespace
+
+  Log-Info -NoNewLine "API Version: "
+  Log-Action $apiVersion
+
+  Log-Info "Resource Types: "
+
+  $resourceTypes | Foreach-Object {
+    Log-Info -NoNewLine "- "
+    Log-Action $_
+  }
+
+  Log-Info "Resource References: "
+
+  $schemaRefs | Foreach-Object {
+    Log-Info -NoNewLine "- "
+    Log-Action $_
+  }
+
+  Log-Info "================================================================================================================================"
 
   return $schemaRefs
 }
@@ -113,9 +108,12 @@ Function SaveToSchemasDirectory {
   $newRefs = @()
   $newRefs += $currentRefs | Where-Object { $_ -notlike "$outputSchemaUri*" }
   $newRefs += $schemaRefs
-  $newRefs = $newRefs | Get-Unique | Sort-Object
 
-  foreach ($schemaRef in $newRefs) {
+  # workaround for https://github.com/PowerShell/PowerShell/issues/8824
+  $newRefsArray = [System.Collections.ArrayList]@($newRefs | Get-Unique)
+  $newRefsArray.Sort([System.StringComparer]::OrdinalIgnoreCase)
+
+  foreach ($schemaRef in $newRefsArray) {
     $templateContents.allOf[1].oneOf += @{
       '$ref' = $schemaRef
     }

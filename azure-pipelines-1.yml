@@ -4,11 +4,11 @@
 # https://aka.ms/yaml
 
 schedules:
-- cron: "0 0 * * *"
+- cron: "0 8 * * *"
   branches:
     include:
     - master
-  displayName: Daily midnight build
+  displayName: Daily build
 
 pool:
   vmImage: 'Ubuntu-16.04'
@@ -17,18 +17,13 @@ steps:
 - checkout: self
   persistCredentials: true
   clean: true
-#- script: |
-#    cd generator
-#    npm install
-#    npm run generate-all
-#    cd ..
-#  displayName: 'Generate schemas'
 - script: |
     cd generator
     npm install
-    npm run generate-single portal/resource-manager
+    npm run generate-all
     cd ..
-  displayName: 'Generate schemas'
+  failOnStderr: true
+  displayName: Generate schemas
 - script: |
     git config user.name "Autogenerator Pipeline"
     git checkout -b autogenerate
@@ -37,3 +32,5 @@ steps:
       git commit -m "Autogenerate schemas"
       git push --force origin autogenerate
     fi
+  failOnStderr: true
+  displayName: Push schema updates

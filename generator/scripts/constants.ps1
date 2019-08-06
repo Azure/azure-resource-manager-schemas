@@ -33,4 +33,5 @@ $whitelist  = @(
   'edgegateway/resource-manager';
   'portal/resource-manager';
   'cosmos-db/resource-manager';
+  'servicefabric/resource-manager';
 );

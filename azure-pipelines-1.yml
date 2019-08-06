@@ -13,9 +13,17 @@ steps:
 - checkout: self
   persistCredentials: true
   clean: true
+#- script: |
+#    cd generator
+#    npm install
+#    npm run generate-all
+#    cd ..
+#  displayName: 'Generate schemas'
 - script: |
-    cd generator
-    npm install
-    npm run generate-all
-    cd ..
-  displayName: 'Generate schemas'
+    git checkout -b autogenerate
+    git add --all schemas
+    @git diff --cached --exit-code >nul
+    if /i "%ERRORLEVEL%" neq "0" (
+      git commit -m "Autogenerate schemas"
+      git push --force origin autogenerate
+    )

@@ -7,7 +7,7 @@ This is the repo for template deployment schemas hosted under `https://schema.ma
   * [schemas\2014-04-01-preview\deploymentTemplate.json](schemas/2014-04-01-preview/deploymentTemplate.json)
   * [schemas\2015-01-01\deploymentTemplate.json](schemas/2015-01-01/deploymentTemplate.json)
   * [schemas\2019-04-01\deploymentTemplate.json](schemas/2019-04-01/deploymentTemplate.json)
-* If your schema has been manually generated, please ensure you include appropriate tests in [tools/schemaTests](tools/schemaTests/)
+* If your schema has been manually generated, please ensure you include appropriate tests in [tests](tests/)
 * If adding a new resource type, please add examples to the templates in [tools/templateTests](tools/templateTests/)
 * Ensure that the test suite passes (see [Tests](#tests))
 

@@ -9,7 +9,7 @@ import * as schemaTestsRunner from './schemaTestsRunner';
 import 'mocha';
 
 const schemasFolder = __dirname + '/../schemas/';
-const schemaTestsFolder = __dirname + '/schemaTests/';
+const schemaTestsFolder = __dirname + '/../tests/';
 const testSchemasFolder = __dirname + '/schemas/';
 const templateTestsFolder = __dirname + '/templateTests/';
 const armSchemasPrefix = /^https?:\/\/schema\.management\.azure\.com\/schemas\//
@@ -17,6 +17,7 @@ const jsonSchemaDraft4Prefix = /^https?:\/\/json-schema\.org\/draft-04\/schema/
 
 const ajvInstance = new Ajv({
     loadSchema: loadSchema,
+    strictDefaults: true,
     schemaId: 'id',
     meta: false
     }).addMetaSchema(draft4MetaSchema)

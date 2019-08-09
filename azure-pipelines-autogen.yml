@@ -1,0 +1,31 @@
+pr: none
+
+schedules:
+- cron: "0 8 * * *"
+  branches:
+    include:
+    - master
+  displayName: Daily build
+
+pool:
+  vmImage: 'Ubuntu-16.04'
+
+steps:
+- checkout: self
+  persistCredentials: true
+  clean: true
+- script: |
+    cd generator
+    npm install
+    npm run generate-all
+    cd ..
+  displayName: Generate schemas
+- script: |
+    git config user.name "Autogenerator Pipeline"
+    git checkout -b autogenerate
+    git add --all schemas
+    if ! git diff-index --quiet HEAD --; then
+      git commit -m "Autogenerate schemas"
+      git push --force origin autogenerate
+    fi
+  displayName: Push schema updates

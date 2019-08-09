@@ -3,7 +3,7 @@ $ErrorActionPreference  = "stop"
 . $PSScriptRoot/constants.ps1
 . $PSScriptRoot/git-helpers.ps1
 
-Function CloneAndConfigureSpecs {
+Function CloneAndGenerateBasePaths {
   Param(
     $localPath,
     $remoteUri,
@@ -43,42 +43,35 @@ Function GetWhitelistedPaths {
   In "$specsPath/specification" {
     $whitelistedPaths = $whitelist | Resolve-Path -Relative
     $basePaths = $basePaths | Resolve-Path -Relative
-
+ 
     return $basePaths | Where-Object { $_ -in $whitelistedPaths }
   }
 }
 
+Function ListReadmePaths {
+  Param(
+    $specsPath,
+    $basePaths
+  )
+
+  GetWhitelistedPaths -specsPath $specsPath -basePaths $basePaths `
+  | ForEach-Object { Join-Path -Path "$specsPath/specification" -ChildPath $_ } `
+  | ForEach-Object { Join-Path -Path $_ -ChildPath 'readme.enable-multi-api.md' }
+}
+
 Function ValidateUserProvidedReadme {
   Param(
-    $readmePath
+    $basePath
   )
 
   In "$restSpecsRepoPath/specification" {
-    $readme = Join-Path -Path ($readmePath | Resolve-Path) -ChildPath 'readme.enable-multi-api.md'
+    $readme = Join-Path -Path ($basePath | Resolve-Path) -ChildPath 'readme.enable-multi-api.md'
 
     if (-not (Test-Path $readme)) {
       throw "Unable to find readme '$readme' in specs repo"
     }
 
     return $readme
-  }
-}
-
-Function ValidateAndGetWhitelistedReadmes {
-  Param(
-    $readmePaths
-  )
-
-  In "$restSpecsRepoPath/specification" {
-    $whitelistedPaths = $whitelist | Resolve-Path -Relative
-  
-    foreach ($whitelistPath in $whitelistedPaths) {
-      if ($whitelistPath -notin $readmePaths) {
-        throw "Unable to find whitelisted path '$whitelistPath' in specs repo"
-      }
-    }
-
-    return Join-Path -Path ($whitelistedPaths | Resolve-Path) -ChildPath 'readme.enable-multi-api.md'
   }
 }
 

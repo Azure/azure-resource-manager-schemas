@@ -15,6 +15,41 @@ Function ExecAutoRest {
   }
 }
 
+Function GenerateSchemasForReadme {
+  Param(
+    $readme
+  )
+
+  $apiVersions = Get-ChildItem -Recurse -Directory -Path (Resolve-Path "$readme/..") `
+  | Where-Object { $_.Name -match "^\d{4}-\d{2}-\d{2}(|-preview)$" } `
+  | ForEach-Object { $_.Name }
+
+  Log-Info "Processing '$readme' with api-versions: $($apiVersions -join ', ')"
+
+  foreach ($apiVersion in $apiVersions) {
+    $tmpGuid = [guid]::NewGuid()
+    $tmpFolder = ResolvePath "$tmpRoot/schm_$tmpGuid"
+    
+    try {
+      GenerateSchema -readme $readme -tmpFolder $tmpFolder -apiVersion $apiVersion
+  
+      $generatedSchemas = GetGeneratedSchemas -tmpFolder $tmpFolder
+    
+      foreach ($generatedSchema in $generatedSchemas) {
+        $namespace = $generatedSchema.BaseName
+        $apiVersion = $generatedSchema.Directory.Name
+    
+        $schemaRefs = GenerateSchemaRefs -outputFile $generatedSchema -namespace $namespace -apiVersion $apiVersion
+    
+        SaveToSchemasDirectory -outputFile $generatedSchema -schemaRefs $schemaRefs -namespace $namespace -apiVersion $apiVersion
+      }
+    }
+    finally {
+      Remove-Item -Recurse $tmpFolder -ErrorAction Ignore
+    }
+  }
+}
+
 Function GenerateSchema {
   Param(
     $readme,

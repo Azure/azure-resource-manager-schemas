@@ -4,7 +4,7 @@ $ErrorActionPreference  = "stop"
 . $PSScriptRoot/git-helpers.ps1
 . $PSScriptRoot/specs-helpers.ps1
 
-$basePaths = CloneAndConfigureSpecs -localPath $restSpecsRepoPath -remoteUri $restSpecsRepoUri -commitHash $restSpecsRepoCommitHash
+$basePaths = CloneAndGenerateBasePaths -localPath $restSpecsRepoPath -remoteUri $restSpecsRepoUri -commitHash $restSpecsRepoCommitHash
 
 $whitelistedPaths = GetWhitelistedPaths -specsPath $restSpecsRepoPath -basePaths $basePaths
 

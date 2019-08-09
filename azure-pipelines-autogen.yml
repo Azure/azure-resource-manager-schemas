@@ -16,6 +16,7 @@ steps:
   clean: true
 - script: |
     set -Eeuo pipefail
+    git show-ref
     git config user.name "Autogenerator Pipeline"
     git merge --no-commit --no-ff --strategy-option=theirs origin/master
     if ! git diff-index --quiet HEAD --; then
@@ -36,10 +37,6 @@ steps:
     git add --all schemas
     if ! git diff-index --quiet HEAD --; then
       git commit -m "Autogenerate schemas"
+      git push origin $(Build.SourceBranchName)
     fi
-  displayName: Commit changes
-- script: |
-    set -Eeuo pipefail
-    git config user.name "Autogenerator Pipeline"
-    git push origin $(Build.SourceBranchName)
-  displayName: Push changes
+  displayName: Commit and push changes

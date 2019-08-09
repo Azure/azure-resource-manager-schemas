@@ -77,6 +77,10 @@ Function GetGeneratedSchemas {
     $tmpFolder
   )
 
+  if (-not (Test-Path -Path $tmpFolder)) {
+    return $null
+  }
+
   return Get-ChildItem -File -Recurse "$tmpFolder" -Filter "*.json"
 }
 

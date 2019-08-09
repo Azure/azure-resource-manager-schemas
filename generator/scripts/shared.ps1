@@ -1,19 +1,5 @@
 ## functions
 
-function ResolvePath {
-  param (
-      [string] $FileName
-  )
-
-  $FileName = Resolve-Path $FileName -ErrorAction SilentlyContinue `
-                                     -ErrorVariable _frperror
-  if (-not($FileName)) {
-      $FileName = $_frperror[0].TargetObject
-  }
-
-  return $FileName
-}
-
 function In($location, $scriptblock) {
   pushd $location
   try {

@@ -28,7 +28,7 @@ Function GenerateSchemasForReadme {
 
   foreach ($apiVersion in $apiVersions) {
     $tmpGuid = [guid]::NewGuid()
-    $tmpFolder = ResolvePath "$tmpRoot/schm_$tmpGuid"
+    $tmpFolder = "$tmpRoot/schm_$tmpGuid"
     
     try {
       GenerateSchema -readme $readme -tmpFolder $tmpFolder -apiVersion $apiVersion

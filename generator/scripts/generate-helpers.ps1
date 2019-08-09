@@ -28,7 +28,7 @@ Function GenerateSchemasForReadme {
 
   foreach ($apiVersion in $apiVersions) {
     $tmpGuid = [guid]::NewGuid()
-    $tmpFolder = ResolvePath "$tmpRoot/schm_$tmpGuid"
+    $tmpFolder = "$tmpRoot/schm_$tmpGuid"
     
     try {
       GenerateSchema -readme $readme -tmpFolder $tmpFolder -apiVersion $apiVersion
@@ -76,6 +76,10 @@ Function GetGeneratedSchemas {
   Param(
     $tmpFolder
   )
+
+  if (-not (Test-Path -Path $tmpFolder)) {
+    return $null
+  }
 
   return Get-ChildItem -File -Recurse "$tmpFolder" -Filter "*.json"
 }

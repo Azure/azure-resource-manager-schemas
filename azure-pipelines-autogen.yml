@@ -4,8 +4,8 @@ schedules:
 - cron: "0 8 * * *"
   branches:
     include:
-    - master
-  displayName: Daily build
+    - autogenerate
+  displayName: Daily autogeneration
 
 pool:
   vmImage: 'Ubuntu-16.04'
@@ -15,17 +15,30 @@ steps:
   persistCredentials: true
   clean: true
 - script: |
+    set -Eeuxo pipefail
+    git config user.name "Autogenerator Pipeline"
+    git config user.email "azure-resource-manager-schemas@noreply.github.com"
+    git checkout $(Build.SourceBranchName)
+    git merge --no-commit --no-ff --strategy-option=theirs origin/master
+    if ! git diff-index --quiet HEAD --; then
+      git commit -m "Integrate master"
+    fi
+    git checkout origin/master -- schemas
+  displayName: Integrate master branch
+- script: |
+    set -Eeuxo pipefail
     cd generator
     npm install
     npm run generate-all
     cd ..
   displayName: Generate schemas
 - script: |
+    set -Eeuxo pipefail
     git config user.name "Autogenerator Pipeline"
-    git checkout -b autogenerate
+    git config user.email "azure-resource-manager-schemas@noreply.github.com"
     git add --all schemas
     if ! git diff-index --quiet HEAD --; then
       git commit -m "Autogenerate schemas"
-      git push --force origin autogenerate
+      git push origin $(Build.SourceBranchName)
     fi
-  displayName: Push schema updates
+  displayName: Commit and push changes

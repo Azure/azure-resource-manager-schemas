@@ -5,7 +5,9 @@ import { promisify } from 'util';
 import { findRecursive, findDirRecursive, executeCmd, rmdirRecursive } from './utils';
 import * as constants from './constants';
 import chalk from 'chalk';
-import { getWhitelistedPaths } from './specs';
+import { isWhitelisted } from './specs';
+
+const autorestBinary = os.platform() === 'win32' ? 'autorest.cmd' : 'autorest';
 
 const exists = promisify(fs.exists);
 const readFile = promisify(fs.readFile);
@@ -24,13 +26,13 @@ async function generateSchemasForReadme(readme: string) {
         try {
             const generatedSchemas = await generateSchema(readme, tmpFolder, apiVersion);
 
-            for (const generatedSchema of generatedSchemas) {
-                const namespace = path.basename(generatedSchema);
-                const apiVersion = path.basename(path.resolve(`${generatedSchema}/..`));
+            for (const schemaPath of generatedSchemas) {
+                const namespace = path.basename(schemaPath.substring(0, schemaPath.lastIndexOf(path.extname(schemaPath))));
+                const apiVersion = path.basename(path.resolve(`${schemaPath}/..`));
 
-                const schemaRefs = await generateSchemaRefs(generatedSchema, namespace, apiVersion);
+                const schemaRefs = await generateSchemaRefs(schemaPath, namespace, apiVersion);
 
-                await saveToSchemasDirectory(generatedSchema, schemaRefs, namespace, apiVersion);
+                await saveToSchemasDirectory(schemaPath, schemaRefs, namespace, apiVersion);
             }
         }
         finally {
@@ -40,7 +42,7 @@ async function generateSchemasForReadme(readme: string) {
 }
 
 async function execAutoRest(tmpFolder: string, params: string[]) {
-    await executeCmd(__dirname, 'autorest', params);
+    await executeCmd(__dirname, autorestBinary, params);
     if (!await exists(tmpFolder)) {
         return [];
     }
@@ -70,7 +72,6 @@ async function generateSchemaRefs(outputFile: string, namespace: string, apiVers
     const outputContent = await readFile(outputFile, { encoding: 'utf8' });
     const output = JSON.parse(outputContent);
 
-    
     const resourceDefs: {[path: string]: { description: string }} = output['resourceDefinitions'];
     const resourceKeys = Object.keys(resourceDefs);
     const resourceTypes = resourceKeys.map(r => resourceDefs[r].description);
@@ -94,9 +95,6 @@ async function generateSchemaRefs(outputFile: string, namespace: string, apiVers
 }
 
 async function saveToSchemasDirectory(outputFile: string, schemaRefs: string[], namespace: string, apiVersion: string) {
-    const outputSchemaUri = `${constants.schemasBaseUri}/${apiVersion}/${namespace}.json`;
-    const outputSchemaPath = path.resolve(`${constants.schemasBasePath}/${apiVersion}/${namespace}.json`);
-
     const templateContents = await readFile(constants.generatedSchemasTemplatePath, { encoding: 'utf8' });
     const template = JSON.parse(templateContents);
 
@@ -106,7 +104,7 @@ async function saveToSchemasDirectory(outputFile: string, schemaRefs: string[], 
     const currentRefsOneOf: {[path: string]: string}[] = actual.allOf[1].oneOf;
     const currentRefs = currentRefsOneOf.map(v => v['$ref']);
 
-    const newRefs = [...new Set(currentRefs.concat(schemaRefs))].sort();
+    const newRefs = [...new Set(currentRefs.concat(schemaRefs))].sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : 1);
 
     template.allOf[1].oneOf = newRefs.map(ref => ({ '$ref': ref }));
 
@@ -120,9 +118,10 @@ async function saveToSchemasDirectory(outputFile: string, schemaRefs: string[], 
 }
 
 async function listReadmePaths(localPath: string, basePaths: string[]) {
-    const whitelistedPaths = await getWhitelistedPaths(localPath, basePaths);
-
-    return whitelistedPaths.map(p => path.join(localPath, 'specification', p, 'readme.enable-multi-api.md'));
+    return basePaths
+        .filter(p => isWhitelisted(p))
+        .map(p => path.join(localPath, 'specification', p, 'readme.enable-multi-api.md'))
+        .map(p => path.resolve(p));
 }
 
 export {

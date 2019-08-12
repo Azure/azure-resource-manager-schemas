@@ -1,14 +1,17 @@
 import express = require('express');
 
+import { promisify } from 'util';
 import { hostname } from 'os';
-import { promises as fs } from 'fs';
+import fs from 'fs';
+
+const readFile = promisify(fs.readFile);
 
 const app = express();
 const port = 3000;
 
- app.use("/schemas", async (req, res) => {
+app.use("/schemas", async (req, res) => {
   try {
-    let file = await fs.readFile(__dirname + '/../schemas' + req.path, { encoding: 'utf8'});
+    let file = await readFile(__dirname + '/../schemas' + req.path, { encoding: 'utf8'});
 
     file = file.replace(/https:\/\/schema\.management\.azure\.com\/schemas\//g, `http://${hostname()}:${port}/schemas/`);
 

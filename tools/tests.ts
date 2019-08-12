@@ -2,12 +2,17 @@ import { expect } from 'chai';
 import Ajv from 'ajv';
 import * as url from 'url';
 import path from 'path';
-import { promises as fs } from 'fs';
+import fs from 'fs';
+import { promisify } from 'util';
 import { getLanguageService } from 'vscode-json-languageservice';
 import { TextDocument } from 'vscode-languageserver-types';
 import draft4MetaSchema from 'ajv/lib/refs/json-schema-draft-04.json';
 import * as schemaTestsRunner from './schemaTestsRunner';
 import 'mocha';
+
+const readdir = promisify(fs.readdir);
+const readFile = promisify(fs.readFile);
+const stat = promisify(fs.stat);
 
 const schemasFolder = __dirname + '/../schemas/';
 const schemaTestsFolder = __dirname + '/../tests/';
@@ -47,7 +52,7 @@ async function loadRawSchema(uri: string) : Promise<string> {
         throw new Error(`Unsupported JSON path ${jsonPath}`);
     }
 
-    return await fs.readFile(jsonPath, { encoding: "utf8" });
+    return await readFile(jsonPath, { encoding: "utf8" });
 }
 
 async function loadSchema(uri: string) : Promise<object> {
@@ -62,17 +67,17 @@ function stripUtf8Bom(value: string) {
 async function listSchemaPaths(basePath: string, fileFilter: (path: string) => boolean): Promise<string[]> {
     let results: string[] = [];
 
-    for (const subPathName of await fs.readdir(basePath)) {
+    for (const subPathName of await readdir(basePath)) {
         const subPath = path.resolve(`${basePath}/${subPathName}`);
 
-        const stat = await fs.stat(subPath);
-        if (stat.isDirectory()) {
+        const fileStat = await stat(subPath);
+        if (fileStat.isDirectory()) {
             const pathResults = await listSchemaPaths(subPath, fileFilter);
             results = results.concat(pathResults);
             continue;
         }
 
-        if (!stat.isFile()) {
+        if (!fileStat.isFile()) {
             continue;
         }
 
@@ -148,7 +153,7 @@ const schemasToSkip = [
 
     const schemaTestMap: {[path: string]: any} = {};
     for (const testPath of schemaTestPaths) {
-        const contents = await fs.readFile(testPath, { encoding: 'utf8' });
+        const contents = await readFile(testPath, { encoding: 'utf8' });
         const data = JSON.parse(contents);
 
         schemaTestMap[testPath] = data;
@@ -231,7 +236,7 @@ const schemasToSkip = [
                     },
                 });
 
-                const content = await fs.readFile(templateTestFile, { encoding: 'utf8' });
+                const content = await readFile(templateTestFile, { encoding: 'utf8' });
                 const textDocument = TextDocument.create(templateTestFile, 'json', 0, content);
                 const jsonDocument = service.parseJSONDocument(textDocument);
             

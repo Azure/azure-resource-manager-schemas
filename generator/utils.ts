@@ -6,11 +6,13 @@ import chalk from 'chalk';
 
 const readdir = promisify(fs.readdir);
 const stat = promisify(fs.stat);
+const unlink = promisify(fs.unlink);
 const rmdir = promisify(fs.rmdir);
+const exists = promisify(fs.exists);
 
 function executeCmd(cwd: string, cmd: string, args: string[]) : Promise<number> {
     return new Promise((resolve, reject) => {
-        console.log(`Running: ${cmd} ${args.join(' ')}`);
+        console.log(`[${cwd}] executing: ${cmd} ${args.join(' ')}`);
 
         const child = spawn(cmd, args, {
             cwd: cwd,
@@ -19,6 +21,9 @@ function executeCmd(cwd: string, cmd: string, args: string[]) : Promise<number> 
 
         child.stdout.on('data', data => process.stdout.write(chalk.grey(data.toString())));
         child.stderr.on('data', data => process.stdout.write(chalk.grey(data.toString())));
+        child.on('error', err => {
+            reject(err);
+        });
         child.on('exit', code => {
             if (code !== 0) {
                 reject(`Exited with code ${code}`);
@@ -78,6 +83,10 @@ async function findRecursive(basePath: string, filter: (name: string) => boolean
 }
 
 async function rmdirRecursive(basePath: string) {
+    if (!await exists(basePath)) {
+        return;
+    }
+
     for (const subPathName of await readdir(basePath)) {
         const subPath = path.resolve(`${basePath}/${subPathName}`);
 
@@ -88,11 +97,12 @@ async function rmdirRecursive(basePath: string) {
         }
 
         if (fileStat.isFile()) {
+            await unlink(subPath);
             continue;
         }
-
-        await rmdir(subPath);
     }
+
+    await rmdir(basePath);
 }
 
 export {

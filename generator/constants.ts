@@ -34,18 +34,6 @@ const whitelist  = [
   'portal/resource-manager',
   'cosmos-db/resource-manager',
   'servicefabric/resource-manager',
-  'containerinstance/resource-manager',
-  'containerregistry/resource-manager',
-  'containerservice/resource-manager',
-  'azure-kusto/resource-manager',
-  'postgresql/resource-manager',
-  'mariadb/resource-manager',
-  'mysql/resource-manager',
-  'domainservices/resource-manager',
-  'cdn/resource-manager',
-  'redis/resource-manager',
-  'vmwarecloudsimple/resource-manager',
-  'hanaonazure/resource-manager',
 ];
 
 export {

@@ -1,0 +1,340 @@
+{
+    "$schema": "http://anbam:3014/schemas/2019-03-01-hybrid/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "Admin username"
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Admin password"
+            }
+        },
+        "a": {
+            "type": "string"
+        },
+        "b": {
+            "type": "string"
+        },
+        "c": {
+            "type": "string"
+        },
+        "e": {
+            "type": "string"
+        },
+        "f": {
+            "type": "string"
+        },
+        "g": {
+            "type": "string"
+        },
+        "h": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "pwd": {
+            "type": "string"
+        },
+        "wsName": {
+            "type": "string"
+        },
+        "BEvirtualMachineNames": {
+            "type": "string"
+        },
+        "BEsubnetIPPrefix": {
+            "type": "string"
+        },
+        "BEnicStartingAddress": {
+            "type": "string"
+        },
+        "onPremDNSServers": {
+            "type": "string"
+        },
+        "metadata": {
+            "type": "string"
+        },
+        "sku": {
+            "type": "string"
+        },
+        "batchSize": {
+            "type": "string"
+        },
+        "dnsLabelPrefix": {
+            "type": "string"
+        },
+        "keyvaultSettings": {
+            "type": "string"
+        },
+        "keyvaultSecrets": {
+            "type": "string"
+        },
+        "newZoneName": {
+            "type": "string"
+        },
+        "nt0InstanceCount": {
+            "type": "string"
+        },
+        "newAccountName": {
+            "type": "string"
+        },
+        "storageAccountId": {
+            "type": "string"
+        },
+        "newRecordName": {
+            "type": "string"
+        },
+        "d": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "loadBalancerName": {
+            "type": "string",
+            "metadata": {
+                "description": "This is the name of the load balancer"
+            }
+        },
+        "publicIPAddressID1": "123",
+        "nt0fabricTcpGatewayPort": "3000",
+        "nt0fabricHttpGatewayPort": "3000",
+        "lbIPName": "loadbalancerIPName",
+        "vmNodeType0Name": "virtualMachineName",
+        "importExportJobName": "ieJobName"
+    },
+    "outputs": {
+        "out1": {
+            "type": "secureObject",
+            "value": {
+                "abc": "val1"
+            }
+        }
+    },
+    "apiProfile": "2019-03-01-hybrid",
+    "resources": [
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "name": "[parameters('keyvaultSettings').keyVaultName]",
+            "apiVersion": "2016-10-01",
+            "location": "[parameters('keyvaultSettings').location]",
+            "properties": {
+                "enabledForDeployment": true,
+                "enabledForTemplateDeployment": true,
+                "enabledForVolumeEncryption": false,
+                "tenantId": "[parameters('keyvaultSettings').tenantId]",
+                "accessPolicies": [
+                    {
+                        "tenantId": "[parameters('keyvaultSettings').tenantId]",
+                        "objectId": "[parameters('keyvaultSettings').objectId]",
+                        "permissions": {
+                            "keys": [
+                                "get"
+                            ],
+                            "secrets": [
+                                "get"
+                            ]
+                        }
+                    }
+                ],
+                "sku": {
+                    "name": "[parameters('keyvaultSettings').vaultSku]",
+                    "family": "A"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/secrets",
+            "name": "[parameters('keyvaultSecrets').keyVaultName]",
+            "apiVersion": "2016-10-01",
+            "location": "[parameters('keyvaultSecrets').location]",
+            "properties": {
+                "enabledForDeployment": true,
+                "enabledForTemplateDeployment": true,
+                "enabledForVolumeEncryption": false,
+                "tenantId": "[parameters('keyvaultSecrets').tenantId]",
+                "accessPolicies": [
+                    {
+                        "tenantId": "[parameters('keyvaultSecrets').tenantId]",
+                        "objectId": "[parameters('keyvaultSecrets').objectId]",
+                        "permissions": {
+                            "keys": [
+                                "get"
+                            ],
+                            "secrets": [
+                                "get"
+                            ]
+                        }
+                    }
+                ],
+                "sku": {
+                    "name": "[parameters('keyvaultSecrets').vaultSku]",
+                    "family": "A"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.KeyVault/vaults/accessPolicies",
+            "apiVersion": "2016-10-01",
+            "name": "add",
+            "properties": {
+                "accessPolicies": [
+                    {
+                        "applicationId": "[parameters('keyvaultAP').applicationId]",
+                        "objectId": "",
+                        "permissions": {},
+                        "tenantId": "[parameters('keyvaultAP').tenantId]"
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2017-10-01",
+            "location": "West Us",
+            "name": "sto725",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_GRS"
+            },
+            "properties": {
+                "supportsHttpsTrafficOnly": true
+            }
+        },
+        {
+            "type": "Microsoft.Network/connections",
+            "apiVersion": "2017-10-01",
+            "name": "",
+            "properties": {
+                "virtualNetworkGateway1": {
+                    "properties": {}
+                },
+                "connectionType": "ExpressRoute"
+            }
+        },
+        {
+            "apiVersion": "2017-10-01",
+            "name": "[variables('loadBalancerName')]",
+            "type": "Microsoft.Network/loadBalancers",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "loadBalancerFrontEnd1",
+                        "properties": {
+                            "publicIPAddress": {
+                                "id": "[variables('publicIPAddressID1')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/localNetworkGateways",
+            "apiVersion": "2017-10-01",
+            "name": "",
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2017-10-01",
+            "name": "",
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2017-10-01",
+            "name": "",
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2017-10-01",
+            "name": "",
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2017-10-01",
+            "name": "",
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworkGateways",
+            "apiVersion": "2017-10-01",
+            "name": "",
+            "properties": {}
+        },
+        {
+            "type":"Microsoft.Network/virtualNetworks",
+            "apiVersion":"2017-10-01",
+            "name":"",
+            "properties":{}
+        },
+        {
+            "type":"Microsoft.Network/dnsZones",
+            "apiVersion":"2016-04-01",
+            "name":"",
+            "properties":{}
+        },
+        {
+            "type":"Microsoft.Compute/images",
+            "apiVersion": "2017-12-01",
+            "name":"",
+            "properties":{}
+        },
+        {
+            "type":"Microsoft.Compute/availabilitySets",
+            "apiVersion":"2017-12-01",
+            "name":"",
+            "properties":{}
+        },
+        {
+            "type":"Microsoft.Compute/virtualMachines",
+            "apiVersion":"2017-12-01",
+            "name":"",
+            "properties":{}
+        },
+        {
+            "type":"Microsoft.Compute/virtualMachineScaleSets",
+            "apiVersion":"2017-12-01",
+            "name":"",
+            "properties":{}
+        },
+        {
+            "type":"Microsoft.Compute/virtualMachineScaleSets/extensions",
+            "apiVersion":"2017-12-01",
+            "name":"",
+            "properties":{}
+        },
+        {
+            "type":"Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion":"2017-12-01",
+            "name":"",
+            "properties":{}
+        },
+        {
+            "type":"Microsoft.Compute/disk",
+            "apiVersion":"2017-12-01",
+            "name":"",
+            "properties":{}
+        },
+        {
+            "type":"Microsoft.Resources/deployments",
+            "apiVersion":"2018-05-01",
+            "name":"",
+            "properties":{}
+        },
+        {
+            "type":"Microsoft.Resources/resourceGroups",
+            "apiVersion":"2018-05-01",
+            "name":"",
+            "properties":{}
+        }
+    ]
+}

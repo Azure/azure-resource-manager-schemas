@@ -7,9 +7,9 @@ const exists = promisify(fs.exists);
 
 async function resetGitDirectory(localPath: string) {
     if (await exists(localPath)) {
-        await executeCmd(localPath, 'git', ['reset', '.']);
-        await executeCmd(localPath, 'git', ['checkout', '--', '.']);
-        await executeCmd(localPath, 'git', ['clean', '-fd']);
+        await executeCmd(localPath, 'git', ['reset', '-q', '.']);
+        await executeCmd(localPath, 'git', ['checkout', '-q', '--', '.']);
+        await executeCmd(localPath, 'git', ['clean', '-q', '-fd']);
     }
 }
 

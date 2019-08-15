@@ -50,7 +50,8 @@ async function cloneAndGenerateBasePaths(localPath: string, remoteUri: string, c
 
     return filePaths
         .map(p => p.substring(0, p.lastIndexOf(path.sep)))
-        .map(getBasePathString.bind(null, localPath));
+        .map(getBasePathString.bind(null, localPath))
+        .filter(p => !isBlacklisted(p));
 }
 
 function getBasePathString(localPath: string, basePath: string) {
@@ -62,6 +63,10 @@ function getBasePathString(localPath: string, basePath: string) {
 
 function isWhitelisted(basePath: string) {
     return constants.whitelist.includes(basePath);
+}
+
+function isBlacklisted(basePath: string) {
+    return constants.blacklist.includes(basePath);
 }
 
 export {

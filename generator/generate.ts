@@ -54,6 +54,7 @@ async function generateSchema(readme: string, tmpFolder: string, apiVersion: str
     const autoRestParams = [
         '--azureresourceschema',
         `--output-folder=${tmpFolder}`,
+        `--tag=all-api-versions`,
         `--api-version=${apiVersion}`,
         '--title=none',
         readme,
@@ -120,7 +121,7 @@ async function saveToSchemasDirectory(outputFile: string, schemaRefs: string[], 
 async function listReadmePaths(localPath: string, basePaths: string[]) {
     return basePaths
         .filter(p => isWhitelisted(p))
-        .map(p => path.join(localPath, 'specification', p, 'readme.enable-multi-api.md'))
+        .map(p => path.join(localPath, 'specification', p, 'readme.md'))
         .map(p => path.resolve(p));
 }
 

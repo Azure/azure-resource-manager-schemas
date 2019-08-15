@@ -10,7 +10,7 @@ const exists = promisify(fs.exists);
 const npmBinary = os.platform() === 'win32' ? 'npm.cmd' : 'npm';
 
 async function validateUserProvidedBasePath(basePath: string) {
-    const readme = path.join(constants.specsRepoPath, 'specification', basePath, 'readme.enable-multi-api.md');
+    const readme = path.join(constants.specsRepoPath, 'specification', basePath, 'readme.md');
 
     if (!await exists(readme)) {
         throw new Error(`Unable to find readme '$readme' in specs repo`)
@@ -28,7 +28,7 @@ async function cloneAndGenerateBasePaths(localPath: string, remoteUri: string, c
     const specsPath = path.join(localPath, 'specification');
 
     const filePaths = await findRecursive(specsPath, filePath => {
-        if (path.basename(filePath) !== 'readme.enable-multi-api.md') {
+        if (path.basename(filePath) !== 'readme.md') {
             return false;
         }
 

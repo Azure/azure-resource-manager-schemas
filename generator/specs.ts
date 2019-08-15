@@ -1,13 +1,13 @@
 import path from 'path';
-import os from 'os';
 import fs from 'fs';
 import { promisify } from 'util';
 import { cloneGitRepo } from './git';
-import { executeCmd, findRecursive } from './utils';
+import { findRecursive } from './utils';
 import * as constants from './constants';
 
+const readFile = promisify(fs.readFile);
+const writeFile = promisify(fs.writeFile);
 const exists = promisify(fs.exists);
-const npmBinary = os.platform() === 'win32' ? 'npm.cmd' : 'npm';
 
 async function validateUserProvidedBasePath(basePath: string) {
     const readme = path.join(constants.specsRepoPath, 'specification', basePath, 'readme.md');
@@ -19,11 +19,22 @@ async function validateUserProvidedBasePath(basePath: string) {
     return readme;
 }
 
+async function appendAutorestV3Config(readmePath: string) {
+    let content = await readFile(readmePath, { encoding: 'utf8' });
+
+    if (content.indexOf('pipeline-model: v3') === -1) {
+        content += `
+\`\`\` yaml
+#to use the autorest-v3 pipeline
+pipeline-model: v3
+\`\`\``;
+
+        await writeFile(readmePath, content, { encoding: 'utf8' });
+    }
+}
+
 async function cloneAndGenerateBasePaths(localPath: string, remoteUri: string, commitHash: string) {
     await cloneGitRepo(localPath, remoteUri, commitHash);
-
-    await executeCmd(localPath, npmBinary, ['install']);
-    await executeCmd(localPath, npmBinary, ['run', 'multiapi']);
 
     const specsPath = path.join(localPath, 'specification');
 
@@ -54,6 +65,7 @@ function isWhitelisted(basePath: string) {
 }
 
 export {
+    appendAutorestV3Config,
     validateUserProvidedBasePath,
     cloneAndGenerateBasePaths,
     getBasePathString,

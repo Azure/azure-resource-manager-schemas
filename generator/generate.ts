@@ -5,7 +5,7 @@ import { promisify } from 'util';
 import { findRecursive, findDirRecursive, executeCmd, rmdirRecursive } from './utils';
 import * as constants from './constants';
 import chalk from 'chalk';
-import { isWhitelisted } from './specs';
+import { isWhitelisted, appendAutorestV3Config } from './specs';
 
 const autorestBinary = os.platform() === 'win32' ? 'autorest.cmd' : 'autorest';
 
@@ -51,6 +51,8 @@ async function execAutoRest(tmpFolder: string, params: string[]) {
 }
 
 async function generateSchema(readme: string, tmpFolder: string, apiVersion: string) {
+    await appendAutorestV3Config(readme);
+
     const autoRestParams = [
         '--azureresourceschema',
         `--output-folder=${tmpFolder}`,

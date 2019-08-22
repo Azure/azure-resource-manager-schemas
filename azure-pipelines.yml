@@ -11,7 +11,15 @@ pool:
 
 steps:
 - script: |
+    set -Eeuxo pipefail
     cd tools
     npm install
-    npm test
-  displayName: 'npm install and test'
+    npm run test-ci
+    cd ..
+  displayName: 'Run schema tests'
+- task: PublishTestResults@2
+  condition: succeededOrFailed()
+  inputs:
+    testRunner: JUnit
+    testResultsFiles: 'tools/test-results.xml'
+    failTaskOnFailedTests: true

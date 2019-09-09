@@ -33,7 +33,8 @@
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              }
+              },
+              "properties": {}
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -72,22 +73,25 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/dataBoxEdgeDevices_users_childResource"
+                "$ref": "#/definitions/dataBoxEdgeDevices_bandwidthSchedules_childResource"
               },
               {
-                "$ref": "#/definitions/dataBoxEdgeDevices_triggers_childResource"
-              },
-              {
-                "$ref": "#/definitions/dataBoxEdgeDevices_storageAccountCredentials_childResource"
-              },
-              {
-                "$ref": "#/definitions/dataBoxEdgeDevices_shares_childResource"
+                "$ref": "#/definitions/dataBoxEdgeDevices_orders_childResource"
               },
               {
                 "$ref": "#/definitions/dataBoxEdgeDevices_roles_childResource"
               },
               {
-                "$ref": "#/definitions/dataBoxEdgeDevices_bandwidthSchedules_childResource"
+                "$ref": "#/definitions/dataBoxEdgeDevices_shares_childResource"
+              },
+              {
+                "$ref": "#/definitions/dataBoxEdgeDevices_storageAccountCredentials_childResource"
+              },
+              {
+                "$ref": "#/definitions/dataBoxEdgeDevices_triggers_childResource"
+              },
+              {
+                "$ref": "#/definitions/dataBoxEdgeDevices_users_childResource"
               }
             ]
           }
@@ -141,8 +145,59 @@
       ],
       "description": "Microsoft.DataBoxEdge/dataBoxEdgeDevices/bandwidthSchedules"
     },
+    "dataBoxEdgeDevices_orders": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^.*/default$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.DataBoxEdge/dataBoxEdgeDevices/orders"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-03-01"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/OrderProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Order properties."
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.DataBoxEdge/dataBoxEdgeDevices/orders"
+    },
     "dataBoxEdgeDevices_roles": {
       "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/IoTRole"
+        }
+      ],
       "properties": {
         "name": {
           "type": "string",
@@ -248,6 +303,14 @@
     },
     "dataBoxEdgeDevices_triggers": {
       "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/FileEventTrigger"
+        },
+        {
+          "$ref": "#/definitions/PeriodicTimerEventTrigger"
+        }
+      ],
       "properties": {
         "name": {
           "type": "string",
@@ -314,6 +377,47 @@
     }
   },
   "definitions": {
+    "Address": {
+      "type": "object",
+      "properties": {
+        "addressLine1": {
+          "type": "string",
+          "description": "The address line1."
+        },
+        "addressLine2": {
+          "type": "string",
+          "description": "The address line2."
+        },
+        "addressLine3": {
+          "type": "string",
+          "description": "The address line3."
+        },
+        "postalCode": {
+          "type": "string",
+          "description": "The postal code."
+        },
+        "city": {
+          "type": "string",
+          "description": "The city name."
+        },
+        "state": {
+          "type": "string",
+          "description": "The state name."
+        },
+        "country": {
+          "type": "string",
+          "description": "The country name."
+        }
+      },
+      "required": [
+        "addressLine1",
+        "postalCode",
+        "city",
+        "state",
+        "country"
+      ],
+      "description": "The shipping address of the customer."
+    },
     "AsymmetricEncryptedSecret": {
       "type": "object",
       "properties": {
@@ -347,6 +451,23 @@
         "encryptionAlgorithm"
       ],
       "description": "Represent the secrets intended for encryption with asymmetric key pair."
+    },
+    "Authentication": {
+      "type": "object",
+      "properties": {
+        "symmetricKey": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SymmetricKey"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Symmetric key for authentication."
+        }
+      },
+      "description": "Authentication mechanism for IoT devices."
     },
     "AzureContainerInfo": {
       "type": "object",
@@ -467,6 +588,44 @@
       ],
       "description": "The mapping between a particular client IP and the type of access client has on the NFS share."
     },
+    "ContactDetails": {
+      "type": "object",
+      "properties": {
+        "contactPerson": {
+          "type": "string",
+          "description": "The contact person name."
+        },
+        "companyName": {
+          "type": "string",
+          "description": "The name of the company."
+        },
+        "phone": {
+          "type": "string",
+          "description": "The phone number."
+        },
+        "emailList": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The email list."
+        }
+      },
+      "required": [
+        "contactPerson",
+        "companyName",
+        "phone",
+        "emailList"
+      ],
+      "description": "Contains all the contact details of the customer."
+    },
     "DataBoxEdgeDeviceProperties": {
       "type": "object",
       "properties": {
@@ -543,8 +702,59 @@
       ],
       "description": "Microsoft.DataBoxEdge/dataBoxEdgeDevices/bandwidthSchedules"
     },
+    "dataBoxEdgeDevices_orders_childResource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^.*/default$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "orders"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-03-01"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/OrderProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Order properties."
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.DataBoxEdge/dataBoxEdgeDevices/orders"
+    },
     "dataBoxEdgeDevices_roles_childResource": {
       "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/IoTRole"
+        }
+      ],
       "properties": {
         "name": {
           "type": "string",
@@ -650,6 +860,14 @@
     },
     "dataBoxEdgeDevices_triggers_childResource": {
       "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/FileEventTrigger"
+        },
+        {
+          "$ref": "#/definitions/PeriodicTimerEventTrigger"
+        }
+      ],
       "properties": {
         "name": {
           "type": "string",
@@ -714,6 +932,397 @@
       ],
       "description": "Microsoft.DataBoxEdge/dataBoxEdgeDevices/users"
     },
+    "FileEventTrigger": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/FileTriggerProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "File trigger properties."
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "FileEvent"
+          ]
+        }
+      },
+      "required": [
+        "properties",
+        "kind"
+      ],
+      "description": "Trigger details."
+    },
+    "FileSourceInfo": {
+      "type": "object",
+      "properties": {
+        "shareId": {
+          "type": "string",
+          "description": "File share ID."
+        }
+      },
+      "required": [
+        "shareId"
+      ],
+      "description": "File source details."
+    },
+    "FileTriggerProperties": {
+      "type": "object",
+      "properties": {
+        "sourceInfo": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/FileSourceInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "File source details."
+        },
+        "sinkInfo": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/RoleSinkInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Compute role against which events will be raised."
+        },
+        "customContextTag": {
+          "type": "string",
+          "description": "A custom context tag typically used to correlate the trigger against its usage. For example, if a periodic timer trigger is intended for certain specific IoT modules in the device, the tag can be the name or the image URL of the module."
+        }
+      },
+      "required": [
+        "sourceInfo",
+        "sinkInfo"
+      ],
+      "description": "File trigger properties."
+    },
+    "IoTDeviceInfo": {
+      "type": "object",
+      "properties": {
+        "deviceId": {
+          "type": "string",
+          "description": "ID of the IoT device/edge device."
+        },
+        "ioTHostHub": {
+          "type": "string",
+          "description": "Host name for the IoT hub associated to the device."
+        },
+        "authentication": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Authentication"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Authentication mechanism for IoT devices."
+        }
+      },
+      "required": [
+        "deviceId",
+        "ioTHostHub"
+      ],
+      "description": "Metadata of IoT device/IoT Edge device to be configured."
+    },
+    "IoTRole": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/IoTRoleProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "IoT role properties."
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "IOT"
+          ]
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "description": "Compute role."
+    },
+    "IoTRoleProperties": {
+      "type": "object",
+      "properties": {
+        "hostPlatform": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Windows",
+                "Linux"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Host OS supported by the IoT role."
+        },
+        "ioTDeviceDetails": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/IoTDeviceInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Metadata of IoT device/IoT Edge device to be configured."
+        },
+        "ioTEdgeDeviceDetails": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/IoTDeviceInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Metadata of IoT device/IoT Edge device to be configured."
+        },
+        "shareMappings": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MountPointMap"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Mount points of shares in role(s)."
+        },
+        "roleStatus": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Enabled",
+                "Disabled"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Role status."
+        }
+      },
+      "required": [
+        "hostPlatform",
+        "ioTDeviceDetails",
+        "ioTEdgeDeviceDetails",
+        "roleStatus"
+      ],
+      "description": "IoT role properties."
+    },
+    "MountPointMap": {
+      "type": "object",
+      "properties": {
+        "shareId": {
+          "type": "string",
+          "description": "ID of the share mounted to the role VM."
+        }
+      },
+      "required": [
+        "shareId"
+      ],
+      "description": "The share mount point."
+    },
+    "OrderProperties": {
+      "type": "object",
+      "properties": {
+        "contactInformation": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContactDetails"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Contains all the contact details of the customer."
+        },
+        "shippingAddress": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Address"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The shipping address of the customer."
+        },
+        "currentStatus": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/OrderStatus"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Represents a single status change."
+        }
+      },
+      "required": [
+        "contactInformation",
+        "shippingAddress"
+      ],
+      "description": "Order properties."
+    },
+    "OrderStatus": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Untracked",
+                "AwaitingFulfilment",
+                "AwaitingPreparation",
+                "AwaitingShipment",
+                "Shipped",
+                "Arriving",
+                "Delivered",
+                "ReplacementRequested",
+                "LostDevice",
+                "Declined",
+                "ReturnInitiated",
+                "AwaitingReturnShipment",
+                "ShippedBack",
+                "CollectedAtMicrosoft"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Status of the order as per the allowed status types."
+        },
+        "comments": {
+          "type": "string",
+          "description": "Comments related to this status change."
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "description": "Represents a single status change."
+    },
+    "PeriodicTimerEventTrigger": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PeriodicTimerProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Periodic timer trigger properties."
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "PeriodicTimerEvent"
+          ]
+        }
+      },
+      "required": [
+        "properties",
+        "kind"
+      ],
+      "description": "Trigger details."
+    },
+    "PeriodicTimerProperties": {
+      "type": "object",
+      "properties": {
+        "sourceInfo": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PeriodicTimerSourceInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Periodic timer event source."
+        },
+        "sinkInfo": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/RoleSinkInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Compute role against which events will be raised."
+        },
+        "customContextTag": {
+          "type": "string",
+          "description": "A custom context tag typically used to correlate the trigger against its usage. For example, if a periodic timer trigger is intended for certain specific IoT modules in the device, the tag can be the name or the image URL of the module."
+        }
+      },
+      "required": [
+        "sourceInfo",
+        "sinkInfo"
+      ],
+      "description": "Periodic timer trigger properties."
+    },
+    "PeriodicTimerSourceInfo": {
+      "type": "object",
+      "properties": {
+        "startTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time of the day that results in a valid trigger. Schedule is computed with reference to the time specified up to seconds. If timezone is not specified the time will considered to be in device timezone. The value will always be returned as UTC time."
+        },
+        "schedule": {
+          "type": "string",
+          "description": "Periodic frequency at which timer event needs to be raised. Supports daily, hourly, minutes, and seconds."
+        },
+        "topic": {
+          "type": "string",
+          "description": "Topic where periodic events are published to IoT device."
+        }
+      },
+      "required": [
+        "startTime",
+        "schedule"
+      ],
+      "description": "Periodic timer event source."
+    },
     "RefreshDetails": {
       "type": "object",
       "properties": {
@@ -736,6 +1345,19 @@
         }
       },
       "description": "Fields for tracking refresh job on the share."
+    },
+    "RoleSinkInfo": {
+      "type": "object",
+      "properties": {
+        "roleId": {
+          "type": "string",
+          "description": "Compute role ID."
+        }
+      },
+      "required": [
+        "roleId"
+      ],
+      "description": "Compute role against which events will be raised."
     },
     "ShareAccessRight": {
       "type": "object",
@@ -994,6 +1616,23 @@
         "accountType"
       ],
       "description": "The storage account credential properties."
+    },
+    "SymmetricKey": {
+      "type": "object",
+      "properties": {
+        "connectionString": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AsymmetricEncryptedSecret"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Represent the secrets intended for encryption with asymmetric key pair."
+        }
+      },
+      "description": "Symmetric key for authentication."
     },
     "UserAccessRight": {
       "type": "object",

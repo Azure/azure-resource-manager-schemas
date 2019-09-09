@@ -7,7 +7,7 @@ import * as constants from './constants';
 import chalk from 'chalk';
 import { isWhitelisted, appendAutorestV3Config } from './specs';
 
-const autorestBinary = os.platform() === 'win32' ? 'autorest.cmd' : 'autorest';
+const autorestBinary = os.platform() === 'win32' ? 'autorest-beta.cmd' : 'autorest-beta';
 
 const exists = promisify(fs.exists);
 const readFile = promisify(fs.readFile);
@@ -55,6 +55,7 @@ async function generateSchema(readme: string, tmpFolder: string, apiVersion: str
 
     const autoRestParams = [
         '--azureresourceschema',
+        '--azureresourceschema.multi-scope=true',
         `--output-folder=${tmpFolder}`,
         `--tag=all-api-versions`,
         `--api-version=${apiVersion}`,

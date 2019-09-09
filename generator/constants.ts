@@ -34,6 +34,7 @@ const whitelist  = [
     'portal/resource-manager',
     'cosmos-db/resource-manager',
     'servicefabric/resource-manager',
+    'healthcareapis/resource-manager',
 ];
 
 // paths in this list won't even appear in list-basepaths

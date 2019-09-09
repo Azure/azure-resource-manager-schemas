@@ -191,7 +191,9 @@ async function execute(test: any, loadSchema: (uri: string) => Promise<any>) {
     let definitionSchema = scopeToPath(test.definition, fullSchema);
     definitionSchema = resolveSchemaLocalReferences(definitionSchema, fullSchema, '#', {});
 
-    await validate(test.json, definitionSchema, loadSchema);
+    const result = await validate(test.json, definitionSchema, loadSchema);
+
+    assertErrors(test.expectedErrors, result.errors, false, '');
 }
 
 export {

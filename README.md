@@ -4,11 +4,11 @@ This is the repo for template deployment schemas hosted under `https://schema.ma
 
 ## Submitting a PR
 * Ensure that any new resource types that you are adding have been added to the following top-level template schemas:
-  * [schemas\2014-04-01-preview\deploymentTemplate.json](schemas/2014-04-01-preview/deploymentTemplate.json)
-  * [schemas\2015-01-01\deploymentTemplate.json](schemas/2015-01-01/deploymentTemplate.json)
-  * [schemas\2019-04-01\deploymentTemplate.json](schemas/2019-04-01/deploymentTemplate.json)
-* If your schema has been manually generated, please ensure you include appropriate tests in [tests](tests/)
-* If adding a new resource type, please add examples to the templates in [tools/templateTests](tools/templateTests/)
+  * [schemas/2014-04-01-preview/deploymentTemplate.json](/schemas/2014-04-01-preview/deploymentTemplate.json)
+  * [schemas/2015-01-01/deploymentTemplate.json](/schemas/2015-01-01/deploymentTemplate.json)
+  * [schemas/2019-04-01/deploymentTemplate.json](/schemas/2019-04-01/deploymentTemplate.json)
+* If your schema has been manually generated, please ensure you include appropriate tests in [tests](/tests/)
+* If adding a new resource type, please add examples to the templates in [tools/templateTests](/tools/templateTests/)
 * Ensure that the test suite passes (see [Tests](#tests))
 
 ## Tests
@@ -19,6 +19,9 @@ Use the following commands to execute the test suite locally:
 
 ## Autogenerating from swagger
 You can use the generator in this repo to automatically generate a schema from a swagger spec checked into the [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) repo. We are working on fully automating this process, but please note that until then, it is your responsibility to ensure that the auto-generated schema has been correctly formatted before submitting a pull request.
+
+See [Generator README](/generator/README.md) for more information.
+
 ### Instructions
 1. Fork this repo, and clone it locally.
 2. Run the following commands (replace the base path accordingly - valid paths can be disovered with `npm run list-basepaths`):

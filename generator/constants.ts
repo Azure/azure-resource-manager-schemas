@@ -34,6 +34,7 @@ const whitelist  = [
     'portal/resource-manager',
     'cosmos-db/resource-manager',
     'servicefabric/resource-manager',
+    'servicebus/resource-manager',
     'eventhub/resource-manager',
 ];
 

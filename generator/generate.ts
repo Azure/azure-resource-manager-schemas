@@ -5,7 +5,7 @@ import { promisify } from 'util';
 import { findRecursive, findDirRecursive, executeCmd, rmdirRecursive } from './utils';
 import * as constants from './constants';
 import chalk from 'chalk';
-import { isWhitelisted, appendAutorestV3Config } from './specs';
+import { isWhitelisted } from './specs';
 
 const autorestBinary = os.platform() === 'win32' ? 'autorest-beta.cmd' : 'autorest-beta';
 
@@ -32,7 +32,7 @@ async function generateSchemasForReadme(readme: string) {
 
                 const schemaRefs = await generateSchemaRefs(schemaPath, namespace, apiVersion);
 
-                await saveToSchemasDirectory(schemaPath, schemaRefs, namespace, apiVersion);
+                await saveToSchemasDirectory(schemaPath, schemaRefs, apiVersion);
             }
         }
         finally {
@@ -51,8 +51,6 @@ async function execAutoRest(tmpFolder: string, params: string[]) {
 }
 
 async function generateSchema(readme: string, tmpFolder: string, apiVersion: string) {
-    await appendAutorestV3Config(readme);
-
     const autoRestParams = [
         '--azureresourceschema',
         '--azureresourceschema.multi-scope=true',
@@ -70,35 +68,124 @@ async function generateSchema(readme: string, tmpFolder: string, apiVersion: str
     return await execAutoRest(tmpFolder, autoRestParams);
 }
 
-async function generateSchemaRefs(outputFile: string, namespace: string, apiVersion: string) {
+enum ScopeType {
+    Unknown = 0,
+    Tenant,
+    Subcription,
+    ResourceGroup,
+    ManagementGroup,
+    Extension,
+}
+
+interface ResourceDefinition {
+    scope: ScopeType;
+    resourceType: string;
+    schemaRef: string;
+}
+
+function getResourceContainerPath(scopeType: ScopeType): string {
+    switch (scopeType) {
+        case ScopeType.Tenant:
+            return 'tenant_resourceDefinitions';
+        case ScopeType.Subcription:
+            return 'subscription_ResourceDefinitions';
+        case ScopeType.ResourceGroup:
+            return 'resourceDefinitions';
+        case ScopeType.ManagementGroup:
+            return 'managementGroup_resourceDefinitions';
+        case ScopeType.Extension:
+            return 'extension_resourceDefinitions';
+        default:
+            return 'unknown_resourceDefinitions';
+    }
+}
+
+function getSchemaRefs(schemaUri: string, output: any, scopeType: ScopeType): ResourceDefinition[] {
+    var schemaJsonPath = getResourceContainerPath(scopeType);
+
+    const resourceDefs = output[schemaJsonPath] || {};
+    const resourceKeys = Object.keys(resourceDefs);
+
+    return resourceKeys.map(r => ({
+        scope: scopeType,
+        resourceType: resourceDefs[r].description,
+        schemaRef: `${schemaUri}#/${schemaJsonPath}/${r}`,
+    }));
+}
+
+async function generateSchemaRefs(outputFile: string, namespace: string, apiVersion: string): Promise<ResourceDefinition[]> {
     const outputSchemaUri = `${constants.schemasBaseUri}/${apiVersion}/${namespace}.json`;
 
     const outputContent = await readFile(outputFile, { encoding: 'utf8' });
     const output = JSON.parse(outputContent);
 
-    const resourceDefs: {[path: string]: { description: string }} = output['resourceDefinitions'];
-    const resourceKeys = Object.keys(resourceDefs);
-    const resourceTypes = resourceKeys.map(r => resourceDefs[r].description);
-    const schemaRefs = resourceKeys.map(r => `${outputSchemaUri}#/resourceDefinitions/${r}`);
+    const tenantSchemaRefs = getSchemaRefs(outputSchemaUri, output, ScopeType.Tenant);
+    const managementGroupSchemaRefs = getSchemaRefs(outputSchemaUri, output, ScopeType.ManagementGroup);
+    const subscriptionSchemaRefs = getSchemaRefs(outputSchemaUri, output, ScopeType.Subcription);
+    const resourceGroupSchemaRefs = getSchemaRefs(outputSchemaUri, output, ScopeType.ResourceGroup);
+    const extensionSchemaRefs = getSchemaRefs(outputSchemaUri, output, ScopeType.Extension);
+    const unknownSchemaRefs = getSchemaRefs(outputSchemaUri, output, ScopeType.Unknown);
 
     console.log('================================================================================================================================');
     console.log('Filename: ' + chalk.green(outputFile));
     console.log('Provider Namespace: ' + chalk.green(namespace));
     console.log('API Version: ' + chalk.green(apiVersion));
-    console.log('Resource Types: ');
-    for (const resourceType of resourceTypes) {
-        console.log('- ' + chalk.green(resourceType));
+   
+    if (tenantSchemaRefs.length > 0) {
+        console.log('Resource Types (Tenant Scope):');
+        for (const schemaRef of tenantSchemaRefs) {
+            console.log('- ' + chalk.green(schemaRef.resourceType));
+        }
     }
-    console.log('Resource References: ');
-    for (const schemaRef of schemaRefs) {
-        console.log('- ' + chalk.green(schemaRef));
+   
+    if (managementGroupSchemaRefs.length > 0) {
+        console.log('Resource Types (Management Group Scope):');
+        for (const schemaRef of managementGroupSchemaRefs) {
+            console.log('- ' + chalk.green(schemaRef.resourceType));
+        }
     }
+   
+    if (subscriptionSchemaRefs.length > 0) {
+        console.log('Resource Types (Subscription Scope):');
+        for (const schemaRef of subscriptionSchemaRefs) {
+            console.log('- ' + chalk.green(schemaRef.resourceType));
+        }
+    }
+   
+    if (resourceGroupSchemaRefs.length > 0) {
+        console.log('Resource Types (Resource Group Scope):');
+        for (const schemaRef of resourceGroupSchemaRefs) {
+            console.log('- ' + chalk.green(schemaRef.resourceType));
+        }
+    }
+   
+    if (extensionSchemaRefs.length > 0) {
+        console.log('Resource Types (Extension Scope):');
+        for (const schemaRef of extensionSchemaRefs) {
+            console.log('- ' + chalk.green(schemaRef.resourceType));
+        }
+    }
+   
+    if (unknownSchemaRefs.length > 0) {
+        console.log('Resource Types (Unknown Scope):');
+        for (const schemaRef of unknownSchemaRefs) {
+            console.log('- ' + chalk.green(schemaRef.resourceType));
+        }
+    }
+
     console.log('================================================================================================================================');
 
-    return schemaRefs;
+    return [
+        ...tenantSchemaRefs,
+        ...managementGroupSchemaRefs,
+        ...subscriptionSchemaRefs,
+        ...resourceGroupSchemaRefs,
+        ...extensionSchemaRefs,
+        ...unknownSchemaRefs,
+    ];
 }
 
-async function saveToSchemasDirectory(outputFile: string, schemaRefs: string[], namespace: string, apiVersion: string) {
+async function saveToSchemasDirectory(outputFile: string, schemaRefs: ResourceDefinition[], apiVersion: string) {
     const templateContents = await readFile(constants.generatedSchemasTemplatePath, { encoding: 'utf8' });
     const template = JSON.parse(templateContents);
 
@@ -108,7 +195,9 @@ async function saveToSchemasDirectory(outputFile: string, schemaRefs: string[], 
     const currentRefsOneOf: {[path: string]: string}[] = actual.allOf[1].oneOf;
     const currentRefs = currentRefsOneOf.map(v => v['$ref']);
 
-    const newRefs = [...new Set(currentRefs.concat(schemaRefs))].sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : 1);
+    const resourceGroupRefs = schemaRefs.filter(r => r.scope == ScopeType.ResourceGroup).map(r => r.schemaRef);
+
+    const newRefs = [...new Set(currentRefs.concat(resourceGroupRefs))].sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : 1);
 
     template.allOf[1].oneOf = newRefs.map(ref => ({ '$ref': ref }));
 

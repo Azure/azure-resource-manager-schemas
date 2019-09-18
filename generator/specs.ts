@@ -5,8 +5,6 @@ import { cloneGitRepo } from './git';
 import { findRecursive } from './utils';
 import * as constants from './constants';
 
-const readFile = promisify(fs.readFile);
-const writeFile = promisify(fs.writeFile);
 const exists = promisify(fs.exists);
 
 async function validateUserProvidedBasePath(basePath: string) {
@@ -17,20 +15,6 @@ async function validateUserProvidedBasePath(basePath: string) {
     }
 
     return readme;
-}
-
-async function appendAutorestV3Config(readmePath: string) {
-    let content = await readFile(readmePath, { encoding: 'utf8' });
-
-    if (content.indexOf('pipeline-model: v3') === -1) {
-        content += `
-\`\`\` yaml
-#to use the autorest-v3 pipeline
-pipeline-model: v3
-\`\`\``;
-
-        await writeFile(readmePath, content, { encoding: 'utf8' });
-    }
 }
 
 async function cloneAndGenerateBasePaths(localPath: string, remoteUri: string, commitHash: string) {
@@ -70,7 +54,6 @@ function isBlacklisted(basePath: string) {
 }
 
 export {
-    appendAutorestV3Config,
     validateUserProvidedBasePath,
     cloneAndGenerateBasePaths,
     getBasePathString,

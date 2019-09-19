@@ -105,9 +105,21 @@ async function rmdirRecursive(basePath: string) {
     await rmdir(basePath);
 }
 
+function lowerCaseCompare(a: string, b: string) {
+    const aLower = a.toLowerCase();
+    const bLower = b.toLowerCase();
+
+    if (aLower === bLower) {
+        return 0;
+    }
+
+    return aLower < bLower ? -1 : 1;
+}
+
 export {
     executeCmd,
     findDirRecursive,
     findRecursive,
     rmdirRecursive,
+    lowerCaseCompare,
 }

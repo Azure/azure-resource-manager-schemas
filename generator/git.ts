@@ -5,11 +5,15 @@ import { promisify } from 'util';
 const mkdir = promisify(fs.mkdir);
 const exists = promisify(fs.exists);
 
-async function resetGitDirectory(localPath: string) {
+async function resetGitDirectory(localPath: string, includeGc: boolean) {
     if (await exists(localPath)) {
         await executeCmd(localPath, 'git', ['reset', '-q', '.']);
         await executeCmd(localPath, 'git', ['checkout', '-q', '--', '.']);
         await executeCmd(localPath, 'git', ['clean', '-q', '-fd']);
+
+        if (includeGc) {
+            await executeCmd(localPath, 'git', ['gc']);
+        }
     }
 }
 
@@ -22,8 +26,10 @@ async function cloneGitRepo(localPath: string, remoteUri: string, commitHash: st
         await executeCmd(localPath, 'git', ['clone', remoteUri, localPath]);
     }
 
+    await resetGitDirectory(localPath, true);
+
     await executeCmd(localPath, 'git', ['fetch']);
-    await executeCmd(localPath, 'git', ['checkout', commitHash]);
+    await executeCmd(localPath, 'git', ['checkout', '-q', commitHash]);
 }
 
 export {

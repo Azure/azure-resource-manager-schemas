@@ -9,21 +9,19 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "The Cluster name"
+          "description": "The name of the Kusto cluster."
         },
         "type": {
+      "type": "string",
           "enum": [
             "Microsoft.Kusto/clusters"
           ]
         },
         "apiVersion": {
+        "type": "string",
           "enum": [
             "2019-09-07"
           ]
-        },
-        "location": {
-          "type": "string",
-          "description": "Cluster's location"
         },
         "tags": {
           "oneOf": [
@@ -37,12 +35,16 @@
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Cluster tags"
+          "description": "Resource tags."
+        },
+    "location": {
+          "type": "string",
+          "description": "The geo-location where the resource lives"
         },
         "sku": {
           "oneOf": [
             {
-              "$ref": "#/definitions/Sku"
+              "$ref": "#/definitions/AzureSku"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -53,13 +55,16 @@
         "zones": {
           "oneOf": [
             {
-              "$ref": "#/definitions/Zones"
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "The availability zones of the cluster."
+          "description": "An array represents the  availability zones of the cluster."
         },
         "identity": {
           "oneOf": [
@@ -70,7 +75,7 @@
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "The identity of the resource."
+          "description": "Identity for the resource."
         },
         "properties": {
           "oneOf": [
@@ -80,8 +85,7 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
-          ],
-          "description": "Properties for a Kusto Cluster."
+          ]
         },
         "resources": {
           "type": "array",
@@ -99,7 +103,8 @@
         "type",
         "apiVersion",
         "location",
-        "sku"
+        "sku",
+        "properties"
       ],
       "description": "Microsoft.Kusto/clusters"
     },
@@ -108,9 +113,10 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "The Database name"
+          "description": "The name of the database in the Kusto cluster."
         },
         "type": {
+          "type": "string",
           "enum": [
             "Microsoft.Kusto/clusters/databases"
           ]
@@ -121,6 +127,10 @@
             "2019-09-07"
           ]
         },
+        "location": {
+          "type": "string",
+          "description": "Resource location."
+        },
         "properties": {
           "oneOf": [
             {
@@ -129,8 +139,7 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
-          ],
-          "description": "Properties supplied to the Database Create Or Update Kusto operation."
+          ]
         },
         "resources": {
           "type": "array",
@@ -153,14 +162,26 @@
     },
     "clusters_databases_dataconnections": {
       "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/EventHubDataConnection"
+        },
+        {
+          "$ref": "#/definitions/IotHubDataConnection"
+        },
+        {
+          "$ref": "#/definitions/EventGridDataConnection"
+        }
+      ],
       "properties": {
         "name": {
           "type": "string",
-          "description": "The data connection name"
+          "description": "The name of the data connection."
         },
         "type": {
+          "type": "string",
           "enum": [
-            "Microsoft.Kusto/clusters/databases/dataconnections"
+            "Microsoft.Kusto/clusters/databases/dataConnections"
           ]
         },
         "apiVersion": {
@@ -169,19 +190,9 @@
             "2019-09-07"
           ]
         },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/EventHubDataConnection"
-            },
-            {
-              "$ref": "#/definitions/EventGridDataConnection"
-            },
-            {
-              "$ref": "#/definitions/IotHubDataConnection"
-            }
-          ],
-          "description": "Properties supplied to the Data Connection Create Or Update Kusto operation."
+        "location": {
+          "type": "string",
+          "description": "Resource location."
         }
       },
       "required": [
@@ -190,274 +201,206 @@
         "apiVersion",
         "properties"
       ],
-      "description": "Microsoft.Kusto/clusters/databases"
+      "description": "Microsoft.Kusto/clusters/databases/dataConnections"
     }
   },
   "definitions": {
-    "Sku": {
-      "oneOf": [
-        {
-          "$ref": "#/definitions/AzureSku"
-        },
-        {
-          "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-        }
-      ]
-    },
     "AzureSku": {
       "type": "object",
+      "properties": {
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "KC8",
+                "KC16",
+                "KS8",
+                "KS16",
+                "D13_v2",
+                "D14_v2",
+                "L8",
+                "L16",
+                "Standard_DS13_v2+1TB_PS",
+                "Standard_DS13_v2+2TB_PS",
+                "Standard_DS14_v2+3TB_PS",
+                "Standard_DS14_v2+4TB_PS",
+                "Standard_D13_v2",
+                "Standard_D14_v2",
+                "Standard_L8s",
+                "Standard_L16s",
+                "Standard_D11_v2",
+                "Standard_D12_v2",
+                "Standard_L4s",
+                "Dev(No SLA)_Standard_D11_v2"
+              ],
+              "x-ms-enum": {
+                "name": "AzureSkuName",
+                "modelAsString": true
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "SKU name. Possible values include: 'D14_v2', 'D13_v2', 'L16', 'L8', 'Standard_DS13_v2+1TB_PS', 'Standard_DS13_v2+2TB_PS', 'Standard_DS14_v2+3TB_PS', 'Standard_DS14_v2+4TB_PS', 'Dev(No SLA)_Standard_D11_v2'"
+        },
+        "capacity": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The number of instances of the cluster."
+        },
+        "tier": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Standard",
+                "Basic"
+              ],
+              "x-ms-enum": {
+                "name": "AzureSkuTier",
+                "modelAsString": true
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "SKU tier."
+        }
+      },
       "required": [
         "name",
         "tier"
       ],
-      "properties": {
-        "name": {
-          "description": "SKU name. Possible values include: 'D14_v2', 'D13_v2', 'L16', 'L8', 'Standard_DS13_v2+1TB_PS', 'Standard_DS13_v2+2TB_PS', 'Standard_DS14_v2+3TB_PS', 'Standard_DS14_v2+4TB_PS', 'Dev(No SLA)_Standard_D11_v2'",
-          "type": "string",
-          "enum": [
-            "D13_v2",
-            "D14_v2",
-            "L8",
-            "L16",
-            "Standard_DS13_v2+1TB_PS",
-            "Standard_DS13_v2+2TB_PS",
-            "Standard_DS14_v2+3TB_PS",
-            "Standard_DS14_v2+4TB_PS",
-            "Standard_D13_v2",
-            "Standard_D14_v2",
-            "Standard_L8s",
-            "Standard_L16s",
-            "Standard_D11_v2",
-            "Standard_D12_v2",
-            "Standard_L4s",
-            "Dev(No SLA)_Standard_D11_v2"
-          ],
-          "x-ms-enum": {
-            "name": "AzureSkuName",
-            "modelAsString": true
-          }
-        },
-        "capacity": {
-          "description": "SKU capacity.",
-          "type": "integer"
-        },
-        "tier": {
-          "description": "SKU tier",
-          "type": "string",
-          "enum": [
-            "Basic",
-            "Standard"
-          ],
-          "x-ms-enum": {
-            "name": "AzureSkuTier",
-            "modelAsString": true
-          }
-        }
-      }
-    },
-    "Zones": {
-      "description": "An array represents the availability zones of the cluster.",
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
+      "description": "Azure SKU definition."
     },
     "ClusterProperties": {
       "type": "object",
       "properties": {
         "trustedExternalTenants": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/TrustedExternalTenant"
-          },
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TrustedExternalTenant"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
           "description": "The cluster's external tenants."
         },
         "optimizedAutoscale": {
-          "type": "object",
-          "$ref": "#/definitions/OptimizedAutoscale",
-          "description": "Optimized auto scale definition."
+          "oneOf": [
+            {
+              "$ref": "#/definitions/OptimizedAutoscale"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "A class that contains the optimized auto scale definition."
         },
         "enableDiskEncryption": {
-          "description": "A boolean value that indicates if the cluster's disks are encrypted.",
-          "type": "boolean"
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "A boolean value that indicates if the cluster's disks are encrypted."
         },
         "enableStreamingIngest": {
-          "description": "A boolean value that indicates if streaming ingest is enabled.",
-          "default": false,
-          "type": "boolean"
+          "oneOf": [
+            {
+              "type": "boolean",
+              "default": false
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "A boolean value that indicates if the streaming ingest is enabled."
         },
         "virtualNetworkConfiguration": {
-          "type": "object",
-          "$ref": "#/definitions/VirtualNetworkConfiguration",
-          "description": "Virtual network definition."
+          "oneOf": [
+            {
+              "$ref": "#/definitions/VirtualNetworkConfiguration"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "A class that contains virtual network definition."
         },
         "keyVaultProperties": {
-          "type": "object",
-          "$ref": "#/definitions/KeyVaultProperties",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/KeyVaultProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
           "description": "KeyVault properties for the cluster encryption."
         }
-      },
-      "description": "Class representing the Kusto cluster properties."
+      }
     },
     "DatabaseProperties": {
       "type": "object",
       "properties": {
         "softDeletePeriod": {
           "type": "string",
+          "format": "duration",
           "description": "The time the data should be kept before it stops being accessible to queries in TimeSpan."
         },
         "hotCachePeriod": {
           "type": "string",
+          "format": "duration",
           "description": "The time the data should be kept in cache for fast queries in TimeSpan."
+        },
+        "statistics": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DatabaseStatistics"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "A class that contains database statistics information."
+        }
+      }
+    },
+    "DatabaseStatistics": {
+      "type": "object",
+      "properties": {
+        "size": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The database size - the total size of compressed data and index in bytes."
         }
       },
-      "description": "Class representing the Kusto database properties."
-    },
-    "EventHubDataConnection": {
-      "description": "Information about the event hub data connection",
-      "required": [
-        "kind",
-        "properties"
-      ],
-      "type": "object",
-      "properties": {
-        "kind": {
-          "description": "Kind of the endpoint for the data connection",
-          "enum": [
-            "EventHub"
-          ],
-          "type": "string"
-        },
-        "properties": {
-          "$ref": "#/definitions/EventHubDataConnectionProperties",
-          "description": "Event hub data connection properties"
-        }
-      }
-    },
-    "EventHubDataConnectionProperties": {
-      "description": "Class representing the Kusto event hub connection properties.",
-      "required": [
-        "eventHubResourceId",
-        "consumerGroup"
-      ],
-      "type": "object",
-      "properties": {
-        "eventHubResourceId": {
-          "type": "string",
-          "description": "The resource ID of the event hub to be used to create a data connection."
-        },
-        "consumerGroup": {
-          "type": "string",
-          "description": "The event hub consumer group."
-        },
-        "tableName": {
-          "type": "string",
-          "description": "The table where the data should be ingested. Optionally the table information can be added to each message."
-        },
-        "mappingRuleName": {
-          "type": "string",
-          "description": "The mapping rule to be used to ingest the data. Optionally the mapping information can be added to each message."
-        },
-        "dataFormat": {
-          "$ref": "#/definitions/DataFormat",
-          "description": "The data format of the message. Optionally the data format can be added to each message."
-        },
-        "eventSystemProperties": {
-          "description": "The event hub system properties.",
-          "$ref": "#/definitions/EventSystemProperties"
-        }
-      }
-    },
-    "IotHubDataConnection": {
-      "description": "Information about the Iot hub data connection",
-      "required": [
-        "kind",
-        "properties"
-      ],
-      "type": "object",
-      "properties": {
-        "kind": {
-          "description": "Kind of the endpoint for the data connection",
-          "enum": [
-            "IotHub"
-          ],
-          "type": "string"
-        },
-        "properties": {
-          "$ref": "#/definitions/IotHubDataConnectionProperties",
-          "description": "Iot hub data connection properties"
-        }
-      }
-    },
-    "IotHubDataConnectionProperties": {
-      "description": "Class representing the Kusto Iot hub connection properties.",
-      "required": [
-        "iotHubResourceId",
-        "consumerGroup",
-        "sharedAccessPolicyName"
-      ],
-      "type": "object",
-      "properties": {
-        "IotHubResourceId": {
-          "type": "string",
-          "description": "The resource ID of the iot hub to be used to create a data connection."
-        },
-        "consumerGroup": {
-          "type": "string",
-          "description": "The iot hub consumer group."
-        },
-        "tableName": {
-          "type": "string",
-          "description": "The table where the data should be ingested. Optionally the table information can be added to each message."
-        },
-        "mappingRuleName": {
-          "type": "string",
-          "description": "The mapping rule to be used to ingest the data. Optionally the mapping information can be added to each message."
-        },
-        "dataFormat": {
-          "$ref": "#/definitions/DataFormat",
-          "description": "The data format of the message. Optionally the data format can be added to each message."
-        },
-        "eventSystemProperties": {
-          "description": "The iot hub system properties.",
-          "$ref": "#/definitions/EventSystemProperties"
-        },
-        "sharedAccessPolicyName": {
-          "type": "string",
-          "description": "The name of the shared access policy."
-        }
-      }
-    },
-    "EventGridDataConnection": {
-      "description": "Information about the event grid data connection",
-      "required": [
-        "kind",
-        "properties"
-      ],
-      "type": "object",
-      "properties": {
-        "kind": {
-          "description": "Kind of the endpoint for the data connection",
-          "enum": [
-            "EventGrid"
-          ],
-          "type": "string"
-        },
-        "properties": {
-          "$ref": "#/definitions/EventGridDataConnectionProperties",
-          "description": "Event grid data connection properties"
-        }
-      }
+      "description": "A class that contains database statistics information."
     },
     "EventGridDataConnectionProperties": {
-      "description": "Class representing the Kusto event grid connection properties.",
-      "required": [
-        "storageAccountResourceId",
-        "eventHubResourceId",
-        "consumerGroup",
-        "tableName",
-        "dataFormat"
-      ],
       "type": "object",
       "properties": {
         "storageAccountResourceId": {
@@ -481,124 +424,237 @@
           "description": "The mapping rule to be used to ingest the data. Optionally the mapping information can be added to each message."
         },
         "dataFormat": {
-          "$ref": "#/definitions/DataFormat",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DataFormat"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
           "description": "The data format of the message. Optionally the data format can be added to each message."
         }
-      }
-    },
-    "DataFormat": {
-      "description": "The data format of the message. Optionally the data format can be added to each message.",
-      "type": "string",
-      "enum": [
-        "MULTIJSON",
-        "JSON",
-        "CSV",
-        "TSV",
-        "SCSV",
-        "SOHSV",
-        "PSV",
-        "TXT",
-        "RAW",
-        "SINGLEJSON",
-        "AVRO",
-        "TSVE"
+      },
+      "required": [
+        "storageAccountResourceId",
+        "eventHubResourceId",
+        "consumerGroup",
+        "tableName",
+        "dataFormat"
       ],
-      "x-ms-enum": {
-        "name": "dataFormat",
-        "modelAsString": true
-      }
+      "description": "Class representing the Kusto event grid connection properties."
     },
-    "EventSystemProperties": {
-      "description": "The resource system properties.",
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "TrustedExternalTenant": {
+    "EventGridDataConnection": {
       "type": "object",
       "properties": {
-        "value": {
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EventGridDataConnectionProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Class representing the Kusto event grid connection properties."
+        },
+        "kind": {
           "type": "string",
-          "description": "GUID representing an external tenant."
-        }
-      }
-    },
-    "OptimizedAutoscale": {
-      "type": "object",
-      "required": [
-        "version",
-        "isEnabled",
-        "minimum",
-        "maximum"
-      ],
-      "properties": {
-        "version": {
-          "description": "The version of the template defined, for instance 1.",
-          "type": "integer"
-        },
-        "isEnabled": {
-          "description": "A boolean value that indicate if the optimized autoscale feature is enabled or not.",
-          "type": "boolean"
-        },
-        "minimum": {
-          "description": "Minimum allowed instances count.",
-          "type": "integer"
-        },
-        "maximum": {
-          "description": "Maximum allowed instances count.",
-          "type": "integer"
+          "enum": [
+            "EventGrid"
+          ],
+          "description": "Kind of the endpoint for the data connection"
         }
       },
-      "description": "A class that contains the optimized auto scale definition."
-    },
-    "VirtualNetworkConfiguration": {
-      "type": "object",
       "required": [
-        "subnetId",
-        "enginePublicIpId",
-        "dataManagementPublicIpId"
+        "kind",
+        "properties"
       ],
+      "description": "Class representing an Event Grid data connection."
+    },
+    "EventHubConnectionProperties": {
+      "type": "object",
       "properties": {
-        "subnetId": {
-          "description": "The subnet resource id.",
-          "type": "string"
+        "eventHubResourceId": {
+          "type": "string",
+          "description": "The resource ID of the event hub to be used to create a data connection."
         },
-        "enginePublicIpId": {
-          "description": "Engine service's public IP address resource id.",
-          "type": "string"
+        "consumerGroup": {
+          "type": "string",
+          "description": "The event hub consumer group."
         },
-        "dataManagementPublicIpId": {
-          "description": "Data management's service public IP address resource id.",
-          "type": "string"
+        "tableName": {
+          "type": "string",
+          "description": "The table where the data should be ingested. Optionally the table information can be added to each message."
+        },
+        "mappingRuleName": {
+          "type": "string",
+          "description": "The mapping rule to be used to ingest the data. Optionally the mapping information can be added to each message."
+        },
+        "dataFormat": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DataFormat"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The data format of the message. Optionally the data format can be added to each message."
+        },
+        "eventSystemProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EventSystemProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "System properties of the event hub"
         }
       },
-      "description": "A class that contains virtual network definition."
+      "required": [
+        "eventHubResourceId",
+        "consumerGroup"
+      ],
+      "description": "Class representing the Kusto event hub connection properties."
+    },
+    "EventHubDataConnection": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EventHubConnectionProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Event hub data connection properties"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "EventHub"
+          ],
+          "description": "Kind of the endpoint for the data connection"
+        }
+      },
+      "required": [
+        "kind",
+        "properties"
+      ],
+      "description": "Information about the event hub data connection"
     },
     "Identity": {
       "type": "object",
-      "required": [
-        "type"
-      ],
       "properties": {
         "type": {
-          "type": "string",
-          "enum": [
-            "None",
-            "SystemAssigned"
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "None",
+                "SystemAssigned"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
           ],
           "description": "The identity type."
         }
       },
+      "required": [
+        "type"
+      ],
       "description": "Identity for the resource."
     },
-    "KeyVaultProperties": {
-      "description": "Properties of the key vault.",
+    "IotHubDataConnectionProperties": {
+      "type": "object",
+      "properties": {
+        "iotHubResourceId": {
+          "type": "string",
+          "description": "The resource ID of the iot hub to be used to create a data connection."
+        },
+        "consumerGroup": {
+          "type": "string",
+          "description": "The iot hub consumer group."
+        },
+        "tableName": {
+          "type": "string",
+          "description": "The table where the data should be ingested. Optionally the table information can be added to each message."
+        },
+        "mappingRuleName": {
+          "type": "string",
+          "description": "The mapping rule to be used to ingest the data. Optionally the mapping information can be added to each message."
+        },
+        "dataFormat": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DataFormat"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The data format of the message. Optionally the data format can be added to each message."
+        },
+        "eventSystemProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EventSystemProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The iot hub system properties."
+        },
+        "sharedAccessPolicyName": {
+          "type": "string",
+          "description": "The name of the shared access policy."
+        }
+      },
       "required": [
-        "keyName",
-        "keyVersion",
-        "keyVaultUri"
+        "iotHubResourceId",
+        "consumerGroup",
+        "sharedAccessPolicyName"
       ],
+      "description": "Class representing the Kusto Iot hub connection properties."
+    },
+    "IotHubDataConnection": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/IotHubConnectionProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Iot hub data connection properties"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "IotHub"
+          ],
+          "description": "Kind of the endpoint for the data connection"
+        }
+      },
+      "required": [
+        "kind",
+        "properties"
+      ],
+      "description": "Information about the Iot hub data connection"
+    },
+    "KeyVaultProperties": {
+      "type": "object",
       "properties": {
         "keyName": {
           "type": "string",
@@ -615,7 +671,131 @@
           "description": "The Uri of the key vault.",
           "x-ms-client-name": "KeyVaultUri"
         }
+      },
+      "required": [
+        "keyName",
+        "keyVersion",
+        "keyVaultUri"
+      ],
+      "description": "Properties of the key vault."
+    },
+    "OptimizedAutoscale": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The version of the template defined, for instance 1."
+        },
+        "isEnabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "A boolean value that indicate if the optimized autoscale feature is enabled or not."
+        },
+        "minimum": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Minimum allowed instances count."
+        },
+        "maximum": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Maximum allowed instances count."
+        }
+      },
+      "required": [
+        "version",
+        "isEnabled",
+        "minimum",
+        "maximum"
+      ],
+      "description": "A class that contains the optimized auto scale definition."
+    },
+    "TrustedExternalTenant": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "description": "GUID representing an external tenant."
+        }
+      }    ,
+      "description": "Represents a tenant ID that is trusted by the cluster."
+    },
+    "VirtualNetworkConfiguration": {
+      "type": "object",
+      "properties": {
+        "subnetId": {
+          "type": "string",
+          "description": "The subnet resource id."
+        },
+        "enginePublicIpId": {
+          "type": "string",
+          "description": "Engine service's public IP address resource id."
+        },
+        "dataManagementPublicIpId": {
+          "type": "string",
+          "description": "Data management's service public IP address resource id."
+        }
+      },
+      "required": [
+        "subnetId",
+        "enginePublicIpId",
+        "dataManagementPublicIpId"
+      ],
+      "description": "A class that contains virtual network definition."
+    },
+    "DataFormat": {
+      "type": "string",
+      "enum": [
+        "MULTIJSON",
+        "JSON",
+        "CSV",
+        "TSV",
+        "SCSV",
+        "SOHSV",
+        "PSV",
+        "TXT",
+        "RAW",
+        "SINGLEJSON",
+        "AVRO",
+        "TSVE"
+      ],
+      "description": "The data format of the message. Optionally the data format can be added to each message.",
+      "x-ms-enum": {
+        "name": "dataFormat",
+        "modelAsString": true
       }
+    },
+    "EventSystemProperties": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+    "description": "The resource system properties."
     }
   }
 }

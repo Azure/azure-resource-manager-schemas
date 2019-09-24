@@ -35,6 +35,7 @@ const whitelist  = [
     'cosmos-db/resource-manager',
     'servicefabric/resource-manager',
     'servicebus/resource-manager',
+    'eventhub/resource-manager',
 ];
 
 // paths in this list won't even appear in list-basepaths

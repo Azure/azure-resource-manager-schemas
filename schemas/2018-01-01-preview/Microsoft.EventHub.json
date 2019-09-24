@@ -4,6 +4,35 @@
   "title": "Microsoft.EventHub",
   "description": "Microsoft EventHub Resource Types",
   "resourceDefinitions": {
+    "clusters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 6,
+          "maxLength": 50,
+          "description": "The name of the Event Hubs Cluster."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.EventHub/clusters"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-01-01-preview"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion"
+      ],
+      "description": "Microsoft.EventHub/clusters"
+    },
     "namespaces": {
       "type": "object",
       "properties": {
@@ -35,7 +64,8 @@
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              }
+              },
+              "properties": {}
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -52,7 +82,7 @@
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Properties of sku resource"
+          "description": "SKU parameters supplied to the create namespace operation"
         },
         "properties": {
           "oneOf": [
@@ -70,10 +100,13 @@
           "items": {
             "oneOf": [
               {
+                "$ref": "#/definitions/namespaces_ipfilterrules_childResource"
+              },
+              {
                 "$ref": "#/definitions/namespaces_virtualnetworkrules_childResource"
               },
               {
-                "$ref": "#/definitions/namespaces_ipfilterrules_childResource"
+                "$ref": "#/definitions/namespaces_networkRuleSets_childResource"
               }
             ]
           }
@@ -86,40 +119,6 @@
         "properties"
       ],
       "description": "Microsoft.EventHub/namespaces"
-    },
-    "namespaces_networkRuleSets": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.EventHub/Namespaces/NetworkRuleSets"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2018-01-01-preview"
-          ]
-        },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/NetworkRuleSetProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Properties supplied to create or update NetworkRuleSet"
-        }
-      },
-      "required": [
-        "type",
-        "apiVersion",
-        "properties"
-      ],
-      "description": "Microsoft.EventHub/Namespaces/NetworkRuleSets"
     },
     "namespaces_ipfilterrules": {
       "type": "object",
@@ -161,6 +160,52 @@
       ],
       "description": "Microsoft.EventHub/namespaces/ipfilterrules"
     },
+    "namespaces_networkRuleSets": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^.*/default$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.EventHub/namespaces/networkRuleSets"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-01-01-preview"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/NetworkRuleSetProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "NetworkRuleSet properties"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.EventHub/namespaces/networkRuleSets"
+    },
     "namespaces_virtualnetworkrules": {
       "type": "object",
       "properties": {
@@ -200,35 +245,6 @@
         "properties"
       ],
       "description": "Microsoft.EventHub/namespaces/virtualnetworkrules"
-    },
-    "clusters": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "minLength": 6,
-          "maxLength": 50,
-          "description": "The name of the Event Hubs Cluster."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.EventHub/clusters"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2018-01-01-preview"
-          ]
-        }
-      },
-      "required": [
-        "name",
-        "type",
-        "apiVersion"
-      ],
-      "description": "Microsoft.EventHub/clusters"
     }
   },
   "definitions": {
@@ -352,6 +368,52 @@
       ],
       "description": "Microsoft.EventHub/namespaces/ipfilterrules"
     },
+    "namespaces_networkRuleSets_childResource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^.*/default$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "networkRuleSets"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-01-01-preview"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/NetworkRuleSetProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "NetworkRuleSet properties"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.EventHub/namespaces/networkRuleSets"
+    },
     "namespaces_virtualnetworkrules_childResource": {
       "type": "object",
       "properties": {
@@ -391,39 +453,106 @@
       ],
       "description": "Microsoft.EventHub/namespaces/virtualnetworkrules"
     },
-    "namespaces_networkRuleSets_childResource": {
+    "NetworkRuleSetProperties": {
       "type": "object",
       "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.EventHub/Namespaces/NetworkRuleSets"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2018-01-01-preview"
-          ]
-        },
-        "properties": {
+        "defaultAction": {
           "oneOf": [
             {
-              "$ref": "#/definitions/NetworkRuleSetProperties"
+              "type": "string",
+              "enum": [
+                "Allow",
+                "Deny"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Properties supplied to create or update AuthorizationRule"
+          "description": "Default Action for Network Rule Set."
+        },
+        "virtualNetworkRules": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/NWRuleSetVirtualNetworkRules"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "List VirtualNetwork Rules"
+        },
+        "ipRules": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/NWRuleSetIpRules"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "List of IpRules"
         }
       },
-      "required": [
-        "type",
-        "apiVersion",
-        "properties"
-      ],
-      "description": "Microsoft.EventHub/Namespaces/NetworkRuleSets"
+      "description": "NetworkRuleSet properties"
+    },
+    "NWRuleSetIpRules": {
+      "type": "object",
+      "properties": {
+        "ipMask": {
+          "type": "string",
+          "description": "IP Mask"
+        },
+        "action": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Allow"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The IP Filter Action."
+        }
+      },
+      "description": "The response from the List namespace operation."
+    },
+    "NWRuleSetVirtualNetworkRules": {
+      "type": "object",
+      "properties": {
+        "subnet": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Subnet"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties supplied for Subnet"
+        },
+        "ignoreMissingVnetServiceEndpoint": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Value that indicates whether to ignore missing Vnet Service Endpoint"
+        }
+      },
+      "description": "The response from the List namespace operation."
     },
     "Sku": {
       "type": "object",
@@ -433,6 +562,7 @@
             {
               "type": "string",
               "enum": [
+                "Dedicated",
                 "Basic",
                 "Standard"
               ]
@@ -477,6 +607,16 @@
       ],
       "description": "SKU parameters supplied to the create namespace operation"
     },
+    "Subnet": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Resource ID of Virtual Network Subnet"
+        }
+      },
+      "description": "Properties supplied for Subnet"
+    },
     "VirtualNetworkRuleProperties": {
       "type": "object",
       "properties": {
@@ -486,123 +626,6 @@
         }
       },
       "description": "Properties supplied to create or update VirtualNetworkRules"
-    },
-    "NetworkRuleSetProperties": {
-      "type": "object",
-      "properties": {
-        "defaultAction": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Allow",
-                "Deny"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Default Action for Network Rule Set"
-        },
-        "virtualNetworkRules": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/NWVirtualNetworkRuleProperties"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "List of VirtualNetwork Rules"
-        },
-        "ipRules": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/NWIpRulesProperties"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "List of IpRules"
-        }
-      },
-      "required": [
-        "defaultAction"
-      ],
-      "description": "Properties supplied to create or update NetworkRuleSet"
-    },
-    "NWIpRulesProperties": {
-      "type": "object",
-      "properties": {
-        "ipMask": {
-          "type": "string",
-          "description": "IP Mask"
-        },
-        "action": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Allow"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "The IP Filter Action"
-        }
-      },
-      "description": "Properties of IpRule object."
-    },
-    "NWVirtualNetworkRuleProperties": {
-      "type": "object",
-      "properties": {
-        "subnet": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/Subnet"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Subnet properties"
-        },
-        "ignoreMissingVnetServiceEndpoint": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Value that indicates whether to ignore missing VNet Service Endpoint"
-        }
-      },
-      "description": "Properties of VirtualNetworkRule object."
-    },
-    "Subnet": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Resource ID of Virtual Network Subnet"
-        }
-      },
-      "required": [
-        "id"
-      ],
-      "description": "Properties supplied for Subnet"
     }
   }
 }

@@ -1,8 +1,8 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2018-05-01/policyDefinition.json#",
+  "id": "https://schema.management.azure.com/schemas/2019-06-01/policyDefinition.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Policy Definition",
-  "description": "This schema defines Azure resource policy definition, please see https://azure.microsoft.com/en-us/documentation/articles/resource-manager-policy/ for more details.",
+  "description": "This schema defines Azure resource policy definition, please see https://azure.microsoft.com/documentation/articles/resource-manager-policy/ for more details.",
   "type": "object",
   "properties": {
     "if": {
@@ -23,7 +23,8 @@
         "details": {
           "oneOf": [
             { "$ref": "#/definitions/ifNotExistsDetails" },
-            { "$ref": "#/definitions/appendDetails" }
+            { "$ref": "#/definitions/appendDetails" },
+            { "$ref": "#/definitions/modifyDetails" }
           ]
         }
       },
@@ -66,6 +67,10 @@
           "type": "string",
           "enum": [ "resourceGroup", "subscription" ]
         },
+        "deploymentScope": {
+          "type": "string",
+          "enum": [ "resourceGroup", "subscription" ]
+        },
         "roleDefinitionIds": {
           "type": "array",
           "items": {
@@ -90,6 +95,42 @@
         }
       },
       "required": [ "type" ],
+      "additionalProperties": false
+    },
+    "modifyDetails": {
+      "type": "object",
+      "properties": {
+        "roleDefinitionIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "properties": {
+              "operation": {
+                "type": "string",
+                "enum": [ "add", "addOrReplace", "remove" ]
+              },
+              "field": {
+                "type": "string"
+              },
+              "value": {
+              }
+            },
+            "required": [
+              "operation",
+              "field"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "additionalItems": false
+        }
+      },
+      "required": [ "roleDefinitionIds", "operations" ],
       "additionalProperties": false
     },
     "condition": {
@@ -212,6 +253,14 @@
             },
             {
               "properties": {
+                "matchInsensitively": {
+                  "type": "string"
+                }
+              },
+              "required": [ "matchInsensitively" ]
+            },
+            {
+              "properties": {
                 "notMatch": {
                   "type": "string"
                 }
@@ -220,11 +269,51 @@
             },
             {
               "properties": {
+                "notMatchInsensitively": {
+                  "type": "string"
+                }
+              },
+              "required": [ "notMatchInsensitively" ]
+            },
+            {
+              "properties": {
                 "exists": {
                   "type": "string"
                 }
               },
               "required": [ "exists" ]
+            },
+            {
+              "properties": {
+                "greater": {
+                  "type": [ "number", "string" ]
+                }
+              },
+              "required": [ "greater" ]
+            },
+            {
+              "properties": {
+                "less": {
+                  "type": [ "number", "string" ]
+                }
+              },
+              "required": [ "less" ]
+            },
+            {
+              "properties": {
+                "greaterOrEquals": {
+                  "type": [ "number", "string" ]
+                }
+              },
+              "required": [ "greaterOrEquals" ]
+            },
+            {
+              "properties": {
+                "lessOrEquals": {
+                  "type": [ "number", "string" ]
+                }
+              },
+              "required": [ "lessOrEquals" ]
             }
           ]
         }

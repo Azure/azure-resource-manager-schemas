@@ -73,7 +73,15 @@ const whitelist: WhitelistConfig[] = [
     { 
         basePath: 'servicebus/resource-manager',
         namespace: 'Microsoft.ServiceBus',
-    }
+    },
+    { 
+        basePath: 'eventhub/resource-manager',
+        namespace: 'Microsoft.EventHub',
+    },
+    { 
+        basePath: 'relay/resource-manager',
+        namespace: 'Microsoft.Relay',
+    },
 ];
 
 function findWhitelistConfig(basePath: string) {

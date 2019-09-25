@@ -1,8 +1,8 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2017-04-01/Microsoft.Relay.json#",
+  "id": "https://schema.management.azure.com/schemas/2014-09-01/Microsoft.EventHub.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "Microsoft.Relay",
-  "description": "Microsoft Relay Resource Types",
+  "title": "Microsoft.EventHub",
+  "description": "Microsoft EventHub Resource Types",
   "resourceDefinitions": {
     "namespaces": {
       "type": "object",
@@ -11,23 +11,34 @@
           "type": "string",
           "minLength": 6,
           "maxLength": 50,
-          "description": "The namespace name"
+          "description": "The Namespace name"
         },
         "type": {
           "type": "string",
           "enum": [
-            "Microsoft.Relay/namespaces"
+            "Microsoft.EventHub/namespaces"
           ]
         },
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2017-04-01"
+            "2014-09-01"
           ]
         },
         "location": {
           "type": "string",
-          "description": "Resource location."
+          "description": "Namespace location."
+        },
+        "sku": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Sku"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "SKU parameters supplied to the create Namespace operation"
         },
         "tags": {
           "oneOf": [
@@ -42,42 +53,28 @@
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Resource tags."
-        },
-        "sku": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/Sku"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "SKU of the namespace."
+          "description": "Namespace tags."
         },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/RelayNamespaceProperties"
+              "$ref": "#/definitions/NamespaceProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Properties of the namespace."
+          "description": "Properties of the Namespace supplied for create or update Namespace operation"
         },
         "resources": {
           "type": "array",
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/namespaces_authorizationRules_childResource"
+                "$ref": "#/definitions/namespaces_AuthorizationRules_childResource"
               },
               {
-                "$ref": "#/definitions/namespaces_hybridConnections_childResource"
-              },
-              {
-                "$ref": "#/definitions/namespaces_wcfRelays_childResource"
+                "$ref": "#/definitions/namespaces_eventhubs_childResource"
               }
             ]
           }
@@ -90,38 +87,43 @@
         "location",
         "properties"
       ],
-      "description": "Microsoft.Relay/namespaces"
+      "description": "Microsoft.EventHub/namespaces"
     },
-    "namespaces_authorizationRules": {
+    "namespaces_AuthorizationRules": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string",
           "minLength": 1,
+          "maxLength": 50,
           "description": "The authorization rule name."
         },
         "type": {
           "type": "string",
           "enum": [
-            "Microsoft.Relay/namespaces/authorizationRules"
+            "Microsoft.EventHub/namespaces/AuthorizationRules"
           ]
         },
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2017-04-01"
+            "2014-09-01"
           ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Data center location."
         },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/AuthorizationRuleProperties"
+              "$ref": "#/definitions/SharedAccessAuthorizationRuleProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Authorization rule properties."
+          "description": "Properties supplied to create or update SharedAccessAuthorizationRule"
         }
       },
       "required": [
@@ -130,45 +132,53 @@
         "apiVersion",
         "properties"
       ],
-      "description": "Microsoft.Relay/namespaces/authorizationRules"
+      "description": "Microsoft.EventHub/namespaces/AuthorizationRules"
     },
-    "namespaces_hybridConnections": {
+    "namespaces_eventhubs": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string",
           "minLength": 1,
-          "description": "The hybrid connection name."
+          "maxLength": 50,
+          "description": "The Event Hub name"
         },
         "type": {
           "type": "string",
           "enum": [
-            "Microsoft.Relay/namespaces/hybridConnections"
+            "Microsoft.EventHub/namespaces/eventhubs"
           ]
         },
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2017-04-01"
+            "2014-09-01"
           ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Location of the resource."
         },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/HybridConnectionProperties"
+              "$ref": "#/definitions/EventHubProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Properties of the HybridConnection."
+          "description": "Properties supplied to the Create Or Update Event Hub operation."
         },
         "resources": {
           "type": "array",
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/namespaces_hybridConnections_authorizationRules_childResource"
+                "$ref": "#/definitions/namespaces_eventhubs_authorizationRules_childResource"
+              },
+              {
+                "$ref": "#/definitions/namespaces_eventhubs_consumergroups_childResource"
               }
             ]
           }
@@ -178,40 +188,46 @@
         "name",
         "type",
         "apiVersion",
+        "location",
         "properties"
       ],
-      "description": "Microsoft.Relay/namespaces/hybridConnections"
+      "description": "Microsoft.EventHub/namespaces/eventhubs"
     },
-    "namespaces_hybridConnections_authorizationRules": {
+    "namespaces_eventhubs_authorizationRules": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string",
           "minLength": 1,
+          "maxLength": 50,
           "description": "The authorization rule name."
         },
         "type": {
           "type": "string",
           "enum": [
-            "Microsoft.Relay/namespaces/hybridConnections/authorizationRules"
+            "Microsoft.EventHub/namespaces/eventhubs/authorizationRules"
           ]
         },
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2017-04-01"
+            "2014-09-01"
           ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Data center location."
         },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/AuthorizationRuleProperties"
+              "$ref": "#/definitions/SharedAccessAuthorizationRuleProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Authorization rule properties."
+          "description": "Properties supplied to create or update SharedAccessAuthorizationRule"
         }
       },
       "required": [
@@ -220,101 +236,352 @@
         "apiVersion",
         "properties"
       ],
-      "description": "Microsoft.Relay/namespaces/hybridConnections/authorizationRules"
+      "description": "Microsoft.EventHub/namespaces/eventhubs/authorizationRules"
     },
-    "namespaces_wcfRelays": {
+    "namespaces_eventhubs_consumergroups": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string",
           "minLength": 1,
-          "description": "The relay name."
+          "maxLength": 50,
+          "description": "The consumer group name"
         },
         "type": {
           "type": "string",
           "enum": [
-            "Microsoft.Relay/namespaces/wcfRelays"
+            "Microsoft.EventHub/namespaces/eventhubs/consumergroups"
           ]
         },
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2017-04-01"
+            "2014-09-01"
           ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Location of the resource."
         },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/WcfRelayProperties"
+              "$ref": "#/definitions/ConsumerGroupProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "Properties of the WCF relay."
-        },
-        "resources": {
-          "type": "array",
-          "items": {
-            "oneOf": [
-              {
-                "$ref": "#/definitions/namespaces_wcfRelays_authorizationRules_childResource"
-              }
-            ]
-          }
+          "description": "Properties supplied to the Create Or Update Consumer Group operation."
         }
       },
       "required": [
         "name",
         "type",
         "apiVersion",
+        "location",
         "properties"
       ],
-      "description": "Microsoft.Relay/namespaces/wcfRelays"
-    },
-    "namespaces_wcfRelays_authorizationRules": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "minLength": 1,
-          "description": "The authorization rule name."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.Relay/namespaces/wcfRelays/authorizationRules"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2017-04-01"
-          ]
-        },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/AuthorizationRuleProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Authorization rule properties."
-        }
-      },
-      "required": [
-        "name",
-        "type",
-        "apiVersion",
-        "properties"
-      ],
-      "description": "Microsoft.Relay/namespaces/wcfRelays/authorizationRules"
+      "description": "Microsoft.EventHub/namespaces/eventhubs/consumergroups"
     }
   },
   "definitions": {
-    "AuthorizationRuleProperties": {
+    "ConsumerGroupProperties": {
+      "type": "object",
+      "properties": {
+        "userMetadata": {
+          "type": "string",
+          "description": "The user metadata."
+        }
+      },
+      "description": "Properties supplied to the Create Or Update Consumer Group operation."
+    },
+    "EventHubProperties": {
+      "type": "object",
+      "properties": {
+        "messageRetentionInDays": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Number of days to retain the events for this Event Hub."
+        },
+        "partitionCount": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Number of partitions created for the Event Hub."
+        },
+        "status": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Active",
+                "Disabled",
+                "Restoring",
+                "SendDisabled",
+                "ReceiveDisabled",
+                "Creating",
+                "Deleting",
+                "Renaming",
+                "Unknown"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Enumerates the possible values for the status of the Event Hub."
+        }
+      },
+      "description": "Properties supplied to the Create Or Update Event Hub operation."
+    },
+    "NamespaceProperties": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Unknown",
+                "Creating",
+                "Created",
+                "Activating",
+                "Enabling",
+                "Active",
+                "Disabling",
+                "Disabled",
+                "SoftDeleting",
+                "SoftDeleted",
+                "Removing",
+                "Removed",
+                "Failed"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "State of the Namespace."
+        },
+        "provisioningState": {
+          "type": "string",
+          "description": "Provisioning state of the Namespace."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time the Namespace was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time the Namespace was updated."
+        },
+        "serviceBusEndpoint": {
+          "type": "string",
+          "description": "Endpoint you can use to perform Service Bus operations."
+        },
+        "enabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies whether this instance is enabled."
+        }
+      },
+      "description": "Properties of the Namespace supplied for create or update Namespace operation"
+    },
+    "namespaces_AuthorizationRules_childResource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The authorization rule name."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "AuthorizationRules"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2014-09-01"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Data center location."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SharedAccessAuthorizationRuleProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties supplied to create or update SharedAccessAuthorizationRule"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.EventHub/namespaces/AuthorizationRules"
+    },
+    "namespaces_eventhubs_authorizationRules_childResource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The authorization rule name."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "authorizationRules"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2014-09-01"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Data center location."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SharedAccessAuthorizationRuleProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties supplied to create or update SharedAccessAuthorizationRule"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.EventHub/namespaces/eventhubs/authorizationRules"
+    },
+    "namespaces_eventhubs_childResource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The Event Hub name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "eventhubs"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2014-09-01"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Location of the resource."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EventHubProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties supplied to the Create Or Update Event Hub operation."
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "location",
+        "properties"
+      ],
+      "description": "Microsoft.EventHub/namespaces/eventhubs"
+    },
+    "namespaces_eventhubs_consumergroups_childResource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The consumer group name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "consumergroups"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2014-09-01"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Location of the resource."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ConsumerGroupProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties supplied to the Create Or Update Consumer Group operation."
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "location",
+        "properties"
+      ],
+      "description": "Microsoft.EventHub/namespaces/eventhubs/consumergroups"
+    },
+    "SharedAccessAuthorizationRuleProperties": {
       "type": "object",
       "properties": {
         "rights": {
@@ -340,228 +607,7 @@
       "required": [
         "rights"
       ],
-      "description": "Authorization rule properties."
-    },
-    "HybridConnectionProperties": {
-      "type": "object",
-      "properties": {
-        "requiresClientAuthorization": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Returns true if client authorization is needed for this hybrid connection; otherwise, false."
-        },
-        "userMetadata": {
-          "type": "string",
-          "description": "The usermetadata is a placeholder to store user-defined string data for the hybrid connection endpoint. For example, it can be used to store descriptive data, such as a list of teams and their contact information. Also, user-defined configuration settings can be stored."
-        }
-      },
-      "description": "Properties of the HybridConnection."
-    },
-    "namespaces_authorizationRules_childResource": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The authorization rule name."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "authorizationRules"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2017-04-01"
-          ]
-        },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/AuthorizationRuleProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Authorization rule properties."
-        }
-      },
-      "required": [
-        "name",
-        "type",
-        "apiVersion",
-        "properties"
-      ],
-      "description": "Microsoft.Relay/namespaces/authorizationRules"
-    },
-    "namespaces_hybridConnections_authorizationRules_childResource": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The authorization rule name."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "authorizationRules"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2017-04-01"
-          ]
-        },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/AuthorizationRuleProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Authorization rule properties."
-        }
-      },
-      "required": [
-        "name",
-        "type",
-        "apiVersion",
-        "properties"
-      ],
-      "description": "Microsoft.Relay/namespaces/hybridConnections/authorizationRules"
-    },
-    "namespaces_hybridConnections_childResource": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The hybrid connection name."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "hybridConnections"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2017-04-01"
-          ]
-        },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/HybridConnectionProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Properties of the HybridConnection."
-        }
-      },
-      "required": [
-        "name",
-        "type",
-        "apiVersion",
-        "properties"
-      ],
-      "description": "Microsoft.Relay/namespaces/hybridConnections"
-    },
-    "namespaces_wcfRelays_authorizationRules_childResource": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The authorization rule name."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "authorizationRules"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2017-04-01"
-          ]
-        },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/AuthorizationRuleProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Authorization rule properties."
-        }
-      },
-      "required": [
-        "name",
-        "type",
-        "apiVersion",
-        "properties"
-      ],
-      "description": "Microsoft.Relay/namespaces/wcfRelays/authorizationRules"
-    },
-    "namespaces_wcfRelays_childResource": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The relay name."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "wcfRelays"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2017-04-01"
-          ]
-        },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/WcfRelayProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Properties of the WCF relay."
-        }
-      },
-      "required": [
-        "name",
-        "type",
-        "apiVersion",
-        "properties"
-      ],
-      "description": "Microsoft.Relay/namespaces/wcfRelays"
-    },
-    "RelayNamespaceProperties": {
-      "type": "object",
-      "properties": {},
-      "description": "Properties of the namespace."
+      "description": "Properties supplied to create or update SharedAccessAuthorizationRule"
     },
     "Sku": {
       "type": "object",
@@ -571,6 +617,7 @@
             {
               "type": "string",
               "enum": [
+                "Basic",
                 "Standard"
               ]
             },
@@ -585,67 +632,33 @@
             {
               "type": "string",
               "enum": [
-                "Standard"
+                "Basic",
+                "Standard",
+                "Premium"
               ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "The tier of this SKU."
+          "description": "The billing tier of this particular SKU."
+        },
+        "capacity": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The Event Hubs throughput units."
         }
       },
       "required": [
-        "name"
+        "tier"
       ],
-      "description": "SKU of the namespace."
-    },
-    "WcfRelayProperties": {
-      "type": "object",
-      "properties": {
-        "relayType": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "NetTcp",
-                "Http"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "WCF relay type."
-        },
-        "requiresClientAuthorization": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Returns true if client authorization is needed for this relay; otherwise, false."
-        },
-        "requiresTransportSecurity": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Returns true if transport security is needed for this relay; otherwise, false."
-        },
-        "userMetadata": {
-          "type": "string",
-          "description": "The usermetadata is a placeholder to store user-defined string data for the WCF Relay endpoint. For example, it can be used to store descriptive data, such as list of teams and their contact information. Also, user-defined configuration settings can be stored."
-        }
-      },
-      "description": "Properties of the WCF relay."
+      "description": "SKU parameters supplied to the create Namespace operation"
     }
   }
 }

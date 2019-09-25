@@ -105,9 +105,42 @@ async function rmdirRecursive(basePath: string) {
     await rmdir(basePath);
 }
 
+function lowerCaseCompare(a: string, b: string) {
+    const aLower = a.toLowerCase();
+    const bLower = b.toLowerCase();
+
+    if (aLower === bLower) {
+        return 0;
+    }
+
+    return aLower < bLower ? -1 : 1;
+}
+
+function lowerCaseCompareLists(listA: string[], listB: string[]) {
+    for (let i = 0; i < listA.length; i++) {
+        if (listB.length < i + 1) {
+            return -1;
+        }
+
+        const compareResult = lowerCaseCompare(listA[i], listB[i]);
+
+        if (compareResult !== 0) {
+            return compareResult;
+        }
+    }
+
+    if (listB.length > listA.length) {
+        return 1;
+    }
+
+    return 0;
+}
+
 export {
     executeCmd,
     findDirRecursive,
     findRecursive,
     rmdirRecursive,
+    lowerCaseCompare,
+    lowerCaseCompareLists,
 }

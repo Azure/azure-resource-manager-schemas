@@ -1,19 +1,27 @@
 import * as constants from '../constants';
-import { cloneAndGenerateBasePaths, validateUserProvidedBasePath } from '../specs';
+import { cloneAndGenerateBasePaths, validateAndReturnReadmePath } from '../specs';
 import { series } from 'async';
-import { generateSchemasForReadme } from '../generate';
+import { generateSchemas } from '../generate';
 import process from 'process';
+import { findWhitelistConfig } from '../whitelist';
+import chalk from 'chalk';
 
 series([async () => {
     const basePath = process.argv[2];
-    const basePaths = await cloneAndGenerateBasePaths(constants.specsRepoPath, constants.specsRepoUri, constants.specsRepoCommitHash);
+    await cloneAndGenerateBasePaths(constants.specsRepoPath, constants.specsRepoUri, constants.specsRepoCommitHash);
 
     let readme = '';
     try {
-        readme = await validateUserProvidedBasePath(basePath);
+        readme = await validateAndReturnReadmePath(basePath);
     } catch {
         throw new Error(`Unable to find a readme under '${basePath}'. Please try running 'npm run list-basepaths' to find the list of valid paths.`);
     }
 
-    await generateSchemasForReadme(readme);
+    const whitelistConfig = findWhitelistConfig(basePath);
+    if (whitelistConfig) {
+        console.log(`Using whitelist config:`)
+        console.log(chalk.green(JSON.stringify(whitelistConfig, null, 2)));
+    }
+
+    await generateSchemas(readme, whitelistConfig);
 }]);

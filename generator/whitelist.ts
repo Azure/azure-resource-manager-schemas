@@ -82,6 +82,16 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'relay/resource-manager',
         namespace: 'Microsoft.Relay',
     },
+    { 
+        basePath: 'eventgrid/resource-manager',
+        namespace: 'Microsoft.EventGrid',
+        resourceConfig: [
+            {
+                type: 'eventSubscriptions',
+                scopes: ScopeType.Extension | ScopeType.Subcription | ScopeType.ResourceGroup,
+            },
+        ],
+    },
 ];
 
 function findWhitelistConfig(basePath: string) {

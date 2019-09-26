@@ -82,6 +82,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'relay/resource-manager',
         namespace: 'Microsoft.Relay',
     },
+    { 
+        basePath: 'containerinstance/resource-manager',
+        namespace: 'Microsoft.ContainerInstance',
+    },
 ];
 
 function findWhitelistConfig(basePath: string) {

@@ -1,7 +1,8 @@
 import * as constants from '../constants';
-import { isWhitelisted, cloneAndGenerateBasePaths } from '../specs';
+import { cloneAndGenerateBasePaths } from '../specs';
 import { series } from 'async';
 import chalk from 'chalk';
+import { isWhitelisted } from '../whitelist';
 
 series([async () => {
     const basePaths = await cloneAndGenerateBasePaths(constants.specsRepoPath, constants.specsRepoUri, constants.specsRepoCommitHash);

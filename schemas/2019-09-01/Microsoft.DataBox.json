@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2018-01-01/Microsoft.DataBox.json#",
+  "id": "https://schema.management.azure.com/schemas/2019-09-01/Microsoft.DataBox.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.DataBox",
   "description": "Microsoft DataBox Resource Types",
@@ -28,7 +28,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-01-01"
+            "2019-09-01"
           ]
         },
         "location": {
@@ -177,6 +177,10 @@
     "DataBoxHeavyJobDetails": {
       "type": "object",
       "properties": {
+        "devicePassword": {
+          "type": "string",
+          "description": "Set Device password for unlocking Databox Heavy"
+        },
         "jobDetailsType": {
           "type": "string",
           "enum": [
@@ -187,11 +191,15 @@
       "required": [
         "jobDetailsType"
       ],
-      "description": "DataBoxHeavy Device Job Details"
+      "description": "Databox Heavy Device Job Details"
     },
     "DataBoxJobDetails": {
       "type": "object",
       "properties": {
+        "devicePassword": {
+          "type": "string",
+          "description": "Set Device password for unlocking Databox"
+        },
         "jobDetailsType": {
           "type": "string",
           "enum": [
@@ -202,7 +210,7 @@
       "required": [
         "jobDetailsType"
       ],
-      "description": "DataBox Job Details"
+      "description": "Databox Job Details"
     },
     "DestinationAccountDetails": {
       "type": "object",
@@ -218,9 +226,13 @@
         "accountId": {
           "type": "string",
           "description": "Arm Id of the destination where the data has to be moved."
+        },
+        "sharePassword": {
+          "type": "string",
+          "description": "Share password to be shared by all shares in SA."
         }
       },
-      "description": "Details of the destination of the data"
+      "description": "Details of the destination storage accounts."
     },
     "DestinationManagedDiskDetails": {
       "type": "object",
@@ -267,6 +279,17 @@
       ],
       "description": "Details for the destination storage account."
     },
+    "JobDeliveryInfo": {
+      "type": "object",
+      "properties": {
+        "scheduledDateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Scheduled date time."
+        }
+      },
+      "description": "Additional delivery info."
+    },
     "JobDetails": {
       "type": "object",
       "oneOf": [
@@ -281,7 +304,7 @@
         }
       ],
       "properties": {
-        "expectedDataSizeInTeraBytes": {
+        "expectedDataSizeInTerabytes": {
           "oneOf": [
             {
               "type": "integer"
@@ -360,6 +383,32 @@
             }
           ],
           "description": "Job details."
+        },
+        "deliveryType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "NonScheduled",
+                "Scheduled"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Delivery type of Job."
+        },
+        "deliveryInfo": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/JobDeliveryInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Additional delivery info."
         }
       },
       "description": "Job Properties"
@@ -418,7 +467,19 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Preferred Data Center Region."
+        },
+        "transportPreferences": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/TransportPreferences"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Preferences related to the shipment logistics of the sku"
         }
       },
       "description": "Preferences related to the order"
@@ -518,6 +579,30 @@
         "name"
       ],
       "description": "The Sku."
+    },
+    "TransportPreferences": {
+      "type": "object",
+      "properties": {
+        "preferredShipmentType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "CustomerManaged",
+                "MicrosoftManaged"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates Shipment Logistics type that the customer preferred."
+        }
+      },
+      "required": [
+        "preferredShipmentType"
+      ],
+      "description": "Preferences related to the shipment logistics of the sku"
     }
   }
 }

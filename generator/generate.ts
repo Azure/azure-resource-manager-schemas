@@ -120,7 +120,7 @@ async function generateSchemaRefs(outputFile: string, namespace: string, apiVers
     const schemaRefs = [
         ...getSchemaRefs(outputSchemaUri, output, ScopeType.Tenant, 'tenant_resourceDefinitions'),
         ...getSchemaRefs(outputSchemaUri, output, ScopeType.ManagementGroup, 'managementGroup_resourceDefinitions'),
-        ...getSchemaRefs(outputSchemaUri, output, ScopeType.Subcription, 'subscription_ResourceDefinitions'),
+        ...getSchemaRefs(outputSchemaUri, output, ScopeType.Subcription, 'subscription_resourceDefinitions'),
         ...getSchemaRefs(outputSchemaUri, output, ScopeType.ResourceGroup, 'resourceDefinitions'),
         ...getSchemaRefs(outputSchemaUri, output, ScopeType.Extension, 'extension_resourceDefinitions'),
         ...getSchemaRefs(outputSchemaUri, output, ScopeType.Unknown, 'unknown_resourceDefinitions'),

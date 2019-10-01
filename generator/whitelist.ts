@@ -82,6 +82,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'relay/resource-manager',
         namespace: 'Microsoft.Relay',
     },
+    { 
+        basePath: 'azure-kusto/resource-manager',
+        namespace: 'Microsoft.Kusto',
+    },
 ];
 
 function findWhitelistConfig(basePath: string) {

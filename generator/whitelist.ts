@@ -82,6 +82,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'relay/resource-manager',
         namespace: 'Microsoft.Relay',
     },
+    { 
+        basePath: 'mysql/resource-manager',
+        namespace: 'Microsoft.DBforMySQL',
+    },
 ];
 
 function findWhitelistConfig(basePath: string) {

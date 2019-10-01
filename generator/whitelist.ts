@@ -82,6 +82,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'relay/resource-manager',
         namespace: 'Microsoft.Relay',
     },
+    { 
+        basePath: 'hdinsight/resource-manager',
+        namespace: 'Microsoft.HDInsight',
+    },
 ];
 
 function findWhitelistConfig(basePath: string) {

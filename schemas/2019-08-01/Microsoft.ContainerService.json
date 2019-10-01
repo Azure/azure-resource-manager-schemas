@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2019-06-01/Microsoft.ContainerService.json#",
+  "id": "https://schema.management.azure.com/schemas/2019-08-01/Microsoft.ContainerService.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.ContainerService",
   "description": "Microsoft ContainerService Resource Types",
@@ -28,7 +28,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-06-01"
+            "2019-08-01"
           ]
         },
         "location": {
@@ -108,7 +108,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-06-01"
+            "2019-08-01"
           ]
         },
         "properties": {
@@ -265,6 +265,17 @@
             }
           ],
           "description": "The load balancer sku for the managed cluster."
+        },
+        "loadBalancerProfile": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ManagedClusterLoadBalancerProfile"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Profile of the managed cluster load balancer"
         }
       },
       "description": "Profile of network configuration."
@@ -1129,6 +1140,37 @@
       ],
       "description": "Properties for the container service agent pool profile."
     },
+    "ManagedClusterAPIServerAccessProfile": {
+      "type": "object",
+      "properties": {
+        "authorizedIPRanges": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Authorized IP Ranges to kubernetes API server."
+        },
+        "enablePrivateCluster": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether to create the cluster as a private cluster or not."
+        }
+      },
+      "description": "Access profile for managed cluster API server."
+    },
     "ManagedClusterIdentity": {
       "type": "object",
       "properties": {
@@ -1149,6 +1191,119 @@
         }
       },
       "description": "Identity for the managed cluster."
+    },
+    "ManagedClusterLoadBalancerProfile": {
+      "type": "object",
+      "properties": {
+        "managedOutboundIPs": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ManagedClusterLoadBalancerProfileManagedOutboundIPs"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Desired managed outbound IPs for the cluster load balancer."
+        },
+        "outboundIPPrefixes": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ManagedClusterLoadBalancerProfileOutboundIPPrefixes"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Desired outbound IP Prefix resources for the cluster load balancer."
+        },
+        "outboundIPs": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ManagedClusterLoadBalancerProfileOutboundIPs"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Desired outbound IP resources for the cluster load balancer."
+        },
+        "effectiveOutboundIPs": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ResourceReference"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The effective outbound IP resources of the cluster load balancer."
+        }
+      },
+      "description": "Profile of the managed cluster load balancer"
+    },
+    "ManagedClusterLoadBalancerProfileManagedOutboundIPs": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": "1"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Desired number of outbound IP created/managed by Azure for the cluster load balancer. Allowed values must be in the range of 1 to 100 (inclusive). The default value is 1. "
+        }
+      },
+      "description": "Desired managed outbound IPs for the cluster load balancer."
+    },
+    "ManagedClusterLoadBalancerProfileOutboundIPPrefixes": {
+      "type": "object",
+      "properties": {
+        "publicIPPrefixes": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ResourceReference"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A list of public IP prefix resources."
+        }
+      },
+      "description": "Desired outbound IP Prefix resources for the cluster load balancer."
+    },
+    "ManagedClusterLoadBalancerProfileOutboundIPs": {
+      "type": "object",
+      "properties": {
+        "publicIPs": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ResourceReference"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A list of public IP resources."
+        }
+      },
+      "description": "Desired outbound IP resources for the cluster load balancer."
     },
     "ManagedClusterProperties": {
       "type": "object",
@@ -1271,19 +1426,16 @@
           ],
           "description": "AADProfile specifies attributes for Azure Active Directory integration."
         },
-        "apiServerAuthorizedIPRanges": {
+        "apiServerAccessProfile": {
           "oneOf": [
             {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
+              "$ref": "#/definitions/ManagedClusterAPIServerAccessProfile"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "(PREVIEW) Authorized IP Ranges to kubernetes API server."
+          "description": "Access profile for managed cluster API server."
         }
       },
       "description": "Properties of the managed cluster."
@@ -1321,7 +1473,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-06-01"
+            "2019-08-01"
           ]
         },
         "properties": {
@@ -1376,6 +1528,16 @@
         "adminUsername"
       ],
       "description": "Profile for Windows VMs in the container service cluster."
+    },
+    "ResourceReference": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The fully qualified Azure resource id."
+        }
+      },
+      "description": "A reference to an Azure resource."
     }
   }
 }

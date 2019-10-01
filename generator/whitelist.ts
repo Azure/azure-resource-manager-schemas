@@ -82,6 +82,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'relay/resource-manager',
         namespace: 'Microsoft.Relay',
     },
+    { 
+        basePath: 'mariadb/resource-manager',
+        namespace: 'Microsoft.DBforMariaDB',
+    },
 ];
 
 function findWhitelistConfig(basePath: string) {

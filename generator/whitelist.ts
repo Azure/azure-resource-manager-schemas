@@ -82,6 +82,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'relay/resource-manager',
         namespace: 'Microsoft.Relay',
     },
+    {
+        basePath: 'postgresql/resource-manager',
+        namespace: 'Microsoft.DBforPostgreSQL',
+    },
 ];
 
 function findWhitelistConfig(basePath: string) {

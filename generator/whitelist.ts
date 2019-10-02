@@ -82,6 +82,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'relay/resource-manager',
         namespace: 'Microsoft.Relay',
     },
+    { 
+        basePath: 'vmwarecloudsimple/resource-manager',
+        namespace: 'Microsoft.VMwareCloudSimple',
+    },
 ];
 
 function findWhitelistConfig(basePath: string) {

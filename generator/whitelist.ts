@@ -82,6 +82,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'relay/resource-manager',
         namespace: 'Microsoft.Relay',
     },
+    { 
+        basePath: 'operationalinsights/resource-manager',
+        namespace: 'Microsoft.OperationalInsights',
+    },
 ];
 
 function findWhitelistConfig(basePath: string) {

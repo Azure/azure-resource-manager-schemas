@@ -50,6 +50,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'mariadb/resource-manager',
         namespace: 'Microsoft.DBforMariaDB',
     },
+    { 
+        basePath: 'mysql/resource-manager',
+        namespace: 'Microsoft.DBforMySQL',
+    },
     {
         "basePath": "policyinsights/resource-manager",
         "namespace": "Microsoft.PolicyInsights"

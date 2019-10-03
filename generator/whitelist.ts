@@ -3,8 +3,8 @@ import { ScopeType, WhitelistConfig } from './models';
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
 const whitelist: WhitelistConfig[] = [
     {
-        "basePath": "alertsmanagement/resource-manager",
-        "namespace": "Microsoft.AlertsManagement"
+        basePath: 'alertsmanagement/resource-manager',
+        namespace: 'Microsoft.AlertsManagement',
     },
     {
         "basePath": "botservice/resource-manager",

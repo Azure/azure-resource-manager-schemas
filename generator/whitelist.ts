@@ -46,6 +46,10 @@ const whitelist: WhitelistConfig[] = [
         "basePath": "machinelearningcompute/resource-manager",
         "namespace": "Microsoft.MachineLearningCompute"
     },
+    { 
+        basePath: 'mysql/resource-manager',
+        namespace: 'Microsoft.DBforMySQL',
+    },
     {
         "basePath": "policyinsights/resource-manager",
         "namespace": "Microsoft.PolicyInsights"

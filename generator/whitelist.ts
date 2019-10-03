@@ -3,85 +3,89 @@ import { ScopeType, WhitelistConfig } from './models';
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
 const whitelist: WhitelistConfig[] = [
     {
-        basePath: 'sqlvirtualmachine/resource-manager',
-        namespace: 'Microsoft.SqlVirtualMachine',
+        "basePath": "alertsmanagement/resource-manager",
+        "namespace": "Microsoft.AlertsManagement"
     },
     {
-        basePath: 'machinelearningcompute/resource-manager',
-        namespace: 'Microsoft.MachineLearningCompute',
+        "basePath": "botservice/resource-manager",
+        "namespace": "Microsoft.BotService"
     },
-    { 
-        basePath: 'iotspaces/resource-manager',
-        namespace: 'Microsoft.IoTSpaces',
+    {
+        "basePath": "cosmos-db/resource-manager",
+        "namespace": "Microsoft.DocumentDB"
     },
-    { 
-        basePath: 'botservice/resource-manager',
-        namespace: 'Microsoft.BotService',
+    {
+        "basePath": "databox/resource-manager",
+        "namespace": "Microsoft.DataBox"
     },
-    { 
-        basePath: 'databox/resource-manager',
-        namespace: 'Microsoft.DataBox',
+    {
+        "basePath": "databoxedge/resource-manager",
+        "namespace": "Microsoft.DataBoxEdge"
     },
-    { 
-        basePath: 'windowsiot/resource-manager',
-        namespace: 'Microsoft.WindowsIoT',
+    {
+        "basePath": "databricks/resource-manager",
+        "namespace": "Microsoft.Databricks"
     },
-    { 
-        basePath: 'databricks/resource-manager',
-        namespace: 'Microsoft.Databricks',
+    {
+        "basePath": "devspaces/resource-manager",
+        "namespace": "Microsoft.DevSpaces"
     },
-    { 
-        basePath: 'storagesync/resource-manager',
-        namespace: 'Microsoft.StorageSync',
+    {
+        "basePath": "EnterpriseKnowledgeGraph/resource-manager",
+        "namespace": "Microsoft.EnterpriseKnowledgeGraph"
     },
-    { 
-        basePath: 'devspaces/resource-manager',
-        namespace: 'Microsoft.DevSpaces',
+    {
+        "basePath": "eventhub/resource-manager",
+        "namespace": "Microsoft.EventHub"
     },
-    { 
-        basePath: 'policyinsights/resource-manager',
-        namespace: 'Microsoft.PolicyInsights',
+    {
+        "basePath": "iotspaces/resource-manager",
+        "namespace": "Microsoft.IoTSpaces"
     },
-    { 
-        basePath: 'servicefabricmesh/resource-manager',
-        namespace: 'Microsoft.ServiceFabricMesh',
+    {
+        "basePath": "labservices/resource-manager",
+        "namespace": "Microsoft.LabServices"
     },
-    { 
-        basePath: 'labservices/resource-manager',
-        namespace: 'Microsoft.LabServices',
+    {
+        "basePath": "machinelearningcompute/resource-manager",
+        "namespace": "Microsoft.MachineLearningCompute"
     },
-    { 
-        basePath: 'EnterpriseKnowledgeGraph/resource-manager',
-        namespace: 'Microsoft.EnterpriseKnowledgeGraph',
+    {
+        "basePath": "policyinsights/resource-manager",
+        "namespace": "Microsoft.PolicyInsights"
     },
-    { 
-        basePath: 'databoxedge/resource-manager',
-        namespace: 'Microsoft.DataBoxEdge',
+    {
+        "basePath": "portal/resource-manager",
+        "namespace": "Microsoft.Portal"
     },
-    { 
-        basePath: 'portal/resource-manager',
-        namespace: 'Microsoft.Portal',
+    {
+        "basePath": "relay/resource-manager",
+        "namespace": "Microsoft.Relay"
     },
-    { 
-        basePath: 'cosmos-db/resource-manager',
-        namespace: 'Microsoft.DocumentDB',
+    {
+        "basePath": "servicebus/resource-manager",
+        "namespace": "Microsoft.ServiceBus"
     },
-    { 
-        basePath: 'servicefabric/resource-manager',
-        namespace: 'Microsoft.ServiceFabric',
+    {
+        "basePath": "servicefabric/resource-manager",
+        "namespace": "Microsoft.ServiceFabric"
     },
-    { 
-        basePath: 'servicebus/resource-manager',
-        namespace: 'Microsoft.ServiceBus',
+    {
+        "basePath": "servicefabricmesh/resource-manager",
+        "namespace": "Microsoft.ServiceFabricMesh"
     },
-    { 
-        basePath: 'eventhub/resource-manager',
-        namespace: 'Microsoft.EventHub',
+    {
+        "basePath": "sqlvirtualmachine/resource-manager",
+        "namespace": "Microsoft.SqlVirtualMachine"
     },
-    { 
-        basePath: 'relay/resource-manager',
-        namespace: 'Microsoft.Relay',
+    {
+        "basePath": "storagesync/resource-manager",
+        "namespace": "Microsoft.StorageSync"
     },
+    {
+        "basePath": "windowsiot/resource-manager",
+        "namespace": "Microsoft.WindowsIoT"
+    }
 ];
 
 function findWhitelistConfig(basePath: string) {

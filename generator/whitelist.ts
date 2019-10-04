@@ -27,6 +27,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Databricks',
     },
     {
+        basePath: 'deploymentmanager/resource-manager',
+        namespace: 'Microsoft.DeploymentManager',
+    },
+    {
         basePath: 'devspaces/resource-manager',
         namespace: 'Microsoft.DevSpaces',
     },

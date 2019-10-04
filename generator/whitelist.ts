@@ -95,6 +95,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.StorageSync',
     },
     {
+        basePath: 'timeseriesinsights/resource-manager',
+        namespace: 'Microsoft.TimeSeriesInsights',
+    },
+    {
         basePath: 'windowsiot/resource-manager',
         namespace: 'Microsoft.WindowsIoT',
     }

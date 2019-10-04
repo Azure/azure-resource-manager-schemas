@@ -95,6 +95,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.StorageSync',
     },
     {
+        basePath: 'streamanalytics/resource-manager',
+        namespace: 'Microsoft.StreamAnalytics',
+    },
+    {
         basePath: 'windowsiot/resource-manager',
         namespace: 'Microsoft.WindowsIoT',
     }

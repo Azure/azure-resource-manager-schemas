@@ -55,6 +55,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DBforMariaDB',
     },
     { 
+        basePath: 'migrate/resource-manager',
+        namespace: 'Microsoft.Migrate',
+    },
+    { 
         basePath: 'mysql/resource-manager',
         namespace: 'Microsoft.DBforMySQL',
     },

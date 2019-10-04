@@ -75,6 +75,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Relay',
     },
     {
+        basePath: 'recoveryservices/resource-manager',
+        namespace: 'Microsoft.RecoveryServices',
+    },
+    {
         basePath: 'servicebus/resource-manager',
         namespace: 'Microsoft.ServiceBus',
     },

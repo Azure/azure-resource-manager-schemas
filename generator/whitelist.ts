@@ -39,6 +39,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.EventHub',
     },
     {
+        basePath: 'iothub/resource-manager',
+        namespace: 'Microsoft.Devices',
+    },
+    {
         basePath: 'iotspaces/resource-manager',
         namespace: 'Microsoft.IoTSpaces',
     },

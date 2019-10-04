@@ -70,6 +70,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'policyinsights/resource-manager',
         namespace: 'Microsoft.PolicyInsights',
     },
+    { 
+        basePath: 'peering/resource-manager',
+        namespace: 'Microsoft.Peering',
+    },
     {
         basePath: 'portal/resource-manager',
         namespace: 'Microsoft.Portal',

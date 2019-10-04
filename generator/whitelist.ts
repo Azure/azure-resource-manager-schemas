@@ -15,6 +15,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DocumentDB',
     },
     {
+        basePath: 'customer-insights/resource-manager',
+        namespace: 'Microsoft.CustomerInsights',
+    },
+    {
         basePath: 'databox/resource-manager',
         namespace: 'Microsoft.DataBox',
     },

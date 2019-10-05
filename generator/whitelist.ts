@@ -27,12 +27,20 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Databricks',
     },
     {
+        basePath: 'deploymentmanager/resource-manager',
+        namespace: 'Microsoft.DeploymentManager',
+    },
+    {
         basePath: 'devspaces/resource-manager',
         namespace: 'Microsoft.DevSpaces',
     },
     {
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',
         namespace: 'Microsoft.EnterpriseKnowledgeGraph',
+    },
+    { 
+        basePath: 'domainservices/resource-manager',
+        namespace: 'Microsoft.AAD',
     },
     {
         basePath: 'eventhub/resource-manager',
@@ -61,6 +69,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'policyinsights/resource-manager',
         namespace: 'Microsoft.PolicyInsights',
+    },
+    { 
+        basePath: 'peering/resource-manager',
+        namespace: 'Microsoft.Peering',
     },
     {
         basePath: 'portal/resource-manager',

@@ -29,7 +29,8 @@
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              }
+              },
+              "properties": {}
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -87,7 +88,8 @@
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              }
+              },
+              "properties": {}
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -135,6 +137,10 @@
     "serviceTopologies": {
       "type": "object",
       "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the service topology ."
+        },
         "type": {
           "type": "string",
           "enum": [
@@ -153,7 +159,8 @@
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              }
+              },
+              "properties": {}
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -188,6 +195,7 @@
         }
       },
       "required": [
+        "name",
         "type",
         "apiVersion",
         "location",
@@ -220,7 +228,8 @@
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              }
+              },
+              "properties": {}
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -288,7 +297,8 @@
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              }
+              },
+              "properties": {}
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -346,7 +356,8 @@
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              }
+              },
+              "properties": {}
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -414,24 +425,10 @@
       "type": "object",
       "oneOf": [
         {
-          "properties": {
-            "type": {
-              "type": "string",
-              "enum": [
-                "Authentication"
-              ]
-            }
-          }
+          "$ref": "#/definitions/SasAuthentication"
         }
       ],
-      "properties": {
-        "type": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "type"
-      ],
+      "properties": {},
       "description": "Defines the authentication method and properties to access the artifacts."
     },
     "Identity": {
@@ -512,6 +509,45 @@
       ],
       "description": "The properties for defining a rollout."
     },
+    "SasAuthentication": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SasProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties that define SAS authentication."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Sas"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Defines the properties to access the artifacts using an Azure Storage SAS URI."
+    },
+    "SasProperties": {
+      "type": "object",
+      "properties": {
+        "sasUri": {
+          "type": "string",
+          "description": "The SAS URI to the Azure Storage blob container. Any offset from the root of the container to where the artifacts are located can be defined in the artifactRoot."
+        }
+      },
+      "required": [
+        "sasUri"
+      ],
+      "description": "The properties that define SAS authentication."
+    },
     "ServiceResourceProperties": {
       "type": "object",
       "properties": {
@@ -555,7 +591,8 @@
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              }
+              },
+              "properties": {}
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -577,16 +614,6 @@
             }
           ],
           "description": "The properties that define a service in a service topology."
-        },
-        "resources": {
-          "type": "array",
-          "items": {
-            "oneOf": [
-              {
-                "$ref": "#/definitions/serviceTopologies_services_serviceUnits_childResource"
-              }
-            ]
-          }
         }
       },
       "required": [
@@ -623,7 +650,8 @@
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              }
+              },
+              "properties": {}
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
@@ -792,32 +820,50 @@
       "type": "object",
       "oneOf": [
         {
-          "properties": {
-            "stepType": {
-              "oneOf": [
-                {
-                  "type": "string",
-                  "enum": [
-                    "StepProperties"
-                  ]
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-                }
-              ]
-            }
-          }
+          "$ref": "#/definitions/WaitStepProperties"
         }
       ],
+      "properties": {},
+      "description": "The properties of a step resource."
+    },
+    "WaitStepAttributes": {
+      "type": "object",
       "properties": {
+        "duration": {
+          "type": "string",
+          "description": "The duration in ISO 8601 format of how long the wait should be."
+        }
+      },
+      "required": [
+        "duration"
+      ],
+      "description": "The parameters for the wait step."
+    },
+    "WaitStepProperties": {
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WaitStepAttributes"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The parameters for the wait step."
+        },
         "stepType": {
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "Wait"
+          ]
         }
       },
       "required": [
         "stepType"
       ],
-      "description": "The properties of a step resource."
+      "description": "Defines the properties of a Wait step."
     }
   }
 }

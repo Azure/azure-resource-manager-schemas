@@ -3,88 +3,124 @@ import { ScopeType, WhitelistConfig } from './models';
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
 const whitelist: WhitelistConfig[] = [
     {
-        "basePath": "botservice/resource-manager",
-        "namespace": "Microsoft.BotService"
+        basePath: 'botservice/resource-manager',
+        namespace: 'Microsoft.BotService',
+    },
+    { 
+        basePath: 'cognitiveservices/resource-manager',
+        namespace: 'Microsoft.CognitiveServices',
+    },
+    { 
+        basePath: 'containerinstance/resource-manager',
+        namespace: 'Microsoft.ContainerInstance',
+    },
+    {
+        basePath: 'cosmos-db/resource-manager',
+        namespace: 'Microsoft.DocumentDB',
+    },
+    {
+        basePath: 'databox/resource-manager',
+        namespace: 'Microsoft.DataBox',
     },
     { 
         basePath: 'containerservice/resource-manager',
         namespace: 'Microsoft.ContainerService',
     },
     {
-        "basePath": "cosmos-db/resource-manager",
-        "namespace": "Microsoft.DocumentDB"
+        basePath: 'databoxedge/resource-manager',
+        namespace: 'Microsoft.DataBoxEdge',
     },
     {
-        "basePath": "databox/resource-manager",
-        "namespace": "Microsoft.DataBox"
+        basePath: 'databricks/resource-manager',
+        namespace: 'Microsoft.Databricks',
     },
     {
-        "basePath": "databoxedge/resource-manager",
-        "namespace": "Microsoft.DataBoxEdge"
+        basePath: 'deploymentmanager/resource-manager',
+        namespace: 'Microsoft.DeploymentManager',
     },
     {
-        "basePath": "databricks/resource-manager",
-        "namespace": "Microsoft.Databricks"
+        basePath: 'devspaces/resource-manager',
+        namespace: 'Microsoft.DevSpaces',
     },
     {
-        "basePath": "devspaces/resource-manager",
-        "namespace": "Microsoft.DevSpaces"
+        basePath: 'devtestlab/resource-manager',
+        namespace: 'Microsoft.DevTestLab',
     },
     {
-        "basePath": "EnterpriseKnowledgeGraph/resource-manager",
-        "namespace": "Microsoft.EnterpriseKnowledgeGraph"
+        basePath: 'EnterpriseKnowledgeGraph/resource-manager',
+        namespace: 'Microsoft.EnterpriseKnowledgeGraph',
+    },
+    { 
+        basePath: 'domainservices/resource-manager',
+        namespace: 'Microsoft.AAD',
     },
     {
-        "basePath": "eventhub/resource-manager",
-        "namespace": "Microsoft.EventHub"
+        basePath: 'eventhub/resource-manager',
+        namespace: 'Microsoft.EventHub',
     },
     {
-        "basePath": "iotspaces/resource-manager",
-        "namespace": "Microsoft.IoTSpaces"
+        basePath: 'iotspaces/resource-manager',
+        namespace: 'Microsoft.IoTSpaces',
     },
     {
-        "basePath": "labservices/resource-manager",
-        "namespace": "Microsoft.LabServices"
+        basePath: 'labservices/resource-manager',
+        namespace: 'Microsoft.LabServices',
     },
     {
-        "basePath": "machinelearningcompute/resource-manager",
-        "namespace": "Microsoft.MachineLearningCompute"
+        basePath: 'machinelearningcompute/resource-manager',
+        namespace: 'Microsoft.MachineLearningCompute',
+    },
+    { 
+        basePath: 'mariadb/resource-manager',
+        namespace: 'Microsoft.DBforMariaDB',
+    },
+    { 
+        basePath: 'mysql/resource-manager',
+        namespace: 'Microsoft.DBforMySQL',
     },
     {
-        "basePath": "policyinsights/resource-manager",
-        "namespace": "Microsoft.PolicyInsights"
+        basePath: 'policyinsights/resource-manager',
+        namespace: 'Microsoft.PolicyInsights',
+    },
+    { 
+        basePath: 'peering/resource-manager',
+        namespace: 'Microsoft.Peering',
     },
     {
-        "basePath": "portal/resource-manager",
-        "namespace": "Microsoft.Portal"
+        basePath: 'portal/resource-manager',
+        namespace: 'Microsoft.Portal',
     },
     {
-        "basePath": "relay/resource-manager",
-        "namespace": "Microsoft.Relay"
+        basePath: 'postgresql/resource-manager',
+        namespace: 'Microsoft.DBforPostgreSQL',
     },
     {
-        "basePath": "servicebus/resource-manager",
-        "namespace": "Microsoft.ServiceBus"
+        basePath: 'relay/resource-manager',
+        namespace: 'Microsoft.Relay',
     },
     {
-        "basePath": "servicefabric/resource-manager",
-        "namespace": "Microsoft.ServiceFabric"
+        basePath: 'servicebus/resource-manager',
+        namespace: 'Microsoft.ServiceBus',
     },
     {
-        "basePath": "servicefabricmesh/resource-manager",
-        "namespace": "Microsoft.ServiceFabricMesh"
+        basePath: 'servicefabric/resource-manager',
+        namespace: 'Microsoft.ServiceFabric',
     },
     {
-        "basePath": "sqlvirtualmachine/resource-manager",
-        "namespace": "Microsoft.SqlVirtualMachine"
+        basePath: 'servicefabricmesh/resource-manager',
+        namespace: 'Microsoft.ServiceFabricMesh',
     },
     {
-        "basePath": "storagesync/resource-manager",
-        "namespace": "Microsoft.StorageSync"
+        basePath: 'sqlvirtualmachine/resource-manager',
+        namespace: 'Microsoft.SqlVirtualMachine',
     },
     {
-        "basePath": "windowsiot/resource-manager",
-        "namespace": "Microsoft.WindowsIoT"
+        basePath: 'storagesync/resource-manager',
+        namespace: 'Microsoft.StorageSync',
+    },
+    {
+        basePath: 'windowsiot/resource-manager',
+        namespace: 'Microsoft.WindowsIoT',
     }
 ];
 

@@ -10,6 +10,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'cognitiveservices/resource-manager',
         namespace: 'Microsoft.CognitiveServices',
     },
+    { 
+        basePath: 'containerinstance/resource-manager',
+        namespace: 'Microsoft.ContainerInstance',
+    },
     {
         basePath: 'cosmos-db/resource-manager',
         namespace: 'Microsoft.DocumentDB',

@@ -10,6 +10,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'cognitiveservices/resource-manager',
         namespace: 'Microsoft.CognitiveServices',
     },
+    { 
+        basePath: 'containerinstance/resource-manager',
+        namespace: 'Microsoft.ContainerInstance',
+    },
     {
         basePath: 'cosmos-db/resource-manager',
         namespace: 'Microsoft.DocumentDB',
@@ -33,6 +37,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'devspaces/resource-manager',
         namespace: 'Microsoft.DevSpaces',
+    },
+    {
+        basePath: 'devtestlab/resource-manager',
+        namespace: 'Microsoft.DevTestLab',
     },
     {
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',

@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2018-04-01/Microsoft.ContainerInstance.json#",
+  "id": "https://schema.management.azure.com/schemas/2018-06-01/Microsoft.ContainerInstance.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.ContainerInstance",
   "description": "Microsoft ContainerInstance Resource Types",
@@ -20,7 +20,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-04-01"
+            "2018-06-01"
           ]
         },
         "location": {
@@ -121,6 +121,26 @@
       ],
       "description": "A container instance."
     },
+    "ContainerExec": {
+      "type": "object",
+      "properties": {
+        "command": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The commands to execute within the container."
+        }
+      },
+      "description": "The container execution command, for liveness or readiness probe"
+    },
     "ContainerGroup1Properties": {
       "type": "object",
       "properties": {
@@ -207,12 +227,79 @@
             }
           ],
           "description": "The list of volumes that can be mounted by containers in this container group."
+        },
+        "diagnostics": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerGroupDiagnostics"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Container group diagnostic information."
         }
       },
       "required": [
         "containers",
         "osType"
       ]
+    },
+    "ContainerGroupDiagnostics": {
+      "type": "object",
+      "properties": {
+        "logAnalytics": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/LogAnalytics"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Container group log analytics information."
+        }
+      },
+      "description": "Container group diagnostic information."
+    },
+    "ContainerHttpGet": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "The path to probe."
+        },
+        "port": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The port number to probe."
+        },
+        "scheme": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "http",
+                "https"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The scheme."
+        }
+      },
+      "required": [
+        "port"
+      ],
+      "description": "The container Http Get settings, for liveness or readiness probe"
     },
     "ContainerPort": {
       "type": "object",
@@ -248,6 +335,89 @@
         "port"
       ],
       "description": "The port exposed on the container instance."
+    },
+    "ContainerProbe": {
+      "type": "object",
+      "properties": {
+        "exec": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerExec"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The container execution command, for liveness or readiness probe"
+        },
+        "httpGet": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerHttpGet"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The container Http Get settings, for liveness or readiness probe"
+        },
+        "initialDelaySeconds": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The initial delay seconds."
+        },
+        "periodSeconds": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The period seconds."
+        },
+        "failureThreshold": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The failure threshold."
+        },
+        "successThreshold": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The success threshold."
+        },
+        "timeoutSeconds": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The timeout seconds."
+        }
+      },
+      "description": "The container probe, for liveness or readiness"
     },
     "ContainerProperties": {
       "type": "object",
@@ -322,6 +492,28 @@
             }
           ],
           "description": "The volume mounts available to the container instance."
+        },
+        "livenessProbe": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerProbe"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The container probe, for liveness or readiness"
+        },
+        "readinessProbe": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerProbe"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The container probe, for liveness or readiness"
         }
       },
       "required": [
@@ -340,11 +532,14 @@
         "value": {
           "type": "string",
           "description": "The value of the environment variable."
+        },
+        "secureValue": {
+          "type": "string",
+          "description": "The value of the secure environment variable."
         }
       },
       "required": [
-        "name",
-        "value"
+        "name"
       ],
       "description": "The environment variable to set within the container instance."
     },
@@ -436,6 +631,24 @@
         "type"
       ],
       "description": "IP address for the container group."
+    },
+    "LogAnalytics": {
+      "type": "object",
+      "properties": {
+        "workspaceId": {
+          "type": "string",
+          "description": "The workspace id for log analytics"
+        },
+        "workspaceKey": {
+          "type": "string",
+          "description": "The workspace key for log analytics"
+        }
+      },
+      "required": [
+        "workspaceId",
+        "workspaceKey"
+      ],
+      "description": "Container group log analytics information."
     },
     "Port": {
       "type": "object",

@@ -10,6 +10,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'cognitiveservices/resource-manager',
         namespace: 'Microsoft.CognitiveServices',
     },
+    { 
+        basePath: 'containerinstance/resource-manager',
+        namespace: 'Microsoft.ContainerInstance',
+    },
     {
         basePath: 'cosmos-db/resource-manager',
         namespace: 'Microsoft.DocumentDB',
@@ -27,12 +31,24 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Databricks',
     },
     {
+        basePath: 'deploymentmanager/resource-manager',
+        namespace: 'Microsoft.DeploymentManager',
+    },
+    {
         basePath: 'devspaces/resource-manager',
         namespace: 'Microsoft.DevSpaces',
     },
     {
+        basePath: 'devtestlab/resource-manager',
+        namespace: 'Microsoft.DevTestLab',
+    },
+    {
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',
         namespace: 'Microsoft.EnterpriseKnowledgeGraph',
+    },
+    { 
+        basePath: 'domainservices/resource-manager',
+        namespace: 'Microsoft.AAD',
     },
     {
         basePath: 'eventhub/resource-manager',
@@ -61,6 +77,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'policyinsights/resource-manager',
         namespace: 'Microsoft.PolicyInsights',
+    },
+    { 
+        basePath: 'peering/resource-manager',
+        namespace: 'Microsoft.Peering',
     },
     {
         basePath: 'portal/resource-manager',

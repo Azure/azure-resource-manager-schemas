@@ -42,6 +42,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'devtestlab/resource-manager',
         namespace: 'Microsoft.DevTestLab',
     },
+    { 
+        basePath: 'hdinsight/resource-manager',
+        namespace: 'Microsoft.HDInsight',
+    },
     {
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',
         namespace: 'Microsoft.EnterpriseKnowledgeGraph',

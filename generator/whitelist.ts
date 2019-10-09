@@ -114,6 +114,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'storagesync/resource-manager',
         namespace: 'Microsoft.StorageSync',
     },
+    { 
+        basePath: 'vmwarecloudsimple/resource-manager',
+        namespace: 'Microsoft.VMwareCloudSimple',
+    },
     {
         basePath: 'windowsiot/resource-manager',
         namespace: 'Microsoft.WindowsIoT',

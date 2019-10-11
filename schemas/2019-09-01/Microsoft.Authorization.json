@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2019-06-01/Microsoft.Authorization.json#",
+  "id": "https://schema.management.azure.com/schemas/2019-09-01/Microsoft.Authorization.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.Authorization",
   "description": "Microsoft Authorization Resource Types",
@@ -19,7 +19,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-06-01"
+            "2019-09-01"
           ]
         },
         "properties": {
@@ -83,7 +83,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-06-01"
+            "2019-09-01"
           ]
         },
         "properties": {
@@ -121,7 +121,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-06-01"
+            "2019-09-01"
           ]
         },
         "properties": {
@@ -227,14 +227,15 @@
               "enum": [
                 "NotSpecified",
                 "BuiltIn",
-                "Custom"
+                "Custom",
+                "Static"
               ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "The type of policy definition. Possible values are NotSpecified, BuiltIn, and Custom."
+          "description": "The type of policy definition. Possible values are NotSpecified, BuiltIn, Custom, and Static."
         },
         "mode": {
           "type": "string",
@@ -270,8 +271,29 @@
         },
         "parameters": {
           "description": "Required if a parameter is used in policy rule."
+        },
+        "policyDefinitionReferenceId": {
+          "type": "string",
+          "description": "The ID that uniquely represents this policy definition reference within this policy set definition."
+        },
+        "groupNames": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "The groups that this policy definition reference belongs to."
         }
       },
+      "required": [
+        "policyDefinitionId"
+      ],
       "description": "The policy definition reference."
     },
     "PolicySetDefinitionProperties": {
@@ -284,14 +306,15 @@
               "enum": [
                 "NotSpecified",
                 "BuiltIn",
-                "Custom"
+                "Custom",
+                "Static"
               ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
             }
           ],
-          "description": "The type of policy definition. Possible values are NotSpecified, BuiltIn, and Custom."
+          "description": "The type of policy definition. Possible values are NotSpecified, BuiltIn, Custom, and Static."
         },
         "displayName": {
           "type": "string",
@@ -320,12 +343,55 @@
             }
           ],
           "description": "An array of policy definition references."
+        },
+        "policyDefinitionGroups": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PolicyDefinitionGroup"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "An array of groups that policy definitions within this policy set definition can reside in. These groups can be used when aggregating compliance results for this policy set definition."
         }
       },
       "required": [
         "policyDefinitions"
       ],
       "description": "The policy set definition properties."
+    },
+    "PolicyDefinitionGroup": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the group."
+        },
+        "category": {
+          "type": "string",
+          "description": "The group's category."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The group's display name."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the group."
+        },
+        "additionalMetadataId": {
+          "type": "string",
+          "description": "A resource ID of a resource that contains additional metadata about the group."
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "A group that policy definitions within the policy set definition can reside in. These groups can be used when aggregating compliance results for this policy set definition."
     },
     "PolicySku": {
       "type": "object",

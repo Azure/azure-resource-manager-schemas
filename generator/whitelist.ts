@@ -10,6 +10,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'cognitiveservices/resource-manager',
         namespace: 'Microsoft.CognitiveServices',
     },
+    { 
+        basePath: 'containerinstance/resource-manager',
+        namespace: 'Microsoft.ContainerInstance',
+    },
     {
         basePath: 'cosmos-db/resource-manager',
         namespace: 'Microsoft.DocumentDB',
@@ -17,6 +21,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'databox/resource-manager',
         namespace: 'Microsoft.DataBox',
+    },
+    { 
+        basePath: 'containerservice/resource-manager',
+        namespace: 'Microsoft.ContainerService',
     },
     {
         basePath: 'databoxedge/resource-manager',
@@ -33,6 +41,14 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'devspaces/resource-manager',
         namespace: 'Microsoft.DevSpaces',
+    },
+    {
+        basePath: 'devtestlab/resource-manager',
+        namespace: 'Microsoft.DevTestLab',
+    },
+    { 
+        basePath: 'hdinsight/resource-manager',
+        namespace: 'Microsoft.HDInsight',
     },
     {
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',
@@ -105,6 +121,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'storagesync/resource-manager',
         namespace: 'Microsoft.StorageSync',
+    },
+    { 
+        basePath: 'vmwarecloudsimple/resource-manager',
+        namespace: 'Microsoft.VMwareCloudSimple',
     },
     {
         basePath: 'windowsiot/resource-manager',

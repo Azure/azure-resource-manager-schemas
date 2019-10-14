@@ -22,6 +22,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'databox/resource-manager',
         namespace: 'Microsoft.DataBox',
     },
+    { 
+        basePath: 'containerservice/resource-manager',
+        namespace: 'Microsoft.ContainerService',
+    },
     {
         basePath: 'databoxedge/resource-manager',
         namespace: 'Microsoft.DataBoxEdge',

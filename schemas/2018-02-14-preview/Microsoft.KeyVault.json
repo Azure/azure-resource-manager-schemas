@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2016-10-01/Microsoft.KeyVault.json#",
+  "id": "https://schema.management.azure.com/schemas/2018-02-14-preview/Microsoft.KeyVault.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.KeyVault",
   "description": "Microsoft KeyVault Resource Types",
@@ -28,7 +28,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-10-01"
+            "2018-02-14-preview"
           ]
         },
         "location": {
@@ -67,6 +67,9 @@
             "oneOf": [
               {
                 "$ref": "#/definitions/vaults_accessPolicies_childResource"
+              },
+              {
+                "$ref": "#/definitions/vaults_secrets_childResource"
               }
             ]
           }
@@ -109,7 +112,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-10-01"
+            "2018-02-14-preview"
           ]
         },
         "properties": {
@@ -131,6 +134,68 @@
         "properties"
       ],
       "description": "Microsoft.KeyVault/vaults/accessPolicies"
+    },
+    "vaults_secrets": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9-]{1,127}$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Name of the secret"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.KeyVault/vaults/secrets"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-02-14-preview"
+          ]
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The tags that will be assigned to the secret. "
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the secret"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.KeyVault/vaults/secrets"
     }
   },
   "definitions": {
@@ -183,6 +248,83 @@
         "permissions"
       ],
       "description": "An identity that have access to the key vault. All identities in the array must use the same tenant ID as the key vault's tenant ID."
+    },
+    "IPRule": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "description": "An IPv4 address range in CIDR notation, such as '124.56.78.91' (simple IP address) or '124.56.78.0/24' (all addresses that start with 124.56.78)."
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "description": "A rule governing the accessibility of a vault from a specific ip address or ip range."
+    },
+    "NetworkRuleSet": {
+      "type": "object",
+      "properties": {
+        "bypass": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "AzureServices",
+                "None"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Tells what traffic can bypass network rules. This can be 'AzureServices' or 'None'.  If not specified the default is 'AzureServices'."
+        },
+        "defaultAction": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Allow",
+                "Deny"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The default action when no rule from ipRules and from virtualNetworkRules match. This is only used after the bypass property has been evaluated."
+        },
+        "ipRules": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/IPRule"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of IP address rules."
+        },
+        "virtualNetworkRules": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/VirtualNetworkRule"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of virtual network rules."
+        }
+      },
+      "description": "A set of rules governing the network accessibility of a vault."
     },
     "Permissions": {
       "type": "object",
@@ -263,7 +405,9 @@
                   "deleteissuers",
                   "manageissuers",
                   "recover",
-                  "purge"
+                  "purge",
+                  "backup",
+                  "restore"
                 ]
               }
             },
@@ -305,6 +449,70 @@
         }
       },
       "description": "Permissions the identity has for keys, secrets, certificates and storage."
+    },
+    "SecretAttributes": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Determines whether the object is enabled."
+        },
+        "nbf": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Not before date in seconds since 1970-01-01T00:00:00Z."
+        },
+        "exp": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Expiry date in seconds since 1970-01-01T00:00:00Z."
+        }
+      },
+      "description": "The secret management attributes."
+    },
+    "SecretProperties": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "description": "The value of the secret. NOTE: 'value' will never be returned from the service, as APIs using this model are is intended for internal use in ARM deployments. Users should use the data-plane REST service for interaction with vault secrets."
+        },
+        "contentType": {
+          "type": "string",
+          "description": "The content type of the secret."
+        },
+        "attributes": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretAttributes"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The secret management attributes."
+        }
+      },
+      "description": "Properties of the secret"
     },
     "Sku": {
       "type": "object",
@@ -406,7 +614,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "An array of 0 to 16 identities that have access to the key vault. All identities in the array must use the same tenant ID as the key vault's tenant ID. When `createMode` is set to `recover`, access policies are not required. Otherwise, access policies are required."
+          "description": "An array of 0 to 16 identities that have access to the key vault. All identities in the array must use the same tenant ID as the key vault's tenant ID."
         },
         "vaultUri": {
           "type": "string",
@@ -454,7 +662,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Property specifying whether recoverable deletion is enabled for this key vault. Setting this property to true activates the soft delete feature, whereby vaults or vault entities can be recovered after deletion. Enabling this functionality is irreversible - that is, the property does not accept false as its value."
+          "description": "Property to specify whether the 'soft delete' functionality is enabled for this key vault. It does not accept false value."
         },
         "createMode": {
           "oneOf": [
@@ -481,6 +689,17 @@
             }
           ],
           "description": "Property specifying whether protection against purge is enabled for this vault. Setting this property to true activates protection against purge for this vault and its content - only the Key Vault service may initiate a hard, irrecoverable deletion. The setting is effective only if soft delete is also enabled. Enabling this functionality is irreversible - that is, the property does not accept false as its value."
+        },
+        "networkAcls": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/NetworkRuleSet"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A set of rules governing the network accessibility of a vault."
         }
       },
       "required": [
@@ -517,7 +736,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-10-01"
+            "2018-02-14-preview"
           ]
         },
         "properties": {
@@ -539,6 +758,81 @@
         "properties"
       ],
       "description": "Microsoft.KeyVault/vaults/accessPolicies"
+    },
+    "vaults_secrets_childResource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9-]{1,127}$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Name of the secret"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "secrets"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-02-14-preview"
+          ]
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The tags that will be assigned to the secret. "
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the secret"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.KeyVault/vaults/secrets"
+    },
+    "VirtualNetworkRule": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Full resource id of a vnet subnet, such as '/subscriptions/subid/resourceGroups/rg1/providers/Microsoft.Network/virtualNetworks/test-vnet/subnets/subnet1'."
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "description": "A rule governing the accessibility of a vault from a specific virtual network."
     }
   }
 }

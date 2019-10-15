@@ -58,7 +58,7 @@ async function handleGeneratedSchema(readme: string, schemaPath: string, whiteli
         throw new Error(`Unable to determine scope for resource types ${unknownScopeResources.map(x => x.type).join(', ')} in readme ${readme}`);
     }
 
-    await saveToSchemasDirectory(schemaPath, schemaRefs, apiVersion);
+    await saveToSchemasDirectory(schemaPath, schemaRefs, namespace, apiVersion);
 }
 
 async function execAutoRest(tmpFolder: string, params: string[]) {
@@ -127,9 +127,10 @@ async function generateSchemaRefs(outputFile: string, namespace: string, apiVers
     ];
 
     applyResourceConfig(namespace, schemaRefs, whitelistConfig);
+    const schemaPath = getProposedSchemaPath(namespace, apiVersion);
 
     console.log('================================================================================================================================');
-    console.log('Filename: ' + chalk.green(outputFile));
+    console.log('Filename: ' + chalk.green(schemaPath));
     console.log('Provider Namespace: ' + chalk.green(namespace));
     console.log('API Version: ' + chalk.green(apiVersion));
 
@@ -186,7 +187,7 @@ async function generateSchemaRefs(outputFile: string, namespace: string, apiVers
     return schemaRefs;
 }
 
-async function saveToSchemasDirectory(outputFile: string, schemaRefs: ResourceDefinition[], apiVersion: string) {
+async function saveToSchemasDirectory(outputFile: string, schemaRefs: ResourceDefinition[], namespace: string, apiVersion: string) {
     const templateContents = await readFile(constants.generatedSchemasTemplatePath, { encoding: 'utf8' });
     const template = JSON.parse(templateContents);
 
@@ -202,13 +203,18 @@ async function saveToSchemasDirectory(outputFile: string, schemaRefs: ResourceDe
 
     template.allOf[1].oneOf = newRefs.map(ref => ({ '$ref': ref }));
 
-    const schemaPath = path.join(constants.schemasBasePath, apiVersion);
-    if (!await exists(schemaPath)) {
-        await mkdir(schemaPath);
+    const schemaPath = getProposedSchemaPath(namespace, apiVersion);
+
+    if (!await exists(path.dirname(schemaPath))) {
+        await mkdir(path.dirname(schemaPath), { recursive: true });
     }
 
-    await copyFile(outputFile, path.join(schemaPath, path.basename(outputFile)));
+    await copyFile(outputFile, schemaPath);
     await writeFile(constants.generatedSchemasPath, JSON.stringify(template, null, 2), { encoding: 'utf8' });
+}
+
+function getProposedSchemaPath(namespace: string, apiVersion: string) {
+    return path.join(constants.schemasBasePath, apiVersion, `${namespace}.json`);
 }
 
 function schemaRefComparer(schemaRefA: string, schemaRefB: string) {

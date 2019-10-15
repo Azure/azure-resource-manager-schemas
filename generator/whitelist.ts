@@ -2,6 +2,10 @@ import { ScopeType, WhitelistConfig } from './models';
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
 const whitelist: WhitelistConfig[] = [
+    { 
+        basePath: 'blockchain/resource-manager',
+        namespace: 'Microsoft.Blockchain',
+    },
     {
         basePath: 'botservice/resource-manager',
         namespace: 'Microsoft.BotService',
@@ -17,6 +21,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'cosmos-db/resource-manager',
         namespace: 'Microsoft.DocumentDB',
+    },
+    { 
+        basePath: 'containerregistry/resource-manager',
+        namespace: 'Microsoft.ContainerRegistry',
     },
     {
         basePath: 'databox/resource-manager',
@@ -61,6 +69,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'eventhub/resource-manager',
         namespace: 'Microsoft.EventHub',
+    },
+    {
+        basePath: 'hanaonazure/resource-manager',
+        namespace: 'Microsoft.HanaOnAzure',
     },
     {
         basePath: 'iotspaces/resource-manager',
@@ -125,6 +137,10 @@ const whitelist: WhitelistConfig[] = [
     { 
         basePath: 'vmwarecloudsimple/resource-manager',
         namespace: 'Microsoft.VMwareCloudSimple',
+    },
+    {
+        basePath: 'timeseriesinsights/resource-manager',
+        namespace: 'Microsoft.TimeSeriesInsights',
     },
     {
         basePath: 'windowsiot/resource-manager',

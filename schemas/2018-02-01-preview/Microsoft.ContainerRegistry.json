@@ -14,7 +14,7 @@
               "pattern": "^[a-zA-Z0-9]*$"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The name of the container registry build task."
@@ -41,10 +41,11 @@
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              }
+              },
+              "properties": {}
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The tags of the resource."
@@ -55,7 +56,7 @@
               "$ref": "#/definitions/BuildTaskProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The properties of a build task."
@@ -90,7 +91,7 @@
               "pattern": "^[a-zA-Z0-9]*$"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The name of a build step for a container registry build task."
@@ -113,10 +114,10 @@
               "$ref": "#/definitions/BuildStepProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The properties of a build step."
+          "description": "Base properties for any build step."
         }
       },
       "required": [
@@ -133,9 +134,16 @@
       "type": "object",
       "properties": {
         "type": {
-          "type": "string",
-          "enum": [
-            "DockerBuildArgument"
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "DockerBuildArgument"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
           ],
           "description": "The type of the argument."
         },
@@ -154,7 +162,7 @@
               "default": false
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Flag to indicate whether the argument represents a secret and want to be removed from build logs."
@@ -169,26 +177,12 @@
     },
     "BuildStepProperties": {
       "type": "object",
-      "allOf": [
+      "oneOf": [
         {
-          "properties": {
-            "type": {
-              "type": "string",
-              "enum": [
-                "BuildStepProperties",
-                "Docker"
-              ]
-            }
-          }
-        },
-        {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/Docker"
-            }
-          ]
+          "$ref": "#/definitions/DockerBuildStep"
         }
       ],
+      "properties": {},
       "description": "Base properties for any build step."
     },
     "BuildTaskProperties": {
@@ -208,7 +202,7 @@
               ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The current status of build task."
@@ -219,10 +213,10 @@
               "$ref": "#/definitions/SourceRepositoryProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The properties that describes the source(code) for the build task."
+          "description": "The properties of the source code repository."
         },
         "platform": {
           "oneOf": [
@@ -230,7 +224,7 @@
               "$ref": "#/definitions/PlatformProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The platform properties against which the build has to happen."
@@ -244,7 +238,7 @@
               "default": "3600"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Build timeout in seconds."
@@ -257,93 +251,98 @@
       ],
       "description": "The properties of a build task."
     },
-    "Docker": {
+    "DockerBuildStep": {
       "type": "object",
-      "allOf": [
-        {
-          "properties": {
-            "branch": {
-              "type": "string",
-              "description": "The repository branch name."
+      "properties": {
+        "branch": {
+          "type": "string",
+          "description": "The repository branch name."
+        },
+        "imageNames": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
-            "imageNames": {
-              "oneOf": [
-                {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-                }
-              ],
-              "description": "The fully qualified image names including the repository and tag."
-            },
-            "isPushEnabled": {
-              "oneOf": [
-                {
-                  "type": "boolean",
-                  "default": true
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-                }
-              ],
-              "description": "The value of this property indicates whether the image built should be pushed to the registry or not."
-            },
-            "noCache": {
-              "oneOf": [
-                {
-                  "type": "boolean",
-                  "default": false
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-                }
-              ],
-              "description": "The value of this property indicates whether the image cache is enabled or not."
-            },
-            "dockerFilePath": {
-              "type": "string",
-              "description": "The Docker file path relative to the source control root."
-            },
-            "contextPath": {
-              "type": "string",
-              "description": "The relative context path for a docker build in the source."
-            },
-            "buildArguments": {
-              "oneOf": [
-                {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/BuildArgument"
-                  }
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-                }
-              ],
-              "description": "The custom arguments for building this build step."
-            },
-            "baseImageTrigger": {
-              "oneOf": [
-                {
-                  "type": "string",
-                  "enum": [
-                    "All",
-                    "Runtime",
-                    "None"
-                  ]
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-                }
-              ],
-              "description": "The type of the auto trigger for base image dependency updates."
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          }
+          ],
+          "description": "The fully qualified image names including the repository and tag."
+        },
+        "isPushEnabled": {
+          "oneOf": [
+            {
+              "type": "boolean",
+              "default": true
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The value of this property indicates whether the image built should be pushed to the registry or not."
+        },
+        "noCache": {
+          "oneOf": [
+            {
+              "type": "boolean",
+              "default": false
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The value of this property indicates whether the image cache is enabled or not."
+        },
+        "dockerFilePath": {
+          "type": "string",
+          "description": "The Docker file path relative to the source control root."
+        },
+        "contextPath": {
+          "type": "string",
+          "description": "The relative context path for a docker build in the source."
+        },
+        "buildArguments": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/BuildArgument"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The custom arguments for building this build step."
+        },
+        "baseImageTrigger": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "All",
+                "Runtime",
+                "None"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The type of the auto trigger for base image dependency updates."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Docker"
+          ]
         }
+      },
+      "required": [
+        "type"
       ],
       "description": "The Docker build step."
     },
@@ -360,7 +359,7 @@
               ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The operating system type required for the build."
@@ -371,7 +370,7 @@
               "type": "integer"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The CPU configuration in terms of number of cores required for the build."
@@ -392,7 +391,7 @@
               "pattern": "^[a-zA-Z0-9]*$"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The name of a build step for a container registry build task."
@@ -415,10 +414,10 @@
               "$ref": "#/definitions/BuildStepProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The properties of a build step."
+          "description": "Base properties for any build step."
         }
       },
       "required": [
@@ -442,7 +441,7 @@
               ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The type of Auth token."
@@ -465,7 +464,7 @@
               "type": "integer"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Time in seconds that the token remains valid"
@@ -489,14 +488,14 @@
               ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The type of source control service."
         },
         "repositoryUrl": {
           "type": "string",
-          "description": "The full URL to the source code respository"
+          "description": "The full URL to the source code repository"
         },
         "isCommitTriggerEnabled": {
           "oneOf": [
@@ -505,7 +504,7 @@
               "default": false
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The value of this property indicates whether the source control commit trigger is enabled or not."
@@ -516,7 +515,7 @@
               "$ref": "#/definitions/SourceControlAuthInfo"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The authorization properties for accessing the source code repository."

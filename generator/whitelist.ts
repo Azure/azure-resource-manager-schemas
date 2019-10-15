@@ -67,6 +67,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.EventHub',
     },
     {
+        basePath: 'hanaonazure/resource-manager',
+        namespace: 'Microsoft.HanaOnAzure',
+    },
+    {
         basePath: 'iotspaces/resource-manager',
         namespace: 'Microsoft.IoTSpaces',
     },

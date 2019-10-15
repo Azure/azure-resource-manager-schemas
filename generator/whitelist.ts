@@ -78,6 +78,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'mariadb/resource-manager',
         namespace: 'Microsoft.DBforMariaDB',
     },
+    {
+        basePath: 'msi/resource-manager',
+        namespace: 'Microsoft.ManagedIdentity',
+    },
     { 
         basePath: 'mysql/resource-manager',
         namespace: 'Microsoft.DBforMySQL',

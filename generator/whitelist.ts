@@ -131,6 +131,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.VMwareCloudSimple',
     },
     {
+        basePath: 'timeseriesinsights/resource-manager',
+        namespace: 'Microsoft.TimeSeriesInsights',
+    },
+    {
         basePath: 'windowsiot/resource-manager',
         namespace: 'Microsoft.WindowsIoT',
     }

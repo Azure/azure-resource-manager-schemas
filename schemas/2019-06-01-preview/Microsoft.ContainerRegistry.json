@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2018-09-01/Microsoft.ContainerRegistry.json#",
+  "id": "https://schema.management.azure.com/schemas/2019-06-01-preview/Microsoft.ContainerRegistry.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.ContainerRegistry",
   "description": "Microsoft ContainerRegistry Resource Types",
@@ -28,7 +28,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-09-01"
+            "2019-06-01-preview"
           ]
         },
         "location": {
@@ -49,6 +49,17 @@
             }
           ],
           "description": "The tags of the resource."
+        },
+        "identity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/IdentityProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Managed identity for the resource."
         },
         "properties": {
           "oneOf": [
@@ -186,6 +197,25 @@
           ],
           "description": "The type of the auto trigger for base image dependency updates."
         },
+        "updateTriggerEndpoint": {
+          "type": "string",
+          "description": "The endpoint URL for receiving update triggers."
+        },
+        "updateTriggerPayloadType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Default",
+                "Token"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Type of Payload body for Base image update triggers."
+        },
         "status": {
           "oneOf": [
             {
@@ -268,6 +298,10 @@
             }
           ],
           "description": "Describes the properties of a secret object value."
+        },
+        "identity": {
+          "type": "string",
+          "description": "Indicates the managed identity assigned to the custom credential. If a user-assigned identity\r\nthis value is the Client ID. If a system-assigned identity, the value will be `system`. In\r\nthe case of a system-assigned identity, the Client ID will be determined by the runner. This\r\nidentity may be used to authenticate to key vault to retrieve credentials or it may be the only \r\nsource of authentication used for accessing the registry."
         }
       },
       "description": "Describes the credentials that will be used to access a custom registry during a run."
@@ -424,6 +458,52 @@
       ],
       "description": "The properties of a task step."
     },
+    "IdentityProperties": {
+      "type": "object",
+      "properties": {
+        "principalId": {
+          "type": "string",
+          "description": "The principal ID of resource identity."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "The tenant ID of resource."
+        },
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "SystemAssigned",
+                "UserAssigned",
+                "SystemAssigned, UserAssigned",
+                "None"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The identity type."
+        },
+        "userAssignedIdentities": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/UserIdentityProperties"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of user identities associated with the resource. The user identity \r\ndictionary key references will be ARM resource ids in the form: \r\n'/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/\r\n    providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}'."
+        }
+      },
+      "description": "Managed identity for the resource."
+    },
     "PlatformProperties": {
       "type": "object",
       "properties": {
@@ -449,7 +529,9 @@
               "enum": [
                 "amd64",
                 "x86",
-                "arm"
+                "386",
+                "arm",
+                "arm64"
               ]
             },
             {
@@ -492,7 +574,8 @@
             {
               "type": "string",
               "enum": [
-                "Opaque"
+                "Opaque",
+                "Vaultsecret"
               ]
             },
             {
@@ -777,9 +860,56 @@
       },
       "description": "Base properties for any task step."
     },
+    "TimerTrigger": {
+      "type": "object",
+      "properties": {
+        "schedule": {
+          "type": "string",
+          "description": "The CRON expression for the task schedule"
+        },
+        "status": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Disabled",
+                "Enabled"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The current status of trigger."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the trigger."
+        }
+      },
+      "required": [
+        "schedule",
+        "name"
+      ],
+      "description": "The properties of a timer trigger."
+    },
     "TriggerProperties": {
       "type": "object",
       "properties": {
+        "timerTriggers": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TimerTrigger"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The collection of timer triggers."
+        },
         "sourceTriggers": {
           "oneOf": [
             {
@@ -807,6 +937,19 @@
         }
       },
       "description": "The properties of a trigger."
+    },
+    "UserIdentityProperties": {
+      "type": "object",
+      "properties": {
+        "principalId": {
+          "type": "string",
+          "description": "The principal id of user assigned identity."
+        },
+        "clientId": {
+          "type": "string",
+          "description": "The client id of user assigned identity."
+        }
+      }
     }
   }
 }

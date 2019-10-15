@@ -18,6 +18,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'cosmos-db/resource-manager',
         namespace: 'Microsoft.DocumentDB',
     },
+    { 
+        basePath: 'containerregistry/resource-manager',
+        namespace: 'Microsoft.ContainerRegistry',
+    },
     {
         basePath: 'databox/resource-manager',
         namespace: 'Microsoft.DataBox',

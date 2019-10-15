@@ -62,6 +62,11 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',
         namespace: 'Microsoft.EnterpriseKnowledgeGraph',
     },
+    {
+        basePath: 'deviceprovisioningservices/resource-manager',
+        namespace: 'Microsoft.Devices',
+        suffix: 'Provisioning',
+    },
     { 
         basePath: 'domainservices/resource-manager',
         namespace: 'Microsoft.AAD',
@@ -73,6 +78,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'hanaonazure/resource-manager',
         namespace: 'Microsoft.HanaOnAzure',
+    },
+    {
+        basePath: 'iothub/resource-manager',
+        namespace: 'Microsoft.Devices',
     },
     {
         basePath: 'iotspaces/resource-manager',

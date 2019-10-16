@@ -51,7 +51,7 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DevSpaces',
     },
     {
-        basePath: 'devtestlab/resource-manager',
+        basePath: 'devtestlabs/resource-manager',
         namespace: 'Microsoft.DevTestLab',
     },
     { 

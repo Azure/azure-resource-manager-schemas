@@ -3,6 +3,10 @@ import { ScopeType, WhitelistConfig } from './models';
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
 const whitelist: WhitelistConfig[] = [
     { 
+        basePath: 'batchai/resource-manager',
+        namespace: 'Microsoft.BatchAI',
+    },
+    { 
         basePath: 'blockchain/resource-manager',
         namespace: 'Microsoft.Blockchain',
     },

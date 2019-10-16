@@ -212,7 +212,7 @@ const schemasToSkip = [
                         const validate = await ajvInstance.compileAsync(metaSchema);
                         const result = await validate(schema);
 
-                        expect(result, `Validation failed with errors ${JSON.stringify(ajvInstance.errors, null, 2)}`).to.be.true;
+                        expect(result, `Validation failed with errors ${JSON.stringify(validate.errors, null, 2)}`).to.be.true;
                     });
                 }
             });

@@ -20,7 +20,7 @@ function executeCmd(cwd: string, cmd: string, args: string[]) : Promise<number> 
         });
 
         child.stdout.on('data', data => process.stdout.write(chalk.grey(data.toString())));
-        child.stderr.on('data', data => process.stdout.write(chalk.grey(data.toString())));
+        child.stderr.on('data', data => process.stdout.write(chalk.red(data.toString())));
         child.on('error', err => {
             reject(err);
         });

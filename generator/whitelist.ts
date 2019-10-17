@@ -2,7 +2,19 @@ import { ScopeType, WhitelistConfig } from './models';
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
 const whitelist: WhitelistConfig[] = [
-    { 
+    {
+        basePath: 'alertsmanagement/resource-manager',
+        namespace: 'Microsoft.AlertsManagement',
+    },
+    {
+        basePath: 'attestation/resource-manager',
+        namespace: 'Microsoft.Attestation',
+    },
+    {
+        basePath: 'azuredata/resource-manager',
+        namespace: 'Microsoft.AzureData',
+    },
+    {
         basePath: 'blockchain/resource-manager',
         namespace: 'Microsoft.Blockchain',
     },
@@ -10,11 +22,11 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'botservice/resource-manager',
         namespace: 'Microsoft.BotService',
     },
-    { 
+    {
         basePath: 'cognitiveservices/resource-manager',
         namespace: 'Microsoft.CognitiveServices',
     },
-    { 
+    {
         basePath: 'containerinstance/resource-manager',
         namespace: 'Microsoft.ContainerInstance',
     },
@@ -22,15 +34,25 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'cosmos-db/resource-manager',
         namespace: 'Microsoft.DocumentDB',
     },
-    { 
+    {
         basePath: 'containerregistry/resource-manager',
         namespace: 'Microsoft.ContainerRegistry',
+    },
+    {
+        basePath: 'customproviders/resource-manager',
+        namespace: 'Microsoft.CustomProviders',
+        resourceConfig: [
+            {
+                type: 'associations',
+                scopes: ScopeType.Extension,
+            },
+        ],
     },
     {
         basePath: 'databox/resource-manager',
         namespace: 'Microsoft.DataBox',
     },
-    { 
+    {
         basePath: 'containerservice/resource-manager',
         namespace: 'Microsoft.ContainerService',
     },
@@ -43,29 +65,37 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Databricks',
     },
     {
+        basePath: 'datashare/resource-manager',
+        namespace: 'Microsoft.DataShare',
+    },
+    {
         basePath: 'deploymentmanager/resource-manager',
         namespace: 'Microsoft.DeploymentManager',
+    },
+    {
+        basePath: 'deviceprovisioningservices/resource-manager',
+        namespace: 'Microsoft.Devices',
+        suffix: 'Provisioning',
+    },
+    {
+        basePath: 'devops/resource-manager',
+        namespace: 'Microsoft.DevOps',
     },
     {
         basePath: 'devspaces/resource-manager',
         namespace: 'Microsoft.DevSpaces',
     },
     {
-        basePath: 'devtestlab/resource-manager',
+        basePath: 'devtestlabs/resource-manager',
         namespace: 'Microsoft.DevTestLab',
     },
-    { 
+    {
         basePath: 'hdinsight/resource-manager',
         namespace: 'Microsoft.HDInsight',
     },
     {
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',
         namespace: 'Microsoft.EnterpriseKnowledgeGraph',
-    },
-    {
-        basePath: 'deviceprovisioningservices/resource-manager',
-        namespace: 'Microsoft.Devices',
-        suffix: 'Provisioning',
     },
     { 
         basePath: 'domainservices/resource-manager',
@@ -78,6 +108,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'hanaonazure/resource-manager',
         namespace: 'Microsoft.HanaOnAzure',
+    },
+    {
+        basePath: 'hybriddatamanager/resource-manager',
+        namespace: 'Microsoft.HybridData',
     },
     {
         basePath: 'iothub/resource-manager',
@@ -95,11 +129,25 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'machinelearningcompute/resource-manager',
         namespace: 'Microsoft.MachineLearningCompute',
     },
-    { 
+    {
+        basePath: 'maintenance/resource-manager',
+        namespace: 'Microsoft.Maintenance',
+    },
+    {
+        basePath: 'managednetwork/resource-manager',
+        namespace: 'Microsoft.ManagedNetwork',
+        resourceConfig: [
+            {
+                type: 'scopeAssignments',
+                scopes: ScopeType.Subcription,
+            },
+        ],
+    },
+    {
         basePath: 'mariadb/resource-manager',
         namespace: 'Microsoft.DBforMariaDB',
     },
-    { 
+    {
         basePath: 'mysql/resource-manager',
         namespace: 'Microsoft.DBforMySQL',
     },
@@ -107,7 +155,7 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'policyinsights/resource-manager',
         namespace: 'Microsoft.PolicyInsights',
     },
-    { 
+    {
         basePath: 'peering/resource-manager',
         namespace: 'Microsoft.Peering',
     },
@@ -140,16 +188,24 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.SqlVirtualMachine',
     },
     {
+        basePath: 'storagecache/resource-manager',
+        namespace: 'Microsoft.StorageCache',
+    },
+    {
         basePath: 'storagesync/resource-manager',
         namespace: 'Microsoft.StorageSync',
     },
-    { 
+    {
         basePath: 'vmwarecloudsimple/resource-manager',
         namespace: 'Microsoft.VMwareCloudSimple',
     },
     {
         basePath: 'timeseriesinsights/resource-manager',
         namespace: 'Microsoft.TimeSeriesInsights',
+    },
+    {
+        basePath: 'imagebuilder/resource-manager',
+        namespace: 'Microsoft.VirtualMachineImages',
     },
     {
         basePath: 'windowsiot/resource-manager',

@@ -16,6 +16,7 @@ const generatedSchemasTemplatePath = path.join(__dirname, 'resources/autogenerat
 
 // paths in this list won't even appear in list-basepaths
 const blacklist = [
+    /* Azure Stack resource providers */
     'azsadmin/resource-manager/azurebridge',
     'azsadmin/resource-manager/backup',
     'azsadmin/resource-manager/commerce',
@@ -29,6 +30,8 @@ const blacklist = [
     'azsadmin/resource-manager/subscriptions',
     'azsadmin/resource-manager/update',
     'azsadmin/resource-manager/user-subscriptions',
+    /* Microsoft.CustomerInsights is deprecated */
+    'customer-insights/resource-manager',
 ];
 
 export {

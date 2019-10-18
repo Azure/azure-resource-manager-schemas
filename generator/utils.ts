@@ -9,6 +9,10 @@ const stat = promisify(fs.stat);
 const unlink = promisify(fs.unlink);
 const rmdir = promisify(fs.rmdir);
 const exists = promisify(fs.exists);
+const readFile = promisify(fs.readFile);
+const writeFile = promisify(fs.writeFile);
+const mkdir = promisify(fs.mkdir);
+
 
 function executeCmd(cwd: string, cmd: string, args: string[]) : Promise<number> {
     return new Promise((resolve, reject) => {
@@ -20,7 +24,7 @@ function executeCmd(cwd: string, cmd: string, args: string[]) : Promise<number> 
         });
 
         child.stdout.on('data', data => process.stdout.write(chalk.grey(data.toString())));
-        child.stderr.on('data', data => process.stdout.write(chalk.grey(data.toString())));
+        child.stderr.on('data', data => process.stdout.write(chalk.red(data.toString())));
         child.on('error', err => {
             reject(err);
         });
@@ -116,6 +120,13 @@ function lowerCaseCompare(a: string, b: string) {
     return aLower < bLower ? -1 : 1;
 }
 
+function lowerCaseStartsWith(a: string, b: string) {
+    const aLower = a.toLowerCase();
+    const bLower = b.toLowerCase();
+
+    return aLower.startsWith(bLower);
+}
+
 function lowerCaseCompareLists(listA: string[], listB: string[]) {
     for (let i = 0; i < listA.length; i++) {
         if (listB.length < i + 1) {
@@ -136,11 +147,45 @@ function lowerCaseCompareLists(listA: string[], listB: string[]) {
     return 0;
 }
 
+async function readJsonFile(filePath: string) {    
+    const rawContents = await readFile(filePath, { encoding: 'utf8' });
+
+    return JSON.parse(rawContents);
+}
+
+async function writeJsonFile(filePath: string, json: any) {
+    const rawContents = JSON.stringify(json, null, 2);
+
+    await writeFile(filePath, rawContents, { encoding: 'utf8' });
+}
+
+async function safeMkdir(filePath: string) {
+    if (!await exists(filePath)) {
+        await mkdir(filePath, { recursive: true });
+    }
+}
+
+async function safeUnlink(filePath: string) {
+    if (await exists(filePath)) {
+        await unlink(filePath);
+    }
+}
+
+async function fileExists(filePath: string) {
+    return await exists(filePath);
+}
+
 export {
     executeCmd,
     findDirRecursive,
     findRecursive,
     rmdirRecursive,
     lowerCaseCompare,
+    lowerCaseStartsWith,
     lowerCaseCompareLists,
+    readJsonFile,
+    writeJsonFile,
+    safeMkdir,
+    safeUnlink,
+    fileExists,
 }

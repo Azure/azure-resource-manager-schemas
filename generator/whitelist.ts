@@ -65,6 +65,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Databricks',
     },
     {
+        basePath: 'datafactory/resource-manager',
+        namespace: 'Microsoft.DataFactory',
+    },
+    {
         basePath: 'datashare/resource-manager',
         namespace: 'Microsoft.DataShare',
     },

@@ -199,6 +199,20 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.StorageSync',
     },
     {
+        basePath: 'recoveryservices/resource-manager',
+        namespace: 'Microsoft.RecoveryServices',
+    },
+    {
+        basePath: 'recoveryservicesbackup/resource-manager',
+        namespace: 'Microsoft.RecoveryServices',
+        suffix: 'Backup',
+    },
+    {
+        basePath: 'recoveryservicessiterecovery/resource-manager',
+        namespace: 'Microsoft.RecoveryServices',
+        suffix: 'SiteRecovery',
+    },
+    {
         basePath: 'vmwarecloudsimple/resource-manager',
         namespace: 'Microsoft.VMwareCloudSimple',
     },

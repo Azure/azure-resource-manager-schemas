@@ -14,6 +14,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'azuredata/resource-manager',
         namespace: 'Microsoft.AzureData',
     },
+    { 
+        basePath: 'batchai/resource-manager',
+        namespace: 'Microsoft.BatchAI',
+    },
     {
         basePath: 'blockchain/resource-manager',
         namespace: 'Microsoft.Blockchain',
@@ -51,6 +55,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'databox/resource-manager',
         namespace: 'Microsoft.DataBox',
+    },
+    { 
+        basePath: 'operationalinsights/resource-manager',
+        namespace: 'Microsoft.OperationalInsights',
     },
     {
         basePath: 'containerservice/resource-manager',

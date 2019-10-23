@@ -7,16 +7,6 @@
     "containerServices": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the container service in the specified subscription and resource group."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.ContainerService/containerServices"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
@@ -26,6 +16,21 @@
         "location": {
           "type": "string",
           "description": "Resource location"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the container service in the specified subscription and resource group."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerServiceProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the container service."
         },
         "tags": {
           "oneOf": [
@@ -42,24 +47,19 @@
           ],
           "description": "Resource tags"
         },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ContainerServiceProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Properties of the container service."
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ContainerService/containerServices"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
         "location",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.ContainerService/containerServices"
     }
@@ -68,10 +68,6 @@
     "ContainerServiceAgentPoolProfile": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "Unique name of the agent pool profile in the context of the subscription and resource group."
-        },
         "count": {
           "oneOf": [
             {
@@ -84,6 +80,14 @@
             }
           ],
           "description": "Number of agents (VMs) to host docker containers. Allowed values must be in the range of 1 to 100 (inclusive). The default value is 1. "
+        },
+        "dnsPrefix": {
+          "type": "string",
+          "description": "DNS prefix to be used to create the FQDN for the agent pool."
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the agent pool profile in the context of the subscription and resource group."
         },
         "vmSize": {
           "oneOf": [
@@ -144,16 +148,12 @@
             }
           ],
           "description": "Size of agent VMs."
-        },
-        "dnsPrefix": {
-          "type": "string",
-          "description": "DNS prefix to be used to create the FQDN for the agent pool."
         }
       },
       "required": [
+        "dnsPrefix",
         "name",
-        "vmSize",
-        "dnsPrefix"
+        "vmSize"
       ],
       "description": "Profile for the container service agent pool."
     },
@@ -253,28 +253,6 @@
     "ContainerServiceProperties": {
       "type": "object",
       "properties": {
-        "orchestratorProfile": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ContainerServiceOrchestratorProfile"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Profile for the container service orchestrator."
-        },
-        "masterProfile": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ContainerServiceMasterProfile"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Profile for the container service master."
-        },
         "agentPoolProfiles": {
           "oneOf": [
             {
@@ -289,16 +267,15 @@
           ],
           "description": "Properties of the agent pool."
         },
-        "windowsProfile": {
+        "diagnosticsProfile": {
           "oneOf": [
             {
-              "$ref": "#/definitions/ContainerServiceWindowsProfile"
+              "$ref": "#/definitions/ContainerServiceDiagnosticsProfile"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Profile for Windows VMs in the container service cluster."
+          ]
         },
         "linuxProfile": {
           "oneOf": [
@@ -311,21 +288,44 @@
           ],
           "description": "Profile for Linux VMs in the container service cluster."
         },
-        "diagnosticsProfile": {
+        "masterProfile": {
           "oneOf": [
             {
-              "$ref": "#/definitions/ContainerServiceDiagnosticsProfile"
+              "$ref": "#/definitions/ContainerServiceMasterProfile"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Profile for the container service master."
+        },
+        "orchestratorProfile": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerServiceOrchestratorProfile"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Profile for the container service orchestrator."
+        },
+        "windowsProfile": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerServiceWindowsProfile"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Profile for Windows VMs in the container service cluster."
         }
       },
       "required": [
-        "masterProfile",
         "agentPoolProfiles",
-        "linuxProfile"
+        "linuxProfile",
+        "masterProfile"
       ],
       "description": "Properties of the container service."
     },
@@ -388,18 +388,18 @@
     "ContainerServiceWindowsProfile": {
       "type": "object",
       "properties": {
-        "adminUsername": {
-          "type": "string",
-          "description": "The administrator username to use for Windows VMs"
-        },
         "adminPassword": {
           "type": "string",
           "description": "The administrator password to use for Windows VMs"
+        },
+        "adminUsername": {
+          "type": "string",
+          "description": "The administrator username to use for Windows VMs"
         }
       },
       "required": [
-        "adminUsername",
-        "adminPassword"
+        "adminPassword",
+        "adminUsername"
       ],
       "description": "Profile for Windows VMs in the container service cluster."
     }

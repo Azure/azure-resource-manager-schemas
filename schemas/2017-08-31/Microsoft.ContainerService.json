@@ -7,16 +7,6 @@
     "managedClusters": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the managed cluster resource."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.ContainerService/managedClusters"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
@@ -26,6 +16,21 @@
         "location": {
           "type": "string",
           "description": "Resource location"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the managed cluster resource."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ManagedClusterProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the managed cluster."
         },
         "tags": {
           "oneOf": [
@@ -42,24 +47,19 @@
           ],
           "description": "Resource tags"
         },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ManagedClusterProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Properties of the managed cluster."
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ContainerService/managedClusters"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
         "location",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.ContainerService/managedClusters"
     }
@@ -68,10 +68,6 @@
     "ContainerServiceAgentPoolProfile": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "Unique name of the agent pool profile in the context of the subscription and resource group."
-        },
         "count": {
           "oneOf": [
             {
@@ -85,6 +81,71 @@
             }
           ],
           "description": "Number of agents (VMs) to host docker containers. Allowed values must be in the range of 1 to 100 (inclusive). The default value is 1. "
+        },
+        "dnsPrefix": {
+          "type": "string",
+          "description": "DNS prefix to be used to create the FQDN for the agent pool."
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the agent pool profile in the context of the subscription and resource group."
+        },
+        "osDiskSizeGB": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1023
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "OS Disk Size in GB to be used to specify the disk size for every machine in this master/agent pool. If you specify 0, it will apply the default osDisk size according to the vmSize specified."
+        },
+        "osType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Linux",
+                "Windows"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "OsType to be used to specify os type. Choose from Linux and Windows. Default to Linux."
+        },
+        "ports": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Ports number array used to expose on this agent pool. The default opened ports are different based on your choice of orchestrator."
+        },
+        "storageProfile": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "StorageAccount",
+                "ManagedDisks"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Storage profile specifies what kind of storage used. Choose from StorageAccount and ManagedDisks. Leave it empty, we will choose for you based on the orchestrator choice."
         },
         "vmSize": {
           "oneOf": [
@@ -273,70 +334,9 @@
           ],
           "description": "Size of agent VMs."
         },
-        "osDiskSizeGB": {
-          "oneOf": [
-            {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 1023
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "OS Disk Size in GB to be used to specify the disk size for every machine in this master/agent pool. If you specify 0, it will apply the default osDisk size according to the vmSize specified."
-        },
-        "dnsPrefix": {
-          "type": "string",
-          "description": "DNS prefix to be used to create the FQDN for the agent pool."
-        },
-        "ports": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "type": "integer"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Ports number array used to expose on this agent pool. The default opened ports are different based on your choice of orchestrator."
-        },
-        "storageProfile": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "StorageAccount",
-                "ManagedDisks"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Storage profile specifies what kind of storage used. Choose from StorageAccount and ManagedDisks. Leave it empty, we will choose for you based on the orchestrator choice."
-        },
         "vnetSubnetID": {
           "type": "string",
           "description": "VNet SubnetID specifies the VNet's subnet identifier."
-        },
-        "osType": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Linux",
-                "Windows"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "OsType to be used to specify os type. Choose from Linux and Windows. Default to Linux."
         }
       },
       "required": [
@@ -385,10 +385,6 @@
           "type": "string",
           "description": "The ID for the service principal."
         },
-        "secret": {
-          "type": "string",
-          "description": "The secret password associated with the service principal in plain text."
-        },
         "keyVaultSecretRef": {
           "oneOf": [
             {
@@ -399,6 +395,10 @@
             }
           ],
           "description": "Reference to a secret stored in Azure Key Vault."
+        },
+        "secret": {
+          "type": "string",
+          "description": "The secret password associated with the service principal in plain text."
         }
       },
       "required": [
@@ -445,13 +445,13 @@
     "KeyVaultSecretRef": {
       "type": "object",
       "properties": {
-        "vaultID": {
-          "type": "string",
-          "description": "Key vault identifier."
-        },
         "secretName": {
           "type": "string",
           "description": "The secret name."
+        },
+        "vaultID": {
+          "type": "string",
+          "description": "Key vault identifier."
         },
         "version": {
           "type": "string",
@@ -459,22 +459,14 @@
         }
       },
       "required": [
-        "vaultID",
-        "secretName"
+        "secretName",
+        "vaultID"
       ],
       "description": "Reference to a secret stored in Azure Key Vault."
     },
     "ManagedClusterProperties": {
       "type": "object",
       "properties": {
-        "dnsPrefix": {
-          "type": "string",
-          "description": "DNS prefix specified when creating the managed cluster."
-        },
-        "kubernetesVersion": {
-          "type": "string",
-          "description": "Version of Kubernetes specified when creating the managed cluster."
-        },
         "agentPoolProfiles": {
           "oneOf": [
             {
@@ -488,6 +480,14 @@
             }
           ],
           "description": "Properties of the agent pool."
+        },
+        "dnsPrefix": {
+          "type": "string",
+          "description": "DNS prefix specified when creating the managed cluster."
+        },
+        "kubernetesVersion": {
+          "type": "string",
+          "description": "Version of Kubernetes specified when creating the managed cluster."
         },
         "linuxProfile": {
           "oneOf": [

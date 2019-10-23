@@ -7,16 +7,6 @@
     "containerGroups": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the container group."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.ContainerInstance/containerGroups"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
@@ -26,6 +16,20 @@
         "location": {
           "type": "string",
           "description": "The resource location."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the container group."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerGroup1Properties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "tags": {
           "oneOf": [
@@ -42,22 +46,18 @@
           ],
           "description": "The resource tags."
         },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ContainerGroup1Properties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ContainerInstance/containerGroups"
           ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.ContainerInstance/containerGroups"
     }
@@ -66,10 +66,6 @@
     "AzureFileVolume": {
       "type": "object",
       "properties": {
-        "shareName": {
-          "type": "string",
-          "description": "The name of the Azure File share to be mounted as a volume."
-        },
         "readOnly": {
           "oneOf": [
             {
@@ -81,13 +77,17 @@
           ],
           "description": "The flag indicating whether the Azure File shared mounted as a volume is read-only."
         },
-        "storageAccountName": {
+        "shareName": {
           "type": "string",
-          "description": "The name of the storage account that contains the Azure File share."
+          "description": "The name of the Azure File share to be mounted as a volume."
         },
         "storageAccountKey": {
           "type": "string",
           "description": "The storage account access key used to access the Azure File share."
+        },
+        "storageAccountName": {
+          "type": "string",
+          "description": "The name of the storage account that contains the Azure File share."
         }
       },
       "required": [
@@ -158,6 +158,17 @@
           ],
           "description": "The containers within the container group."
         },
+        "diagnostics": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerGroupDiagnostics"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Container group diagnostic information."
+        },
         "imageRegistryCredentials": {
           "oneOf": [
             {
@@ -171,6 +182,43 @@
             }
           ],
           "description": "The image registry credentials by which the container group is created from."
+        },
+        "ipAddress": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/IpAddress"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "IP address for the container group."
+        },
+        "networkProfile": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerGroupNetworkProfile"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Container group network profile information."
+        },
+        "osType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Windows",
+                "Linux"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The operating system type required by the containers in the container group."
         },
         "restartPolicy": {
           "oneOf": [
@@ -188,32 +236,6 @@
           ],
           "description": "Restart policy for all containers within the container group. \n- `Always` Always restart\n- `OnFailure` Restart on failure\n- `Never` Never restart\n."
         },
-        "ipAddress": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/IpAddress"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "IP address for the container group."
-        },
-        "osType": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Windows",
-                "Linux"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The operating system type required by the containers in the container group."
-        },
         "volumes": {
           "oneOf": [
             {
@@ -227,28 +249,6 @@
             }
           ],
           "description": "The list of volumes that can be mounted by containers in this container group."
-        },
-        "diagnostics": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ContainerGroupDiagnostics"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Container group diagnostic information."
-        },
-        "networkProfile": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ContainerGroupNetworkProfile"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Container group network profile information."
         }
       },
       "required": [
@@ -328,6 +328,17 @@
     "ContainerPort": {
       "type": "object",
       "properties": {
+        "port": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The port number exposed within the container group."
+        },
         "protocol": {
           "oneOf": [
             {
@@ -342,17 +353,6 @@
             }
           ],
           "description": "The protocol associated with the port."
-        },
-        "port": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The port number exposed within the container group."
         }
       },
       "required": [
@@ -373,6 +373,17 @@
             }
           ],
           "description": "The container execution command, for liveness or readiness probe"
+        },
+        "failureThreshold": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The failure threshold."
         },
         "httpGet": {
           "oneOf": [
@@ -407,17 +418,6 @@
           ],
           "description": "The period seconds."
         },
-        "failureThreshold": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The failure threshold."
-        },
         "successThreshold": {
           "oneOf": [
             {
@@ -446,10 +446,6 @@
     "ContainerProperties": {
       "type": "object",
       "properties": {
-        "image": {
-          "type": "string",
-          "description": "The name of the image used to create the container instance."
-        },
         "command": {
           "oneOf": [
             {
@@ -463,6 +459,35 @@
             }
           ],
           "description": "The commands to execute within the container instance in exec form."
+        },
+        "environmentVariables": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/EnvironmentVariable"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The environment variables to set in the container instance."
+        },
+        "image": {
+          "type": "string",
+          "description": "The name of the image used to create the container instance."
+        },
+        "livenessProbe": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerProbe"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The container probe, for liveness or readiness"
         },
         "ports": {
           "oneOf": [
@@ -478,19 +503,16 @@
           ],
           "description": "The exposed ports on the container instance."
         },
-        "environmentVariables": {
+        "readinessProbe": {
           "oneOf": [
             {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/EnvironmentVariable"
-              }
+              "$ref": "#/definitions/ContainerProbe"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The environment variables to set in the container instance."
+          "description": "The container probe, for liveness or readiness"
         },
         "resources": {
           "oneOf": [
@@ -516,28 +538,6 @@
             }
           ],
           "description": "The volume mounts available to the container instance."
-        },
-        "livenessProbe": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ContainerProbe"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The container probe, for liveness or readiness"
-        },
-        "readinessProbe": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ContainerProbe"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The container probe, for liveness or readiness"
         }
       },
       "required": [
@@ -553,13 +553,13 @@
           "type": "string",
           "description": "The name of the environment variable."
         },
-        "value": {
-          "type": "string",
-          "description": "The value of the environment variable."
-        },
         "secureValue": {
           "type": "string",
           "description": "The value of the secure environment variable."
+        },
+        "value": {
+          "type": "string",
+          "description": "The value of the environment variable."
         }
       },
       "required": [
@@ -591,6 +591,10 @@
     "ImageRegistryCredential": {
       "type": "object",
       "properties": {
+        "password": {
+          "type": "string",
+          "description": "The password for the private registry."
+        },
         "server": {
           "type": "string",
           "description": "The Docker image registry server without a protocol such as \"http\" and \"https\"."
@@ -598,10 +602,6 @@
         "username": {
           "type": "string",
           "description": "The username for the private registry."
-        },
-        "password": {
-          "type": "string",
-          "description": "The password for the private registry."
         }
       },
       "required": [
@@ -613,6 +613,14 @@
     "IpAddress": {
       "type": "object",
       "properties": {
+        "dnsNameLabel": {
+          "type": "string",
+          "description": "The Dns name label for the IP."
+        },
+        "ip": {
+          "type": "string",
+          "description": "The IP exposed to the public internet."
+        },
         "ports": {
           "oneOf": [
             {
@@ -641,14 +649,6 @@
             }
           ],
           "description": "Specifies if the IP is exposed to the public internet."
-        },
-        "ip": {
-          "type": "string",
-          "description": "The IP exposed to the public internet."
-        },
-        "dnsNameLabel": {
-          "type": "string",
-          "description": "The Dns name label for the IP."
         }
       },
       "required": [
@@ -660,14 +660,6 @@
     "LogAnalytics": {
       "type": "object",
       "properties": {
-        "workspaceId": {
-          "type": "string",
-          "description": "The workspace id for log analytics"
-        },
-        "workspaceKey": {
-          "type": "string",
-          "description": "The workspace key for log analytics"
-        },
         "logType": {
           "oneOf": [
             {
@@ -697,6 +689,14 @@
             }
           ],
           "description": "Metadata for log analytics."
+        },
+        "workspaceId": {
+          "type": "string",
+          "description": "The workspace id for log analytics"
+        },
+        "workspaceKey": {
+          "type": "string",
+          "description": "The workspace key for log analytics"
         }
       },
       "required": [
@@ -708,6 +708,17 @@
     "Port": {
       "type": "object",
       "properties": {
+        "port": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The port number."
+        },
         "protocol": {
           "oneOf": [
             {
@@ -722,17 +733,6 @@
             }
           ],
           "description": "The protocol associated with the port."
-        },
-        "port": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The port number."
         }
       },
       "required": [
@@ -743,17 +743,6 @@
     "ResourceLimits": {
       "type": "object",
       "properties": {
-        "memoryInGB": {
-          "oneOf": [
-            {
-              "type": "number"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The memory limit in GB of this container instance."
-        },
         "cpu": {
           "oneOf": [
             {
@@ -764,13 +753,7 @@
             }
           ],
           "description": "The CPU limit of this container instance."
-        }
-      },
-      "description": "The resource limits."
-    },
-    "ResourceRequests": {
-      "type": "object",
-      "properties": {
+        },
         "memoryInGB": {
           "oneOf": [
             {
@@ -780,8 +763,14 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The memory request in GB of this container instance."
-        },
+          "description": "The memory limit in GB of this container instance."
+        }
+      },
+      "description": "The resource limits."
+    },
+    "ResourceRequests": {
+      "type": "object",
+      "properties": {
         "cpu": {
           "oneOf": [
             {
@@ -792,28 +781,28 @@
             }
           ],
           "description": "The CPU request of this container instance."
+        },
+        "memoryInGB": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The memory request in GB of this container instance."
         }
       },
       "required": [
-        "memoryInGB",
-        "cpu"
+        "cpu",
+        "memoryInGB"
       ],
       "description": "The resource requests."
     },
     "ResourceRequirements": {
       "type": "object",
       "properties": {
-        "requests": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ResourceRequests"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The resource requests."
-        },
         "limits": {
           "oneOf": [
             {
@@ -824,6 +813,17 @@
             }
           ],
           "description": "The resource limits."
+        },
+        "requests": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ResourceRequests"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The resource requests."
         }
       },
       "required": [
@@ -834,10 +834,6 @@
     "Volume": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the volume."
-        },
         "azureFile": {
           "oneOf": [
             {
@@ -854,6 +850,21 @@
           "properties": {},
           "description": "The empty directory volume."
         },
+        "gitRepo": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/GitRepoVolume"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Represents a volume that is populated with the contents of a git repository"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the volume."
+        },
         "secret": {
           "oneOf": [
             {
@@ -868,17 +879,6 @@
             }
           ],
           "description": "The secret volume."
-        },
-        "gitRepo": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/GitRepoVolume"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Represents a volume that is populated with the contents of a git repository"
         }
       },
       "required": [
@@ -889,13 +889,13 @@
     "VolumeMount": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the volume mount."
-        },
         "mountPath": {
           "type": "string",
           "description": "The path within the container where the volume should be mounted. Must not contain colon (:)."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the volume mount."
         },
         "readOnly": {
           "oneOf": [
@@ -910,8 +910,8 @@
         }
       },
       "required": [
-        "name",
-        "mountPath"
+        "mountPath",
+        "name"
       ],
       "description": "The properties of the volume mount."
     }

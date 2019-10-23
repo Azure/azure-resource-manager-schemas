@@ -7,16 +7,6 @@
     "openShiftManagedClusters": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the OpenShift managed cluster resource."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.ContainerService/openShiftManagedClusters"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
@@ -27,20 +17,9 @@
           "type": "string",
           "description": "Resource location"
         },
-        "tags": {
-          "oneOf": [
-            {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {}
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Resource tags"
+        "name": {
+          "type": "string",
+          "description": "The name of the OpenShift managed cluster resource."
         },
         "plan": {
           "oneOf": [
@@ -63,14 +42,35 @@
             }
           ],
           "description": "Properties of the OpenShift managed cluster."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Resource tags"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ContainerService/openShiftManagedClusters"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
         "location",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.ContainerService/openShiftManagedClusters"
     }
@@ -79,14 +79,14 @@
     "NetworkProfile": {
       "type": "object",
       "properties": {
+        "peerVnetId": {
+          "type": "string",
+          "description": "CIDR of the Vnet to peer."
+        },
         "vnetCidr": {
           "type": "string",
           "default": "10.0.0.0/8",
           "description": "CIDR for the OpenShift Vnet."
-        },
-        "peerVnetId": {
-          "type": "string",
-          "description": "CIDR of the Vnet to peer."
         }
       },
       "description": "Represents the OpenShift networking configuration"
@@ -94,10 +94,6 @@
     "OpenShiftManagedClusterAgentPoolProfile": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "Unique name of the pool profile in the context of the subscription and resource group."
-        },
         "count": {
           "oneOf": [
             {
@@ -108,6 +104,45 @@
             }
           ],
           "description": "Number of agents (VMs) to host docker containers."
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the pool profile in the context of the subscription and resource group."
+        },
+        "osType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Linux",
+                "Windows"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "OsType to be used to specify os type. Choose from Linux and Windows. Default to Linux."
+        },
+        "role": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "compute",
+                "infra"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Define the role of the AgentPoolProfile."
+        },
+        "subnetCidr": {
+          "type": "string",
+          "default": "10.0.0.0/24",
+          "description": "Subnet CIDR for the peering."
         },
         "vmSize": {
           "oneOf": [
@@ -154,46 +189,11 @@
             }
           ],
           "description": "Size of agent VMs."
-        },
-        "subnetCidr": {
-          "type": "string",
-          "default": "10.0.0.0/24",
-          "description": "Subnet CIDR for the peering."
-        },
-        "osType": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Linux",
-                "Windows"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "OsType to be used to specify os type. Choose from Linux and Windows. Default to Linux."
-        },
-        "role": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "compute",
-                "infra"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Define the role of the AgentPoolProfile."
         }
       },
       "required": [
-        "name",
         "count",
+        "name",
         "vmSize"
       ],
       "description": "Defines the configuration of the OpenShift cluster VMs."
@@ -247,10 +247,6 @@
     "OpenShiftManagedClusterMasterPoolProfile": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "Unique name of the master pool profile in the context of the subscription and resource group."
-        },
         "count": {
           "oneOf": [
             {
@@ -261,6 +257,29 @@
             }
           ],
           "description": "Number of masters (VMs) to host docker containers. The default value is 3."
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the master pool profile in the context of the subscription and resource group."
+        },
+        "osType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Linux",
+                "Windows"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "OsType to be used to specify os type. Choose from Linux and Windows. Default to Linux."
+        },
+        "subnetCidr": {
+          "type": "string",
+          "description": "Subnet CIDR for the peering."
         },
         "vmSize": {
           "oneOf": [
@@ -307,25 +326,6 @@
             }
           ],
           "description": "Size of agent VMs."
-        },
-        "subnetCidr": {
-          "type": "string",
-          "description": "Subnet CIDR for the peering."
-        },
-        "osType": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Linux",
-                "Windows"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "OsType to be used to specify os type. Choose from Linux and Windows. Default to Linux."
         }
       },
       "required": [
@@ -337,54 +337,6 @@
     "OpenShiftManagedClusterProperties": {
       "type": "object",
       "properties": {
-        "openShiftVersion": {
-          "type": "string",
-          "description": "Version of OpenShift specified when creating the cluster."
-        },
-        "publicHostname": {
-          "type": "string",
-          "description": "Optional user-specified FQDN for OpenShift API server."
-        },
-        "fqdn": {
-          "type": "string",
-          "description": "User-specified FQDN for OpenShift API server loadbalancer internal hostname."
-        },
-        "networkProfile": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/NetworkProfile"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Represents the OpenShift networking configuration"
-        },
-        "routerProfiles": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/OpenShiftRouterProfile"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Configuration for OpenShift router(s)."
-        },
-        "masterPoolProfile": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/OpenShiftManagedClusterMasterPoolProfile"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "OpenShiftManagedClusterMaterPoolProfile contains configuration for OpenShift master VMs."
-        },
         "agentPoolProfiles": {
           "oneOf": [
             {
@@ -409,6 +361,54 @@
             }
           ],
           "description": "Defines all possible authentication profiles for the OpenShift cluster."
+        },
+        "fqdn": {
+          "type": "string",
+          "description": "User-specified FQDN for OpenShift API server loadbalancer internal hostname."
+        },
+        "masterPoolProfile": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/OpenShiftManagedClusterMasterPoolProfile"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "OpenShiftManagedClusterMaterPoolProfile contains configuration for OpenShift master VMs."
+        },
+        "networkProfile": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/NetworkProfile"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Represents the OpenShift networking configuration"
+        },
+        "openShiftVersion": {
+          "type": "string",
+          "description": "Version of OpenShift specified when creating the cluster."
+        },
+        "publicHostname": {
+          "type": "string",
+          "description": "Optional user-specified FQDN for OpenShift API server."
+        },
+        "routerProfiles": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/OpenShiftRouterProfile"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Configuration for OpenShift router(s)."
         }
       },
       "required": [

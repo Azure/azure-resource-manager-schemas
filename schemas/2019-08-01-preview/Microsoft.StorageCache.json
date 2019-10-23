@@ -7,6 +7,16 @@
     "caches": {
       "type": "object",
       "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-08-01-preview"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Region name string."
+        },
         "name": {
           "oneOf": [
             {
@@ -19,27 +29,6 @@
           ],
           "description": "Name of cache."
         },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.StorageCache/caches"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2019-08-01-preview"
-          ]
-        },
-        "tags": {
-          "type": "object",
-          "properties": {},
-          "description": "ARM tags as name/value pairs."
-        },
-        "location": {
-          "type": "string",
-          "description": "Region name string."
-        },
         "properties": {
           "oneOf": [
             {
@@ -50,6 +39,16 @@
             }
           ],
           "description": "Properties for the cache."
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/caches_storageTargets_childResource"
+              }
+            ]
+          }
         },
         "sku": {
           "oneOf": [
@@ -62,28 +61,35 @@
           ],
           "description": "Sku for the cache."
         },
-        "resources": {
-          "type": "array",
-          "items": {
-            "oneOf": [
-              {
-                "$ref": "#/definitions/caches_storageTargets_childResource"
-              }
-            ]
-          }
+        "tags": {
+          "type": "object",
+          "properties": {},
+          "description": "ARM tags as name/value pairs."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.StorageCache/caches"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.StorageCache/caches"
     },
     "caches_storageTargets": {
       "type": "object",
       "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-08-01-preview"
+          ]
+        },
         "name": {
           "oneOf": [
             {
@@ -96,18 +102,6 @@
           ],
           "description": "Name of storage target."
         },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.StorageCache/caches/storageTargets"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2019-08-01-preview"
-          ]
-        },
         "properties": {
           "oneOf": [
             {
@@ -118,13 +112,19 @@
             }
           ],
           "description": "Properties of the storage target."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.StorageCache/caches/storageTargets"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.StorageCache/caches/storageTargets"
     }
@@ -194,6 +194,12 @@
     "caches_storageTargets_childResource": {
       "type": "object",
       "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-08-01-preview"
+          ]
+        },
         "name": {
           "oneOf": [
             {
@@ -206,18 +212,6 @@
           ],
           "description": "Name of storage target."
         },
-        "type": {
-          "type": "string",
-          "enum": [
-            "storageTargets"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2019-08-01-preview"
-          ]
-        },
         "properties": {
           "oneOf": [
             {
@@ -228,13 +222,19 @@
             }
           ],
           "description": "Properties of the storage target."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "storageTargets"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.StorageCache/caches/storageTargets"
     },
@@ -260,13 +260,13 @@
           "type": "string",
           "description": "Namespace path on a cache for a storage target."
         },
-        "targetPath": {
-          "type": "string",
-          "description": "Path in storage target to which namespacePath points."
-        },
         "nfsExport": {
           "type": "string",
           "description": "NFS export where targetPath exists."
+        },
+        "targetPath": {
+          "type": "string",
+          "description": "Path in storage target to which namespacePath points."
         }
       },
       "description": "A namespace junction."
@@ -296,6 +296,17 @@
     "StorageTargetProperties": {
       "type": "object",
       "properties": {
+        "clfs": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ClfsTarget"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Storage container for use as a CLFS StorageTarget."
+        },
         "junctions": {
           "oneOf": [
             {
@@ -310,21 +321,16 @@
           ],
           "description": "List of cache namespace to target namespace associations."
         },
-        "targetType": {
+        "nfs3": {
           "oneOf": [
             {
-              "type": "string",
-              "enum": [
-                "nfs3",
-                "clfs",
-                "unknown"
-              ]
+              "$ref": "#/definitions/Nfs3Target"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Type for storage target."
+          "description": "An NFS mount point for use as a StorageTarget."
         },
         "provisioningState": {
           "oneOf": [
@@ -345,27 +351,21 @@
           ],
           "description": "ARM provisioning state, see https://github.com/Azure/azure-resource-manager-rpc/blob/master/v1.0/Addendum.md#provisioningstate-property."
         },
-        "nfs3": {
+        "targetType": {
           "oneOf": [
             {
-              "$ref": "#/definitions/Nfs3Target"
+              "type": "string",
+              "enum": [
+                "nfs3",
+                "clfs",
+                "unknown"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "An NFS mount point for use as a StorageTarget."
-        },
-        "clfs": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ClfsTarget"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Storage container for use as a CLFS StorageTarget."
+          "description": "Type for storage target."
         },
         "unknown": {
           "oneOf": [

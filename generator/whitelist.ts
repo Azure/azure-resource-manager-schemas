@@ -206,6 +206,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'vmwarecloudsimple/resource-manager',
         namespace: 'Microsoft.VMwareCloudSimple',
     },
+    { 
+        basePath: 'sql/resource-manager',
+        namespace: 'Microsoft.Sql',
+    },
     {
         basePath: 'timeseriesinsights/resource-manager',
         namespace: 'Microsoft.TimeSeriesInsights',

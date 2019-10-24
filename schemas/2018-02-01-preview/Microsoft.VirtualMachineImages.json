@@ -7,6 +7,16 @@
     "imageTemplates": {
       "type": "object",
       "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-02-01-preview"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Resource location"
+        },
         "name": {
           "oneOf": [
             {
@@ -19,21 +29,15 @@
           ],
           "description": "The name of the image Template"
         },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.VirtualMachineImages/imageTemplates"
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ImageTemplateProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
           ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2018-02-01-preview"
-          ]
-        },
-        "location": {
-          "type": "string",
-          "description": "Resource location"
         },
         "tags": {
           "oneOf": [
@@ -50,23 +54,19 @@
           ],
           "description": "Resource tags"
         },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ImageTemplateProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.VirtualMachineImages/imageTemplates"
           ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
         "location",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.VirtualMachineImages/imageTemplates"
     }
@@ -97,18 +97,6 @@
         }
       ],
       "properties": {
-        "runOutputName": {
-          "oneOf": [
-            {
-              "type": "string",
-              "pattern": "^[A-Za-z0-9-_]{1,64}$"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The name to be used for the associated RunOutput."
-        },
         "artifactTags": {
           "oneOf": [
             {
@@ -123,6 +111,18 @@
             }
           ],
           "description": "Tags that will be applied to the artifact once it has been created/updated by the distributor."
+        },
+        "runOutputName": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9-_]{1,64}$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name to be used for the associated RunOutput."
         }
       },
       "required": [
@@ -133,13 +133,13 @@
     "ImageTemplateIsoSource": {
       "type": "object",
       "properties": {
-        "sourceURI": {
-          "type": "string",
-          "description": "URL to get the ISO image. This URL has to be accessible to the resource provider at the time of the imageTemplate creation."
-        },
         "sha256Checksum": {
           "type": "string",
           "description": "SHA256 Checksum of the ISO image."
+        },
+        "sourceURI": {
+          "type": "string",
+          "description": "URL to get the ISO image. This URL has to be accessible to the resource provider at the time of the imageTemplate creation."
         },
         "type": {
           "type": "string",
@@ -149,8 +149,8 @@
         }
       },
       "required": [
-        "sourceURI",
         "sha256Checksum",
+        "sourceURI",
         "type"
       ],
       "description": "Describes an image source that is an installation ISO. Currently only supports Red Hat Enterprise Linux 7.2-7.5 ISO's."
@@ -183,27 +183,27 @@
     "ImageTemplatePlatformImageSource": {
       "type": "object",
       "properties": {
-        "publisher": {
-          "type": "string",
-          "description": "Image Publisher in [Azure Gallery Images](https://docs.microsoft.com/en-us/rest/api/compute/virtualmachineimages)."
-        },
         "offer": {
           "type": "string",
           "description": "Image offer from the [Azure Gallery Images](https://docs.microsoft.com/en-us/rest/api/compute/virtualmachineimages)."
         },
+        "publisher": {
+          "type": "string",
+          "description": "Image Publisher in [Azure Gallery Images](https://docs.microsoft.com/en-us/rest/api/compute/virtualmachineimages)."
+        },
         "sku": {
           "type": "string",
           "description": "Image sku from the [Azure Gallery Images](https://docs.microsoft.com/en-us/rest/api/compute/virtualmachineimages)."
-        },
-        "version": {
-          "type": "string",
-          "description": "Image version from the [Azure Gallery Images](https://docs.microsoft.com/en-us/rest/api/compute/virtualmachineimages)."
         },
         "type": {
           "type": "string",
           "enum": [
             "PlatformImage"
           ]
+        },
+        "version": {
+          "type": "string",
+          "description": "Image version from the [Azure Gallery Images](https://docs.microsoft.com/en-us/rest/api/compute/virtualmachineimages)."
         }
       },
       "required": [
@@ -214,16 +214,6 @@
     "ImageTemplateProperties": {
       "type": "object",
       "properties": {
-        "source": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ImageTemplateSource"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
         "customize": {
           "oneOf": [
             {
@@ -251,11 +241,21 @@
             }
           ],
           "description": "The distribution targets where the image output needs to go to."
+        },
+        "source": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ImageTemplateSource"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "required": [
-        "source",
-        "distribute"
+        "distribute",
+        "source"
       ]
     },
     "ImageTemplateSharedImageDistributor": {

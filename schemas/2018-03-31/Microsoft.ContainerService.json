@@ -7,16 +7,6 @@
     "managedClusters": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the managed cluster resource."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.ContainerService/managedClusters"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
@@ -26,6 +16,21 @@
         "location": {
           "type": "string",
           "description": "Resource location"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the managed cluster resource."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ManagedClusterProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the managed cluster."
         },
         "tags": {
           "oneOf": [
@@ -42,24 +47,19 @@
           ],
           "description": "Resource tags"
         },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ManagedClusterProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Properties of the managed cluster."
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ContainerService/managedClusters"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
         "location",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.ContainerService/managedClusters"
     }
@@ -101,6 +101,32 @@
     "ContainerServiceNetworkProfile": {
       "type": "object",
       "properties": {
+        "dnsServiceIP": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+              "default": "10.0.0.10"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "An IP address assigned to the Kubernetes DNS service. It must be within the Kubernetes service address range specified in serviceCidr."
+        },
+        "dockerBridgeCidr": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}(\\/([0-9]|[1-2][0-9]|3[0-2]))?$",
+              "default": "172.17.0.1/16"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A CIDR notation IP range assigned to the Docker bridge network. It must not overlap with any Subnet IP ranges or the Kubernetes service address range."
+        },
         "networkPlugin": {
           "oneOf": [
             {
@@ -155,32 +181,6 @@
             }
           ],
           "description": "A CIDR notation IP range from which to assign service cluster IPs. It must not overlap with any Subnet IP ranges."
-        },
-        "dnsServiceIP": {
-          "oneOf": [
-            {
-              "type": "string",
-              "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
-              "default": "10.0.0.10"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "An IP address assigned to the Kubernetes DNS service. It must be within the Kubernetes service address range specified in serviceCidr."
-        },
-        "dockerBridgeCidr": {
-          "oneOf": [
-            {
-              "type": "string",
-              "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}(\\/([0-9]|[1-2][0-9]|3[0-2]))?$",
-              "default": "172.17.0.1/16"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "A CIDR notation IP range assigned to the Docker bridge network. It must not overlap with any Subnet IP ranges or the Kubernetes service address range."
         }
       },
       "description": "Profile of network configuration."
@@ -250,17 +250,6 @@
     "ManagedClusterAddonProfile": {
       "type": "object",
       "properties": {
-        "enabled": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Whether the add-on is enabled or not."
-        },
         "config": {
           "oneOf": [
             {
@@ -275,6 +264,17 @@
             }
           ],
           "description": "Key-value pairs for configuring an add-on."
+        },
+        "enabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether the add-on is enabled or not."
         }
       },
       "required": [
@@ -285,18 +285,6 @@
     "ManagedClusterAgentPoolProfile": {
       "type": "object",
       "properties": {
-        "name": {
-          "oneOf": [
-            {
-              "type": "string",
-              "pattern": "^[a-z][a-z0-9]{0,11}$"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Unique name of the agent pool profile in the context of the subscription and resource group."
-        },
         "count": {
           "oneOf": [
             {
@@ -310,6 +298,57 @@
             }
           ],
           "description": "Number of agents (VMs) to host docker containers. Allowed values must be in the range of 1 to 100 (inclusive). The default value is 1. "
+        },
+        "maxPods": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Maximum number of pods that can run on a node."
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9]{0,11}$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Unique name of the agent pool profile in the context of the subscription and resource group."
+        },
+        "osDiskSizeGB": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1023
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "OS Disk Size in GB to be used to specify the disk size for every machine in this master/agent pool. If you specify 0, it will apply the default osDisk size according to the vmSize specified."
+        },
+        "osType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Linux",
+                "Windows"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "OsType to be used to specify os type. Choose from Linux and Windows. Default to Linux."
         },
         "vmSize": {
           "oneOf": [
@@ -498,48 +537,9 @@
           ],
           "description": "Size of agent VMs."
         },
-        "osDiskSizeGB": {
-          "oneOf": [
-            {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 1023
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "OS Disk Size in GB to be used to specify the disk size for every machine in this master/agent pool. If you specify 0, it will apply the default osDisk size according to the vmSize specified."
-        },
         "vnetSubnetID": {
           "type": "string",
           "description": "VNet SubnetID specifies the VNet's subnet identifier."
-        },
-        "maxPods": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Maximum number of pods that can run on a node."
-        },
-        "osType": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Linux",
-                "Windows"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "OsType to be used to specify os type. Choose from Linux and Windows. Default to Linux."
         }
       },
       "required": [
@@ -551,49 +551,16 @@
     "ManagedClusterProperties": {
       "type": "object",
       "properties": {
-        "kubernetesVersion": {
-          "type": "string",
-          "description": "Version of Kubernetes specified when creating the managed cluster."
-        },
-        "dnsPrefix": {
-          "type": "string",
-          "description": "DNS prefix specified when creating the managed cluster."
-        },
-        "agentPoolProfiles": {
+        "aadProfile": {
           "oneOf": [
             {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/ManagedClusterAgentPoolProfile"
-              }
+              "$ref": "#/definitions/ManagedClusterAADProfile"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Properties of the agent pool. Currently only one agent pool can exist."
-        },
-        "linuxProfile": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ContainerServiceLinuxProfile"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Profile for Linux VMs in the container service cluster."
-        },
-        "servicePrincipalProfile": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ManagedClusterServicePrincipalProfile"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Information about a service principal identity for the cluster to use for manipulating Azure APIs."
+          "description": "AADProfile specifies attributes for Azure Active Directory integration."
         },
         "addonProfiles": {
           "oneOf": [
@@ -610,6 +577,24 @@
           ],
           "description": "Profile of managed cluster add-on."
         },
+        "agentPoolProfiles": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ManagedClusterAgentPoolProfile"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the agent pool. Currently only one agent pool can exist."
+        },
+        "dnsPrefix": {
+          "type": "string",
+          "description": "DNS prefix specified when creating the managed cluster."
+        },
         "enableRBAC": {
           "oneOf": [
             {
@@ -620,6 +605,21 @@
             }
           ],
           "description": "Whether to enable Kubernetes Role-Based Access Control."
+        },
+        "kubernetesVersion": {
+          "type": "string",
+          "description": "Version of Kubernetes specified when creating the managed cluster."
+        },
+        "linuxProfile": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerServiceLinuxProfile"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Profile for Linux VMs in the container service cluster."
         },
         "networkProfile": {
           "oneOf": [
@@ -632,16 +632,16 @@
           ],
           "description": "Profile of network configuration."
         },
-        "aadProfile": {
+        "servicePrincipalProfile": {
           "oneOf": [
             {
-              "$ref": "#/definitions/ManagedClusterAADProfile"
+              "$ref": "#/definitions/ManagedClusterServicePrincipalProfile"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "AADProfile specifies attributes for Azure Active Directory integration."
+          "description": "Information about a service principal identity for the cluster to use for manipulating Azure APIs."
         }
       },
       "description": "Properties of the managed cluster."

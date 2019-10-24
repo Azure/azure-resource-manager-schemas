@@ -7,18 +7,6 @@
     "resourceProviders": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "minLength": 3,
-          "maxLength": 64,
-          "description": "The name of the resource provider."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.CustomProviders/resourceProviders"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
@@ -28,6 +16,23 @@
         "location": {
           "type": "string",
           "description": "Resource location"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 64,
+          "description": "The name of the resource provider."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CustomRPManifestProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The manifest for the custom resource provider"
         },
         "tags": {
           "oneOf": [
@@ -44,24 +49,19 @@
           ],
           "description": "Resource tags"
         },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/CustomRPManifestProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The manifest for the custom resource provider"
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.CustomProviders/resourceProviders"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
         "location",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.CustomProviders/resourceProviders"
     }
@@ -70,21 +70,15 @@
     "associations": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the association."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.CustomProviders/associations"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
             "2018-09-01-preview"
           ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the association."
         },
         "properties": {
           "oneOf": [
@@ -96,13 +90,19 @@
             }
           ],
           "description": "The properties of the association."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.CustomProviders/associations"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.CustomProviders/associations"
     }
@@ -121,10 +121,6 @@
     "CustomRPActionRouteDefinition": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the route definition. This becomes the name for the ARM extension (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')"
-        },
         "endpoint": {
           "oneOf": [
             {
@@ -136,6 +132,10 @@
             }
           ],
           "description": "The route definition endpoint URI that the custom resource provider will proxy requests to. This can be in the form of a flat URI (e.g. 'https://testendpoint/') or can specify to route via a path (e.g. 'https://testendpoint/{requestPath}')"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the route definition. This becomes the name for the ARM extension (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')"
         },
         "routingType": {
           "oneOf": [
@@ -153,8 +153,8 @@
         }
       },
       "required": [
-        "name",
-        "endpoint"
+        "endpoint",
+        "name"
       ],
       "description": "The route definition for an action implemented by the custom resource provider."
     },
@@ -209,10 +209,6 @@
     "CustomRPResourceTypeRouteDefinition": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the route definition. This becomes the name for the ARM extension (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')"
-        },
         "endpoint": {
           "oneOf": [
             {
@@ -224,6 +220,10 @@
             }
           ],
           "description": "The route definition endpoint URI that the custom resource provider will proxy requests to. This can be in the form of a flat URI (e.g. 'https://testendpoint/') or can specify to route via a path (e.g. 'https://testendpoint/{requestPath}')"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the route definition. This becomes the name for the ARM extension (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')"
         },
         "routingType": {
           "oneOf": [
@@ -242,14 +242,26 @@
         }
       },
       "required": [
-        "name",
-        "endpoint"
+        "endpoint",
+        "name"
       ],
       "description": "The route definition for a resource implemented by the custom resource provider."
     },
     "CustomRPValidations": {
       "type": "object",
       "properties": {
+        "specification": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^https://raw.githubusercontent.com/.+"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A link to the validation specification. The specification must be hosted on raw.githubusercontent.com."
+        },
         "validationType": {
           "oneOf": [
             {
@@ -263,18 +275,6 @@
             }
           ],
           "description": "The type of validation to run against a matching request."
-        },
-        "specification": {
-          "oneOf": [
-            {
-              "type": "string",
-              "pattern": "^https://raw.githubusercontent.com/.+"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "A link to the validation specification. The specification must be hosted on raw.githubusercontent.com."
         }
       },
       "required": [

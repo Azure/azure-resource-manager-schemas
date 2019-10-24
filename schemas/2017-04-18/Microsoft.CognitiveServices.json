@@ -19,7 +19,7 @@
         },
         "location": {
           "type": "string",
-          "description": "Required. Gets or sets the location of the resource. This will be one of the supported and registered Azure Geo Regions (e.g. West US, East US, Southeast Asia, etc.). The geo region of a resource cannot be changed once it is created, but if an identical geo region is specified on update the request will succeed."
+          "description": "The location of the resource"
         },
         "name": {
           "oneOf": [
@@ -36,9 +36,15 @@
           "description": "The name of Cognitive Services account."
         },
         "properties": {
-          "type": "object",
-          "properties": {},
-          "description": "Must exist in the request. Must be an empty object. Must not be null."
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CognitiveServicesAccountProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of Cognitive Services account."
         },
         "sku": {
           "oneOf": [
@@ -75,17 +81,155 @@
       },
       "required": [
         "apiVersion",
-        "kind",
-        "location",
         "name",
         "properties",
-        "sku",
         "type"
       ],
       "description": "Microsoft.CognitiveServices/accounts"
     }
   },
   "definitions": {
+    "CognitiveServicesAccountApiProperties": {
+      "type": "object",
+      "properties": {
+        "eventHubConnectionString": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^( *)Endpoint=sb://(.*);( *)SharedAccessKeyName=(.*);( *)SharedAccessKey=(.*)$",
+              "maxLength": 1000
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "(Personalization Only) The flag to enable statistics of Bing Search."
+        },
+        "qnaRuntimeEndpoint": {
+          "type": "string",
+          "description": "(QnAMaker Only) The runtime endpoint of QnAMaker."
+        },
+        "statisticsEnabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "(Bing Search Only) The flag to enable statistics of Bing Search."
+        },
+        "storageAccountConnectionString": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^(( *)DefaultEndpointsProtocol=(http|https)( *);( *))?AccountName=(.*)AccountKey=(.*)EndpointSuffix=(.*)$",
+              "maxLength": 1000
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "(Personalization Only) The storage account connection string."
+        }
+      },
+      "description": "The api properties for special APIs."
+    },
+    "CognitiveServicesAccountProperties": {
+      "type": "object",
+      "properties": {
+        "apiProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CognitiveServicesAccountApiProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The api properties for special APIs."
+        },
+        "customSubDomainName": {
+          "type": "string",
+          "description": "Optional subdomain name used for token-based authentication."
+        },
+        "networkAcls": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/NetworkRuleSet"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A set of rules governing the network accessibility."
+        }
+      },
+      "description": "Properties of Cognitive Services account."
+    },
+    "IpRule": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "description": "An IPv4 address range in CIDR notation, such as '124.56.78.91' (simple IP address) or '124.56.78.0/24' (all addresses that start with 124.56.78)."
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "description": "A rule governing the accessibility from a specific ip address or ip range."
+    },
+    "NetworkRuleSet": {
+      "type": "object",
+      "properties": {
+        "defaultAction": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Allow",
+                "Deny"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The default action when no rule from ipRules and from virtualNetworkRules match. This is only used after the bypass property has been evaluated."
+        },
+        "ipRules": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/IpRule"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of IP address rules."
+        },
+        "virtualNetworkRules": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/VirtualNetworkRule"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of virtual network rules."
+        }
+      },
+      "description": "A set of rules governing the network accessibility."
+    },
     "Sku": {
       "type": "object",
       "properties": {
@@ -98,6 +242,34 @@
         "name"
       ],
       "description": "The SKU of the cognitive services account."
+    },
+    "VirtualNetworkRule": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Full resource id of a vnet subnet, such as '/subscriptions/subid/resourceGroups/rg1/providers/Microsoft.Network/virtualNetworks/test-vnet/subnets/subnet1'."
+        },
+        "ignoreMissingVnetServiceEndpoint": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Ignore missing vnet service endpoint or not."
+        },
+        "state": {
+          "type": "string",
+          "description": "Gets the state of virtual network rule."
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "description": "A rule governing the accessibility from a specific virtual network."
     }
   }
 }

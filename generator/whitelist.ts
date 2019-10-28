@@ -77,6 +77,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DataFactory',
     },
     {
+        basePath: 'datalake-analytics/resource-manager',
+        namespace: 'Microsoft.DataLakeAnalytics',
+    },
+    {
         basePath: 'datashare/resource-manager',
         namespace: 'Microsoft.DataShare',
     },

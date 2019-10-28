@@ -100,6 +100,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'devtestlabs/resource-manager',
         namespace: 'Microsoft.DevTestLab',
     },
+    { 
+        basePath: 'redis/resource-manager',
+        namespace: 'Microsoft.Cache',
+    },
     {
         basePath: 'hdinsight/resource-manager',
         namespace: 'Microsoft.HDInsight',

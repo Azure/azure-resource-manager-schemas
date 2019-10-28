@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2016-04-01/Microsoft.Cache.json#",
+  "id": "https://schema.management.azure.com/schemas/2018-03-01/Microsoft.Cache.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.Cache",
   "description": "Microsoft Cache Resource Types",
@@ -20,12 +20,37 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-04-01"
+            "2018-03-01"
           ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/RedisCreateProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties supplied to Create Redis operation."
+        },
+        "zones": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A list of availability zones denoting where the resource needs to come from."
         },
         "location": {
           "type": "string",
-          "description": "Resource location."
+          "description": "The geo-location where the resource lives"
         },
         "tags": {
           "oneOf": [
@@ -42,17 +67,6 @@
           ],
           "description": "Resource tags."
         },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/RedisCreateProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Properties supplied to Create Redis operation."
-        },
         "resources": {
           "type": "array",
           "items": {
@@ -62,6 +76,9 @@
               },
               {
                 "$ref": "#/definitions/Redis_patchSchedules_childResource"
+              },
+              {
+                "$ref": "#/definitions/Redis_linkedServers_childResource"
               }
             ]
           }
@@ -71,8 +88,8 @@
         "name",
         "type",
         "apiVersion",
-        "location",
-        "properties"
+        "properties",
+        "location"
       ],
       "description": "Microsoft.Cache/Redis"
     },
@@ -92,7 +109,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-04-01"
+            "2018-03-01"
           ]
         },
         "properties": {
@@ -115,6 +132,45 @@
       ],
       "description": "Microsoft.Cache/Redis/firewallRules"
     },
+    "Redis_linkedServers": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the linked server that is being added to the Redis cache."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Cache/Redis/linkedServers"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-03-01"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/RedisLinkedServerCreateProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Create properties for a linked server"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.Cache/Redis/linkedServers"
+    },
     "Redis_patchSchedules": {
       "type": "object",
       "properties": {
@@ -122,12 +178,15 @@
           "oneOf": [
             {
               "type": "string",
-              "pattern": "^.*/default$"
+              "enum": [
+                "default"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Default string modeled as parameter for auto generation to work correctly."
         },
         "type": {
           "type": "string",
@@ -138,7 +197,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-04-01"
+            "2018-03-01"
           ]
         },
         "properties": {
@@ -205,7 +264,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "tenantSettings"
+          "description": "A dictionary of tenant settings"
         },
         "shardCount": {
           "oneOf": [
@@ -217,6 +276,33 @@
             }
           ],
           "description": "The number of shards to be created on a Premium Cluster Cache."
+        },
+        "minimumTlsVersion": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "1.0",
+                "1.1",
+                "1.2"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Optional: requires clients to use a specified TLS version (or higher) to connect (e,g, '1.0', '1.1', '1.2')."
+        },
+        "sku": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Sku"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "SKU parameters supplied to the create Redis operation."
         },
         "subnetId": {
           "oneOf": [
@@ -241,17 +327,6 @@
             }
           ],
           "description": "Static IP address. Required when deploying a Redis cache inside an existing Azure Virtual Network."
-        },
-        "sku": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/Sku"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "SKU parameters supplied to the create Redis operation."
         }
       },
       "required": [
@@ -277,6 +352,40 @@
       ],
       "description": "Specifies a range of IP addresses permitted to connect to the cache"
     },
+    "RedisLinkedServerCreateProperties": {
+      "type": "object",
+      "properties": {
+        "linkedRedisCacheId": {
+          "type": "string",
+          "description": "Fully qualified resourceId of the linked redis cache."
+        },
+        "linkedRedisCacheLocation": {
+          "type": "string",
+          "description": "Location of the linked redis cache."
+        },
+        "serverRole": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Primary",
+                "Secondary"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Role of the linked server."
+        }
+      },
+      "required": [
+        "linkedRedisCacheId",
+        "linkedRedisCacheLocation",
+        "serverRole"
+      ],
+      "description": "Create properties for a linked server"
+    },
     "Redis_firewallRules_childResource": {
       "type": "object",
       "properties": {
@@ -293,7 +402,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-04-01"
+            "2018-03-01"
           ]
         },
         "properties": {
@@ -316,6 +425,45 @@
       ],
       "description": "Microsoft.Cache/Redis/firewallRules"
     },
+    "Redis_linkedServers_childResource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the linked server that is being added to the Redis cache."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "linkedServers"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-03-01"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/RedisLinkedServerCreateProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Create properties for a linked server"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Microsoft.Cache/Redis/linkedServers"
+    },
     "Redis_patchSchedules_childResource": {
       "type": "object",
       "properties": {
@@ -323,12 +471,15 @@
           "oneOf": [
             {
               "type": "string",
-              "pattern": "^.*/default$"
+              "enum": [
+                "default"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Default string modeled as parameter for auto generation to work correctly."
         },
         "type": {
           "type": "string",
@@ -339,7 +490,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-04-01"
+            "2018-03-01"
           ]
         },
         "properties": {

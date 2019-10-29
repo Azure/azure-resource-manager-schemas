@@ -12,13 +12,13 @@
           "description": "The name of the Kusto cluster."
         },
         "type": {
-      "type": "string",
+          "type": "string",
           "enum": [
             "Microsoft.Kusto/clusters"
           ]
         },
         "apiVersion": {
-        "type": "string",
+          "type": "string",
           "enum": [
             "2019-09-07"
           ]
@@ -93,6 +93,9 @@
             "oneOf": [
               {
                 "$ref": "#/resourceDefinitions/clusters_databases"
+              },
+              {
+                "$ref": "#/resourceDefinitions/clusters_attacheddatabaseconfigurations"
               }
             ]
           }
@@ -109,6 +112,14 @@
     },
     "clusters_databases": {
       "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/ReadWriteDatabase"
+        },
+        {
+          "$ref": "#/definitions/ReadOnlyFollowingDatabase"
+        }
+      ],
       "properties": {
         "name": {
           "type": "string",
@@ -129,16 +140,6 @@
         "location": {
           "type": "string",
           "description": "Resource location."
-        },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DatabaseProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ]
         },
         "resources": {
           "type": "array",
@@ -199,6 +200,48 @@
         "properties"
       ],
       "description": "Microsoft.Kusto/clusters/databases/dataConnections"
+    },
+    "clusters_attacheddatabaseconfigurations": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the attached database configurations."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Kusto/clusters/AttachedDatabaseConfigurations"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-09-07"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Resource location."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AttachedDatabaseConfigurationsProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Class representing an attached database configurations."
     }
   },
   "definitions": {
@@ -354,7 +397,7 @@
         }
       }
     },
-    "DatabaseProperties": {
+    "ReadWriteDatabaseProperties": {
       "type": "object",
       "properties": {
         "softDeletePeriod": {
@@ -377,6 +420,127 @@
             }
           ],
           "description": "A class that contains database statistics information."
+        }
+      }
+    },
+    "ReadWriteDatabase": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ReadWriteDatabaseProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Read write database properties"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "ReadWrite"
+          ],
+          "description": "Kind of the database"
+        }
+      },
+      "required": [
+        "kind",
+        "properties"
+      ],
+      "description": "Information about the readWrite database"
+    },
+    "ReadOnlyFollowingDatabaseProperties": {
+      "type": "object",
+      "properties": {
+        "softDeletePeriod": {
+          "type": "string",
+          "format": "duration",
+          "description": "The time the data should be kept before it stops being accessible to queries in TimeSpan."
+        },
+        "hotCachePeriod": {
+          "type": "string",
+          "format": "duration",
+          "description": "The time the data should be kept in cache for fast queries in TimeSpan."
+        },
+        "statistics": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DatabaseStatistics"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "A class that contains database statistics information."
+        },
+        "leaderClusterResourceId": {
+          "type": "string",
+          "description": "The name of the leader cluster"
+        },
+        "attachedDatabaseConfigurationName": {
+          "type": "string",
+          "description": "The name of the attached database configuration cluster"
+        },
+        "principalsModificationKind": {
+          "type": "string",
+          "enum": [
+            "Union",
+            "Replace",
+            "None"
+          ],
+          "description": "The principals modification kind of the database"
+        }
+      }
+    },
+    "ReadOnlyFollowingDatabase": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ReadOnlyFollowingDatabaseProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ],
+          "description": "Read only following database properties"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "ReadOnlyFollowing"
+          ],
+          "description": "Kind of the database"
+        }
+      },
+      "required": [
+        "kind",
+        "properties"
+      ],
+      "description": "Information about the readOnlyFollowing database"
+    },
+    "AttachedDatabaseConfigurationsProperties": {
+      "type": "object",
+      "properties": {
+        "databaseName": {
+          "type": "string",
+          "description": "The name of the database which you would like to attach, use * if you want to follow all current and future databases."
+        },
+        "clusterResourceId": {
+          "type": "string",
+          "description": "The resource id of the cluster where the databases you would like to attach reside."
+        },
+        "defaultPrincipalsModificationKind": {
+          "type": "string",
+          "enum": [
+            "Union",
+            "Replace",
+            "None"
+          ],
+          "description": "The default principals modification kind"
         }
       }
     },
@@ -733,7 +897,7 @@
           "type": "string",
           "description": "GUID representing an external tenant."
         }
-      }    ,
+      },
       "description": "Represents a tenant ID that is trusted by the cluster."
     },
     "VirtualNetworkConfiguration": {
@@ -786,7 +950,7 @@
       "items": {
         "type": "string"
       },
-    "description": "The resource system properties."
+      "description": "The resource system properties."
     }
   }
 }

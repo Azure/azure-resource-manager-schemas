@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { promisify } from 'util';
 import chalk from 'chalk';
+import { series } from 'async';
 
 const readdir = promisify(fs.readdir);
 const stat = promisify(fs.stat);
@@ -175,6 +176,37 @@ async function fileExists(filePath: string) {
     return await exists(filePath);
 }
 
+function executeSynchronous<T>(asyncFunc: () => Promise<T>) {
+    series(
+        [asyncFunc],
+        (error, _) => {
+            if (error) {
+                throw error;
+            }
+        });
+}
+
+function chunker<T>(input: T[], chunks: number): T[][] {
+    const minChunkSize = Math.floor(input.length / chunks);
+    let remainder = input.length - (minChunkSize * chunks);
+
+    let position = 0;
+    const output = [];
+    for (let i = 0; i < chunks; i++) {
+        let chunkSize = minChunkSize;
+        if (remainder > 0) {
+            remainder--;
+            chunkSize++;
+        }
+        
+        const chunk = input.slice(position, position + chunkSize);
+        output.push(chunk);
+        position += chunkSize;
+    }
+
+    return output;
+}
+
 export {
     executeCmd,
     findDirRecursive,
@@ -188,4 +220,6 @@ export {
     safeMkdir,
     safeUnlink,
     fileExists,
+    executeSynchronous,
+    chunker,
 }

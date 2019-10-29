@@ -23,19 +23,19 @@ steps:
     git merge --no-commit --no-ff --strategy-option=theirs origin/master
     if ! git diff-index --quiet HEAD --; then
       git commit -m "Integrate master"
+      git push origin $(Build.SourceBranchName)
     fi
     git checkout origin/master -- schemas
   displayName: Integrate master branch
-- task: Npm@1
-  inputs:
-    command: 'install'
-    workingDir: 'generator'
+- script: |
+    set -Eeuxo pipefail
+    cd generator
+    npm install
   displayName: 'Install packages'
-- task: Npm@1
-  inputs:
-    command: 'custom'
-    workingDir: 'generator'
-    customCommand: 'run generate-all'
+- script: |
+    set -Eeuxo pipefail
+    cd generator
+    npm run generate-all $(generateParams)
   displayName: 'Generate schemas'
 - script: |
     set -Eeuxo pipefail

@@ -2,8 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import { promisify } from 'util';
 import * as constants from '../constants';
-import { series } from 'async';
-import { lowerCaseCompare } from '../utils';
+import { lowerCaseCompare, executeSynchronous } from '../utils';
 
 const rootSchemaPaths = [
     'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json',
@@ -85,7 +84,7 @@ async function findAllResourceReferences() {
     return [...new Set(allRefs)];
 }
 
-series([async () => {
+executeSynchronous(async () => {
     const rootSchemaRefs = await findAllResourceReferences();
 
     const allResources: {[type: string]: string[]} = {};
@@ -105,4 +104,4 @@ series([async () => {
     }
 
     console.log(allResources);
-}]);
+});

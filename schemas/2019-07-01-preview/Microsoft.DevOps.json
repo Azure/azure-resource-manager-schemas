@@ -7,21 +7,30 @@
     "pipelines": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the Azure Pipeline resource in ARM."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.DevOps/pipelines"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
             "2019-07-01-preview"
           ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Resource Location"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the Azure Pipeline resource in ARM."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PipelineProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Custom properties of a Pipeline."
         },
         "tags": {
           "oneOf": [
@@ -38,27 +47,18 @@
           ],
           "description": "Resource Tags"
         },
-        "location": {
+        "type": {
           "type": "string",
-          "description": "Resource Location"
-        },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/PipelineProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Custom properties of a Pipeline."
+          "enum": [
+            "Microsoft.DevOps/pipelines"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.DevOps/pipelines"
     }
@@ -136,29 +136,6 @@
     "CodeRepository": {
       "type": "object",
       "properties": {
-        "repositoryType": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "gitHub",
-                "vstsGit"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Type of code repository."
-        },
-        "id": {
-          "type": "string",
-          "description": "Unique immutable identifier of the code repository."
-        },
-        "defaultBranch": {
-          "type": "string",
-          "description": "Default branch used to configure Continuous Integration (CI) in the pipeline."
-        },
         "authorization": {
           "oneOf": [
             {
@@ -169,6 +146,14 @@
             }
           ],
           "description": "Authorization info used to access a resource (like code repository)."
+        },
+        "defaultBranch": {
+          "type": "string",
+          "description": "Default branch used to configure Continuous Integration (CI) in the pipeline."
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique immutable identifier of the code repository."
         },
         "properties": {
           "oneOf": [
@@ -184,12 +169,27 @@
             }
           ],
           "description": "Repository-specific properties."
+        },
+        "repositoryType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "gitHub",
+                "vstsGit"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Type of code repository."
         }
       },
       "required": [
-        "repositoryType",
+        "defaultBranch",
         "id",
-        "defaultBranch"
+        "repositoryType"
       ],
       "description": "Repository containing the source code for a pipeline."
     },
@@ -209,6 +209,17 @@
     "PipelineProperties": {
       "type": "object",
       "properties": {
+        "bootstrapConfiguration": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BootstrapConfiguration"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Configuration used to bootstrap a Pipeline."
+        },
         "organization": {
           "oneOf": [
             {
@@ -230,23 +241,12 @@
             }
           ],
           "description": "Reference to an Azure DevOps Project."
-        },
-        "bootstrapConfiguration": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/BootstrapConfiguration"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Configuration used to bootstrap a Pipeline."
         }
       },
       "required": [
+        "bootstrapConfiguration",
         "organization",
-        "project",
-        "bootstrapConfiguration"
+        "project"
       ],
       "description": "Custom properties of a Pipeline."
     },

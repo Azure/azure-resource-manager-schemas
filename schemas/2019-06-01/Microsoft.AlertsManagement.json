@@ -7,16 +7,6 @@
     "smartDetectorAlertRules": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the alert rule."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "microsoft.alertsManagement/smartDetectorAlertRules"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
@@ -28,10 +18,9 @@
           "default": "global",
           "description": "The resource location."
         },
-        "tags": {
-          "type": "object",
-          "properties": {},
-          "description": "The resource tags."
+        "name": {
+          "type": "string",
+          "description": "The name of the alert rule."
         },
         "properties": {
           "oneOf": [
@@ -43,13 +32,24 @@
             }
           ],
           "description": "The alert rule properties."
+        },
+        "tags": {
+          "type": "object",
+          "properties": {},
+          "description": "The resource tags."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "microsoft.alertsManagement/smartDetectorAlertRules"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "microsoft.alertsManagement/smartDetectorAlertRules"
     }
@@ -89,24 +89,50 @@
     "AlertRuleProperties": {
       "type": "object",
       "properties": {
-        "description": {
-          "type": "string",
-          "description": "The alert rule description."
-        },
-        "state": {
+        "actionGroups": {
           "oneOf": [
             {
-              "type": "string",
-              "enum": [
-                "Enabled",
-                "Disabled"
-              ]
+              "$ref": "#/definitions/ActionGroupsInformation"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The alert rule state."
+          "description": "The Action Groups information, used by the alert rule."
+        },
+        "description": {
+          "type": "string",
+          "description": "The alert rule description."
+        },
+        "detector": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Detector"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The detector information. By default this is not populated, unless it's specified in expandDetector"
+        },
+        "frequency": {
+          "type": "string",
+          "format": "duration",
+          "description": "The alert rule frequency in ISO8601 format. The time granularity must be in minutes and minimum value is 5 minutes."
+        },
+        "scope": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The alert rule resources scope."
         },
         "severity": {
           "oneOf": [
@@ -126,46 +152,20 @@
           ],
           "description": "The alert rule severity."
         },
-        "frequency": {
-          "type": "string",
-          "format": "duration",
-          "description": "The alert rule frequency in ISO8601 format. The time granularity must be in minutes and minimum value is 5 minutes."
-        },
-        "detector": {
+        "state": {
           "oneOf": [
             {
-              "$ref": "#/definitions/Detector"
+              "type": "string",
+              "enum": [
+                "Enabled",
+                "Disabled"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The detector information. By default this is not populated, unless it's specified in expandDetector"
-        },
-        "scope": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The alert rule resources scope."
-        },
-        "actionGroups": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ActionGroupsInformation"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Action Groups information, used by the alert rule."
+          "description": "The alert rule state."
         },
         "throttling": {
           "oneOf": [
@@ -180,21 +180,43 @@
         }
       },
       "required": [
-        "state",
-        "severity",
-        "frequency",
+        "actionGroups",
         "detector",
+        "frequency",
         "scope",
-        "actionGroups"
+        "severity",
+        "state"
       ],
       "description": "The alert rule properties."
     },
     "Detector": {
       "type": "object",
       "properties": {
+        "description": {
+          "type": "string",
+          "description": "The Smart Detector description. By default this is not populated, unless it's specified in expandDetector"
+        },
         "id": {
           "type": "string",
           "description": "The detector id."
+        },
+        "imagePaths": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Smart Detector image path. By default this is not populated, unless it's specified in expandDetector"
+        },
+        "name": {
+          "type": "string",
+          "description": "The Smart Detector name. By default this is not populated, unless it's specified in expandDetector"
         },
         "parameters": {
           "oneOf": [
@@ -212,14 +234,6 @@
           ],
           "description": "The detector's parameters.'"
         },
-        "name": {
-          "type": "string",
-          "description": "The Smart Detector name. By default this is not populated, unless it's specified in expandDetector"
-        },
-        "description": {
-          "type": "string",
-          "description": "The Smart Detector description. By default this is not populated, unless it's specified in expandDetector"
-        },
         "supportedResourceTypes": {
           "oneOf": [
             {
@@ -233,20 +247,6 @@
             }
           ],
           "description": "The Smart Detector supported resource types. By default this is not populated, unless it's specified in expandDetector"
-        },
-        "imagePaths": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Smart Detector image path. By default this is not populated, unless it's specified in expandDetector"
         }
       },
       "required": [

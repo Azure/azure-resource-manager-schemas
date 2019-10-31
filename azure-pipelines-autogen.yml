@@ -19,13 +19,15 @@ steps:
     set -Eeuxo pipefail
     git config user.name "Autogenerator Pipeline"
     git config user.email "azure-resource-manager-schemas@noreply.github.com"
+  displayName: Configure git
+- script: |
+    set -Eeuxo pipefail
     git checkout $(Build.SourceBranchName)
     git merge --no-commit --no-ff --strategy-option=theirs origin/master
     if ! git diff-index --quiet HEAD --; then
-      git commit -m "Integrate master"
+      git commit -m "Merge remote-tracking branch 'origin/master' into $(Build.SourceBranchName)"
       git push origin $(Build.SourceBranchName)
     fi
-    git checkout origin/master -- schemas
   displayName: Integrate master branch
 - script: |
     set -Eeuxo pipefail
@@ -39,11 +41,10 @@ steps:
   displayName: 'Generate schemas'
 - script: |
     set -Eeuxo pipefail
-    git config user.name "Autogenerator Pipeline"
-    git config user.email "azure-resource-manager-schemas@noreply.github.com"
     git add --all schemas
     if ! git diff-index --quiet HEAD --; then
       git commit -m "Autogenerate schemas"
+      git pull --rebase
       git push origin $(Build.SourceBranchName)
     fi
   displayName: Commit and push changes

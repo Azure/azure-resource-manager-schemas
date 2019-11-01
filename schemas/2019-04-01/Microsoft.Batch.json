@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2017-09-01/Microsoft.Batch.json#",
+  "id": "https://schema.management.azure.com/schemas/2019-04-01/Microsoft.Batch.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.Batch",
   "description": "Microsoft Batch Resource Types",
@@ -28,7 +28,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2017-09-01"
+            "2019-04-01"
           ]
         },
         "location": {
@@ -91,8 +91,16 @@
       "type": "object",
       "properties": {
         "name": {
-          "type": "string",
-          "description": "The ID of the application."
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_-]+$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the application. This must be unique within the account."
         },
         "type": {
           "type": "string",
@@ -103,23 +111,19 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2017-09-01"
+            "2019-04-01"
           ]
         },
-        "allowUpdates": {
+        "properties": {
           "oneOf": [
             {
-              "type": "boolean"
+              "$ref": "#/definitions/ApplicationProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "A value indicating whether packages within the application may be overwritten using the same version string."
-        },
-        "displayName": {
-          "type": "string",
-          "description": "The display name for the application."
+          "description": "The properties associated with the Application."
         },
         "resources": {
           "type": "array",
@@ -135,7 +139,8 @@
       "required": [
         "name",
         "type",
-        "apiVersion"
+        "apiVersion",
+        "properties"
       ],
       "description": "Microsoft.Batch/batchAccounts/applications"
     },
@@ -143,8 +148,16 @@
       "type": "object",
       "properties": {
         "name": {
-          "type": "string",
-          "description": "The version of the application to activate."
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_-][a-zA-Z0-9_.-]*$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The version of the application."
         },
         "type": {
           "type": "string",
@@ -155,14 +168,26 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2017-09-01"
+            "2019-04-01"
           ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ApplicationPackageProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of an application package"
         }
       },
       "required": [
         "name",
         "type",
-        "apiVersion"
+        "apiVersion",
+        "properties"
       ],
       "description": "Microsoft.Batch/batchAccounts/applications/versions"
     },
@@ -190,7 +215,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2017-09-01"
+            "2019-04-01"
           ]
         },
         "properties": {
@@ -237,7 +262,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2017-09-01"
+            "2019-04-01"
           ]
         },
         "properties": {
@@ -262,6 +287,11 @@
     }
   },
   "definitions": {
+    "ApplicationPackageProperties": {
+      "type": "object",
+      "properties": {},
+      "description": "Properties of an application package"
+    },
     "ApplicationPackageReference": {
       "type": "object",
       "properties": {
@@ -276,6 +306,31 @@
       "required": [
         "id"
       ]
+    },
+    "ApplicationProperties": {
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "The display name for the application."
+        },
+        "allowUpdates": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A value indicating whether packages within the application may be overwritten using the same version string."
+        },
+        "defaultVersion": {
+          "type": "string",
+          "description": "The package to use if a client requests the application but does not specify a version. This property can only be set to the name of an existing package."
+        }
+      },
+      "description": "The properties associated with the Application."
     },
     "AutoScaleSettings": {
       "type": "object",
@@ -322,7 +377,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "pool - specifies that the task runs as the common auto user account which is created on every node in a pool. task - specifies that the service should create a new user for the task. The default value is task."
+          "description": "The default value is task."
         },
         "elevationLevel": {
           "oneOf": [
@@ -388,8 +443,16 @@
       "type": "object",
       "properties": {
         "name": {
-          "type": "string",
-          "description": "The ID of the application."
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_-]+$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the application. This must be unique within the account."
         },
         "type": {
           "type": "string",
@@ -400,29 +463,26 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2017-09-01"
+            "2019-04-01"
           ]
         },
-        "allowUpdates": {
+        "properties": {
           "oneOf": [
             {
-              "type": "boolean"
+              "$ref": "#/definitions/ApplicationProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "A value indicating whether packages within the application may be overwritten using the same version string."
-        },
-        "displayName": {
-          "type": "string",
-          "description": "The display name for the application."
+          "description": "The properties associated with the Application."
         }
       },
       "required": [
         "name",
         "type",
-        "apiVersion"
+        "apiVersion",
+        "properties"
       ],
       "description": "Microsoft.Batch/batchAccounts/applications"
     },
@@ -430,8 +490,16 @@
       "type": "object",
       "properties": {
         "name": {
-          "type": "string",
-          "description": "The version of the application to activate."
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_-][a-zA-Z0-9_.-]*$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The version of the application."
         },
         "type": {
           "type": "string",
@@ -442,14 +510,26 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2017-09-01"
+            "2019-04-01"
           ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ApplicationPackageProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of an application package"
         }
       },
       "required": [
         "name",
         "type",
-        "apiVersion"
+        "apiVersion",
+        "properties"
       ],
       "description": "Microsoft.Batch/batchAccounts/applications/versions"
     },
@@ -477,7 +557,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2017-09-01"
+            "2019-04-01"
           ]
         },
         "properties": {
@@ -524,7 +604,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2017-09-01"
+            "2019-04-01"
           ]
         },
         "properties": {
@@ -628,8 +708,7 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Values are:\n\n starttask - The user account under which the start task is run.\n task - The accounts under which job tasks are run.\n remoteuser - The accounts under which users remotely access the node.\n\n You can specify more than one visibility in this collection. The default is all accounts."
+          ]
         }
       },
       "required": [
@@ -641,19 +720,83 @@
       "properties": {
         "osFamily": {
           "type": "string",
-          "description": "Possible values are: 2 - OS Family 2, equivalent to Windows Server 2008 R2 SP1. 3 - OS Family 3, equivalent to Windows Server 2012. 4 - OS Family 4, equivalent to Windows Server 2012 R2. 5 - OS Family 5, equivalent to Windows Server 2016. For more information, see Azure Guest OS Releases (https://azure.microsoft.com/documentation/articles/cloud-services-guestos-update-matrix/#releases)."
+          "description": "Possible values are: 2 - OS Family 2, equivalent to Windows Server 2008 R2 SP1. 3 - OS Family 3, equivalent to Windows Server 2012. 4 - OS Family 4, equivalent to Windows Server 2012 R2. 5 - OS Family 5, equivalent to Windows Server 2016. 6 - OS Family 6, equivalent to Windows Server 2019. For more information, see Azure Guest OS Releases (https://azure.microsoft.com/documentation/articles/cloud-services-guestos-update-matrix/#releases)."
         },
-        "targetOSVersion": {
+        "osVersion": {
           "type": "string",
           "description": "The default value is * which specifies the latest operating system version for the specified OS family."
-        },
-        "currentOSVersion": {
-          "type": "string",
-          "description": "This may differ from targetOSVersion if the pool state is Upgrading. In this case some virtual machines may be on the targetOSVersion and some may be on the currentOSVersion during the upgrade process. Once all virtual machines have upgraded, currentOSVersion is updated to be the same as targetOSVersion."
         }
       },
       "required": [
         "osFamily"
+      ]
+    },
+    "ContainerConfiguration": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "DockerCompatible"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "containerImageNames": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "This is the full image reference, as would be specified to \"docker pull\". An image will be sourced from the default Docker registry unless the image is fully qualified with an alternative registry."
+        },
+        "containerRegistries": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ContainerRegistry"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "If any images must be downloaded from a private registry which requires credentials, then those credentials must be provided here."
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "ContainerRegistry": {
+      "type": "object",
+      "properties": {
+        "registryServer": {
+          "type": "string",
+          "description": "If omitted, the default is \"docker.io\"."
+        },
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "username",
+        "password"
       ]
     },
     "DataDisk": {
@@ -1032,27 +1175,6 @@
         "sourceAddressPrefix"
       ]
     },
-    "OSDisk": {
-      "type": "object",
-      "properties": {
-        "caching": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "None",
-                "ReadOnly",
-                "ReadWrite"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Default value is none."
-        }
-      }
-    },
     "PoolEndpointConfiguration": {
       "type": "object",
       "properties": {
@@ -1141,7 +1263,8 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The default value is 1. The maximum value is the smaller of 4 times the number of cores of the vmSize of the pool or 256."
         },
         "taskSchedulingPolicy": {
           "oneOf": [
@@ -1188,7 +1311,8 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "In some cases the start task may be re-run even though the node was not rebooted. Due to this, start tasks should be idempotent and exit gracefully if the setup they're performing has already been done. Special care should be taken to avoid start tasks which create breakaway process or install/launch services from the start task working directory, as this will block Batch from being able to re-run the start task."
         },
         "certificates": {
           "oneOf": [
@@ -1216,7 +1340,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Changes to application packages affect all new compute nodes joining the pool, but do not affect compute nodes that are already in the pool until they are rebooted or reimaged."
+          "description": "Changes to application package references affect all new compute nodes joining the pool, but do not affect compute nodes that are already in the pool until they are rebooted or reimaged. There is a maximum of 10 application package references on any given pool."
         },
         "applicationLicenses": {
           "oneOf": [
@@ -1238,22 +1362,31 @@
     "ResourceFile": {
       "type": "object",
       "properties": {
-        "blobSource": {
+        "autoStorageContainerName": {
           "type": "string",
-          "description": "This URL must be readable using anonymous access; that is, the Batch service does not present any credentials when downloading the blob. There are two ways to get such a URL for a blob in Azure storage: include a Shared Access Signature (SAS) granting read permissions on the blob, or set the ACL for the blob or its container to allow public access."
+          "description": "The autoStorageContainerName, storageContainerUrl and httpUrl properties are mutually exclusive and one of them must be specified."
+        },
+        "storageContainerUrl": {
+          "type": "string",
+          "description": "The autoStorageContainerName, storageContainerUrl and httpUrl properties are mutually exclusive and one of them must be specified. This URL must be readable and listable using anonymous access; that is, the Batch service does not present any credentials when downloading the blob. There are two ways to get such a URL for a blob in Azure storage: include a Shared Access Signature (SAS) granting read and list permissions on the blob, or set the ACL for the blob or its container to allow public access."
+        },
+        "httpUrl": {
+          "type": "string",
+          "description": "The autoStorageContainerName, storageContainerUrl and httpUrl properties are mutually exclusive and one of them must be specified. If the URL is Azure Blob Storage, it must be readable using anonymous access; that is, the Batch service does not present any credentials when downloading the blob. There are two ways to get such a URL for a blob in Azure storage: include a Shared Access Signature (SAS) granting read permissions on the blob, or set the ACL for the blob or its container to allow public access."
+        },
+        "blobPrefix": {
+          "type": "string",
+          "description": "The property is valid only when autoStorageContainerName or storageContainerUrl is used. This prefix can be a partial filename or a subdirectory. If a prefix is not specified, all the files in the container will be downloaded."
         },
         "filePath": {
-          "type": "string"
+          "type": "string",
+          "description": "If the httpUrl property is specified, the filePath is required and describes the path which the file will be downloaded to, including the filename. Otherwise, if the autoStorageContainerName or storageContainerUrl property is specified, filePath is optional and is the directory to download the files to. In the case where filePath is used as a directory, any directory structure already associated with the input data will be retained in full and appended to the specified filePath directory. The specified relative path cannot break out of the task's working directory (for example by using '..')."
         },
         "fileMode": {
           "type": "string",
           "description": "This property applies only to files being downloaded to Linux compute nodes. It will be ignored if it is specified for a resourceFile which will be downloaded to a Windows node. If this property is not specified for a Linux node, then a default value of 0770 is applied to the file."
         }
-      },
-      "required": [
-        "blobSource",
-        "filePath"
-      ]
+      }
     },
     "ScaleSettings": {
       "type": "object",
@@ -1346,8 +1479,45 @@
             }
           ],
           "description": "If true and the start task fails on a compute node, the Batch service retries the start task up to its maximum retry count (maxTaskRetryCount). If the task has still not completed successfully after all retries, then the Batch service marks the compute node unusable, and will not schedule tasks to it. This condition can be detected via the node state and scheduling error detail. If false, the Batch service will not wait for the start task to complete. In this case, other tasks can start executing on the compute node while the start task is still running; and even if the start task fails, new tasks will continue to be scheduled on the node. The default is false."
+        },
+        "containerSettings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/TaskContainerSettings"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
-      }
+      },
+      "description": "In some cases the start task may be re-run even though the node was not rebooted. Due to this, start tasks should be idempotent and exit gracefully if the setup they're performing has already been done. Special care should be taken to avoid start tasks which create breakaway process or install/launch services from the start task working directory, as this will block Batch from being able to re-run the start task."
+    },
+    "TaskContainerSettings": {
+      "type": "object",
+      "properties": {
+        "containerRunOptions": {
+          "type": "string",
+          "description": "These additional options are supplied as arguments to the \"docker create\" command, in addition to those controlled by the Batch Service."
+        },
+        "imageName": {
+          "type": "string",
+          "description": "This is the full image reference, as would be specified to \"docker pull\". If no tag is provided as part of the image name, the tag \":latest\" is used as a default."
+        },
+        "registry": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerRegistry"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "imageName"
+      ]
     },
     "TaskSchedulingPolicy": {
       "type": "object",
@@ -1404,6 +1574,16 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
+        },
+        "windowsUserConfiguration": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WindowsUserConfiguration"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "required": [
@@ -1444,16 +1624,6 @@
             }
           ]
         },
-        "osDisk": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/OSDisk"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
         "nodeAgentSkuId": {
           "type": "string",
           "description": "The Batch node agent is a program that runs on each node in the pool, and provides the command-and-control interface between the node and the Batch service. There are different implementations of the node agent, known as SKUs, for different operating systems. You must specify a node agent SKU which matches the selected image reference. To get the list of supported node agent SKUs along with their list of verified image references, see the 'List supported node agent SKUs' operation."
@@ -1485,6 +1655,16 @@
         "licenseType": {
           "type": "string",
           "description": "This only applies to images that contain the Windows operating system, and should only be used when you hold valid on-premises licenses for the nodes which will be deployed. If omitted, no on-premises licensing discount is applied. Values are:\n\n Windows_Server - The on-premises license is for Windows Server.\n Windows_Client - The on-premises license is for Windows Client.\n"
+        },
+        "containerConfiguration": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerConfiguration"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "required": [
@@ -1505,6 +1685,26 @@
             }
           ],
           "description": "If omitted, the default value is true."
+        }
+      }
+    },
+    "WindowsUserConfiguration": {
+      "type": "object",
+      "properties": {
+        "loginMode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Batch",
+                "Interactive"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies login mode for the user. The default value for VirtualMachineConfiguration pools is interactive mode and for CloudServiceConfiguration pools is batch mode."
         }
       }
     }

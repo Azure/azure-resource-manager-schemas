@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2018-04-01/Microsoft.Devices.json#",
+  "id": "https://schema.management.azure.com/schemas/2018-12-01-preview/Microsoft.Devices.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.Devices",
   "description": "Microsoft Devices Resource Types",
@@ -20,7 +20,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-04-01"
+            "2018-12-01-preview"
           ]
         },
         "location": {
@@ -113,7 +113,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-04-01"
+            "2018-12-01-preview"
           ]
         },
         "certificate": {
@@ -144,7 +144,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-04-01"
+            "2018-12-01-preview"
           ]
         }
       },
@@ -311,6 +311,31 @@
       },
       "description": "The properties of the feedback queue for cloud-to-device messages."
     },
+    "IotHubLocationDescription": {
+      "type": "object",
+      "properties": {
+        "location": {
+          "type": "string",
+          "description": "Azure Geo Regions"
+        },
+        "role": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "primary",
+                "secondary"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specific Role assigned to this location."
+        }
+      },
+      "description": "Public representation of one of the locations where a resource is provisioned."
+    },
     "IotHubProperties": {
       "type": "object",
       "properties": {
@@ -355,7 +380,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The Event Hub-compatible endpoint properties. The possible keys to this dictionary are events and operationsMonitoringEvents. Both of these keys have to be present in the dictionary while making create or update calls for the IoT hub."
+          "description": "The Event Hub-compatible endpoint properties. The only possible keys to this dictionary is events. This key has to be present in the dictionary while making create or update calls for the IoT hub."
         },
         "routing": {
           "oneOf": [
@@ -424,16 +449,16 @@
           "type": "string",
           "description": "IoT hub comments."
         },
-        "operationsMonitoringProperties": {
+        "deviceStreams": {
           "oneOf": [
             {
-              "$ref": "#/definitions/OperationsMonitoringProperties"
+              "$ref": "#/definitions/IotHubPropertiesDeviceStreams"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The operations monitoring properties for the IoT hub. The possible keys to the dictionary are Connections, DeviceTelemetry, C2DCommands, DeviceIdentityOperations, FileUploadOperations, Routes, D2CTwinOperations, C2DTwinOperations, TwinQueries, JobsOperations, DirectMethods."
+          "description": "The device streams properties of iothub."
         },
         "features": {
           "oneOf": [
@@ -449,9 +474,43 @@
             }
           ],
           "description": "The capabilities and features enabled for the IoT hub."
+        },
+        "locations": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/IotHubLocationDescription"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Primary and secondary location for iot hub"
         }
       },
       "description": "The properties of an IoT hub."
+    },
+    "IotHubPropertiesDeviceStreams": {
+      "type": "object",
+      "properties": {
+        "streamingEndpoints": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of Device Streams Endpoints."
+        }
+      },
+      "description": "The device streams properties of iothub."
     },
     "IotHubSkuInfo": {
       "type": "object",
@@ -517,7 +576,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-04-01"
+            "2018-12-01-preview"
           ]
         },
         "certificate": {
@@ -594,32 +653,6 @@
         }
       },
       "description": "The properties of the messaging endpoints used by this IoT hub."
-    },
-    "OperationsMonitoringProperties": {
-      "type": "object",
-      "properties": {
-        "events": {
-          "oneOf": [
-            {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string",
-                "enum": [
-                  "None",
-                  "Error",
-                  "Information",
-                  "Error, Information"
-                ]
-              },
-              "properties": {}
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "description": "The operations monitoring properties for the IoT hub. The possible keys to the dictionary are Connections, DeviceTelemetry, C2DCommands, DeviceIdentityOperations, FileUploadOperations, Routes, D2CTwinOperations, C2DTwinOperations, TwinQueries, JobsOperations, DirectMethods."
     },
     "RouteProperties": {
       "type": "object",
@@ -771,7 +804,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The name that identifies this endpoint. The name can only include alphanumeric characters, periods, underscores, hyphens and has a maximum length of 64 characters. The following names are reserved:  events, operationsMonitoringEvents, fileNotifications, $default. Endpoint names must be unique across endpoint types."
+          "description": "The name that identifies this endpoint. The name can only include alphanumeric characters, periods, underscores, hyphens and has a maximum length of 64 characters. The following names are reserved:  events, fileNotifications, $default. Endpoint names must be unique across endpoint types."
         },
         "subscriptionId": {
           "type": "string",
@@ -847,7 +880,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The name that identifies this endpoint. The name can only include alphanumeric characters, periods, underscores, hyphens and has a maximum length of 64 characters. The following names are reserved:  events, operationsMonitoringEvents, fileNotifications, $default. Endpoint names must be unique across endpoint types. The name need not be the same as the actual queue name."
+          "description": "The name that identifies this endpoint. The name can only include alphanumeric characters, periods, underscores, hyphens and has a maximum length of 64 characters. The following names are reserved:  events, fileNotifications, $default. Endpoint names must be unique across endpoint types. The name need not be the same as the actual queue name."
         },
         "subscriptionId": {
           "type": "string",
@@ -881,7 +914,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The name that identifies this endpoint. The name can only include alphanumeric characters, periods, underscores, hyphens and has a maximum length of 64 characters. The following names are reserved:  events, operationsMonitoringEvents, fileNotifications, $default. Endpoint names must be unique across endpoint types.  The name need not be the same as the actual topic name."
+          "description": "The name that identifies this endpoint. The name can only include alphanumeric characters, periods, underscores, hyphens and has a maximum length of 64 characters. The following names are reserved:  events, fileNotifications, $default. Endpoint names must be unique across endpoint types.  The name need not be the same as the actual topic name."
         },
         "subscriptionId": {
           "type": "string",
@@ -915,7 +948,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The name that identifies this endpoint. The name can only include alphanumeric characters, periods, underscores, hyphens and has a maximum length of 64 characters. The following names are reserved:  events, operationsMonitoringEvents, fileNotifications, $default. Endpoint names must be unique across endpoint types."
+          "description": "The name that identifies this endpoint. The name can only include alphanumeric characters, periods, underscores, hyphens and has a maximum length of 64 characters. The following names are reserved:  events, fileNotifications, $default. Endpoint names must be unique across endpoint types."
         },
         "subscriptionId": {
           "type": "string",
@@ -960,8 +993,20 @@
           "description": "Maximum number of bytes for each blob written to storage. Value should be between 10485760(10MB) and 524288000(500MB). Default value is 314572800(300MB)."
         },
         "encoding": {
-          "type": "string",
-          "description": "Encoding that is used to serialize messages to blobs. Supported values are 'avro' and 'avroDeflate'. Default value is 'avro'."
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Avro",
+                "AvroDeflate",
+                "JSON"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Encoding that is used to serialize messages to blobs. Supported values are 'avro', 'avrodeflate', and 'JSON'. Default value is 'avro'."
         }
       },
       "required": [

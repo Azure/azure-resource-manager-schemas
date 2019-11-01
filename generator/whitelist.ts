@@ -15,6 +15,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.AzureData',
     },
     { 
+        basePath: 'batch/resource-manager',
+        namespace: 'Microsoft.Batch',
+    },
+    { 
         basePath: 'batchai/resource-manager',
         namespace: 'Microsoft.BatchAI',
     },

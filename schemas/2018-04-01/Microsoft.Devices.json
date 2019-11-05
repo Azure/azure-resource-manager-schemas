@@ -8,22 +8,11 @@
       "type": "object",
       "properties": {
         "name": {
-          "oneOf": [
-            {
-              "type": "string",
-              "description": "The Resource name with the following regex pattern for the name ^(?![0-9]+$)(?!-)[a-zA-Z0-9-]{2,49}[a-zA-Z0-9]$",
-              "pattern": "^(?![0-9]+$)(?!-)[a-zA-Z0-9-]{2,49}[a-zA-Z0-9]$",
-              "minLength": 3,
-              "maxLength": 50
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ]
+          "type": "string",
+          "description": "The name of the IoT hub."
         },
         "type": {
           "type": "string",
-          "description": "The Resource type.",
           "enum": [
             "Microsoft.Devices/IotHubs"
           ]
@@ -44,10 +33,11 @@
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              }
+              },
+              "properties": {}
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The resource tags."
@@ -62,10 +52,10 @@
               "$ref": "#/definitions/IotHubProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "IotHub properties"
+          "description": "The properties of an IoT hub."
         },
         "sku": {
           "oneOf": [
@@ -73,10 +63,10 @@
               "$ref": "#/definitions/IotHubSkuInfo"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "IotHub SKU info"
+          "description": "Information about the SKU of the IoT hub."
         },
         "resources": {
           "type": "array",
@@ -99,11 +89,51 @@
       ],
       "description": "Microsoft.Devices/IotHubs"
     },
+    "IotHubs_certificates": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9-._]{1,64}$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the certificate"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Devices/IotHubs/certificates"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-04-01"
+          ]
+        },
+        "certificate": {
+          "type": "string",
+          "description": "base-64 representation of the X509 leaf certificate .cer file or just .pem file content."
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion"
+      ],
+      "description": "Microsoft.Devices/IotHubs/certificates"
+    },
     "IotHubs_eventHubEndpoints_ConsumerGroups": {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the consumer group to retrieve."
         },
         "type": {
           "type": "string",
@@ -138,13 +168,14 @@
               "maximum": 100
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The max delivery count for cloud-to-device messages in the device queue. See: https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-messaging#cloud-to-device-messages."
         },
         "defaultTtlAsIso8601": {
           "type": "string",
+          "format": "duration",
           "description": "The default time to live for cloud-to-device messages in the device queue. See: https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-messaging#cloud-to-device-messages."
         },
         "feedback": {
@@ -153,9 +184,10 @@
               "$ref": "#/definitions/FeedbackProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The properties of the feedback queue for cloud-to-device messages."
         }
       },
       "description": "The IoT hub cloud-to-device messaging properties."
@@ -169,7 +201,7 @@
               "type": "integer"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The retention time for device-to-cloud messages in days. See: https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-messaging#device-to-cloud-messages"
@@ -180,7 +212,7 @@
               "type": "integer"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The number of partitions for receiving device-to-cloud messages in the Event Hub-compatible endpoint. See: https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-messaging#device-to-cloud-messages."
@@ -200,14 +232,18 @@
             {
               "type": "string",
               "enum": [
-                "DeviceMessages"
+                "Invalid",
+                "DeviceMessages",
+                "TwinChangeEvents",
+                "DeviceLifecycleEvents",
+                "DeviceJobLifecycleEvents"
               ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The source to which the routing rule is to be applied to. For example, DeviceMessages"
+          "description": "The source to which the routing rule is to be applied to. For example, DeviceMessages."
         },
         "condition": {
           "type": "string",
@@ -222,7 +258,7 @@
               }
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The list of endpoints to which the messages that satisfy the condition are routed to. Currently only 1 endpoint is allowed."
@@ -233,7 +269,7 @@
               "type": "boolean"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Used to specify whether the fallback route is enabled."
@@ -251,10 +287,12 @@
       "properties": {
         "lockDurationAsIso8601": {
           "type": "string",
+          "format": "duration",
           "description": "The lock duration for the feedback queue. See: https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-messaging#cloud-to-device-messages."
         },
         "ttlAsIso8601": {
           "type": "string",
+          "format": "duration",
           "description": "The period of time for which a message is available to consume before it is expired by the IoT hub. See: https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-messaging#cloud-to-device-messages."
         },
         "maxDeliveryCount": {
@@ -265,7 +303,7 @@
               "maximum": 100
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The number of times the IoT hub attempts to deliver a message on the feedback queue. See: https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-messaging#cloud-to-device-messages."
@@ -285,7 +323,7 @@
               }
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The shared access policies you can use to secure a connection to the IoT hub."
@@ -294,13 +332,12 @@
           "oneOf": [
             {
               "type": "array",
-              "maxItems": 10,
               "items": {
                 "$ref": "#/definitions/IpFilterRule"
               }
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The IP filter rules."
@@ -311,10 +348,11 @@
               "type": "object",
               "additionalProperties": {
                 "$ref": "#/definitions/EventHubProperties"
-              }
+              },
+              "properties": {}
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The Event Hub-compatible endpoint properties. The possible keys to this dictionary are events and operationsMonitoringEvents. Both of these keys have to be present in the dictionary while making create or update calls for the IoT hub."
@@ -325,9 +363,10 @@
               "$ref": "#/definitions/RoutingProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The routing related properties of the IoT hub. See: https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-messaging"
         },
         "storageEndpoints": {
           "oneOf": [
@@ -335,10 +374,11 @@
               "type": "object",
               "additionalProperties": {
                 "$ref": "#/definitions/StorageEndpointProperties"
-              }
+              },
+              "properties": {}
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The list of Azure Storage endpoints where you can upload files. Currently you can configure only one Azure Storage account and that MUST have its key as $default. Specifying more than one storage account causes an error to be thrown. Not specifying a value for this property when the enableFileUploadNotifications property is set to True, causes an error to be thrown."
@@ -349,10 +389,11 @@
               "type": "object",
               "additionalProperties": {
                 "$ref": "#/definitions/MessagingEndpointProperties"
-              }
+              },
+              "properties": {}
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The messaging endpoint properties for the file upload notification queue."
@@ -363,7 +404,7 @@
               "type": "boolean"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "If True, file upload notifications are enabled."
@@ -374,9 +415,10 @@
               "$ref": "#/definitions/CloudToDeviceProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The IoT hub cloud-to-device messaging properties."
         },
         "comments": {
           "type": "string",
@@ -388,9 +430,10 @@
               "$ref": "#/definitions/OperationsMonitoringProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The operations monitoring properties for the IoT hub. The possible keys to the dictionary are Connections, DeviceTelemetry, C2DCommands, DeviceIdentityOperations, FileUploadOperations, Routes, D2CTwinOperations, C2DTwinOperations, TwinQueries, JobsOperations, DirectMethods."
         },
         "features": {
           "oneOf": [
@@ -402,48 +445,13 @@
               ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The capabilities and features enabled for the IoT hub."
         }
       },
       "description": "The properties of an IoT hub."
-    },
-    "IotHubs_certificates_childResource": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "oneOf": [
-            {
-              "type": "string",
-              "pattern": "^[A-Za-z0-9-._]{1,64}$"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "The name of the certificate"
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "certificates"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2018-04-01"
-          ]
-        }
-      },
-      "required": [
-        "name",
-        "type",
-        "apiVersion"
-      ],
-      "description": "Microsoft.Devices/IotHubs/certificates"
     },
     "IotHubSkuInfo": {
       "type": "object",
@@ -463,7 +471,7 @@
               ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The name of the SKU."
@@ -474,7 +482,7 @@
               "type": "integer"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The number of provisioned IoT Hub units. See: https://docs.microsoft.com/azure/azure-subscription-service-limits#iot-hub-limits."
@@ -485,22 +493,51 @@
       ],
       "description": "Information about the SKU of the IoT hub."
     },
+    "IotHubs_certificates_childResource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9-._]{1,64}$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the certificate"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "certificates"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-04-01"
+          ]
+        },
+        "certificate": {
+          "type": "string",
+          "description": "base-64 representation of the X509 leaf certificate .cer file or just .pem file content."
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion"
+      ],
+      "description": "Microsoft.Devices/IotHubs/certificates"
+    },
     "IpFilterRule": {
       "type": "object",
       "properties": {
         "filterName": {
-          "oneOf": [
-            {
-              "description": "The name of the IP filter rule with the following regex pattern.",
-              "type": "string",
-              "pattern": "^[A-Za-z0-9-:.+%_#*?!(),=@;']{1,128}$",
-              "minLength": 1,
-              "maxLength": 128
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression" 
-            }
-          ]
+          "type": "string",
+          "description": "The name of the IP filter rule."
         },
         "action": {
           "oneOf": [
@@ -512,7 +549,7 @@
               ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The desired action for requests captured by this rule."
@@ -534,10 +571,12 @@
       "properties": {
         "lockDurationAsIso8601": {
           "type": "string",
+          "format": "duration",
           "description": "The lock duration. See: https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-file-upload."
         },
         "ttlAsIso8601": {
           "type": "string",
+          "format": "duration",
           "description": "The period of time for which a message is available to consume before it is expired by the IoT hub. See: https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-file-upload."
         },
         "maxDeliveryCount": {
@@ -548,7 +587,7 @@
               "maximum": 100
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The number of times the IoT hub attempts to deliver a message. See: https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-file-upload."
@@ -571,10 +610,11 @@
                   "Information",
                   "Error, Information"
                 ]
-              }
+              },
+              "properties": {}
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
         }
@@ -591,7 +631,7 @@
               "pattern": "^[A-Za-z0-9-._]{1,64}$"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The name of the route. The name can only include alphanumeric characters, periods, underscores, hyphens, has a maximum length of 64 characters, and must be unique."
@@ -609,7 +649,7 @@
               ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The source that the routing rule is to be applied to, such as DeviceMessages."
@@ -627,7 +667,7 @@
               }
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The list of endpoints to which messages that satisfy the condition are routed. Currently only one endpoint is allowed."
@@ -638,7 +678,7 @@
               "type": "boolean"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Used to specify whether a route is enabled."
@@ -664,7 +704,7 @@
               }
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The list of Service Bus queue endpoints that IoT hub routes the messages to, based on the routing rules."
@@ -678,7 +718,7 @@
               }
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The list of Service Bus topic endpoints that the IoT hub routes the messages to, based on the routing rules."
@@ -692,7 +732,7 @@
               }
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The list of Event Hubs endpoints that IoT hub routes messages to, based on the routing rules. This list does not include the built-in Event Hubs endpoint."
@@ -706,7 +746,7 @@
               }
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The list of storage container endpoints that IoT hub routes messages to, based on the routing rules."
@@ -728,7 +768,7 @@
               "pattern": "^[A-Za-z0-9-._]{1,64}$"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The name that identifies this endpoint. The name can only include alphanumeric characters, periods, underscores, hyphens and has a maximum length of 64 characters. The following names are reserved:  events, operationsMonitoringEvents, fileNotifications, $default. Endpoint names must be unique across endpoint types."
@@ -757,9 +797,10 @@
               "$ref": "#/definitions/RoutingEndpoints"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The properties related to the custom endpoints to which your IoT hub routes messages based on the routing rules. A maximum of 10 custom endpoints are allowed across all endpoint types for paid hubs and only 1 custom endpoint is allowed across all endpoint types for free hubs."
         },
         "routes": {
           "oneOf": [
@@ -770,7 +811,7 @@
               }
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The list of user-provided routing rules that the IoT hub uses to route messages to built-in and custom endpoints. A maximum of 100 routing rules are allowed for paid hubs and a maximum of 5 routing rules are allowed for free hubs."
@@ -781,10 +822,10 @@
               "$ref": "#/definitions/FallbackRouteProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The properties of the route that is used as a fall-back route when none of the conditions specified in the 'routes' section are met. This is an optional parameter. When this property is not set, the messages which do not meet any of the conditions specified in the 'routes' section get routed to the built-in eventhub endpoint."
+          "description": "The properties of the fallback route. IoT Hub uses these properties when it routes messages to the fallback endpoint."
         }
       },
       "description": "The routing related properties of the IoT hub. See: https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-messaging"
@@ -803,7 +844,7 @@
               "pattern": "^[A-Za-z0-9-._]{1,64}$"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The name that identifies this endpoint. The name can only include alphanumeric characters, periods, underscores, hyphens and has a maximum length of 64 characters. The following names are reserved:  events, operationsMonitoringEvents, fileNotifications, $default. Endpoint names must be unique across endpoint types. The name need not be the same as the actual queue name."
@@ -837,7 +878,7 @@
               "pattern": "^[A-Za-z0-9-._]{1,64}$"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The name that identifies this endpoint. The name can only include alphanumeric characters, periods, underscores, hyphens and has a maximum length of 64 characters. The following names are reserved:  events, operationsMonitoringEvents, fileNotifications, $default. Endpoint names must be unique across endpoint types.  The name need not be the same as the actual topic name."
@@ -871,7 +912,7 @@
               "pattern": "^[A-Za-z0-9-._]{1,64}$"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The name that identifies this endpoint. The name can only include alphanumeric characters, periods, underscores, hyphens and has a maximum length of 64 characters. The following names are reserved:  events, operationsMonitoringEvents, fileNotifications, $default. Endpoint names must be unique across endpoint types."
@@ -900,7 +941,7 @@
               "maximum": 720
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Time interval at which blobs are written to storage. Value should be between 60 and 720 seconds. Default value is 300 seconds."
@@ -913,14 +954,14 @@
               "maximum": 524288000
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Maximum number of bytes for each blob written to storage. Value should be between 10485760(10MB) and 524288000(500MB). Default value is 314572800(300MB)."
         },
         "encoding": {
           "type": "string",
-          "description": "Encoding that is used to serialize messages to blobs. Supported values are 'avro' and 'avrodeflate'. Default value is 'avro'."
+          "description": "Encoding that is used to serialize messages to blobs. Supported values are 'avro' and 'avroDeflate'. Default value is 'avro'."
         }
       },
       "required": [
@@ -968,7 +1009,7 @@
               ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The permissions assigned to the shared access policy."
@@ -985,7 +1026,8 @@
       "properties": {
         "sasTtlAsIso8601": {
           "type": "string",
-          "description": "The period of time for which the the SAS URI generated by IoT Hub for file upload is valid. See: https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-file-upload#file-upload-notification-configuration-options."
+          "format": "duration",
+          "description": "The period of time for which the SAS URI generated by IoT Hub for file upload is valid. See: https://docs.microsoft.com/azure/iot-hub/iot-hub-devguide-file-upload#file-upload-notification-configuration-options."
         },
         "connectionString": {
           "type": "string",

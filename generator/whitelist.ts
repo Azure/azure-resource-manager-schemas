@@ -15,6 +15,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.AzureData',
     },
     { 
+        basePath: 'batch/resource-manager',
+        namespace: 'Microsoft.Batch',
+    },
+    { 
         basePath: 'batchai/resource-manager',
         namespace: 'Microsoft.BatchAI',
     },
@@ -89,6 +93,11 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DeploymentManager',
     },
     {
+        basePath: 'deviceprovisioningservices/resource-manager',
+        namespace: 'Microsoft.Devices',
+        suffix: 'Provisioning',
+    },
+    {
         basePath: 'devops/resource-manager',
         namespace: 'Microsoft.DevOps',
     },
@@ -112,7 +121,7 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',
         namespace: 'Microsoft.EnterpriseKnowledgeGraph',
     },
-    {
+    { 
         basePath: 'domainservices/resource-manager',
         namespace: 'Microsoft.AAD',
     },
@@ -127,6 +136,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'hybriddatamanager/resource-manager',
         namespace: 'Microsoft.HybridData',
+    },
+    {
+        basePath: 'iothub/resource-manager',
+        namespace: 'Microsoft.Devices',
     },
     {
         basePath: 'iotspaces/resource-manager',

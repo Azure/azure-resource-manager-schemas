@@ -11,6 +11,7 @@ enum ScopeType {
 interface WhitelistConfig {
     basePath: string,
     namespace: string,
+    suffix?: string,
     resourceConfig?: WhitelistResourceConfig[],
 }
 

@@ -111,6 +111,11 @@
     },
     "clusters_databases": {
       "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/ReadWriteDatabase"
+        }
+      ],
       "properties": {
         "name": {
           "type": "string",
@@ -202,6 +207,48 @@
         "apiVersion"
       ],
       "description": "Microsoft.Kusto/clusters/databases/dataConnections"
+    },
+    "clusters_attacheddatabaseconfigurations": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the attached database configurations."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Kusto/clusters/AttachedDatabaseConfigurations"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-09-07"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Resource location."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AttachedDatabaseConfigurationsProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "properties"
+      ],
+      "description": "Class representing an attached database configurations."
     }
   },
   "definitions": {
@@ -463,22 +510,55 @@
         }
       }
     },
-    "DatabaseStatistics": {
+    "ReadWriteDatabase": {
       "type": "object",
       "properties": {
-        "size": {
+        "properties": {
           "oneOf": [
             {
-              "type": "number"
+              "$ref": "#/definitions/ReadWriteDatabaseProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The database size - the total size of compressed data and index in bytes."
+          "description": "Read write database properties"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "ReadWrite"
+          ],
+          "description": "Kind of the database"
         }
       },
-      "description": "A class that contains database statistics information."
+      "required": [
+        "kind",
+        "properties"
+      ],
+      "description": "Information about the readWrite database"
+    },
+    "AttachedDatabaseConfigurationsProperties": {
+      "type": "object",
+      "properties": {
+        "databaseName": {
+          "type": "string",
+          "description": "The name of the database which you would like to attach, use * if you want to follow all current and future databases."
+        },
+        "clusterResourceId": {
+          "type": "string",
+          "description": "The resource id of the cluster where the databases you would like to attach reside."
+        },
+        "defaultPrincipalsModificationKind": {
+          "type": "string",
+          "enum": [
+            "Union",
+            "Replace",
+            "None"
+          ],
+          "description": "The default principals modification kind"
+        }
+      }
     },
     "EventGridConnectionProperties": {
       "type": "object",

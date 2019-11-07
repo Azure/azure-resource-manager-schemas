@@ -7,15 +7,6 @@
     "containerServices": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string"
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.ContainerService/containerServices"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
@@ -26,19 +17,9 @@
           "type": "string",
           "description": "Resource location"
         },
-        "tags": {
-          "oneOf": [
-            {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Resource tags"
+        "name": {
+          "type": "string",
+          "description": "The name of the container service in the specified subscription and resource group."
         },
         "properties": {
           "oneOf": [
@@ -46,18 +27,39 @@
               "$ref": "#/definitions/ContainerServiceProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Properties of the container service."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Resource tags"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ContainerService/containerServices"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
         "location",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.ContainerService/containerServices"
     }
@@ -66,10 +68,6 @@
     "ContainerServiceAgentPoolProfile": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "Unique name of the agent pool profile in the context of the subscription and resource group."
-        },
         "count": {
           "oneOf": [
             {
@@ -79,10 +77,75 @@
               "default": "1"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Number of agents (VMs) to host docker containers. Allowed values must be in the range of 1 to 100 (inclusive). The default value is 1. "
+        },
+        "dnsPrefix": {
+          "type": "string",
+          "description": "DNS prefix to be used to create the FQDN for the agent pool."
+        },
+        "name": {
+          "type": "string",
+          "description": "Unique name of the agent pool profile in the context of the subscription and resource group."
+        },
+        "osDiskSizeGB": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1023
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "OS Disk Size in GB to be used to specify the disk size for every machine in this master/agent pool. If you specify 0, it will apply the default osDisk size according to the vmSize specified."
+        },
+        "osType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Linux",
+                "Windows"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "OsType to be used to specify os type. Choose from Linux and Windows. Default to Linux."
+        },
+        "ports": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Ports number array used to expose on this agent pool. The default opened ports are different based on your choice of orchestrator."
+        },
+        "storageProfile": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "StorageAccount",
+                "ManagedDisks"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Storage profile specifies what kind of storage used. Choose from StorageAccount and ManagedDisks. Leave it empty, we will choose for you based on the orchestrator choice."
         },
         "vmSize": {
           "oneOf": [
@@ -266,73 +329,14 @@
               ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Size of agent VMs."
         },
-        "osDiskSizeGB": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "OS Disk Size in GB to be used to specify the disk size for every machine in this master/agent pool. If you specify 0, it will apply the default osDisk size according to the vmSize specified."
-        },
-        "dnsPrefix": {
-          "type": "string",
-          "description": "DNS prefix to be used to create the FQDN for the agent pool."
-        },
-        "ports": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "type": "integer"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Ports number array used to expose on this agent pool. The default opened ports are different based on your choice of orchestrator."
-        },
-        "storageProfile": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "StorageAccount",
-                "ManagedDisks"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Storage profile specifies what kind of storage used. Choose from StorageAccount and ManagedDisks. Leave it empty, we will choose for you based on the orchestrator choice."
-        },
         "vnetSubnetID": {
           "type": "string",
-          "description": "VNet SubnetID specifies the vnet's subnet identifier."
-        },
-        "osType": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Linux",
-                "Windows"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "OsType to be used to specify os type. Choose from Linux and Windows. Default to Linux."
+          "description": "VNet SubnetID specifies the VNet's subnet identifier."
         }
       },
       "required": [
@@ -363,7 +367,7 @@
               "$ref": "#/definitions/ContainerServiceVMDiagnostics"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Profile for diagnostics on the container service VMs."
@@ -381,10 +385,10 @@
           "oneOf": [
             {
               "type": "string",
-              "pattern": "^[a-z][a-z0-9_-]*$"
+              "pattern": "^[A-Za-z][-A-Za-z0-9_]*$"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The administrator username to use for Linux VMs."
@@ -395,7 +399,7 @@
               "$ref": "#/definitions/ContainerServiceSshConfiguration"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "SSH configuration for Linux-based VMs running on Azure."
@@ -417,7 +421,7 @@
               "default": "1"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Number of masters (VMs) in the container service cluster. Allowed values are 1, 3, and 5. The default value is 1."
@@ -425,6 +429,39 @@
         "dnsPrefix": {
           "type": "string",
           "description": "DNS prefix to be used to create the FQDN for the master pool."
+        },
+        "firstConsecutiveStaticIP": {
+          "type": "string",
+          "default": "10.240.255.5",
+          "description": "FirstConsecutiveStaticIP used to specify the first static ip of masters."
+        },
+        "osDiskSizeGB": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1023
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "OS Disk Size in GB to be used to specify the disk size for every machine in this master/agent pool. If you specify 0, it will apply the default osDisk size according to the vmSize specified."
+        },
+        "storageProfile": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "StorageAccount",
+                "ManagedDisks"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Storage profile specifies what kind of storage used. Choose from StorageAccount and ManagedDisks. Leave it empty, we will choose for you based on the orchestrator choice."
         },
         "vmSize": {
           "oneOf": [
@@ -608,45 +645,14 @@
               ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Size of agent VMs."
         },
-        "osDiskSizeGB": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "OS Disk Size in GB to be used to specify the disk size for every machine in this master/agent pool. If you specify 0, it will apply the default osDisk size according to the vmSize specified."
-        },
         "vnetSubnetID": {
           "type": "string",
-          "description": "VNet SubnetID specifies the vnet's subnet identifier."
-        },
-        "firstConsecutiveStaticIP": {
-          "type": "string",
-          "default": "10.240.255.5",
-          "description": "FirstConsecutiveStaticIP used to specify the first static ip of masters."
-        },
-        "storageProfile": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "StorageAccount",
-                "ManagedDisks"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Storage profile specifies what kind of storage used. Choose from StorageAccount and ManagedDisks. Leave it empty, we will choose for you based on the orchestrator choice."
+          "description": "VNet SubnetID specifies the VNet's subnet identifier."
         }
       },
       "required": [
@@ -671,7 +677,7 @@
               ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The orchestrator to use to manage container service cluster resources. Valid values are Kubernetes, Swarm, DCOS, DockerCE and Custom."
@@ -689,50 +695,6 @@
     "ContainerServiceProperties": {
       "type": "object",
       "properties": {
-        "orchestratorProfile": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ContainerServiceOrchestratorProfile"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Profile for the container service orchestrator."
-        },
-        "customProfile": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ContainerServiceCustomProfile"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Properties to configure a custom container service cluster."
-        },
-        "servicePrincipalProfile": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ContainerServiceServicePrincipalProfile"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Information about a service principal identity for the cluster to use for manipulating Azure APIs. Exact one of secret or keyVaultSecretRef need to be specified."
-        },
-        "masterProfile": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ContainerServiceMasterProfile"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Profile for the container service master."
-        },
         "agentPoolProfiles": {
           "oneOf": [
             {
@@ -742,32 +704,21 @@
               }
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Properties of the agent pool."
         },
-        "windowsProfile": {
+        "customProfile": {
           "oneOf": [
             {
-              "$ref": "#/definitions/ContainerServiceWindowsProfile"
+              "$ref": "#/definitions/ContainerServiceCustomProfile"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Profile for Windows VMs in the container service cluster."
-        },
-        "linuxProfile": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ContainerServiceLinuxProfile"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Profile for Linux VMs in the container service cluster."
+          "description": "Properties to configure a custom container service cluster."
         },
         "diagnosticsProfile": {
           "oneOf": [
@@ -775,16 +726,71 @@
               "$ref": "#/definitions/ContainerServiceDiagnosticsProfile"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Profile for diagnostics in the container service cluster."
+          "description": "Profile for diagnostics on the container service cluster."
+        },
+        "linuxProfile": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerServiceLinuxProfile"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Profile for Linux VMs in the container service cluster."
+        },
+        "masterProfile": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerServiceMasterProfile"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Profile for the container service master."
+        },
+        "orchestratorProfile": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerServiceOrchestratorProfile"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Profile for the container service orchestrator."
+        },
+        "servicePrincipalProfile": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerServiceServicePrincipalProfile"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Information about a service principal identity for the cluster to use for manipulating Azure APIs. Either secret or keyVaultSecretRef must be specified."
+        },
+        "windowsProfile": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerServiceWindowsProfile"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Profile for Windows VMs in the container service cluster."
         }
       },
       "required": [
-        "orchestratorProfile",
+        "linuxProfile",
         "masterProfile",
-        "linuxProfile"
+        "orchestratorProfile"
       ],
       "description": "Properties of the container service."
     },
@@ -795,20 +801,20 @@
           "type": "string",
           "description": "The ID for the service principal."
         },
-        "secret": {
-          "type": "string",
-          "description": "The secret password associated with the service principal in plain text."
-        },
         "keyVaultSecretRef": {
           "oneOf": [
             {
               "$ref": "#/definitions/KeyVaultSecretRef"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Reference to a secret stored in Azure Key Vault."
+        },
+        "secret": {
+          "type": "string",
+          "description": "The secret password associated with the service principal in plain text."
         }
       },
       "required": [
@@ -828,7 +834,7 @@
               }
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The list of SSH public keys used to authenticate with Linux-based VMs. Only expect one key specified."
@@ -861,7 +867,7 @@
               "type": "boolean"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Whether the VM diagnostic agent is provisioned on the VM."
@@ -875,18 +881,6 @@
     "ContainerServiceWindowsProfile": {
       "type": "object",
       "properties": {
-        "adminUsername": {
-          "oneOf": [
-            {
-              "type": "string",
-              "pattern": "^[a-zA-Z0-9]+([._]?[a-zA-Z0-9]+)*$"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "The administrator username to use for Windows VMs."
-        },
         "adminPassword": {
           "oneOf": [
             {
@@ -894,28 +888,40 @@
               "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%\\^&\\*\\(\\)])[a-zA-Z\\d!@#$%\\^&\\*\\(\\)]{12,123}$"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The administrator password to use for Windows VMs."
+        },
+        "adminUsername": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9]+([._]?[a-zA-Z0-9]+)*$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The administrator username to use for Windows VMs."
         }
       },
       "required": [
-        "adminUsername",
-        "adminPassword"
+        "adminPassword",
+        "adminUsername"
       ],
       "description": "Profile for Windows VMs in the container service cluster."
     },
     "KeyVaultSecretRef": {
       "type": "object",
       "properties": {
-        "vaultID": {
-          "type": "string",
-          "description": "Key vault identifier."
-        },
         "secretName": {
           "type": "string",
           "description": "The secret name."
+        },
+        "vaultID": {
+          "type": "string",
+          "description": "Key vault identifier."
         },
         "version": {
           "type": "string",
@@ -923,8 +929,8 @@
         }
       },
       "required": [
-        "vaultID",
-        "secretName"
+        "secretName",
+        "vaultID"
       ],
       "description": "Reference to a secret stored in Azure Key Vault."
     }

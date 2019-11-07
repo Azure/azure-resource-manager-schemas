@@ -1,9 +1,9 @@
 import * as constants from '../constants';
 import { resetGitDirectory } from '../git';
-import { series } from 'async';
+import { executeSynchronous } from '../utils';
 
-series([async () => {
+executeSynchronous(async () => {
     await resetGitDirectory(constants.specsRepoPath, true);
 
     await resetGitDirectory(constants.schemasBasePath, false);
-}]);
+});

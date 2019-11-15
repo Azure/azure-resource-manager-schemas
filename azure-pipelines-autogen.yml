@@ -8,43 +8,52 @@ schedules:
     - autogenerate
   displayName: Daily autogeneration
 
-pool:
-  vmImage: 'Ubuntu-16.04'
+jobs:
+- job: Autogenerate
+  timeoutInMinutes: 180
 
-steps:
-- checkout: self
-  persistCredentials: true
-  clean: true
-- script: |
-    set -Eeuxo pipefail
-    git config user.name "Autogenerator Pipeline"
-    git config user.email "azure-resource-manager-schemas@noreply.github.com"
-  displayName: Configure git
-- script: |
-    set -Eeuxo pipefail
-    git checkout $(Build.SourceBranchName)
-    git merge --no-commit --no-ff --strategy-option=theirs origin/master
-    if ! git diff-index --quiet HEAD --; then
-      git commit -m "Merge remote-tracking branch 'origin/master' into $(Build.SourceBranchName)"
-      git push origin $(Build.SourceBranchName)
-    fi
-  displayName: Integrate master branch
-- script: |
-    set -Eeuxo pipefail
-    cd generator
-    npm install
-  displayName: 'Install packages'
-- script: |
-    set -Eeuxo pipefail
-    cd generator
-    npm run generate-all $(generateParams)
-  displayName: 'Generate schemas'
-- script: |
-    set -Eeuxo pipefail
-    git add --all schemas
-    if ! git diff-index --quiet HEAD --; then
-      git commit -m "Autogenerate schemas"
-      git pull --rebase
-      git push origin $(Build.SourceBranchName)
-    fi
-  displayName: Commit and push changes
+  pool:
+    vmImage: 'Ubuntu-16.04'
+
+  steps:
+  - checkout: self
+    persistCredentials: true
+    clean: true
+
+  - script: |
+      set -Eeuxo pipefail
+      git config user.name "Autogenerator Pipeline"
+      git config user.email "azure-resource-manager-schemas@noreply.github.com"
+    displayName: Configure git
+
+  - script: |
+      set -Eeuxo pipefail
+      git checkout $(Build.SourceBranchName)
+      git merge --no-commit --no-ff --strategy-option=theirs origin/master
+      if ! git diff-index --quiet HEAD --; then
+        git commit -m "Merge remote-tracking branch 'origin/master' into $(Build.SourceBranchName)"
+        git push origin $(Build.SourceBranchName)
+      fi
+    displayName: Integrate master branch
+
+  - script: |
+      set -Eeuxo pipefail
+      cd generator
+      npm install
+    displayName: 'Install packages'
+
+  - script: |
+      set -Eeuxo pipefail
+      cd generator
+      npm run generate-all $(generateParams)
+    displayName: 'Generate schemas'
+
+  - script: |
+      set -Eeuxo pipefail
+      git add --all schemas
+      if ! git diff-index --quiet HEAD --; then
+        git commit -m "Autogenerate schemas"
+        git pull --rebase
+        git push origin $(Build.SourceBranchName)
+      fi
+    displayName: Commit and push changes

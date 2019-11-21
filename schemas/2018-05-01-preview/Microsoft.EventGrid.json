@@ -7,16 +7,6 @@
     "topics": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "Name of the topic"
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.EventGrid/topics"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
@@ -26,6 +16,21 @@
         "location": {
           "type": "string",
           "description": "Location of the resource"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the topic"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/TopicProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the Topic"
         },
         "tags": {
           "oneOf": [
@@ -37,29 +42,24 @@
               "properties": {}
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Tags of the resource"
         },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/TopicProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Properties of the Topic"
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.EventGrid/topics"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
         "location",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.EventGrid/topics"
     }
@@ -68,21 +68,15 @@
     "eventSubscriptions": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "Name of the event subscription"
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.EventGrid/eventSubscriptions"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
             "2018-05-01-preview"
           ]
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the event subscription. Event subscription names must be between 3 and 64 characters in length and should use alphanumeric letters only."
         },
         "properties": {
           "oneOf": [
@@ -90,17 +84,23 @@
               "$ref": "#/definitions/EventSubscriptionProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Properties of the Event Subscription"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.EventGrid/eventSubscriptions"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.EventGrid/eventSubscriptions"
     }
@@ -119,22 +119,22 @@
     "EventHubEventSubscriptionDestination": {
       "type": "object",
       "properties": {
+        "endpointType": {
+          "type": "string",
+          "enum": [
+            "EventHub"
+          ]
+        },
         "properties": {
           "oneOf": [
             {
               "$ref": "#/definitions/EventHubEventSubscriptionDestinationProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The properties for a event hub destination."
-        },
-        "endpointType": {
-          "type": "string",
-          "enum": [
-            "EventHub"
-          ]
         }
       },
       "required": [
@@ -174,14 +174,6 @@
     "EventSubscriptionFilter": {
       "type": "object",
       "properties": {
-        "subjectBeginsWith": {
-          "type": "string",
-          "description": "An optional string to filter events for an event subscription based on a resource path prefix.\r\nThe format of this depends on the publisher of the events. \r\nWildcard characters are not supported in this path."
-        },
-        "subjectEndsWith": {
-          "type": "string",
-          "description": "An optional string to filter events for an event subscription based on a resource path suffix.\r\nWildcard characters are not supported in this path."
-        },
         "includedEventTypes": {
           "oneOf": [
             {
@@ -191,7 +183,7 @@
               }
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "A list of applicable event types that need to be part of the event subscription. \r\nIf it is desired to subscribe to all event types, the string \"all\" needs to be specified as an element in this list."
@@ -203,10 +195,18 @@
               "default": false
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Specifies if the SubjectBeginsWith and SubjectEndsWith properties of the filter \r\nshould be compared in a case sensitive manner."
+        },
+        "subjectBeginsWith": {
+          "type": "string",
+          "description": "An optional string to filter events for an event subscription based on a resource path prefix.\r\nThe format of this depends on the publisher of the events. \r\nWildcard characters are not supported in this path."
+        },
+        "subjectEndsWith": {
+          "type": "string",
+          "description": "An optional string to filter events for an event subscription based on a resource path suffix.\r\nWildcard characters are not supported in this path."
         }
       },
       "description": "Filter for the Event Subscription"
@@ -214,16 +214,43 @@
     "EventSubscriptionProperties": {
       "type": "object",
       "properties": {
+        "deadLetterDestination": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DeadLetterDestination"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Information about the dead letter destination for an event subscription. To configure a deadletter destination, do not directly instantiate an object of this class. Instead, instantiate an object of a derived class. Currently, StorageBlobDeadLetterDestination is the only class that derives from this class."
+        },
         "destination": {
           "oneOf": [
             {
               "$ref": "#/definitions/EventSubscriptionDestination"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Information about the destination for an event subscription"
+        },
+        "eventDeliverySchema": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "EventGridSchema",
+                "InputEventSchema",
+                "CloudEventV01Schema"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The event delivery schema for the event subscription."
         },
         "filter": {
           "oneOf": [
@@ -231,7 +258,7 @@
               "$ref": "#/definitions/EventSubscriptionFilter"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Filter for the Event Subscription"
@@ -245,26 +272,10 @@
               }
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "List of user defined labels."
-        },
-        "eventDeliverySchema": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "EventGridSchema",
-                "InputEventSchema",
-                "CloudEventV01Schema"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "The event delivery schema for the event subscription."
         },
         "retryPolicy": {
           "oneOf": [
@@ -272,21 +283,10 @@
               "$ref": "#/definitions/RetryPolicy"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Information about the retry policy for an event subscription"
-        },
-        "deadLetterDestination": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DeadLetterDestination"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Information about the dead letter destination for an event subscription. To configure a deadletter destination, do not directly instantiate an object of this class. Instead, instantiate an object of a derived class. Currently, StorageBlobDeadLetterDestination is the only class that derives from this class."
         }
       },
       "description": "Properties of the Event Subscription"
@@ -294,22 +294,22 @@
     "HybridConnectionEventSubscriptionDestination": {
       "type": "object",
       "properties": {
+        "endpointType": {
+          "type": "string",
+          "enum": [
+            "HybridConnection"
+          ]
+        },
         "properties": {
           "oneOf": [
             {
               "$ref": "#/definitions/HybridConnectionEventSubscriptionDestinationProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The properties for a hybrid connection destination."
-        },
-        "endpointType": {
-          "type": "string",
-          "enum": [
-            "HybridConnection"
-          ]
         }
       },
       "required": [
@@ -350,13 +350,13 @@
     "JsonFieldWithDefault": {
       "type": "object",
       "properties": {
-        "sourceField": {
-          "type": "string",
-          "description": "Name of a field in the input event schema that's to be used as the source of a mapping."
-        },
         "defaultValue": {
           "type": "string",
           "description": "The default value to be used for mapping when a SourceField is not provided or if there's no property with the specified name in the published JSON event payload."
+        },
+        "sourceField": {
+          "type": "string",
+          "description": "Name of a field in the input event schema that's to be used as the source of a mapping."
         }
       },
       "description": "This is used to express the source of an input schema mapping for a single target field in the Event Grid Event schema. This is currently used in the mappings for the 'subject','eventType' and 'dataVersion' properties. This represents a field in the input event schema along with a default value to be used, and at least one of these two properties should be provided."
@@ -364,22 +364,22 @@
     "JsonInputSchemaMapping": {
       "type": "object",
       "properties": {
+        "inputSchemaMappingType": {
+          "type": "string",
+          "enum": [
+            "Json"
+          ]
+        },
         "properties": {
           "oneOf": [
             {
               "$ref": "#/definitions/JsonInputSchemaMappingProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "This can be used to map properties of a source schema (or default values, for certain supported properties) to properties of the EventGridEvent schema."
-        },
-        "inputSchemaMappingType": {
-          "type": "string",
-          "enum": [
-            "Json"
-          ]
         }
       },
       "required": [
@@ -390,27 +390,16 @@
     "JsonInputSchemaMappingProperties": {
       "type": "object",
       "properties": {
-        "id": {
+        "dataVersion": {
           "oneOf": [
             {
-              "$ref": "#/definitions/JsonField"
+              "$ref": "#/definitions/JsonFieldWithDefault"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "This is used to express the source of an input schema mapping for a single target field in the Event Grid Event schema. This is currently used in the mappings for the 'id','topic' and 'eventTime' properties. This represents a field in the input event schema."
-        },
-        "topic": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/JsonField"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "This is used to express the source of an input schema mapping for a single target field in the Event Grid Event schema. This is currently used in the mappings for the 'id','topic' and 'eventTime' properties. This represents a field in the input event schema."
+          "description": "This is used to express the source of an input schema mapping for a single target field in the Event Grid Event schema. This is currently used in the mappings for the 'subject','eventType' and 'dataVersion' properties. This represents a field in the input event schema along with a default value to be used, and at least one of these two properties should be provided."
         },
         "eventTime": {
           "oneOf": [
@@ -418,7 +407,7 @@
               "$ref": "#/definitions/JsonField"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "This is used to express the source of an input schema mapping for a single target field in the Event Grid Event schema. This is currently used in the mappings for the 'id','topic' and 'eventTime' properties. This represents a field in the input event schema."
@@ -429,10 +418,21 @@
               "$ref": "#/definitions/JsonFieldWithDefault"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "This is used to express the source of an input schema mapping for a single target field in the Event Grid Event schema. This is currently used in the mappings for the 'subject','eventType' and 'dataVersion' properties. This represents a field in the input event schema along with a default value to be used, and at least one of these two properties should be provided."
+        },
+        "id": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/JsonField"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "This is used to express the source of an input schema mapping for a single target field in the Event Grid Event schema. This is currently used in the mappings for the 'id','topic' and 'eventTime' properties. This represents a field in the input event schema."
         },
         "subject": {
           "oneOf": [
@@ -440,21 +440,21 @@
               "$ref": "#/definitions/JsonFieldWithDefault"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "This is used to express the source of an input schema mapping for a single target field in the Event Grid Event schema. This is currently used in the mappings for the 'subject','eventType' and 'dataVersion' properties. This represents a field in the input event schema along with a default value to be used, and at least one of these two properties should be provided."
         },
-        "dataVersion": {
+        "topic": {
           "oneOf": [
             {
-              "$ref": "#/definitions/JsonFieldWithDefault"
+              "$ref": "#/definitions/JsonField"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "This is used to express the source of an input schema mapping for a single target field in the Event Grid Event schema. This is currently used in the mappings for the 'subject','eventType' and 'dataVersion' properties. This represents a field in the input event schema along with a default value to be used, and at least one of these two properties should be provided."
+          "description": "This is used to express the source of an input schema mapping for a single target field in the Event Grid Event schema. This is currently used in the mappings for the 'id','topic' and 'eventTime' properties. This represents a field in the input event schema."
         }
       },
       "description": "This can be used to map properties of a source schema (or default values, for certain supported properties) to properties of the EventGridEvent schema."
@@ -462,27 +462,27 @@
     "RetryPolicy": {
       "type": "object",
       "properties": {
-        "maxDeliveryAttempts": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Maximum number of delivery retry attempts for events."
-        },
         "eventTimeToLiveInMinutes": {
           "oneOf": [
             {
               "type": "integer"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Time To Live (in minutes) for events."
+        },
+        "maxDeliveryAttempts": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Maximum number of delivery retry attempts for events."
         }
       },
       "description": "Information about the retry policy for an event subscription"
@@ -490,22 +490,22 @@
     "StorageBlobDeadLetterDestination": {
       "type": "object",
       "properties": {
+        "endpointType": {
+          "type": "string",
+          "enum": [
+            "StorageBlob"
+          ]
+        },
         "properties": {
           "oneOf": [
             {
               "$ref": "#/definitions/StorageBlobDeadLetterDestinationProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Properties of the storage blob based dead letter destination."
-        },
-        "endpointType": {
-          "type": "string",
-          "enum": [
-            "StorageBlob"
-          ]
         }
       },
       "required": [
@@ -516,13 +516,13 @@
     "StorageBlobDeadLetterDestinationProperties": {
       "type": "object",
       "properties": {
-        "resourceId": {
-          "type": "string",
-          "description": "The Azure Resource ID of the storage account that is the destination of the deadletter events"
-        },
         "blobContainerName": {
           "type": "string",
           "description": "The name of the Storage blob container that is the destination of the deadletter events"
+        },
+        "resourceId": {
+          "type": "string",
+          "description": "The Azure Resource ID of the storage account that is the destination of the deadletter events"
         }
       },
       "description": "Properties of the storage blob based dead letter destination."
@@ -530,22 +530,22 @@
     "StorageQueueEventSubscriptionDestination": {
       "type": "object",
       "properties": {
+        "endpointType": {
+          "type": "string",
+          "enum": [
+            "StorageQueue"
+          ]
+        },
         "properties": {
           "oneOf": [
             {
               "$ref": "#/definitions/StorageQueueEventSubscriptionDestinationProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The properties for a storage queue destination."
-        },
-        "endpointType": {
-          "type": "string",
-          "enum": [
-            "StorageQueue"
-          ]
         }
       },
       "required": [
@@ -556,13 +556,13 @@
     "StorageQueueEventSubscriptionDestinationProperties": {
       "type": "object",
       "properties": {
-        "resourceId": {
-          "type": "string",
-          "description": "The Azure Resource ID of the storage account that contains the queue that is the destination of an event subscription."
-        },
         "queueName": {
           "type": "string",
           "description": "The name of the Storage queue under a storage account that is the destination of an event subscription."
+        },
+        "resourceId": {
+          "type": "string",
+          "description": "The Azure Resource ID of the storage account that contains the queue that is the destination of an event subscription."
         }
       },
       "description": "The properties for a storage queue destination."
@@ -581,7 +581,7 @@
               ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "This determines the format that Event Grid should expect for incoming events published to the topic."
@@ -592,7 +592,7 @@
               "$ref": "#/definitions/InputSchemaMapping"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "By default, Event Grid expects events to be in the Event Grid event schema. Specifying an input schema mapping enables publishing to Event Grid using a custom input schema. Currently, the only supported type of InputSchemaMapping is 'JsonInputSchemaMapping'."
@@ -603,22 +603,22 @@
     "WebHookEventSubscriptionDestination": {
       "type": "object",
       "properties": {
+        "endpointType": {
+          "type": "string",
+          "enum": [
+            "WebHook"
+          ]
+        },
         "properties": {
           "oneOf": [
             {
               "$ref": "#/definitions/WebHookEventSubscriptionDestinationProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Information about the webhook destination properties for an event subscription."
-        },
-        "endpointType": {
-          "type": "string",
-          "enum": [
-            "WebHook"
-          ]
         }
       },
       "required": [

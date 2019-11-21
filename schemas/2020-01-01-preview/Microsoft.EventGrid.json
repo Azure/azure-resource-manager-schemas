@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2019-02-01-preview/Microsoft.EventGrid.json#",
+  "id": "https://schema.management.azure.com/schemas/2020-01-01-preview/Microsoft.EventGrid.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.EventGrid",
   "description": "Microsoft EventGrid Resource Types",
@@ -10,7 +10,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-02-01-preview"
+            "2020-01-01-preview"
           ]
         },
         "location": {
@@ -79,7 +79,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-02-01-preview"
+            "2020-01-01-preview"
           ]
         },
         "name": {
@@ -106,7 +106,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-02-01-preview"
+            "2020-01-01-preview"
           ]
         },
         "location": {
@@ -167,7 +167,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-02-01-preview"
+            "2020-01-01-preview"
           ]
         },
         "name": {
@@ -250,6 +250,64 @@
       },
       "description": "This is the base type that represents an advanced filter. To configure an advanced filter, do not directly instantiate an object of this class. Instead, instantiate an object of a derived class such as BoolEqualsAdvancedFilter, NumberInAdvancedFilter, StringEqualsAdvancedFilter etc. depending on the type of the key based on which you want to filter."
     },
+    "AzureFunctionEventSubscriptionDestination": {
+      "type": "object",
+      "properties": {
+        "endpointType": {
+          "type": "string",
+          "enum": [
+            "AzureFunction"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AzureFunctionEventSubscriptionDestinationProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties that represent the Azure Function destination of an event subscription."
+        }
+      },
+      "required": [
+        "endpointType"
+      ],
+      "description": "Information about the azure function destination for an event subscription."
+    },
+    "AzureFunctionEventSubscriptionDestinationProperties": {
+      "type": "object",
+      "properties": {
+        "maxEventsPerBatch": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Maximum number of events per batch."
+        },
+        "preferredBatchSizeInKilobytes": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Preferred batch size in Kilobytes."
+        },
+        "resourceId": {
+          "type": "string",
+          "description": "The Azure Resource Id that represents the endpoint of the Azure Function destination of an event subscription."
+        }
+      },
+      "description": "The properties that represent the Azure Function destination of an event subscription."
+    },
     "BoolEqualsAdvancedFilter": {
       "type": "object",
       "properties": {
@@ -296,7 +354,7 @@
               "enum": [
                 "EventGridSchema",
                 "CustomEventSchema",
-                "CloudEventV01Schema"
+                "CloudEventSchemaV1_0"
               ]
             },
             {
@@ -325,7 +383,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-02-01-preview"
+            "2020-01-01-preview"
           ]
         },
         "name": {
@@ -399,6 +457,12 @@
         },
         {
           "$ref": "#/definitions/ServiceBusQueueEventSubscriptionDestination"
+        },
+        {
+          "$ref": "#/definitions/ServiceBusTopicEventSubscriptionDestination"
+        },
+        {
+          "$ref": "#/definitions/AzureFunctionEventSubscriptionDestination"
         }
       ],
       "properties": {},
@@ -489,8 +553,8 @@
               "type": "string",
               "enum": [
                 "EventGridSchema",
-                "CloudEventV01Schema",
-                "CustomInputSchema"
+                "CustomInputSchema",
+                "CloudEventSchemaV1_0"
               ]
             },
             {
@@ -937,6 +1001,42 @@
       },
       "description": "The properties that represent the Service Bus destination of an event subscription."
     },
+    "ServiceBusTopicEventSubscriptionDestination": {
+      "type": "object",
+      "properties": {
+        "endpointType": {
+          "type": "string",
+          "enum": [
+            "ServiceBusTopic"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ServiceBusTopicEventSubscriptionDestinationProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties that represent the Service Bus Topic destination of an event subscription."
+        }
+      },
+      "required": [
+        "endpointType"
+      ],
+      "description": "Information about the service bus topic destination for an event subscription."
+    },
+    "ServiceBusTopicEventSubscriptionDestinationProperties": {
+      "type": "object",
+      "properties": {
+        "resourceId": {
+          "type": "string",
+          "description": "The Azure Resource Id that represents the endpoint of the Service Bus Topic destination of an event subscription."
+        }
+      },
+      "description": "The properties that represent the Service Bus Topic destination of an event subscription."
+    },
     "StorageBlobDeadLetterDestination": {
       "type": "object",
       "properties": {
@@ -1172,7 +1272,7 @@
               "enum": [
                 "EventGridSchema",
                 "CustomEventSchema",
-                "CloudEventV01Schema"
+                "CloudEventSchemaV1_0"
               ]
             },
             {
@@ -1224,9 +1324,39 @@
     "WebHookEventSubscriptionDestinationProperties": {
       "type": "object",
       "properties": {
+        "azureActiveDirectoryApplicationIdOrUri": {
+          "type": "string",
+          "description": "The Azure Active Directory Application ID or URI to get the access token that will be included as the bearer token in delivery requests."
+        },
+        "azureActiveDirectoryTenantId": {
+          "type": "string",
+          "description": "The Azure Active Directory Tenant ID to get the access token that will be included as the bearer token in delivery requests."
+        },
         "endpointUrl": {
           "type": "string",
           "description": "The URL that represents the endpoint of the destination of an event subscription."
+        },
+        "maxEventsPerBatch": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Maximum number of events per batch."
+        },
+        "preferredBatchSizeInKilobytes": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Preferred batch size in Kilobytes."
         }
       },
       "description": "Information about the webhook destination properties for an event subscription."

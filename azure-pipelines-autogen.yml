@@ -20,10 +20,20 @@ jobs:
     persistCredentials: true
     clean: true
 
+  - task: DownloadSecureFile@1
+    name: schemasDeployKey
+    inputs:
+      secureFile: schemas_rsa
+    displayName: "Download GitHub Deploy Key"
+
   - script: |
       set -Eeuxo pipefail
+      mkdir ~/.ssh && mv $(schemasDeployKey.secureFilePath) ~/.ssh/schemas_rsa
+      chmod 700 ~/.ssh
+      chmod 600 ~/.ssh/schemas_rsa
       git config user.name "Autogenerator Pipeline"
       git config user.email "azure-resource-manager-schemas@noreply.github.com"
+      git config core.sshCommand "ssh -i ~/.ssh/schemas_rsa -F /dev/null"
     displayName: Configure git
 
   - script: |

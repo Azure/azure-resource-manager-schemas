@@ -48,7 +48,8 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Describes the properties of an image template"
         },
         "tags": {
           "oneOf": [
@@ -108,7 +109,8 @@
           "type": "string",
           "description": "Friendly Name to provide context on what this customization step does"
         }
-      }
+      },
+      "description": "Describes a unit of image customization"
     },
     "ImageTemplateDistributor": {
       "type": "object",
@@ -163,6 +165,10 @@
         "destination": {
           "type": "string",
           "description": "The absolute path to a file (with nested directory structures already created) where the file (from sourceUri) will be uploaded to in the VM"
+        },
+        "sha256Checksum": {
+          "type": "string",
+          "description": "SHA256 checksum of the file provided in the sourceUri field above"
         },
         "sourceUri": {
           "type": "string",
@@ -334,9 +340,24 @@
           ],
           "description": "Array of PowerShell commands to execute"
         },
+        "runElevated": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "If specified, the PowerShell script will be run with elevated privileges"
+        },
         "scriptUri": {
           "type": "string",
           "description": "URI of the PowerShell script to be run for customizing. It can be a github link, SAS URI for Azure Storage, etc"
+        },
+        "sha256Checksum": {
+          "type": "string",
+          "description": "SHA256 checksum of the power shell script provided in the scriptUri field above"
         },
         "type": {
           "type": "string",
@@ -378,7 +399,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Maximum duration to wait while building the image template. Omit or specify 0 to use the default (60 minutes)."
+          "description": "Maximum duration to wait while building the image template. Omit or specify 0 to use the default (4 hours)."
         },
         "customize": {
           "oneOf": [
@@ -416,13 +437,26 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Describes a virtual machine image source for building, customizing and distributing"
+        },
+        "vmProfile": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ImageTemplateVmProfile"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Describes the virtual machine used to build, customize and capture images"
         }
       },
       "required": [
         "distribute",
         "source"
-      ]
+      ],
+      "description": "Describes the properties of an image template"
     },
     "ImageTemplateRestartCustomizer": {
       "type": "object",
@@ -469,7 +503,8 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "A list of regions that the image will be replicated to"
         },
         "type": {
           "type": "string",
@@ -526,6 +561,10 @@
           "type": "string",
           "description": "URI of the shell script to be run for customizing. It can be a github link, SAS URI for Azure Storage, etc"
         },
+        "sha256Checksum": {
+          "type": "string",
+          "description": "SHA256 checksum of the shell script provided in the scriptUri field"
+        },
         "type": {
           "type": "string",
           "enum": [
@@ -554,7 +593,8 @@
           "$ref": "#/definitions/ImageTemplateSharedImageVersionSource"
         }
       ],
-      "properties": {}
+      "properties": {},
+      "description": "Describes a virtual machine image source for building, customizing and distributing"
     },
     "ImageTemplateVhdDistributor": {
       "type": "object",
@@ -570,6 +610,16 @@
         "type"
       ],
       "description": "Distribute via VHD in a storage account."
+    },
+    "ImageTemplateVmProfile": {
+      "type": "object",
+      "properties": {
+        "vmSize": {
+          "type": "string",
+          "description": "Size of the virtual machine used to build, customize and capture images. Omit or specify empty string to use the default (Standard_D1_v2)."
+        }
+      },
+      "description": "Describes the virtual machine used to build, customize and capture images"
     }
   }
 }

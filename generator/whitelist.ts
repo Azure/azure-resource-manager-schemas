@@ -142,6 +142,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.HybridData',
     },
     {
+        basePath: 'iotcentral/resource-manager',
+        namespace: 'Microsoft.IotCentral',
+    },
+    {
         basePath: 'iothub/resource-manager',
         namespace: 'Microsoft.Devices',
     },

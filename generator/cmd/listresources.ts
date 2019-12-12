@@ -2,7 +2,17 @@ import path from 'path';
 import fs from 'fs';
 import { promisify } from 'util';
 import * as constants from '../constants';
-import { lowerCaseCompare, executeSynchronous } from '../utils';
+import { lowerCaseCompare, executeSynchronous, writeJsonFile } from '../utils';
+
+interface ListResourcesParams {
+    outputFile?: string,
+}
+
+function parseParams(): ListResourcesParams {
+    return {
+        outputFile: process.argv[2],
+    };
+}
 
 const rootSchemaPaths = [
     'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json',
@@ -85,6 +95,7 @@ async function findAllResourceReferences() {
 }
 
 executeSynchronous(async () => {
+    const params = parseParams();
     const rootSchemaRefs = await findAllResourceReferences();
 
     const allResources: {[type: string]: string[]} = {};
@@ -103,5 +114,9 @@ executeSynchronous(async () => {
         }
     }
 
-    console.log(allResources);
+    if (params.outputFile) {
+        await writeJsonFile(params.outputFile, allResources);
+    } else {
+        console.log(JSON.stringify(allResources, null, 2));
+    }
 });

@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import { promisify } from 'util';
 import * as constants from '../constants';
-import { lowerCaseCompare, executeSynchronous, writeJsonFile } from '../utils';
+import { lowerCaseCompare, executeSynchronous } from '../utils';
 
 interface ListResourcesParams {
     outputFile?: string,
@@ -22,6 +22,7 @@ const rootSchemaPaths = [
 ];
 
 const readFile = promisify(fs.readFile);
+const writeFile = promisify(fs.writeFile);
 
 async function readSchema(schemaUri: string) {
     if (!schemaUri.toLowerCase().startsWith(constants.schemasBaseUri.toLowerCase() + '/')) {
@@ -114,9 +115,14 @@ executeSynchronous(async () => {
         }
     }
 
+    for (const resourceType of Object.keys(allResources)) {
+        allResources[resourceType].sort();
+    }
+
+    const sortedJsonOutput = JSON.stringify(allResources, Object.keys(allResources).sort(), 2);
     if (params.outputFile) {
-        await writeJsonFile(params.outputFile, allResources);
+        await writeFile(params.outputFile, sortedJsonOutput, { encoding: 'utf8' });
     } else {
-        console.log(JSON.stringify(allResources, null, 2));
+        console.log(sortedJsonOutput);
     }
 });

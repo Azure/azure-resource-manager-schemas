@@ -248,6 +248,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.VirtualMachineImages',
     },
     {
+        basePath: 'windowsesu/resource-manager',
+        namespace: 'Microsoft.WindowsESU',
+    },
+    {
         basePath: 'windowsiot/resource-manager',
         namespace: 'Microsoft.WindowsIoT',
     }

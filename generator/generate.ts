@@ -5,6 +5,7 @@ import * as constants from './constants';
 import chalk from 'chalk';
 import { ScopeType, WhitelistConfig } from './models';
 import { uniq, concat, Dictionary, groupBy, keys, difference } from 'lodash';
+import { autorestCoreVersion } from './constants';
 
 const autorestBinary = os.platform() === 'win32' ? 'autorest-beta.cmd' : 'autorest-beta';
 
@@ -75,6 +76,7 @@ async function execAutoRest(tmpFolder: string, params: string[]) {
 
 async function generateSchema(readme: string, tmpFolder: string, apiVersion: string) {
     const autoRestParams = [
+        `--version=${autorestCoreVersion}`,
         '--azureresourceschema',
         `--output-folder=${tmpFolder}`,
         `--tag=all-api-versions`,

@@ -28,7 +28,7 @@ async function cloneGitRepo(localPath: string, remoteUri: string, commitHash: st
 
     await resetGitDirectory(localPath, true);
 
-    await executeCmd(localPath, 'git', ['fetch']);
+    await executeCmd(localPath, 'git', ['fetch', '-q']);
     await executeCmd(localPath, 'git', ['checkout', '-q', commitHash]);
 }
 

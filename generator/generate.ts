@@ -75,6 +75,8 @@ async function execAutoRest(tmpFolder: string, params: string[]) {
 
 async function generateSchema(readme: string, tmpFolder: string, apiVersion: string) {
     const autoRestParams = [
+        `--version=${constants.autorestCoreVersion}`,
+        `--use=@autorest/azureresourceschema@${constants.azureresourceschemaVersion}`,
         '--azureresourceschema',
         `--output-folder=${tmpFolder}`,
         `--tag=all-api-versions`,

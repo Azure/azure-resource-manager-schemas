@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2018-09-01-preview/Microsoft.DeploymentManager.json#",
+  "id": "https://schema.management.azure.com/schemas/2019-11-01-preview/Microsoft.DeploymentManager.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.DeploymentManager",
   "description": "Microsoft DeploymentManager Resource Types",
@@ -10,7 +10,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-09-01-preview"
+            "2019-11-01-preview"
           ]
         },
         "location": {
@@ -69,7 +69,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-09-01-preview"
+            "2019-11-01-preview"
           ]
         },
         "identity": {
@@ -94,7 +94,7 @@
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/RolloutRequestPropertiesModel"
+              "$ref": "#/definitions/RolloutRequestProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -140,7 +140,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-09-01-preview"
+            "2019-11-01-preview"
           ]
         },
         "location": {
@@ -209,7 +209,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-09-01-preview"
+            "2019-11-01-preview"
           ]
         },
         "location": {
@@ -278,7 +278,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-09-01-preview"
+            "2019-11-01-preview"
           ]
         },
         "location": {
@@ -337,7 +337,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-09-01-preview"
+            "2019-11-01-preview"
           ]
         },
         "location": {
@@ -351,7 +351,7 @@
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/StepPropertiesModel"
+              "$ref": "#/definitions/StepProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -392,6 +392,47 @@
     }
   },
   "definitions": {
+    "ApiKeyAuthentication": {
+      "type": "object",
+      "properties": {
+        "in": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Query",
+                "Header"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The location of the authentication key/value pair in the request."
+        },
+        "name": {
+          "type": "string",
+          "description": "The key name of the authentication key/value pair."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "ApiKey"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "description": "The value of the authentication key/value pair."
+        }
+      },
+      "required": [
+        "in",
+        "name",
+        "type",
+        "value"
+      ],
+      "description": "ApiKey authentication gives a name and a value that can be included in either the request header or query parameters."
+    },
     "ArtifactSourceProperties": {
       "type": "object",
       "properties": {
@@ -430,6 +471,59 @@
       ],
       "properties": {},
       "description": "Defines the authentication method and properties to access the artifacts."
+    },
+    "HealthCheckStepAttributes": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/RestHealthCheckStepAttributes"
+        }
+      ],
+      "properties": {
+        "healthyStateDuration": {
+          "type": "string",
+          "description": "The duration in ISO 8601 format for which the resource is expected to be continuously healthy. If maxElasticDuration is specified, healthy state duration is enforced after the detection of first healthy signal."
+        },
+        "maxElasticDuration": {
+          "type": "string",
+          "description": "The duration in ISO 8601 format for which the health check waits for the resource to become healthy. Health check fails if it doesn't. Health check starts to enforce healthyStateDuration once resource becomes healthy."
+        },
+        "waitDuration": {
+          "type": "string",
+          "description": "The duration in ISO 8601 format for which health check waits idly without any checks."
+        }
+      },
+      "required": [
+        "healthyStateDuration"
+      ],
+      "description": "The attributes for the health check step."
+    },
+    "HealthCheckStepProperties": {
+      "type": "object",
+      "properties": {
+        "attributes": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/HealthCheckStepAttributes"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The attributes for the health check step."
+        },
+        "stepType": {
+          "type": "string",
+          "enum": [
+            "HealthCheck"
+          ]
+        }
+      },
+      "required": [
+        "attributes",
+        "stepType"
+      ],
+      "description": "Defines the properties of a health check step."
     },
     "Identity": {
       "type": "object",
@@ -472,7 +566,227 @@
       ],
       "description": "The properties that define a step."
     },
-    "RolloutRequestPropertiesModel": {
+    "RestHealthCheck": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "A unique name for this check."
+        },
+        "request": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/RestRequest"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties that make up a REST request"
+        },
+        "response": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/RestResponse"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties that make up the expected REST response"
+        }
+      },
+      "required": [
+        "name",
+        "request"
+      ],
+      "description": "A REST based health check"
+    },
+    "RestHealthCheckStepAttributes": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/RestParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The parameters for the REST health check."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "REST"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Defines the REST health check step properties."
+    },
+    "RestParameters": {
+      "type": "object",
+      "properties": {
+        "healthChecks": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/RestHealthCheck"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of checks that form the health check step."
+        }
+      },
+      "required": [
+        "healthChecks"
+      ],
+      "description": "The parameters for the REST health check."
+    },
+    "RestRequest": {
+      "type": "object",
+      "properties": {
+        "authentication": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/RestRequestAuthentication"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The authentication information required in the REST health check request to the health provider."
+        },
+        "method": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "GET",
+                "POST"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The HTTP method to use for the request."
+        },
+        "uri": {
+          "type": "string",
+          "description": "The HTTP URI to use for the request."
+        }
+      },
+      "required": [
+        "authentication",
+        "method",
+        "uri"
+      ],
+      "description": "The properties that make up a REST request"
+    },
+    "RestRequestAuthentication": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/RolloutIdentityAuthentication"
+        },
+        {
+          "$ref": "#/definitions/ApiKeyAuthentication"
+        }
+      ],
+      "properties": {},
+      "description": "The authentication information required in the REST health check request to the health provider."
+    },
+    "RestResponse": {
+      "type": "object",
+      "properties": {
+        "regex": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/RestResponseRegex"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The regular expressions to match the response content with."
+        },
+        "successStatusCodes": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The HTTP status codes expected in a successful health check response. The response is expected to match one of the given status codes. If no expected status codes are provided, default expected status code is 200 OK."
+        }
+      },
+      "description": "The properties that make up the expected REST response"
+    },
+    "RestResponseRegex": {
+      "type": "object",
+      "properties": {
+        "matches": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of regular expressions."
+        },
+        "matchQuantifier": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "All",
+                "Any"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates whether any or all of the expressions should match with the response content."
+        }
+      },
+      "description": "The regular expressions to match the response content with."
+    },
+    "RolloutIdentityAuthentication": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "RolloutIdentity"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "RolloutIdentity uses the user-assigned managed identity authentication context specified in the Identity property during rollout creation."
+    },
+    "RolloutRequestProperties": {
       "type": "object",
       "properties": {
         "artifactSourceId": {
@@ -488,7 +802,7 @@
             {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Step"
+                "$ref": "#/definitions/StepGroup"
               }
             },
             {
@@ -572,7 +886,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-09-01-preview"
+            "2019-11-01-preview"
           ]
         },
         "location": {
@@ -631,7 +945,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-09-01-preview"
+            "2019-11-01-preview"
           ]
         },
         "location": {
@@ -756,7 +1070,7 @@
       ],
       "description": "The properties that define the service unit."
     },
-    "Step": {
+    "StepGroup": {
       "type": "object",
       "properties": {
         "dependsOnStepGroups": {
@@ -814,13 +1128,16 @@
         "deploymentTargetId",
         "name"
       ],
-      "description": "The properties that define an Azure Deployment Manager step."
+      "description": "The properties that define a Step group in a rollout."
     },
-    "StepPropertiesModel": {
+    "StepProperties": {
       "type": "object",
       "oneOf": [
         {
-          "$ref": "#/definitions/WaitStepPropertiesModel"
+          "$ref": "#/definitions/HealthCheckStepProperties"
+        },
+        {
+          "$ref": "#/definitions/WaitStepProperties"
         }
       ],
       "properties": {},
@@ -839,7 +1156,7 @@
       ],
       "description": "The parameters for the wait step."
     },
-    "WaitStepPropertiesModel": {
+    "WaitStepProperties": {
       "type": "object",
       "properties": {
         "attributes": {
@@ -861,6 +1178,7 @@
         }
       },
       "required": [
+        "attributes",
         "stepType"
       ],
       "description": "Defines the properties of a Wait step."

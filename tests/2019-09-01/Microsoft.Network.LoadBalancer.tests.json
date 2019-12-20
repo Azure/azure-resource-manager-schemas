@@ -1,0 +1,205 @@
+{
+  "tests": [
+    {
+      "name": "load balancer - minimal",
+      "definition": "https://schema.management.azure.com/schemas/2019-09-01/Microsoft.Network.json#/resourceDefinitions/loadBalancers",
+      "json": {
+        "apiVersion": "2019-09-01",
+        "name": "[variables('loadBalancerName')]",
+        "type": "Microsoft.Network/loadBalancers",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "frontendIPConfigurations": [
+            {
+              "name": "loadBalancerFrontEnd1",
+              "properties": {
+                "publicIPAddress": {
+                  "id": "[variables('publicIPAddressID1')]"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "load balancer",
+      "definition": "https://schema.management.azure.com/schemas/2019-09-01/Microsoft.Network.json#/resourceDefinitions/loadBalancers",
+      "json": {
+        "apiVersion": "2019-09-01",
+        "name": "[variables('loadBalancerName')]",
+        "type": "Microsoft.Network/loadBalancers",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "frontendIPConfigurations": [
+            {
+              "name": "loadBalancerFrontEnd1",
+              "properties": {
+                "publicIPAddress": {
+                  "id": "[variables('publicIPAddressID1')]"
+                }
+              }
+            },
+            {
+              "name": "loadBalancerFrontEnd2",
+              "properties": {
+                "publicIPAddress": {
+                  "id": "[variables('publicIPAddressID2')]"
+                }
+              }
+            }
+          ],
+          "backendAddressPools": [
+            {
+              "name": "loadBalancerBackEnd"
+            }
+          ],
+          "loadBalancingRules": [
+            {
+              "name": "LBRuleForVIP1",
+              "properties": {
+                "frontendIPConfiguration": {
+                  "id": "[variables('frontEndIPConfigID1')]"
+                },
+                "backendAddressPool": {
+                  "id": "[variables('lbBackendPoolID')]"
+                },
+                "protocol": "Tcp",
+                "frontendPort": 443,
+                "backendPort": 443,
+                "probe": {
+                  "id": "[variables('lbProbeID')]"
+                }
+              }
+            },
+            {
+              "name": "LBRuleForVIP2",
+              "properties": {
+                "frontendIPConfiguration": {
+                  "id": "[variables('frontEndIPConfigID2')]"
+                },
+                "backendAddressPool": {
+                  "id": "[variables('lbBackendPoolID')]"
+                },
+                "protocol": "Tcp",
+                "frontendPort": 443,
+                "backendPort": 444,
+                "probe": {
+                  "id": "[variables('lbProbeID')]"
+                }
+              }
+            }
+          ],
+          "probes": [
+            {
+              "name": "tcpProbe",
+              "properties": {
+                "protocol": "Tcp",
+                "port": 445,
+                "intervalInSeconds": 5,
+                "numberOfProbes": 2
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "load balancer - no required frontendIPConfigurations",
+      "definition": "https://schema.management.azure.com/schemas/2019-09-01/Microsoft.Network.json#/resourceDefinitions/loadBalancers",
+      "json": {
+        "apiVersion": "2019-09-01",
+        "name": "[variables('loadBalancerName')]",
+        "type": "Microsoft.Network/loadBalancers",
+        "location": "[resourceGroup().location]",
+        "properties": {}
+      }
+    },
+    {
+      "name": "load balancer - probe protocol out of range",
+      "definition": "https://schema.management.azure.com/schemas/2019-09-01/Microsoft.Network.json#/resourceDefinitions/loadBalancers",
+      "expectedErrors": [
+        {
+          "message": "Data does not match any schemas from \"oneOf\"",
+          "dataPath": "/properties"
+        }
+      ],
+      "json": {
+        "apiVersion": "2019-09-01",
+        "name": "[variables('loadBalancerName')]",
+        "type": "Microsoft.Network/loadBalancers",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "frontendIPConfigurations": [
+            {
+              "name": "loadBalancerFrontEnd1",
+              "properties": {
+                "publicIPAddress": {
+                  "id": "[variables('publicIPAddressID1')]"
+                }
+              }
+            }
+          ],
+          "probes": [
+            {
+              "name": "tcpProbe",
+              "properties": {
+                "protocol": "fail",
+                "port": 445,
+                "intervalInSeconds": 5,
+                "numberOfProbes": 2
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "load balancer - rule protocol out of range",
+      "definition": "https://schema.management.azure.com/schemas/2019-09-01/Microsoft.Network.json#/resourceDefinitions/loadBalancers",
+      "expectedErrors": [
+        {
+          "message": "Data does not match any schemas from \"oneOf\"",
+          "dataPath": "/properties"
+        }
+      ],
+      "json": {
+        "apiVersion": "2019-09-01",
+        "name": "[variables('loadBalancerName')]",
+        "type": "Microsoft.Network/loadBalancers",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "frontendIPConfigurations": [
+            {
+              "name": "loadBalancerFrontEnd1",
+              "properties": {
+                "publicIPAddress": {
+                  "id": "[variables('publicIPAddressID1')]"
+                }
+              }
+            }
+          ],
+          "loadBalancingRules": [
+            {
+              "name": "LBRuleForVIP1",
+              "properties": {
+                "frontendIPConfiguration": {
+                  "id": "[variables('frontEndIPConfigID1')]"
+                },
+                "backendAddressPool": {
+                  "id": "[variables('lbBackendPoolID')]"
+                },
+                "protocol": "OutOfRange",
+                "frontendPort": 443,
+                "backendPort": 443,
+                "probe": {
+                  "id": "[variables('lbProbeID')]"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

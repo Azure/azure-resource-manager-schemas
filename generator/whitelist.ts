@@ -7,12 +7,20 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.AlertsManagement',
     },
     {
+        basePath: 'appplatform/resource-manager',
+        namespace: 'Microsoft.AppPlatform',
+    },
+    {
         basePath: 'attestation/resource-manager',
         namespace: 'Microsoft.Attestation',
     },
     {
         basePath: 'azuredata/resource-manager',
         namespace: 'Microsoft.AzureData',
+    },
+    { 
+        basePath: 'batch/resource-manager',
+        namespace: 'Microsoft.Batch',
     },
     { 
         basePath: 'batchai/resource-manager',
@@ -87,12 +95,21 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DataFactory',
     },
     {
+        basePath: 'datalake-analytics/resource-manager',
+        namespace: 'Microsoft.DataLakeAnalytics',
+    },
+    {
         basePath: 'datashare/resource-manager',
         namespace: 'Microsoft.DataShare',
     },
     {
         basePath: 'deploymentmanager/resource-manager',
         namespace: 'Microsoft.DeploymentManager',
+    },
+    {
+        basePath: 'deviceprovisioningservices/resource-manager',
+        namespace: 'Microsoft.Devices',
+        suffix: 'Provisioning',
     },
     {
         basePath: 'devops/resource-manager',
@@ -106,6 +123,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'devtestlabs/resource-manager',
         namespace: 'Microsoft.DevTestLab',
     },
+    { 
+        basePath: 'redis/resource-manager',
+        namespace: 'Microsoft.Cache',
+    },
     {
         basePath: 'hdinsight/resource-manager',
         namespace: 'Microsoft.HDInsight',
@@ -114,7 +135,7 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',
         namespace: 'Microsoft.EnterpriseKnowledgeGraph',
     },
-    {
+    { 
         basePath: 'domainservices/resource-manager',
         namespace: 'Microsoft.AAD',
     },
@@ -129,6 +150,14 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'hybriddatamanager/resource-manager',
         namespace: 'Microsoft.HybridData',
+    },
+    {
+        basePath: 'iotcentral/resource-manager',
+        namespace: 'Microsoft.IotCentral',
+    },
+    {
+        basePath: 'iothub/resource-manager',
+        namespace: 'Microsoft.Devices',
     },
     {
         basePath: 'iotspaces/resource-manager',
@@ -227,6 +256,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'imagebuilder/resource-manager',
         namespace: 'Microsoft.VirtualMachineImages',
+    },
+    {
+        basePath: 'windowsesu/resource-manager',
+        namespace: 'Microsoft.WindowsESU',
     },
     {
         basePath: 'windowsiot/resource-manager',

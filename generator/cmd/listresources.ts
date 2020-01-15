@@ -2,8 +2,17 @@ import path from 'path';
 import fs from 'fs';
 import { promisify } from 'util';
 import * as constants from '../constants';
-import { series } from 'async';
-import { lowerCaseCompare } from '../utils';
+import { lowerCaseCompare, executeSynchronous } from '../utils';
+
+interface ListResourcesParams {
+    outputFile?: string,
+}
+
+function parseParams(): ListResourcesParams {
+    return {
+        outputFile: process.argv[2],
+    };
+}
 
 const rootSchemaPaths = [
     'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json',
@@ -13,6 +22,7 @@ const rootSchemaPaths = [
 ];
 
 const readFile = promisify(fs.readFile);
+const writeFile = promisify(fs.writeFile);
 
 async function readSchema(schemaUri: string) {
     if (!schemaUri.toLowerCase().startsWith(constants.schemasBaseUri.toLowerCase() + '/')) {
@@ -85,7 +95,8 @@ async function findAllResourceReferences() {
     return [...new Set(allRefs)];
 }
 
-series([async () => {
+executeSynchronous(async () => {
+    const params = parseParams();
     const rootSchemaRefs = await findAllResourceReferences();
 
     const allResources: {[type: string]: string[]} = {};
@@ -104,5 +115,14 @@ series([async () => {
         }
     }
 
-    console.log(allResources);
-}]);
+    for (const resourceType of Object.keys(allResources)) {
+        allResources[resourceType].sort();
+    }
+
+    const sortedJsonOutput = JSON.stringify(allResources, Object.keys(allResources).sort(), 2);
+    if (params.outputFile) {
+        await writeFile(params.outputFile, sortedJsonOutput, { encoding: 'utf8' });
+    } else {
+        console.log(sortedJsonOutput);
+    }
+});

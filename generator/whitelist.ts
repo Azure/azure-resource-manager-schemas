@@ -69,6 +69,16 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.OperationalInsights',
     },
     {
+        basePath: 'consumption/resource-manager',
+        namespace: 'Microsoft.Consumption',
+        resourceConfig: [
+            {
+                type: 'budgets',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+        ],
+    },
+    {
         basePath: 'containerservice/resource-manager',
         namespace: 'Microsoft.ContainerService',
     },

@@ -112,14 +112,19 @@ function getFilePathFromRef(schemaRef: string) {
     return path.resolve(path.join(constants.schemasBasePath, schemaUri.substring(constants.schemasBaseUri.length + 1)));
 }
 
-function applyResourceConfig(schemaRefs: SchemaReference[], whitelistConfig?: WhitelistConfig) {
+function assignScopesToUnknownReferences(knownReferences: SchemaReference[], unknownReferences: SchemaReference[], whitelistConfig?: WhitelistConfig) {
     const resourceConfig = (whitelistConfig || {}).resourceConfig || [];
 
-    for (const schemaRef of schemaRefs) {
+    for (const schemaRef of unknownReferences) {
         const config = resourceConfig.find(c => lowerCaseCompare(c.type, schemaRef.type) === 0);
 
         if (config && (schemaRef.scope & ScopeType.Unknown)) {
             schemaRef.scope = config.scopes || ScopeType.None;
+        }
+
+        for (const knownReference of knownReferences.filter(r => lowerCaseCompare(r.type, schemaRef.type) === 0)) {
+            // remove resources for scopes that have already been declared elsewhere to avoid duplication
+            schemaRef.scope &= ~knownReference.scope;
         }
     }
 }
@@ -145,16 +150,22 @@ async function generateSchemaConfig(outputFile: string, namespace: string, apiVe
 
     const output = await readJsonFile(outputFile);
 
-    const references = [
+    const knownReferences = [
         ...getSchemaRefs(output, ScopeType.Tenant, 'tenant_resourceDefinitions'),
         ...getSchemaRefs(output, ScopeType.ManagementGroup, 'managementGroup_resourceDefinitions'),
         ...getSchemaRefs(output, ScopeType.Subcription, 'subscription_resourceDefinitions'),
         ...getSchemaRefs(output, ScopeType.ResourceGroup, 'resourceDefinitions'),
         ...getSchemaRefs(output, ScopeType.Extension, 'extension_resourceDefinitions'),
-        ...getSchemaRefs(output, ScopeType.Unknown, 'unknown_resourceDefinitions'),
     ];
 
-    applyResourceConfig(references, whitelistConfig);
+    const unknownReferences = getSchemaRefs(output, ScopeType.Unknown, 'unknown_resourceDefinitions');
+    assignScopesToUnknownReferences(knownReferences, unknownReferences, whitelistConfig);
+
+    const references = [
+        ...knownReferences,
+        ...unknownReferences,
+    ];
+
     const schemaPath = path.join(constants.schemasBasePath, relativePath);
 
     console.log('================================================================================================================================');

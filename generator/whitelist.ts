@@ -148,6 +148,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.HanaOnAzure',
     },
     {
+        basePath: 'hybridcompute/resource-manager',
+        namespace: 'Microsoft.HybridCompute',
+    },
+    {
         basePath: 'hybriddatamanager/resource-manager',
         namespace: 'Microsoft.HybridData',
     },

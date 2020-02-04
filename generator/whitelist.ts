@@ -218,6 +218,20 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DBforPostgreSQL',
     },
     {
+        basePath: 'resources/resource-manager',
+        namespace: 'Microsoft.Resources',
+        resourceConfig: [
+            {
+                type: 'deployments',
+                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup,
+            },
+            {
+                type: 'tags',
+                scopes: ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+        ],
+    },
+    {
         basePath: 'relay/resource-manager',
         namespace: 'Microsoft.Relay',
     },

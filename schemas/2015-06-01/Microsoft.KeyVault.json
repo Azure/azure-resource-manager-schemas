@@ -7,6 +7,16 @@
     "vaults": {
       "type": "object",
       "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2015-06-01"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "The supported Azure location where the key vault should be created."
+        },
         "name": {
           "oneOf": [
             {
@@ -19,21 +29,16 @@
           ],
           "description": "Name of the vault"
         },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.KeyVault/vaults"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2015-06-01"
-          ]
-        },
-        "location": {
-          "type": "string",
-          "description": "The supported Azure location where the key vault should be created."
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/VaultProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the vault"
         },
         "tags": {
           "oneOf": [
@@ -50,24 +55,19 @@
           ],
           "description": "The tags that will be assigned to the key vault. "
         },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/VaultProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Properties of the vault"
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.KeyVault/vaults"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
         "location",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.KeyVault/vaults"
     }
@@ -76,22 +76,6 @@
     "AccessPolicyEntry": {
       "type": "object",
       "properties": {
-        "tenantId": {
-          "oneOf": [
-            {
-              "type": "string",
-              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Azure Active Directory tenant ID that should be used for authenticating requests to the key vault."
-        },
-        "objectId": {
-          "type": "string",
-          "description": "The object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. The object ID must be unique for the list of access policies."
-        },
         "applicationId": {
           "oneOf": [
             {
@@ -104,6 +88,10 @@
           ],
           "description": " Application ID of the client making request on behalf of a principal"
         },
+        "objectId": {
+          "type": "string",
+          "description": "The object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault. The object ID must be unique for the list of access policies."
+        },
         "permissions": {
           "oneOf": [
             {
@@ -114,18 +102,61 @@
             }
           ],
           "description": "Permissions the identity has for keys, secrets and certificates."
+        },
+        "tenantId": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Azure Active Directory tenant ID that should be used for authenticating requests to the key vault."
         }
       },
       "required": [
-        "tenantId",
         "objectId",
-        "permissions"
+        "permissions",
+        "tenantId"
       ],
       "description": "An identity that have access to the key vault. All identities in the array must use the same tenant ID as the key vault's tenant ID."
     },
     "Permissions": {
       "type": "object",
       "properties": {
+        "certificates": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "all",
+                  "get",
+                  "list",
+                  "delete",
+                  "create",
+                  "import",
+                  "update",
+                  "managecontacts",
+                  "getissuers",
+                  "listissuers",
+                  "setissuers",
+                  "deleteissuers",
+                  "manageissuers",
+                  "recover",
+                  "purge"
+                ]
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Permissions to certificates"
+        },
         "keys": {
           "oneOf": [
             {
@@ -183,37 +214,6 @@
             }
           ],
           "description": "Permissions to secrets"
-        },
-        "certificates": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "enum": [
-                  "all",
-                  "get",
-                  "list",
-                  "delete",
-                  "create",
-                  "import",
-                  "update",
-                  "managecontacts",
-                  "getissuers",
-                  "listissuers",
-                  "setissuers",
-                  "deleteissuers",
-                  "manageissuers",
-                  "recover",
-                  "purge"
-                ]
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Permissions to certificates"
         }
       },
       "description": "Permissions the identity has for keys, secrets and certificates."
@@ -260,33 +260,6 @@
     "VaultProperties": {
       "type": "object",
       "properties": {
-        "vaultUri": {
-          "type": "string",
-          "description": "The URI of the vault for performing operations on keys and secrets."
-        },
-        "tenantId": {
-          "oneOf": [
-            {
-              "type": "string",
-              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Azure Active Directory tenant ID that should be used for authenticating requests to the key vault."
-        },
-        "sku": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/Sku"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "SKU details"
-        },
         "accessPolicies": {
           "oneOf": [
             {
@@ -344,12 +317,39 @@
             }
           ],
           "description": "Property to specify whether the 'soft delete' functionality is enabled for this key vault."
+        },
+        "sku": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Sku"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "SKU details"
+        },
+        "tenantId": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Azure Active Directory tenant ID that should be used for authenticating requests to the key vault."
+        },
+        "vaultUri": {
+          "type": "string",
+          "description": "The URI of the vault for performing operations on keys and secrets."
         }
       },
       "required": [
-        "tenantId",
+        "accessPolicies",
         "sku",
-        "accessPolicies"
+        "tenantId"
       ],
       "description": "Properties of the vault"
     }

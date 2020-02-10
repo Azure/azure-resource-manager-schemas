@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2019-08-01-preview/Microsoft.Peering.json#",
+  "id": "https://schema.management.azure.com/schemas/2020-01-01-preview/Microsoft.Peering.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.Peering",
   "description": "Microsoft Peering Resource Types",
@@ -10,7 +10,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-08-01-preview"
+            "2020-01-01-preview"
           ]
         },
         "kind": {
@@ -46,6 +46,19 @@
             }
           ],
           "description": "The properties that define connectivity to the Microsoft Cloud Edge."
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/peerings_registeredAsns_childResource"
+              },
+              {
+                "$ref": "#/definitions/peerings_registeredPrefixes_childResource"
+              }
+            ]
+          }
         },
         "sku": {
           "oneOf": [
@@ -97,7 +110,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-08-01-preview"
+            "2020-01-01-preview"
           ]
         },
         "location": {
@@ -128,6 +141,17 @@
               }
             ]
           }
+        },
+        "sku": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PeeringServiceSku"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The SKU that defines the type of the peering service."
         },
         "tags": {
           "oneOf": [
@@ -166,12 +190,12 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-08-01-preview"
+            "2020-01-01-preview"
           ]
         },
         "name": {
           "type": "string",
-          "description": "The prefix name"
+          "description": "The name of the prefix."
         },
         "properties": {
           "oneOf": [
@@ -198,6 +222,84 @@
         "type"
       ],
       "description": "Microsoft.Peering/peeringServices/prefixes"
+    },
+    "peerings_registeredAsns": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-01-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the ASN."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PeeringRegisteredAsnProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties that define a registered ASN."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Peering/peerings/registeredAsns"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.Peering/peerings/registeredAsns"
+    },
+    "peerings_registeredPrefixes": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-01-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the registered prefix."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PeeringRegisteredPrefixProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties that define a registered prefix."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Peering/peerings/registeredPrefixes"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.Peering/peerings/registeredPrefixes"
     }
   },
   "subscription_resourceDefinitions": {
@@ -207,7 +309,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-08-01-preview"
+            "2020-01-01-preview"
           ]
         },
         "name": {
@@ -290,39 +392,37 @@
       },
       "description": "The properties that define a BGP session."
     },
-    "ContactInfo": {
+    "ContactDetail": {
       "type": "object",
       "properties": {
-        "emails": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The list of email addresses."
+        "email": {
+          "type": "string",
+          "description": "The e-mail address of the contact."
         },
         "phone": {
+          "type": "string",
+          "description": "The phone number of the contact."
+        },
+        "role": {
           "oneOf": [
             {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
+              "type": "string",
+              "enum": [
+                "Noc",
+                "Policy",
+                "Technical",
+                "Service",
+                "Other"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The list of contact numbers."
+          "description": "The role of the contact."
         }
       },
-      "description": "The contact information of the peer."
+      "description": "The contact detail class."
     },
     "DirectConnection": {
       "type": "object",
@@ -363,17 +463,6 @@
             }
           ],
           "description": "The PeeringDB.com ID of the facility at which the connection has to be set up."
-        },
-        "provisionedBandwidthInMbps": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The bandwidth that is actually provisioned."
         },
         "sessionAddressProvider": {
           "oneOf": [
@@ -450,16 +539,19 @@
           ],
           "description": "The Autonomous System Number (ASN) of the peer."
         },
-        "peerContactInfo": {
+        "peerContactDetail": {
           "oneOf": [
             {
-              "$ref": "#/definitions/ContactInfo"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ContactDetail"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The contact information of the peer."
+          "description": "The contact details of the peer."
         },
         "peerName": {
           "type": "string",
@@ -542,7 +634,9 @@
                 "Edge",
                 "Transit",
                 "Cdn",
-                "Internal"
+                "Internal",
+                "Ix",
+                "IxRs"
               ]
             },
             {
@@ -561,17 +655,6 @@
             }
           ],
           "description": "The sub resource."
-        },
-        "useForPeeringService": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The flag that indicates whether or not the peering is used for peering service."
         }
       },
       "description": "The properties that define a direct peering."
@@ -607,47 +690,43 @@
       },
       "description": "The properties that define an exchange peering."
     },
+    "PeeringRegisteredAsnProperties": {
+      "type": "object",
+      "properties": {
+        "asn": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The customer's ASN from which traffic originates."
+        }
+      },
+      "description": "The properties that define a registered ASN."
+    },
+    "PeeringRegisteredPrefixProperties": {
+      "type": "object",
+      "properties": {
+        "prefix": {
+          "type": "string",
+          "description": "The customer's prefix from which traffic originates."
+        }
+      },
+      "description": "The properties that define a registered prefix."
+    },
     "PeeringServicePrefixProperties": {
       "type": "object",
       "properties": {
-        "learnedType": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "None",
-                "ViaPartner",
-                "ViaSession"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The prefix learned type."
+        "peeringServicePrefixKey": {
+          "type": "string",
+          "description": "The peering service prefix key"
         },
         "prefix": {
           "type": "string",
-          "description": "Valid route prefix"
-        },
-        "prefixValidationState": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "None",
-                "Invalid",
-                "Verified",
-                "Failed",
-                "Pending",
-                "Unknown"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The prefix validation state."
+          "description": "The prefix from which your traffic originates."
         }
       },
       "description": "The peering service prefix properties class."
@@ -666,18 +745,28 @@
       },
       "description": "The properties that define connectivity to the Peering Service."
     },
+    "PeeringServiceSku": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the peering service SKU."
+        }
+      },
+      "description": "The SKU that defines the type of the peering service."
+    },
     "peeringServices_prefixes_childResource": {
       "type": "object",
       "properties": {
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-08-01-preview"
+            "2020-01-01-preview"
           ]
         },
         "name": {
           "type": "string",
-          "description": "The prefix name"
+          "description": "The name of the prefix."
         },
         "properties": {
           "oneOf": [
@@ -724,22 +813,7 @@
           "description": "The family of the peering SKU."
         },
         "name": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Basic_Exchange_Free",
-                "Basic_Direct_Free",
-                "Premium_Direct_Free",
-                "Premium_Exchange_Metered",
-                "Premium_Direct_Metered",
-                "Premium_Direct_Unlimited"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
+          "type": "string",
           "description": "The name of the peering SKU."
         },
         "size": {
@@ -775,6 +849,84 @@
         }
       },
       "description": "The SKU that defines the tier and kind of the peering."
+    },
+    "peerings_registeredAsns_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-01-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the ASN."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PeeringRegisteredAsnProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties that define a registered ASN."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "registeredAsns"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.Peering/peerings/registeredAsns"
+    },
+    "peerings_registeredPrefixes_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-01-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the registered prefix."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PeeringRegisteredPrefixProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties that define a registered prefix."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "registeredPrefixes"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.Peering/peerings/registeredPrefixes"
     },
     "SubResource": {
       "type": "object",

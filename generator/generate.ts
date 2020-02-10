@@ -150,17 +150,16 @@ function getSchemaFileName(namespace: string, suffix: string | undefined) {
 }
 
 async function generateSchemaConfig(outputFile: string, namespace: string, apiVersion: string, whitelistConfig?: WhitelistConfig): Promise<SchemaConfiguration> {
-    let suffix;
-    if (whitelistConfig !== undefined) {
-        namespace = whitelistConfig.namespace;
-        if (whitelistConfig.suffix !== undefined) {
-            suffix = whitelistConfig.suffix;
-        }
-    }
-
+    namespace = whitelistConfig?.namespace ?? namespace;
+    const suffix = whitelistConfig?.suffix;
     const relativePath = `${apiVersion}/${getSchemaFileName(namespace, suffix)}`;
 
-    const output = await readJsonFile(outputFile);
+    let output = await readJsonFile(outputFile);
+    if (whitelistConfig?.postProcessor) {
+        whitelistConfig?.postProcessor(namespace, apiVersion, output);
+
+        await writeJsonFile(outputFile, output);
+    }
 
     const knownReferences = [
         ...getSchemaRefs(output, ScopeType.Tenant, 'tenant_resourceDefinitions'),

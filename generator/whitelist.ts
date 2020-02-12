@@ -15,6 +15,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Attestation',
     },
     {
+        basePath: 'automation/resource-manager',
+        namespace: 'Microsoft.Automation',
+    },
+    {
         basePath: 'azuredata/resource-manager',
         namespace: 'Microsoft.AzureData',
     },

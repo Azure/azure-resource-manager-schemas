@@ -1,9 +1,9 @@
 import { SchemaPostProcessor, ScopeType } from '../models';
 import { merge } from 'lodash';
 import { schemasBaseUri } from '../constants';
-import { lowerCaseCompare } from '../utils';
+import { apiVersionCompare } from '../utils';
 
-const resourceGroupsDefinition = {
+const resourceGroupsDefinition = (apiVersion: string) => ({
   type: 'object',
   properties: {
     name: {
@@ -21,7 +21,7 @@ const resourceGroupsDefinition = {
     apiVersion: {
       type: 'string',
       enum: [
-        '2018-05-01'
+        apiVersion
       ]
     },
     location: {
@@ -50,7 +50,7 @@ const resourceGroupsDefinition = {
     'location'
   ],
   description: 'Microsoft.Resources/resourceGroups'
-};
+});
 
 const subscriptionProps = {
   subscriptionId: {
@@ -78,10 +78,17 @@ export const postProcessor: SchemaPostProcessor = (namespace: string, apiVersion
   appendProps(schema.tenant_resourceDefinitions?.deployments, [subscriptionProps]);
   appendProps(schema.managementGroup_resourceDefinitions?.deployments, [subscriptionProps]);
   appendProps(schema.subscription_resourceDefinitions?.deployments, [resourceGroupProps]);
-  appendProps(schema.resourceDefinitions?.deployments, [subscriptionProps, resourceGroupProps]);
 
-  if (lowerCaseCompare(apiVersion, '2018-05-01') > -1) {
+  if (apiVersionCompare(apiVersion, '2018-05-01') > -1) {
+    appendProps(schema.resourceDefinitions?.deployments, [subscriptionProps]);
+  }
+  
+  if (apiVersionCompare(apiVersion, '2017-05-10') > -1) {
+    appendProps(schema.resourceDefinitions?.deployments, [resourceGroupProps]);
+  }
+
+  if (apiVersionCompare(apiVersion, '2018-05-01') > -1) {
     schema.subscription_resourceDefinitions = schema.subscription_resourceDefinitions ?? {};
-    schema.subscription_resourceDefinitions['resourceGroups'] = resourceGroupsDefinition;
+    schema.subscription_resourceDefinitions['resourceGroups'] = resourceGroupsDefinition(apiVersion);
   }
 }

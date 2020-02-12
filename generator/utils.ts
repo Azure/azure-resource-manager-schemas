@@ -152,6 +152,18 @@ export function lowerCaseCompareLists(listA: string[], listB: string[]) {
     return 0;
 }
 
+export function apiVersionCompare(a: string, b: string) {
+  if (a.length === b.length) {
+    return lowerCaseCompare(a, b);
+  } else if (a.length < b.length) {
+    const result = lowerCaseCompare(a, b.substr(0, a.length));
+    return result !== 0 ? result : 1;
+  } else {
+    const result = lowerCaseCompare(a.substr(0, b.length), b);
+    return result !== 0 ? result : -1;
+  }
+}
+
 export async function readJsonFile(filePath: string) {    
     const rawContents = await readFile(filePath, { encoding: 'utf8' });
 

@@ -1,4 +1,5 @@
 import { ScopeType, WhitelistConfig } from './models';
+import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
 const whitelist: WhitelistConfig[] = [
@@ -216,6 +217,21 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'postgresql/resource-manager',
         namespace: 'Microsoft.DBforPostgreSQL',
+    },
+    {
+        basePath: 'resources/resource-manager',
+        namespace: 'Microsoft.Resources',
+        resourceConfig: [
+            {
+                type: 'deployments',
+                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup,
+            },
+            {
+                type: 'tags',
+                scopes: ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+        ],
+        postProcessor: resourcesPostProcessor,
     },
     {
         basePath: 'relay/resource-manager',

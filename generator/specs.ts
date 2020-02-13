@@ -7,13 +7,13 @@ import * as constants from './constants'
 
 const exists = promisify(fs.exists);
 
-async function resolveReadmePath(localPath: string, basePath: string) {
+export async function resolveReadmePath(localPath: string, basePath: string) {
     const readmePath = path.join(localPath, 'specification', basePath, 'readme.md');
 
     return path.resolve(readmePath);
 }
 
-async function validateAndReturnReadmePath(basePath: string) {
+export async function validateAndReturnReadmePath(basePath: string) {
     const readme = await resolveReadmePath(constants.specsRepoPath, basePath);
 
     if (!await exists(readme)) {
@@ -23,7 +23,7 @@ async function validateAndReturnReadmePath(basePath: string) {
     return readme;
 }
 
-async function cloneAndGenerateBasePaths(localPath: string, remoteUri: string, commitHash: string) {
+export async function cloneAndGenerateBasePaths(localPath: string, remoteUri: string, commitHash: string) {
     await cloneGitRepo(localPath, remoteUri, commitHash);
 
     const specsPath = path.join(localPath, 'specification');
@@ -44,7 +44,7 @@ async function cloneAndGenerateBasePaths(localPath: string, remoteUri: string, c
         .filter(p => !isBlacklisted(p));
 }
 
-function getBasePathString(localPath: string, basePath: string) {
+export function getBasePathString(localPath: string, basePath: string) {
     return path
         .relative(path.join(localPath, 'specification'), basePath)
         .split(path.sep)
@@ -54,10 +54,3 @@ function getBasePathString(localPath: string, basePath: string) {
 function isBlacklisted(basePath: string) {
     return constants.blacklist.includes(basePath);
 }
-
-export {
-    resolveReadmePath,
-    validateAndReturnReadmePath,
-    cloneAndGenerateBasePaths,
-    getBasePathString,
-};

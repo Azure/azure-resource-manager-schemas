@@ -7,10 +7,17 @@ const resourceGroupsDefinition = (apiVersion: string) => ({
   type: 'object',
   properties: {
     name: {
-      type: 'string',
-      pattern: '^[-\\w\\._\\(\\)]+$',
-      maxLength: 90,
-      description: 'the resource group name'
+      oneOf: [
+        {
+          type: 'string',
+          pattern: '^[-\\w\\._\\(\\)]+$',
+          maxLength: 90,
+          description: 'the resource group name'
+        },
+        {
+          $ref: `${schemasBaseUri}/common/definitions.json#/definitions/expression`
+        }
+      ],
     },
     type: {
       type: 'string',

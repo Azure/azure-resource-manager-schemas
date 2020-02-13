@@ -1,12 +1,13 @@
 import path from 'path';
 import os from 'os';
-import { findRecursive, findDirRecursive, executeCmd, rmdirRecursive, lowerCaseCompare, lowerCaseCompareLists, lowerCaseStartsWith, readJsonFile, writeJsonFile, safeMkdir, safeUnlink, fileExists, lowerCaseEquals } from './utils';
+import { findRecursive, findDirRecursive, executeCmd, rmdirRecursive, lowerCaseCompare, lowerCaseCompareLists, lowerCaseStartsWith, readJsonFile, writeJsonFile, safeMkdir, safeUnlink, fileExists, lowerCaseEquals, lowerCaseContains } from './utils';
 import * as constants from './constants';
 import chalk from 'chalk';
 import { ScopeType, WhitelistConfig } from './models';
-import { uniq, concat, Dictionary, groupBy, keys, difference } from 'lodash';
+import { uniq, concat, Dictionary, groupBy, keys, difference, pickBy, flatMap, values, uniqBy } from 'lodash';
 
 const autorestBinary = os.platform() === 'win32' ? 'autorest-beta.cmd' : 'autorest-beta';
+const apiVersionRegex = /^\d{4}-\d{2}-\d{2}(|-preview)$/;
 
 interface SchemaConfiguration {
     references: SchemaReference[];
@@ -19,19 +20,28 @@ interface SchemaReference {
     reference: string;
 }
 
-export async function generateSchemas(readme: string, whitelistConfig?: WhitelistConfig) {
+export async function getApiVersionsByNamespace(readme: string): Promise<Dictionary<string[]>> {
     const searchPath = path.resolve(`${readme}/..`);
-    const apiVersionPaths = await findDirRecursive(searchPath, p => path.basename(p).match(/^\d{4}-\d{2}-\d{2}(|-preview)$/) !== null);
+    const apiVersionPaths = await findDirRecursive(searchPath, p => path.basename(p).match(apiVersionRegex) !== null);
 
-    let filteredApiVersionPaths = apiVersionPaths;
-    if (whitelistConfig) {
-        // filter api versions by namespaces
-        filteredApiVersionPaths = apiVersionPaths.filter(p => lowerCaseEquals(whitelistConfig.namespace, path.relative(searchPath, p).split(path.sep)[0]));
+    const output: Dictionary<string[]> = {};
+    for (const [namespace, _, apiVersion] of apiVersionPaths.map(p => path.relative(searchPath, p).split(path.sep))) {
+        output[namespace] = [...(output[namespace] ?? []), apiVersion];
     }
 
-    let schemaRefs: string[] = [];
-    for (const subPath of filteredApiVersionPaths) {
-        const apiVersion = path.basename(subPath);
+    return output;
+}
+
+export async function generateSchemas(readme: string, whitelistConfig?: WhitelistConfig): Promise<string[]> {
+    const apiVersionsByNamespace = pickBy(
+        await getApiVersionsByNamespace(readme),
+        (_, key) => !whitelistConfig || lowerCaseEquals(key, whitelistConfig.namespace));
+
+    const apiVersions = uniqBy(flatMap(values(apiVersionsByNamespace)), s => s.toLowerCase());
+    const namespaces = keys(apiVersionsByNamespace);
+
+    const schemaRefs: string[] = [];
+    for (const apiVersion of apiVersions) {
         const tmpFolder = path.join(os.tmpdir(), Math.random().toString(36).substr(2));
 
         try {
@@ -39,13 +49,13 @@ export async function generateSchemas(readme: string, whitelistConfig?: Whitelis
 
             for (const schemaPath of generatedSchemas) {
                 const namespace = path.basename(schemaPath.substring(0, schemaPath.lastIndexOf(path.extname(schemaPath))));
-                if (whitelistConfig && whitelistConfig.namespace.toLowerCase() !== namespace.toLowerCase()) {
+                if (!lowerCaseContains(namespaces, namespace)) {
                     continue;
                 }
 
                 const generatedRefs = await handleGeneratedSchema(readme, schemaPath, whitelistConfig);
 
-                schemaRefs = concat(schemaRefs, generatedRefs);
+                schemaRefs.push(...generatedRefs);
             }
         }
         finally {

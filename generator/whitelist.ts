@@ -1,5 +1,6 @@
 import { ScopeType, WhitelistConfig } from './models';
 import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
+import { lowerCaseEquals } from './utils';
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
 const whitelist: WhitelistConfig[] = [
@@ -209,6 +210,12 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'policyinsights/resource-manager',
         namespace: 'Microsoft.PolicyInsights',
+        resourceConfig: [
+            {
+                type: 'remediations',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            }
+        ]
     },
     {
         basePath: 'peering/resource-manager',
@@ -291,18 +298,10 @@ const whitelist: WhitelistConfig[] = [
     }
 ];
 
-function findWhitelistConfig(basePath: string) {
-    const found = whitelist.find(w => w.basePath.toLowerCase() == basePath.toLowerCase());
-
-    return found;
+export function getWhitelist(): WhitelistConfig[] {
+    return whitelist;
 }
 
-function isWhitelisted(basePath: string) {
-    return findWhitelistConfig(basePath) !== undefined;
-}
-
-export {
-    whitelist,
-    isWhitelisted,
-    findWhitelistConfig,
+export function findWhitelistEntries(basePath: string): WhitelistConfig[] {
+    return whitelist.filter(w => lowerCaseEquals(w.basePath, basePath));
 }

@@ -110,7 +110,11 @@ export async function rmdirRecursive(basePath: string) {
     await rmdir(basePath);
 }
 
-export function lowerCaseEquals(a: string, b: string) {
+export function lowerCaseContains(list: string[], item: string): boolean {
+    return list.findIndex(v => lowerCaseEquals(v, item)) > -1;
+}
+
+export function lowerCaseEquals(a: string, b: string): boolean {
     return a.toLowerCase() === b.toLowerCase();
 }
 

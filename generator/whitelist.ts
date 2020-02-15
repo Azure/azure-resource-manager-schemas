@@ -9,6 +9,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.AlertsManagement',
     },
     {
+        basePath: 'appconfiguration/resource-manager',
+        namespace: 'Microsoft.AppConfiguration',
+    },
+    {
         basePath: 'appplatform/resource-manager',
         namespace: 'Microsoft.AppPlatform',
     },

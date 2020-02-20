@@ -25,10 +25,10 @@ interface RootSchemaConfiguration {
 }
 
 const RootSchemaConfigs: Map<ScopeType, RootSchemaConfiguration> = new Map([
-    [ScopeType.Tenant, constants.tenantRootSchemaPath],
-    [ScopeType.Subcription, constants.subscriptionRootSchemaPath],
-    [ScopeType.ResourceGroup, constants.generatedSchemasPath],
-    [ScopeType.ManagementGroup, constants.managementGroupRootSchemaPath]
+    [ScopeType.Tenant, constants.tenantRootSchema],
+    [ScopeType.Subcription, constants.subscriptionRootSchema],
+    [ScopeType.ResourceGroup, constants.resourceGroupRootSchema],
+    [ScopeType.ManagementGroup, constants.managementGroupRootSchema]
 ]);
 
 export async function generateSchemas(readme: string, whitelistConfig?: WhitelistConfig) {

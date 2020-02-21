@@ -213,7 +213,7 @@ const whitelist: WhitelistConfig[] = [
         resourceConfig: [
             {
                 type: 'remediations',
-                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.ManagementGroup,
             }
         ]
     },

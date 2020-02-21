@@ -204,6 +204,12 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'policyinsights/resource-manager',
         namespace: 'Microsoft.PolicyInsights',
+        resourceConfig: [
+            {
+                type: 'remediations',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.ManagementGroup,
+            },
+        ],
     },
     {
         basePath: 'peering/resource-manager',

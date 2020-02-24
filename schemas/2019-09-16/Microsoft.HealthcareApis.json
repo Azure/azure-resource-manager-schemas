@@ -22,6 +22,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
+            "2018-08-20-preview",
             "2019-09-16"
           ]
         },
@@ -39,7 +40,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The kind of the service. Valid values are: fhir."
+          "description": "The kind of the service. Valid values are: fhir, fhir-Stu3 and fhir-R4."
         },
         "location": {
           "type": "string",
@@ -243,7 +244,12 @@
                     "type": "string",
                     "description": "A method for CORS.",
                     "enum": [
-                      "DELETE", "GET", "OPTIONS", "PATCH", "POST", "PUT"
+                      "DELETE",
+                      "GET",
+                      "OPTIONS",
+                      "PATCH",
+                      "POST",
+                      "PUT"
                     ]
                   },
                   {
@@ -286,6 +292,41 @@
       },
       "description": "The settings for the CORS configuration of the service instance."
     },
+    "ServiceOperationsExportConfigurationInfo": {
+      "type": "object",
+      "properties": {
+        "StorageAccountName": {
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "The name of the default export storage account."
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "readOnly": false
+        }
+      },
+      "description": "Operations configuration information"
+    },
+    "ServiceOperationsConfigurationInfo": {
+      "type": "object",
+      "properties": {
+        "ServiceOperationsExportConfigurationInfo": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ServiceCosmosDbConfigurationInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "readOnly": false
+        }
+      },
+      "description": "Operations configuration information"
+    },
     "ServicesProperties": {
       "type": "object",
       "properties": {
@@ -327,15 +368,26 @@
           "description": "The authentication configuration for the service instance."
         },
         "corsConfiguration": {
-            "oneOf": [
-                {
-                    "$ref": "#/definitions/ServiceCorsConfigurationInfo"
-                },
-                {
-                    "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-            ],
-            "description": "The settings for the CORS configuration of the service instance."
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ServiceCorsConfigurationInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The settings for the CORS configuration of the service instance."
+        },
+        "operations": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ServiceOperationsConfigurationInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The settings for the operations of the service instance."
         }
       },
       "required": [

@@ -1,0 +1,610 @@
+{
+  "id": "https://schema.management.azure.com/schemas/2019-09-01/Microsoft.DataBox.json#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Microsoft.DataBox",
+  "description": "Microsoft DataBox Resource Types",
+  "resourceDefinitions": {
+    "jobs": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-09-01"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "The location of the resource. This will be one of the supported and registered Azure Regions (e.g. West US, East US, Southeast Asia, etc.). The region of a resource cannot be changed once it is created, but if an identical region is specified on update the request will succeed."
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[-\\w\\.]+$",
+              "minLength": 3,
+              "maxLength": 24
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the job Resource within the specified resource group. job names must be between 3 and 24 characters in length and use any alphanumeric and underscore only"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/JobProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Job Properties"
+        },
+        "sku": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Sku"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Sku."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of key value pairs that describe the resource. These tags can be used in viewing and grouping this resource (across resource groups)."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.DataBox/jobs"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "location",
+        "name",
+        "properties",
+        "sku",
+        "type"
+      ],
+      "description": "Microsoft.DataBox/jobs"
+    }
+  },
+  "definitions": {
+    "ContactDetails": {
+      "type": "object",
+      "properties": {
+        "contactName": {
+          "type": "string",
+          "description": "Contact name of the person."
+        },
+        "emailList": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of Email-ids to be notified about job progress."
+        },
+        "mobile": {
+          "type": "string",
+          "description": "Mobile number of the contact person."
+        },
+        "notificationPreference": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/NotificationPreference"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Notification preference for a job stage."
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number of the contact person."
+        },
+        "phoneExtension": {
+          "type": "string",
+          "description": "Phone extension number of the contact person."
+        }
+      },
+      "required": [
+        "contactName",
+        "emailList",
+        "phone"
+      ],
+      "description": "Contact Details."
+    },
+    "DataBoxDiskJobDetails": {
+      "type": "object",
+      "properties": {
+        "jobDetailsType": {
+          "type": "string",
+          "enum": [
+            "DataBoxDisk"
+          ]
+        },
+        "passkey": {
+          "type": "string",
+          "description": "User entered passkey for DataBox Disk job."
+        },
+        "preferredDisks": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "User preference on what size disks are needed for the job. The map is from the disk size in TB to the count. Eg. {2,5} means 5 disks of 2 TB size. Key is string but will be checked against an int."
+        }
+      },
+      "required": [
+        "jobDetailsType"
+      ],
+      "description": "DataBox Disk Job Details."
+    },
+    "DataBoxHeavyJobDetails": {
+      "type": "object",
+      "properties": {
+        "devicePassword": {
+          "type": "string",
+          "description": "Set Device password for unlocking Databox Heavy"
+        },
+        "jobDetailsType": {
+          "type": "string",
+          "enum": [
+            "DataBoxHeavy"
+          ]
+        }
+      },
+      "required": [
+        "jobDetailsType"
+      ],
+      "description": "Databox Heavy Device Job Details"
+    },
+    "DataBoxJobDetails": {
+      "type": "object",
+      "properties": {
+        "devicePassword": {
+          "type": "string",
+          "description": "Set Device password for unlocking Databox"
+        },
+        "jobDetailsType": {
+          "type": "string",
+          "enum": [
+            "DataBox"
+          ]
+        }
+      },
+      "required": [
+        "jobDetailsType"
+      ],
+      "description": "Databox Job Details"
+    },
+    "DestinationAccountDetails": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/DestinationManagedDiskDetails"
+        },
+        {
+          "$ref": "#/definitions/DestinationStorageAccountDetails"
+        }
+      ],
+      "properties": {
+        "accountId": {
+          "type": "string",
+          "description": "Arm Id of the destination where the data has to be moved."
+        },
+        "sharePassword": {
+          "type": "string",
+          "description": "Share password to be shared by all shares in SA."
+        }
+      },
+      "description": "Details of the destination storage accounts."
+    },
+    "DestinationManagedDiskDetails": {
+      "type": "object",
+      "properties": {
+        "dataDestinationType": {
+          "type": "string",
+          "enum": [
+            "ManagedDisk"
+          ]
+        },
+        "resourceGroupId": {
+          "type": "string",
+          "description": "Destination Resource Group Id where the Compute disks should be created."
+        },
+        "stagingStorageAccountId": {
+          "type": "string",
+          "description": "Arm Id of the storage account that can be used to copy the vhd for staging."
+        }
+      },
+      "required": [
+        "dataDestinationType",
+        "resourceGroupId",
+        "stagingStorageAccountId"
+      ],
+      "description": "Details for the destination compute disks."
+    },
+    "DestinationStorageAccountDetails": {
+      "type": "object",
+      "properties": {
+        "dataDestinationType": {
+          "type": "string",
+          "enum": [
+            "StorageAccount"
+          ]
+        },
+        "storageAccountId": {
+          "type": "string",
+          "description": "Destination Storage Account Arm Id."
+        }
+      },
+      "required": [
+        "dataDestinationType",
+        "storageAccountId"
+      ],
+      "description": "Details for the destination storage account."
+    },
+    "JobDeliveryInfo": {
+      "type": "object",
+      "properties": {
+        "scheduledDateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Scheduled date time."
+        }
+      },
+      "description": "Additional delivery info."
+    },
+    "JobDetails": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/DataBoxDiskJobDetails"
+        },
+        {
+          "$ref": "#/definitions/DataBoxHeavyJobDetails"
+        },
+        {
+          "$ref": "#/definitions/DataBoxJobDetails"
+        }
+      ],
+      "properties": {
+        "contactDetails": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContactDetails"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Contact Details."
+        },
+        "destinationAccountDetails": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DestinationAccountDetails"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Destination account details."
+        },
+        "expectedDataSizeInTerabytes": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The expected size of the data, which needs to be transferred in this job, in terabytes."
+        },
+        "preferences": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Preferences"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Preferences related to the order"
+        },
+        "shippingAddress": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ShippingAddress"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Shipping address where customer wishes to receive the device."
+        }
+      },
+      "required": [
+        "contactDetails",
+        "destinationAccountDetails",
+        "shippingAddress"
+      ],
+      "description": "Job details."
+    },
+    "JobProperties": {
+      "type": "object",
+      "properties": {
+        "deliveryInfo": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/JobDeliveryInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Additional delivery info."
+        },
+        "deliveryType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "NonScheduled",
+                "Scheduled"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Delivery type of Job."
+        },
+        "details": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/JobDetails"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Job details."
+        }
+      },
+      "description": "Job Properties"
+    },
+    "NotificationPreference": {
+      "type": "object",
+      "properties": {
+        "sendNotification": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Notification is required or not."
+        },
+        "stageName": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "DevicePrepared",
+                "Dispatched",
+                "Delivered",
+                "PickedUp",
+                "AtAzureDC",
+                "DataCopy"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Name of the stage."
+        }
+      },
+      "required": [
+        "sendNotification",
+        "stageName"
+      ],
+      "description": "Notification preference for a job stage."
+    },
+    "Preferences": {
+      "type": "object",
+      "properties": {
+        "preferredDataCenterRegion": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Preferred Data Center Region."
+        },
+        "transportPreferences": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/TransportPreferences"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Preferences related to the shipment logistics of the sku"
+        }
+      },
+      "description": "Preferences related to the order"
+    },
+    "ShippingAddress": {
+      "type": "object",
+      "properties": {
+        "addressType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "None",
+                "Residential",
+                "Commercial"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Type of address."
+        },
+        "city": {
+          "type": "string",
+          "description": "Name of the City."
+        },
+        "companyName": {
+          "type": "string",
+          "description": "Name of the company."
+        },
+        "country": {
+          "type": "string",
+          "description": "Name of the Country."
+        },
+        "postalCode": {
+          "type": "string",
+          "description": "Postal code."
+        },
+        "stateOrProvince": {
+          "type": "string",
+          "description": "Name of the State or Province."
+        },
+        "streetAddress1": {
+          "type": "string",
+          "description": "Street Address line 1."
+        },
+        "streetAddress2": {
+          "type": "string",
+          "description": "Street Address line 1."
+        },
+        "streetAddress3": {
+          "type": "string",
+          "description": "Street Address line 1."
+        },
+        "zipExtendedCode": {
+          "type": "string",
+          "description": "Extended Zip Code."
+        }
+      },
+      "required": [
+        "country",
+        "postalCode",
+        "streetAddress1"
+      ],
+      "description": "Shipping address where customer wishes to receive the device."
+    },
+    "Sku": {
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "The display name of the sku."
+        },
+        "family": {
+          "type": "string",
+          "description": "The sku family."
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "DataBox",
+                "DataBoxDisk",
+                "DataBoxHeavy"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The sku name."
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "The Sku."
+    },
+    "TransportPreferences": {
+      "type": "object",
+      "properties": {
+        "preferredShipmentType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "CustomerManaged",
+                "MicrosoftManaged"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates Shipment Logistics type that the customer preferred."
+        }
+      },
+      "required": [
+        "preferredShipmentType"
+      ],
+      "description": "Preferences related to the shipment logistics of the sku"
+    }
+  }
+}

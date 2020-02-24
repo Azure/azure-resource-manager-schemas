@@ -33,5 +33,28 @@ See [Generator README](/generator/README.md) for more information.
 6. Generate a commit and push it to your fork.
 7. Submit a pull request to this repo. Please include the full command output in a PR comment.
 
+## Testing schemas locally
+This repo contains a command to run a schema web server which will host files directly from your local repo. This can be useful if you want to validate schemas against a particular tool - for example if you want to verify VSCode autocompletion and syntax highlighting. By default this will listen on port 3000, but this can be modified by editing [tools/server.ts](/tools/server.ts).
+To start an instance you can use the following commands:
+* `cd tools`
+* `npm install`
+* `npm run serve`
+
+Once this is running, you can create a basic template with the following structure (replacing the sections between `<` and `>` as appropriate for your scenario):
+```json
+{
+  "$schema": "http://<hostname>:<port>/schemas/2019-04-01/deploymentTemplate.json",
+  "resources": [
+    {
+      "type": "<providerNamespace>/<resourceType>",
+      "apiVersion": "<apiVersion>",
+      "properties": {
+      }
+    }
+  ]
+}
+```
+**NOTE** Many client tools will cache responses from schema servers, so you may need to clear this cache if you are testing modifications, or alternatively, change the port between retries.
+
 ---
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.

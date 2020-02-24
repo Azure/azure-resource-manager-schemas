@@ -18,6 +18,11 @@ function logError(message: string) {
     console.log(`ERROR: ${message}`);
 }
 
+function getJsonDiffMessage<T>(actual: T, expected: T, messageSuffix: string) {
+    // This is a workaround for the DevOps test result analyzer not correctly showing the diff between actual and expected.
+    return `\nActual: ${JSON.stringify(actual, null, 2)}\nExpected: ${JSON.stringify(expected, null, 2)}\n${messageSuffix}`;
+}
+
 function getErrorMessage(prefix: string, value: string, suffix: string) {
     let errorMessage = prefix;
     if (value === undefined) {
@@ -102,29 +107,29 @@ function scopeToPath(schemaPath: string, schema: any) {
     return getProperty(schemaPath, schema);
 }
 
-function assertErrors(expectedErrors: any[], actualErrors: any[], assertSubErrors: boolean, errorPrefix: string) {
+function assertErrors(expectedErrors: ValidationError[], actualErrors: ValidationError[], assertSubErrors: boolean, errorPrefix: string) {
     if (!expectedErrors || expectedErrors.length === 0) {
-        assert.deepStrictEqual(actualErrors, [], `There were no expected errors, but the validation result contained errors.`);
+        assert.deepStrictEqual(actualErrors, [], getJsonDiffMessage(actualErrors, [], `Expected result not to contain errors, but found errors.`));
+        return;
     }
-    else {
-        if (expectedErrors.length !== actualErrors.length) {
-            const errorMessage = `There were a different number of expected errors (${expectedErrors.length}) than there were actual errors (${actualErrors.length})`;
-            assert.deepStrictEqual(actualErrors, expectedErrors, errorMessage);
-        }
-        else {
-            for (let errorIndex = 0; errorIndex < expectedErrors.length; ++errorIndex) {
-                const expectedError = expectedErrors[errorIndex];
-                const actualError = actualErrors[errorIndex];
 
-                const errorNumber = errorPrefix + (errorIndex + 1).toString();
-                assert.deepStrictEqual(actualError.message, expectedError.message, `The error message for error ${errorNumber} was not the expected error.`);
-                assert.deepStrictEqual(actualError.dataPath, expectedError.dataPath, `The error dataPath for error ${errorNumber} was not the expected dataPath.`);
+    if (expectedErrors.length !== actualErrors.length) {
+        assert.deepStrictEqual(actualErrors, expectedErrors, getJsonDiffMessage(actualErrors, expectedErrors, `Different number of expected errors (expected ${expectedErrors.length}, found ${actualErrors.length}).`));
+        return;
+    }
 
-                // Assert sub errors if the -AssertSubErrors parameter is used and there are expected sub errors
-                if (assertSubErrors && expectedError.subErrors && expectedError.subErrors.length > 0) {
-                    assertErrors(expectedError.subErrors, actualError.subErrors, assertSubErrors, errorNumber + ".");
-                }
-            }
+    for (let errorIndex = 0; errorIndex < expectedErrors.length; ++errorIndex) {
+        const expectedError = expectedErrors[errorIndex];
+        const actualError = actualErrors[errorIndex];
+
+        const errorNumber = `${errorPrefix}${errorIndex + 1}`;
+
+        assert.strictEqual(actualError.message, expectedError.message, getJsonDiffMessage(actualErrors, expectedErrors, `The error message for error ${errorNumber} was not the expected error.`));
+        assert.strictEqual(actualError.dataPath, expectedError.dataPath, getJsonDiffMessage(actualErrors, expectedErrors, `The error dataPath for error ${errorNumber} was not the expected dataPath.`));
+
+        // Assert sub errors if the -AssertSubErrors parameter is used and there are expected sub errors
+        if (assertSubErrors && expectedError.subErrors && expectedError.subErrors.length > 0) {
+            assertErrors(expectedError.subErrors, actualError.subErrors, assertSubErrors, `${errorNumber}.`);
         }
     }
 }
@@ -186,14 +191,12 @@ async function addMissingSchemas(missingUris: string[], loadSchema: (uri: string
     }
 }
 
-async function execute(test: any, loadSchema: (uri: string) => Promise<any>) {
+export async function execute(test: any, loadSchema: (uri: string) => Promise<any>) {
     const fullSchema = await loadSchema(test.definition);
     let definitionSchema = scopeToPath(test.definition, fullSchema);
     definitionSchema = resolveSchemaLocalReferences(definitionSchema, fullSchema, '#', {});
 
-    await validate(test.json, definitionSchema, loadSchema);
-}
+    const result = await validate(test.json, definitionSchema, loadSchema);
 
-export {
-    execute,
+    assertErrors(test.expectedErrors, result.errors, false, '');
 }

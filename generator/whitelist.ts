@@ -265,6 +265,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.SqlVirtualMachine',
     },
     {
+        basePath: 'storage/resource-manager',
+        namespace: 'Microsoft.Storage',
+    },
+    {
         basePath: 'storagecache/resource-manager',
         namespace: 'Microsoft.StorageCache',
     },

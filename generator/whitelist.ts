@@ -289,6 +289,18 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.VirtualMachineImages',
     },
     {
+        basePath: 'web/resource-manager',
+        namespace: 'Microsoft.CertificateRegistration',
+    },
+    {
+        basePath: 'web/resource-manager',
+        namespace: 'Microsoft.DomainRegistration',
+    },
+    {
+        basePath: 'web/resource-manager',
+        namespace: 'Microsoft.Web',
+    },
+    {
         basePath: 'windowsesu/resource-manager',
         namespace: 'Microsoft.WindowsESU',
     },

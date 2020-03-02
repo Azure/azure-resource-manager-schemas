@@ -5,6 +5,10 @@ import { lowerCaseEquals } from './utils';
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
 const whitelist: WhitelistConfig[] = [
     {
+        basePath: 'analysisservices/resource-manager',
+        namespace: 'Microsoft.AnalysisServices',
+    },
+    {
         basePath: 'alertsmanagement/resource-manager',
         namespace: 'Microsoft.AlertsManagement',
     },

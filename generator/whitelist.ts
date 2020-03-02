@@ -239,6 +239,24 @@ const whitelist: WhitelistConfig[] = [
     },
     {
         basePath: 'resources/resource-manager',
+        namespace: 'Microsoft.Authorization',
+        resourceConfig: [
+            {
+                type: 'policyassignments',
+                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup,
+            },
+            {
+                type: 'locks',
+                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+        ]
+    },
+    {
+        basePath: 'resources/resource-manager',
+        namespace: 'Microsoft.Features',
+    },
+    {
+        basePath: 'resources/resource-manager',
         namespace: 'Microsoft.Resources',
         resourceConfig: [
             {
@@ -251,6 +269,10 @@ const whitelist: WhitelistConfig[] = [
             },
         ],
         postProcessor: resourcesPostProcessor,
+    },
+    {
+        basePath: 'resources/resource-manager',
+        namespace: 'Microsoft.Solutions',
     },
     {
         basePath: 'relay/resource-manager',

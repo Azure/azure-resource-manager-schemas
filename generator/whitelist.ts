@@ -32,6 +32,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'azuredata/resource-manager',
         namespace: 'Microsoft.AzureData',
     },
+    {
+        basePath: 'azurestack/resource-manager',
+        namespace: 'Microsoft.AzureStack',
+    },
     { 
         basePath: 'batch/resource-manager',
         namespace: 'Microsoft.Batch',

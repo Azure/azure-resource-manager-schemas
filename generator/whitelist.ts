@@ -21,6 +21,20 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.AppPlatform',
     },
     {
+        basePath: 'authorization/resource-manager',
+        namespace: 'Microsoft.Authorization',
+        resourceConfig: [
+            {
+                type: 'roleAssignments',
+                scopes: ScopeType.Tenant | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.ManagementGroup,
+            },
+            {
+                type: 'roleDefinitions',
+                scopes: ScopeType.Tenant | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.ManagementGroup,
+            },
+        ]
+    },
+    {
         basePath: 'attestation/resource-manager',
         namespace: 'Microsoft.Attestation',
     },

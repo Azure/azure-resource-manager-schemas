@@ -208,6 +208,24 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DBforMariaDB',
     },
     {
+        basePath: 'monitor/resource-manager',
+        namespace: 'Microsoft.Insights',
+        resourceConfig: [
+            {
+                type: 'diagnosticSettings',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.ManagementGroup,
+            },
+            {
+                type: 'diagnosticSettingsAssociation',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.ManagementGroup,
+            },
+            {
+                type: 'guestDiagnosticSettingsAssociation',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.ManagementGroup,
+            },
+        ]
+    },
+    {
         basePath: 'mysql/resource-manager',
         namespace: 'Microsoft.DBforMySQL',
     },

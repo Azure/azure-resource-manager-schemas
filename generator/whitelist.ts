@@ -13,6 +13,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.AppConfiguration',
     },
     {
+        basePath: 'apimanagement/resource-manager',
+        namespace: 'Microsoft.ApiManagement',
+    },
+    {
         basePath: 'appplatform/resource-manager',
         namespace: 'Microsoft.AppPlatform',
     },

@@ -1,5 +1,6 @@
 import { ScopeType, WhitelistConfig } from './models';
 import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
+import { postProcessor as devicesPostProcessor } from './processors/Microsoft.Devices';
 import { lowerCaseEquals } from './utils';
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
@@ -176,6 +177,7 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'iothub/resource-manager',
         namespace: 'Microsoft.Devices',
+        postProcessor: devicesPostProcessor,
     },
     {
         basePath: 'iotspaces/resource-manager',

@@ -9,6 +9,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.AlertsManagement',
     },
     {
+        basePath: 'workloadmonitor/resource-manager',
+        namespace: 'Microsoft.WorkloadMonitor',
+    },
+    {
         basePath: 'appconfiguration/resource-manager',
         namespace: 'Microsoft.AppConfiguration',
     },
@@ -31,6 +35,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'azuredata/resource-manager',
         namespace: 'Microsoft.AzureData',
+    },
+    {
+        basePath: 'azurestack/resource-manager',
+        namespace: 'Microsoft.AzureStack',
     },
     { 
         basePath: 'batch/resource-manager',

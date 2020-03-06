@@ -15,7 +15,7 @@ const writeFile = promisify(fs.writeFile);
 const mkdir = promisify(fs.mkdir);
 
 
-function executeCmd(cwd: string, cmd: string, args: string[]) : Promise<number> {
+export function executeCmd(cwd: string, cmd: string, args: string[]) : Promise<number> {
     return new Promise((resolve, reject) => {
         console.log(`[${cwd}] executing: ${cmd} ${args.join(' ')}`);
 
@@ -38,7 +38,7 @@ function executeCmd(cwd: string, cmd: string, args: string[]) : Promise<number> 
     });
 }
 
-async function findDirRecursive(basePath: string, filter: (name: string) => boolean): Promise<string[]> {
+export async function findDirRecursive(basePath: string, filter: (name: string) => boolean): Promise<string[]> {
     let results: string[] = [];
 
     for (const subPathName of await readdir(basePath)) {
@@ -60,7 +60,7 @@ async function findDirRecursive(basePath: string, filter: (name: string) => bool
     return results;
 }
 
-async function findRecursive(basePath: string, filter: (name: string) => boolean): Promise<string[]> {
+export async function findRecursive(basePath: string, filter: (name: string) => boolean): Promise<string[]> {
     let results: string[] = [];
 
     for (const subPathName of await readdir(basePath)) {
@@ -87,7 +87,7 @@ async function findRecursive(basePath: string, filter: (name: string) => boolean
     return results;
 }
 
-async function rmdirRecursive(basePath: string) {
+export async function rmdirRecursive(basePath: string) {
     if (!await exists(basePath)) {
         return;
     }
@@ -110,7 +110,15 @@ async function rmdirRecursive(basePath: string) {
     await rmdir(basePath);
 }
 
-function lowerCaseCompare(a: string, b: string) {
+export function lowerCaseContains(list: string[], item: string): boolean {
+    return list.findIndex(v => lowerCaseEquals(v, item)) > -1;
+}
+
+export function lowerCaseEquals(a: string, b: string): boolean {
+    return a.toLowerCase() === b.toLowerCase();
+}
+
+export function lowerCaseCompare(a: string, b: string) {
     const aLower = a.toLowerCase();
     const bLower = b.toLowerCase();
 
@@ -121,14 +129,14 @@ function lowerCaseCompare(a: string, b: string) {
     return aLower < bLower ? -1 : 1;
 }
 
-function lowerCaseStartsWith(a: string, b: string) {
+export function lowerCaseStartsWith(a: string, b: string) {
     const aLower = a.toLowerCase();
     const bLower = b.toLowerCase();
 
     return aLower.startsWith(bLower);
 }
 
-function lowerCaseCompareLists(listA: string[], listB: string[]) {
+export function lowerCaseCompareLists(listA: string[], listB: string[]) {
     for (let i = 0; i < listA.length; i++) {
         if (listB.length < i + 1) {
             return -1;
@@ -148,35 +156,47 @@ function lowerCaseCompareLists(listA: string[], listB: string[]) {
     return 0;
 }
 
-async function readJsonFile(filePath: string) {    
+export function apiVersionCompare(a: string, b: string) {
+  if (a.length === b.length) {
+    return lowerCaseCompare(a, b);
+  } else if (a.length < b.length) {
+    const result = lowerCaseCompare(a, b.substr(0, a.length));
+    return result !== 0 ? result : 1;
+  } else {
+    const result = lowerCaseCompare(a.substr(0, b.length), b);
+    return result !== 0 ? result : -1;
+  }
+}
+
+export async function readJsonFile(filePath: string) {    
     const rawContents = await readFile(filePath, { encoding: 'utf8' });
 
     return JSON.parse(rawContents);
 }
 
-async function writeJsonFile(filePath: string, json: any) {
+export async function writeJsonFile(filePath: string, json: any) {
     const rawContents = JSON.stringify(json, null, 2);
 
     await writeFile(filePath, rawContents, { encoding: 'utf8' });
 }
 
-async function safeMkdir(filePath: string) {
+export async function safeMkdir(filePath: string) {
     if (!await exists(filePath)) {
         await mkdir(filePath, { recursive: true });
     }
 }
 
-async function safeUnlink(filePath: string) {
+export async function safeUnlink(filePath: string) {
     if (await exists(filePath)) {
         await unlink(filePath);
     }
 }
 
-async function fileExists(filePath: string) {
+export async function fileExists(filePath: string) {
     return await exists(filePath);
 }
 
-function executeSynchronous<T>(asyncFunc: () => Promise<T>) {
+export function executeSynchronous<T>(asyncFunc: () => Promise<T>) {
     series(
         [asyncFunc],
         (error, _) => {
@@ -186,7 +206,7 @@ function executeSynchronous<T>(asyncFunc: () => Promise<T>) {
         });
 }
 
-function chunker<T>(input: T[], chunks: number): T[][] {
+export function chunker<T>(input: T[], chunks: number): T[][] {
     const minChunkSize = Math.floor(input.length / chunks);
     let remainder = input.length - (minChunkSize * chunks);
 
@@ -205,21 +225,4 @@ function chunker<T>(input: T[], chunks: number): T[][] {
     }
 
     return output;
-}
-
-export {
-    executeCmd,
-    findDirRecursive,
-    findRecursive,
-    rmdirRecursive,
-    lowerCaseCompare,
-    lowerCaseStartsWith,
-    lowerCaseCompareLists,
-    readJsonFile,
-    writeJsonFile,
-    safeMkdir,
-    safeUnlink,
-    fileExists,
-    executeSynchronous,
-    chunker,
 }

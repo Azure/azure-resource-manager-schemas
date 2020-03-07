@@ -39,6 +39,7 @@ export const blacklist = [
     'azsadmin/resource-manager/backup',
     'azsadmin/resource-manager/commerce',
     'azsadmin/resource-manager/compute',
+    'azsadmin/resource-manager/deployment',
     'azsadmin/resource-manager/fabric',
     'azsadmin/resource-manager/gallery',
     'azsadmin/resource-manager/infrastructureinsights',

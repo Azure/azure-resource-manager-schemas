@@ -5,12 +5,24 @@ import { lowerCaseEquals } from './utils';
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
 const whitelist: WhitelistConfig[] = [
     {
+        basePath: 'adhybridhealthservice/resource-manager',
+        namespace: 'Microsoft.ADHybridHealthService',
+    },
+    {
         basePath: 'analysisservices/resource-manager',
         namespace: 'Microsoft.AnalysisServices',
     },
     {
+        basePath: 'azureactivedirectory/resource-manager',
+        namespace: 'Microsoft.Aadiam',
+    },
+    {
         basePath: 'alertsmanagement/resource-manager',
         namespace: 'Microsoft.AlertsManagement',
+    },
+    {
+        basePath: 'workloadmonitor/resource-manager',
+        namespace: 'Microsoft.WorkloadMonitor',
     },
     {
         basePath: 'appconfiguration/resource-manager',
@@ -35,6 +47,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'azuredata/resource-manager',
         namespace: 'Microsoft.AzureData',
+    },
+    {
+        basePath: 'azurestack/resource-manager',
+        namespace: 'Microsoft.AzureStack',
     },
     { 
         basePath: 'batch/resource-manager',
@@ -189,6 +205,16 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'labservices/resource-manager',
         namespace: 'Microsoft.LabServices',
     },
+    { 
+        basePath: 'eventgrid/resource-manager',
+        namespace: 'Microsoft.EventGrid',
+        resourceConfig: [
+            {
+                type: 'eventSubscriptions',
+                scopes: ScopeType.Extension | ScopeType.Subcription | ScopeType.ResourceGroup,
+            },
+        ],
+    },
     {
         basePath: 'machinelearningcompute/resource-manager',
         namespace: 'Microsoft.MachineLearningCompute',
@@ -271,6 +297,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'servicefabricmesh/resource-manager',
         namespace: 'Microsoft.ServiceFabricMesh',
+    },
+    {
+        basePath: 'signalr/resource-manager',
+        namespace: 'Microsoft.SignalRService',
     },
     {
         basePath: 'sqlvirtualmachine/resource-manager',

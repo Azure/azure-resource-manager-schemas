@@ -287,6 +287,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.ServiceFabricMesh',
     },
     {
+        basePath: 'signalr/resource-manager',
+        namespace: 'Microsoft.SignalRService',
+    },
+    {
         basePath: 'sqlvirtualmachine/resource-manager',
         namespace: 'Microsoft.SqlVirtualMachine',
     },

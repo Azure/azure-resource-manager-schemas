@@ -307,6 +307,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.StorageCache',
     },
     {
+        basePath: 'streamanalytics/resource-manager',
+        namespace: 'Microsoft.StreamAnalytics',
+    },
+    {
         basePath: 'storagesync/resource-manager',
         namespace: 'Microsoft.StorageSync',
     },

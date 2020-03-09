@@ -5,6 +5,14 @@ import { lowerCaseEquals } from './utils';
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
 const whitelist: WhitelistConfig[] = [
     {
+        basePath: 'adhybridhealthservice/resource-manager',
+        namespace: 'Microsoft.ADHybridHealthService',
+    },
+    {
+        basePath: 'azureactivedirectory/resource-manager',
+        namespace: 'Microsoft.Aadiam',
+    },
+    {
         basePath: 'alertsmanagement/resource-manager',
         namespace: 'Microsoft.AlertsManagement',
     },
@@ -305,12 +313,20 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.ServiceFabricMesh',
     },
     {
+        basePath: 'signalr/resource-manager',
+        namespace: 'Microsoft.SignalRService',
+    },
+    {
         basePath: 'sqlvirtualmachine/resource-manager',
         namespace: 'Microsoft.SqlVirtualMachine',
     },
     {
         basePath: 'storagecache/resource-manager',
         namespace: 'Microsoft.StorageCache',
+    },
+    {
+        basePath: 'streamanalytics/resource-manager',
+        namespace: 'Microsoft.StreamAnalytics',
     },
     {
         basePath: 'storagesync/resource-manager',

@@ -238,6 +238,11 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DBforPostgreSQL',
     },
     {
+        basePath: 'privatedns/resource-manager',
+        namespace: 'Microsoft.Network',
+        suffix: 'PrivateDNS',
+    },
+    {
         basePath: 'resources/resource-manager',
         namespace: 'Microsoft.Resources',
         resourceConfig: [

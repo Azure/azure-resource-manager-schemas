@@ -25,6 +25,21 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.AppConfiguration',
     },
     {
+        basePath: 'applicationinsights/resource-manager',
+        namespace: 'Microsoft.Insights',
+        suffix: 'ApplicationInsights',
+        resourceConfig: [
+            {
+                type: 'workbooks',
+                scopes: ScopeType.ResourceGroup,
+            },
+            {
+                type: 'workbooktemplates',
+                scopes: ScopeType.ResourceGroup,
+            },
+        ]
+    },
+    {
         basePath: 'apimanagement/resource-manager',
         namespace: 'Microsoft.ApiManagement',
     },

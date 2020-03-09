@@ -318,6 +318,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'vmwarecloudsimple/resource-manager',
         namespace: 'Microsoft.VMwareCloudSimple',
     },
+    {
+        basePath: 'vmwarevirtustream/resource-manager',
+        namespace: 'Microsoft.VMwareVirtustream',
+    },
     { 
         basePath: 'sql/resource-manager',
         namespace: 'Microsoft.Sql',

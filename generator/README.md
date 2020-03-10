@@ -16,7 +16,12 @@
 ### Daily autogeneration
 
 #### Autogeneration Pipeline
-[![Build Status](https://dev.azure.com/azure/azure-resource-manager-schemas/_apis/build/status/Autogenerate?branchName=autogenerate)](https://dev.azure.com/azure/azure-resource-manager-schemas/_build/latest?definitionId=38&branchName=autogenerate)
+| Pipeline | Build Status  |
+|----------|---------------|
+| Batch 0  | [![Batch 0 Status](https://dev.azure.com/azure/azure-resource-manager-schemas/_apis/build/status/Autogenerate%20(Batch%200)?branchName=autogenerate)](https://dev.azure.com/azure/azure-resource-manager-schemas/_build/latest?definitionId=58&branchName=autogenerate) |
+| Batch 1  | [![Batch 1 Status](https://dev.azure.com/azure/azure-resource-manager-schemas/_apis/build/status/Autogenerate%20(Batch%201)?branchName=autogenerate)](https://dev.azure.com/azure/azure-resource-manager-schemas/_build/latest?definitionId=59&branchName=autogenerate) |
+| Batch 2  | [![Batch 2 Status](https://dev.azure.com/azure/azure-resource-manager-schemas/_apis/build/status/Autogenerate%20(Batch%202)?branchName=autogenerate)](https://dev.azure.com/azure/azure-resource-manager-schemas/_build/latest?definitionId=60&branchName=autogenerate) |
+| Batch 3  | [![Batch 3 Status](https://dev.azure.com/azure/azure-resource-manager-schemas/_apis/build/status/Autogenerate%20(Batch%203)?branchName=autogenerate)](https://dev.azure.com/azure/azure-resource-manager-schemas/_build/latest?definitionId=61&branchName=autogenerate) |
 
 View the Pipeline Configuration [here](/azure-pipelines-autogen.yml).
 

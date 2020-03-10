@@ -191,7 +191,7 @@ async function addMissingSchemas(missingUris: string[], loadSchema: (uri: string
     }
 }
 
-async function execute(test: any, loadSchema: (uri: string) => Promise<any>) {
+export async function execute(test: any, loadSchema: (uri: string) => Promise<any>) {
     const fullSchema = await loadSchema(test.definition);
     let definitionSchema = scopeToPath(test.definition, fullSchema);
     definitionSchema = resolveSchemaLocalReferences(definitionSchema, fullSchema, '#', {});
@@ -199,8 +199,4 @@ async function execute(test: any, loadSchema: (uri: string) => Promise<any>) {
     const result = await validate(test.json, definitionSchema, loadSchema);
 
     assertErrors(test.expectedErrors, result.errors, false, '');
-}
-
-export {
-    execute,
 }

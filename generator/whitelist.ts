@@ -315,6 +315,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.StorageSync',
     },
     {
+        basePath: 'storSimple1200Series/resource-manager',
+        namespace: 'Microsoft.StorSimple',
+    },
+    {
         basePath: 'vmwarecloudsimple/resource-manager',
         namespace: 'Microsoft.VMwareCloudSimple',
     },

@@ -322,6 +322,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'vmwarevirtustream/resource-manager',
         namespace: 'Microsoft.VMwareVirtustream',
     },
+    {
+        basePath: 'visualstudio/resource-manager',
+        namespace: 'microsoft.visualstudio',
+    },
     { 
         basePath: 'sql/resource-manager',
         namespace: 'Microsoft.Sql',

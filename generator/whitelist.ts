@@ -326,6 +326,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'sql/resource-manager',
         namespace: 'Microsoft.Sql',
     },
+    { 
+        basePath: 'scheduler/resource-manager',
+        namespace: 'Microsoft.Scheduler',
+    },
     {
         basePath: 'timeseriesinsights/resource-manager',
         namespace: 'Microsoft.TimeSeriesInsights',

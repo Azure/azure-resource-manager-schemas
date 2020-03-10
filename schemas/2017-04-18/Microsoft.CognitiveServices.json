@@ -13,6 +13,17 @@
             "2017-04-18"
           ]
         },
+        "identity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Identity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Managed service identity."
+        },
         "kind": {
           "type": "string",
           "description": "Required. Indicates the type of cognitive service account."
@@ -154,6 +165,17 @@
           "type": "string",
           "description": "Optional subdomain name used for token-based authentication."
         },
+        "encryption": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Encryption"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties to configure Encryption"
+        },
         "networkAcls": {
           "oneOf": [
             {
@@ -164,9 +186,92 @@
             }
           ],
           "description": "A set of rules governing the network accessibility."
+        },
+        "userOwnedStorage": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/UserOwnedStorage"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The storage accounts for this resource."
         }
       },
       "description": "Properties of Cognitive Services account."
+    },
+    "Encryption": {
+      "type": "object",
+      "properties": {
+        "keySource": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Microsoft.CognitiveServices",
+                "Microsoft.KeyVault"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Enumerates the possible value of keySource for Encryption."
+        },
+        "keyVaultProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/KeyVaultProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties to configure keyVault Properties"
+        }
+      },
+      "description": "Properties to configure Encryption"
+    },
+    "Identity": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "None",
+                "SystemAssigned",
+                "UserAssigned"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Type of managed service identity."
+        },
+        "userAssignedIdentities": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/UserAssignedIdentity"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of user assigned identities associated with the resource. The user identity dictionary key references will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}"
+        }
+      },
+      "description": "Managed service identity."
     },
     "IpRule": {
       "type": "object",
@@ -180,6 +285,24 @@
         "value"
       ],
       "description": "A rule governing the accessibility from a specific ip address or ip range."
+    },
+    "KeyVaultProperties": {
+      "type": "object",
+      "properties": {
+        "keyName": {
+          "type": "string",
+          "description": "Name of the Key from KeyVault"
+        },
+        "keyVaultUri": {
+          "type": "string",
+          "description": "Uri of KeyVault"
+        },
+        "keyVersion": {
+          "type": "string",
+          "description": "Version of the Key from KeyVault"
+        }
+      },
+      "description": "Properties to configure keyVault Properties"
     },
     "NetworkRuleSet": {
       "type": "object",
@@ -242,6 +365,30 @@
         "name"
       ],
       "description": "The SKU of the cognitive services account."
+    },
+    "UserAssignedIdentity": {
+      "type": "object",
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "description": "Client App Id associated with this identity."
+        },
+        "principalId": {
+          "type": "string",
+          "description": "Azure Active Directory principal ID associated with this Identity."
+        }
+      },
+      "description": "User-assigned managed identity."
+    },
+    "UserOwnedStorage": {
+      "type": "object",
+      "properties": {
+        "resourceId": {
+          "type": "string",
+          "description": "Full resource id of a Microsoft.Storage resource."
+        }
+      },
+      "description": "The user owned storage for Cognitive Services account."
     },
     "VirtualNetworkRule": {
       "type": "object",

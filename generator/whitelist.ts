@@ -224,6 +224,14 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Maintenance',
     },
     {
+        basePath: 'migrate/resource-manager',
+        namespace: 'Microsoft.Migrate',
+    },
+    {
+        basePath: 'migrate/resource-manager',
+        namespace: 'Microsoft.OffAzure',
+    },
+    {
         basePath: 'managednetwork/resource-manager',
         namespace: 'Microsoft.ManagedNetwork',
         resourceConfig: [

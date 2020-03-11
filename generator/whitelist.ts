@@ -324,7 +324,7 @@ const whitelist: WhitelistConfig[] = [
     },
     {
         basePath: 'visualstudio/resource-manager',
-        namespace: 'Microsoft.visualstudio',
+        namespace: 'Microsoft.VisualStudio',
     },
     { 
         basePath: 'sql/resource-manager',

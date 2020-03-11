@@ -153,6 +153,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'devtestlabs/resource-manager',
         namespace: 'Microsoft.DevTestLab',
     },
+    {
+        basePath: 'resourcegraph/resource-manager',
+        namespace: 'Microsoft.ResourceGraph',
+    },
     { 
         basePath: 'redis/resource-manager',
         namespace: 'Microsoft.Cache',
@@ -317,6 +321,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'serialconsole/resource-manager',
         namespace: 'Microsoft.SerialConsole',
+    },
+    {
+        basePath: 'securityinsights/resource-manager',
+        namespace: 'Microsoft.SecurityInsights',
     },
     {
         basePath: 'vmwarecloudsimple/resource-manager',

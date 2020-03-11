@@ -242,6 +242,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DBforMySQL',
     },
     {
+        basePath: 'maps/resource-manager',
+        namespace: 'Microsoft.Maps',
+    },
+    {
         basePath: 'netapp/resource-manager',
         namespace: 'Microsoft.NetApp',
     },

@@ -238,6 +238,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DBforMariaDB',
     },
     {
+        basePath: 'marketplace/resource-manager',
+        namespace: 'Microsoft.Marketplace',
+    },
+    {
         basePath: 'mysql/resource-manager',
         namespace: 'Microsoft.DBforMySQL',
     },

@@ -153,6 +153,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'devtestlabs/resource-manager',
         namespace: 'Microsoft.DevTestLab',
     },
+    {
+        basePath: 'resourcegraph/resource-manager',
+        namespace: 'Microsoft.ResourceGraph',
+    },
     { 
         basePath: 'redis/resource-manager',
         namespace: 'Microsoft.Cache',
@@ -313,6 +317,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'storagesync/resource-manager',
         namespace: 'Microsoft.StorageSync',
+    },
+    {
+        basePath: 'securityinsights/resource-manager',
+        namespace: 'Microsoft.SecurityInsights',
     },
     {
         basePath: 'vmwarecloudsimple/resource-manager',

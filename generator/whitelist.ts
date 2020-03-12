@@ -178,6 +178,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.EventHub',
     },
     {
+        basePath: 'engagementfabric/resource-manager',
+        namespace: 'Microsoft.EngagementFabric',
+    },
+    {
         basePath: 'hanaonazure/resource-manager',
         namespace: 'Microsoft.HanaOnAzure',
     },

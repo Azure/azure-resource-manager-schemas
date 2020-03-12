@@ -154,6 +154,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DevTestLab',
     },
     {
+        basePath: 'guestconfiguration/resource-manager',
+        namespace: 'Microsoft.GuestConfiguration',
+    },
+    {
         basePath: 'resourcegraph/resource-manager',
         namespace: 'Microsoft.ResourceGraph',
     },

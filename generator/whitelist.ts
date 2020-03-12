@@ -109,6 +109,10 @@ const whitelist: WhitelistConfig[] = [
         ],
     },
     {
+        basePath: 'customerlockbox/resource-manager',
+        namespace: 'Microsoft.CustomerLockbox',
+    },
+    {
         basePath: 'containerservice/resource-manager',
         namespace: 'Microsoft.ContainerService',
     },

@@ -190,6 +190,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.HybridData',
     },
     {
+        basePath: 'healthcareapis/resource-manager',
+        namespace: 'Microsoft.HealthcareApis',
+    },
+    {
         basePath: 'iotcentral/resource-manager',
         namespace: 'Microsoft.IotCentral',
     },

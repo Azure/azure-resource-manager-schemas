@@ -220,6 +220,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.MachineLearningCompute',
     },
     {
+        basePath: 'machinelearningexperimentation/resource-manager',
+        namespace: 'Microsoft.MachineLearningExperimentation',
+    },
+    {
         basePath: 'maintenance/resource-manager',
         namespace: 'Microsoft.Maintenance',
     },

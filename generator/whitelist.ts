@@ -146,6 +146,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DevOps',
     },
     {
+        basePath: 'dns/resource-manager',
+        namespace: 'Microsoft.Network',
+    },
+    {
         basePath: 'devspaces/resource-manager',
         namespace: 'Microsoft.DevSpaces',
     },

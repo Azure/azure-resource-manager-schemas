@@ -49,6 +49,28 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.AzureStack',
     },
     { 
+        basePath: 'blueprint/resource-manager',
+        namespace: 'Microsoft.Blueprint',
+        resourceConfig: [
+            {
+                type: 'blueprintAssignments',
+                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup,
+            },
+            {
+                type: 'blueprints',
+                scopes: ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'blueprints/artifacts',
+                scopes: ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'blueprints/versions',
+                scopes: ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+        ],
+    },
+    { 
         basePath: 'batch/resource-manager',
         namespace: 'Microsoft.Batch',
     },

@@ -261,7 +261,7 @@ const whitelist: WhitelistConfig[] = [
     },
     {
         basePath: 'powerbidedicated/resource-manager',
-        namespace: 'Microsoft.PowerBIdedicated',
+        namespace: 'Microsoft.PowerBIDedicated',
     },
     {
         basePath: 'portal/resource-manager',

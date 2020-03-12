@@ -216,6 +216,20 @@ const whitelist: WhitelistConfig[] = [
         ],
     },
     {
+        basePath: 'managedservices/resource-manager',
+        namespace: 'Microsoft.ManagedServices',
+        resourceConfig: [
+            {
+                type: 'registrationAssignments',
+                scopes: ScopeType.Tenant | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.ManagementGroup,
+            },
+            {
+                type: 'registrationDefinitions',
+                scopes: ScopeType.Tenant | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.ManagementGroup,
+            },
+        ],
+    },
+    {
         basePath: 'machinelearningcompute/resource-manager',
         namespace: 'Microsoft.MachineLearningCompute',
     },

@@ -154,6 +154,11 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DevTestLab',
     },
     {
+        basePath: 'frontdoor/resource-manager',
+        namespace: 'Microsoft.Network',
+        suffix: 'ApplicationGatewayWebApplicationFirewallPolicies'
+    },
+    {
         basePath: 'resourcegraph/resource-manager',
         namespace: 'Microsoft.ResourceGraph',
     },

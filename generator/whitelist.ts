@@ -331,6 +331,11 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.TimeSeriesInsights',
     },
     {
+        basePath: 'trafficmanager/resource-manager',
+        namespace: 'Microsoft.Network',
+        suffix: 'resourceDefinitions/trafficManagerProfiles'
+    },
+    {
         basePath: 'imagebuilder/resource-manager',
         namespace: 'Microsoft.VirtualMachineImages',
     },

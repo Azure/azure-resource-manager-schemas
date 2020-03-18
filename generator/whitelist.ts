@@ -153,6 +153,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'devtestlabs/resource-manager',
         namespace: 'Microsoft.DevTestLab',
     },
+    {
+        basePath: 'resourcegraph/resource-manager',
+        namespace: 'Microsoft.ResourceGraph',
+    },
     { 
         basePath: 'redis/resource-manager',
         namespace: 'Microsoft.Cache',
@@ -316,7 +320,11 @@ const whitelist: WhitelistConfig[] = [
     },
     {
         basePath: 'storageimportexport/resource-manager',
-        namespace: 'Microsoft.ImportExport',
+        namespace: 'Microsoft.ImportExport'
+    },
+    {
+        basePath: 'securityinsights/resource-manager',
+        namespace: 'Microsoft.SecurityInsights',
     },
     {
         basePath: 'vmwarecloudsimple/resource-manager',
@@ -325,6 +333,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'vmwarevirtustream/resource-manager',
         namespace: 'Microsoft.VMwareVirtustream',
+    },
+    {
+        basePath: 'visualstudio/resource-manager',
+        namespace: 'Microsoft.VisualStudio',
     },
     { 
         basePath: 'sql/resource-manager',

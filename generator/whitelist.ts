@@ -162,6 +162,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Cache',
     },
     {
+        basePath: 'hardwaresecuritymodules/resource-manager',
+        namespace: 'Microsoft.HardwareSecurityModules',
+    },
+    {
         basePath: 'hdinsight/resource-manager',
         namespace: 'Microsoft.HDInsight',
     },

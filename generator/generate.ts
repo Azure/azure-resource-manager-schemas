@@ -1,45 +1,81 @@
 import path from 'path';
 import os from 'os';
-import fs from 'fs';
-import { promisify } from 'util';
-import { findRecursive, findDirRecursive, executeCmd, rmdirRecursive, lowerCaseCompare, lowerCaseCompareLists } from './utils';
+import { findRecursive, findDirRecursive, executeCmd, rmdirRecursive, lowerCaseCompare, lowerCaseCompareLists, lowerCaseStartsWith, readJsonFile, writeJsonFile, safeMkdir, safeUnlink, fileExists, lowerCaseEquals, lowerCaseContains } from './utils';
 import * as constants from './constants';
 import chalk from 'chalk';
 import { ScopeType, WhitelistConfig } from './models';
+import { get, set, flatten, uniq, concat, Dictionary, groupBy, keys, difference, pickBy, flatMap, values, uniqBy } from 'lodash';
 
 const autorestBinary = os.platform() === 'win32' ? 'autorest-beta.cmd' : 'autorest-beta';
+const apiVersionRegex = /^\d{4}-\d{2}-\d{2}(|-preview)$/;
 
-const exists = promisify(fs.exists);
-const readFile = promisify(fs.readFile);
-const writeFile = promisify(fs.writeFile);
-const copyFile = promisify(fs.copyFile);
-const mkdir = promisify(fs.mkdir);
-
-interface ResourceDefinition {
-    scope: ScopeType;
-    type: string;
-    schemaRef: string;
+export interface SchemaConfiguration {
+    references: SchemaReference[];
+    relativePath: string;
 }
 
-async function generateSchemas(readme: string, whitelistEntry?: WhitelistConfig) {
-    const searchPath = path.resolve(`${readme}/..`);
-    const apiVersionPaths = await findDirRecursive(searchPath, p => path.basename(p).match(/^\d{4}-\d{2}-\d{2}(|-preview)$/) !== null);
+interface SchemaReference {
+    scope: ScopeType;
+    type: string;
+    reference: string;
+}
 
-    for (const subPath of apiVersionPaths) {
-        const apiVersion = path.basename(subPath);
+interface RootSchemaConfiguration {
+    file: string;
+    jsonPath: string;
+}
+
+const RootSchemaConfigs: Map<ScopeType, RootSchemaConfiguration> = new Map([
+    [ScopeType.Tenant, constants.tenantRootSchema],
+    [ScopeType.Subcription, constants.subscriptionRootSchema],
+    [ScopeType.ResourceGroup, constants.resourceGroupRootSchema],
+    [ScopeType.ManagementGroup, constants.managementGroupRootSchema]
+]);
+
+export async function getApiVersionsByNamespace(readme: string): Promise<Dictionary<string[]>> {
+    const searchPath = path.resolve(`${readme}/..`);
+    const apiVersionPaths = await findDirRecursive(searchPath, p => path.basename(p).match(apiVersionRegex) !== null);
+
+    const output: Dictionary<string[]> = {};
+    for (const [namespace, _, apiVersion] of apiVersionPaths.map(p => path.relative(searchPath, p).split(path.sep))) {
+        output[namespace] = [...(output[namespace] ?? []), apiVersion];
+    }
+
+    return output;
+}
+
+export async function generateSchemas(readme: string, whitelistConfig?: WhitelistConfig): Promise<SchemaConfiguration[]> {
+    const apiVersionsByNamespace = pickBy(
+        await getApiVersionsByNamespace(readme),
+        (_, key) => !whitelistConfig || lowerCaseEquals(key, whitelistConfig.namespace));
+
+    const apiVersions = uniqBy(flatMap(values(apiVersionsByNamespace)), s => s.toLowerCase());
+    const namespaces = keys(apiVersionsByNamespace);
+
+    const schemaConfigs: SchemaConfiguration[] = [];
+    for (const apiVersion of apiVersions) {
         const tmpFolder = path.join(os.tmpdir(), Math.random().toString(36).substr(2));
 
         try {
             const generatedSchemas = await generateSchema(readme, tmpFolder, apiVersion);
 
             for (const schemaPath of generatedSchemas) {
-                await handleGeneratedSchema(readme, schemaPath, whitelistEntry);
+                const namespace = path.basename(schemaPath.substring(0, schemaPath.lastIndexOf(path.extname(schemaPath))));
+                if (!lowerCaseContains(namespaces, namespace)) {
+                    continue;
+                }
+
+                const generatedSchemaConfig = await handleGeneratedSchema(readme, schemaPath, whitelistConfig);
+
+                schemaConfigs.push(generatedSchemaConfig);
             }
         }
         finally {
             await rmdirRecursive(tmpFolder);
         }
     }
+
+    return schemaConfigs;
 }
 
 async function handleGeneratedSchema(readme: string, schemaPath: string, whitelistConfig?: WhitelistConfig) {
@@ -51,19 +87,21 @@ async function handleGeneratedSchema(readme: string, schemaPath: string, whiteli
 
     const apiVersion = path.basename(path.resolve(`${schemaPath}/..`));
 
-    const schemaRefs = await generateSchemaRefs(schemaPath, namespace, apiVersion, whitelistConfig);
+    const schemaConfig = await generateSchemaConfig(schemaPath, namespace, apiVersion, whitelistConfig);
 
-    const unknownScopeResources = schemaRefs.filter(x => x.scope & ScopeType.Unknown);
+    const unknownScopeResources = schemaConfig.references.filter(x => x.scope & ScopeType.Unknown);
     if (whitelistConfig && unknownScopeResources.length > 0) {
         throw new Error(`Unable to determine scope for resource types ${unknownScopeResources.map(x => x.type).join(', ')} in readme ${readme}`);
     }
 
-    await saveToSchemasDirectory(schemaPath, schemaRefs, apiVersion);
+    await saveSchemaFile(schemaPath, schemaConfig);
+
+    return schemaConfig;
 }
 
 async function execAutoRest(tmpFolder: string, params: string[]) {
     await executeCmd(__dirname, autorestBinary, params);
-    if (!await exists(tmpFolder)) {
+    if (!await fileExists(tmpFolder)) {
         return [];
     }
 
@@ -72,12 +110,14 @@ async function execAutoRest(tmpFolder: string, params: string[]) {
 
 async function generateSchema(readme: string, tmpFolder: string, apiVersion: string) {
     const autoRestParams = [
+        `--version=${constants.autorestCoreVersion}`,
+        `--use=@autorest/azureresourceschema@${constants.azureresourceschemaVersion}`,
         '--azureresourceschema',
-        '--azureresourceschema.multi-scope=true',
         `--output-folder=${tmpFolder}`,
         `--tag=all-api-versions`,
         `--api-version=${apiVersion}`,
         '--title=none',
+        '--pass-thru:subset-reducer',
         readme,
     ];
 
@@ -88,92 +128,127 @@ async function generateSchema(readme: string, tmpFolder: string, apiVersion: str
     return await execAutoRest(tmpFolder, autoRestParams);
 }
 
-function getSchemaRefs(schemaUri: string, output: any, scopeType: ScopeType, resourceDefinitionsPath: string): ResourceDefinition[] {
+function getSchemaRefs(output: any, scopeType: ScopeType, resourceDefinitionsPath: string): SchemaReference[] {
     const resourceDefs = output[resourceDefinitionsPath] || {};
     const resourceKeys = Object.keys(resourceDefs);
 
     return resourceKeys.map(r => ({
         scope: scopeType,
         type: resourceDefs[r].description.substr(resourceDefs[r].description.indexOf('/') + 1),
-        schemaRef: `${schemaUri}#/${resourceDefinitionsPath}/${r}`,
+        reference: `${resourceDefinitionsPath}/${r}`,
     }));
 }
 
-function applyResourceConfig(namespace: string, schemaRefs: ResourceDefinition[], whitelistConfig?: WhitelistConfig) {
+function getFilePathFromRef(schemaRef: string) {
+    const schemaUri = schemaRef.split('#')[0];
+    if (!lowerCaseStartsWith(schemaUri, constants.schemasBaseUri)) {
+        throw new Error(`Unrecognized schema reference ${schemaRef}`);
+    }
+
+    return path.resolve(path.join(constants.schemasBasePath, schemaUri.substring(constants.schemasBaseUri.length + 1)));
+}
+
+function assignScopesToUnknownReferences(knownReferences: SchemaReference[], unknownReferences: SchemaReference[], whitelistConfig?: WhitelistConfig) {
     const resourceConfig = (whitelistConfig || {}).resourceConfig || [];
 
-    for (const schemaRef of schemaRefs) {
+    for (const schemaRef of unknownReferences) {
         const config = resourceConfig.find(c => lowerCaseCompare(c.type, schemaRef.type) === 0);
 
         if (config && (schemaRef.scope & ScopeType.Unknown)) {
             schemaRef.scope = config.scopes || ScopeType.None;
         }
+
+        for (const knownReference of knownReferences.filter(r => lowerCaseCompare(r.type, schemaRef.type) === 0)) {
+            // remove resources for scopes that have already been declared elsewhere to avoid duplication
+            schemaRef.scope &= ~knownReference.scope;
+        }
     }
 }
 
-async function generateSchemaRefs(outputFile: string, namespace: string, apiVersion: string, whitelistConfig?: WhitelistConfig): Promise<ResourceDefinition[]> {
-    const outputSchemaUri = `${constants.schemasBaseUri}/${apiVersion}/${namespace}.json`;
+function getSchemaFileName(namespace: string, suffix: string | undefined) {
+    if (suffix === undefined) {
+        return `${namespace}.json`
+    }
 
-    const outputContent = await readFile(outputFile, { encoding: 'utf8' });
-    const output = JSON.parse(outputContent);
+    return `${namespace}.${suffix}.json`;
+}
 
-    const schemaRefs = [
-        ...getSchemaRefs(outputSchemaUri, output, ScopeType.Tenant, 'tenant_resourceDefinitions'),
-        ...getSchemaRefs(outputSchemaUri, output, ScopeType.ManagementGroup, 'managementGroup_resourceDefinitions'),
-        ...getSchemaRefs(outputSchemaUri, output, ScopeType.Subcription, 'subscription_resourceDefinitions'),
-        ...getSchemaRefs(outputSchemaUri, output, ScopeType.ResourceGroup, 'resourceDefinitions'),
-        ...getSchemaRefs(outputSchemaUri, output, ScopeType.Extension, 'extension_resourceDefinitions'),
-        ...getSchemaRefs(outputSchemaUri, output, ScopeType.Unknown, 'unknown_resourceDefinitions'),
+async function generateSchemaConfig(outputFile: string, namespace: string, apiVersion: string, whitelistConfig?: WhitelistConfig): Promise<SchemaConfiguration> {
+    namespace = whitelistConfig?.namespace ?? namespace;
+    const suffix = whitelistConfig?.suffix;
+    const relativePath = `${apiVersion}/${getSchemaFileName(namespace, suffix)}`;
+
+    let output = await readJsonFile(outputFile);
+    if (whitelistConfig?.postProcessor) {
+        whitelistConfig?.postProcessor(namespace, apiVersion, output);
+
+        await writeJsonFile(outputFile, output);
+    }
+
+    const knownReferences = [
+        ...getSchemaRefs(output, ScopeType.Tenant, 'tenant_resourceDefinitions'),
+        ...getSchemaRefs(output, ScopeType.ManagementGroup, 'managementGroup_resourceDefinitions'),
+        ...getSchemaRefs(output, ScopeType.Subcription, 'subscription_resourceDefinitions'),
+        ...getSchemaRefs(output, ScopeType.ResourceGroup, 'resourceDefinitions'),
+        ...getSchemaRefs(output, ScopeType.Extension, 'extension_resourceDefinitions'),
     ];
 
-    applyResourceConfig(namespace, schemaRefs, whitelistConfig);
+    const unknownReferences = getSchemaRefs(output, ScopeType.Unknown, 'unknown_resourceDefinitions');
+    assignScopesToUnknownReferences(knownReferences, unknownReferences, whitelistConfig);
+
+    const references = [
+        ...knownReferences,
+        ...unknownReferences,
+    ];
+
+    const schemaPath = path.join(constants.schemasBasePath, relativePath);
 
     console.log('================================================================================================================================');
-    console.log('Filename: ' + chalk.green(outputFile));
+    console.log('Filename: ' + chalk.green(schemaPath));
     console.log('Provider Namespace: ' + chalk.green(namespace));
     console.log('API Version: ' + chalk.green(apiVersion));
 
-    const tenantSchemaRefs = schemaRefs.filter(x => x.scope & ScopeType.Tenant);
+    const tenantSchemaRefs = references.filter(x => x.scope & ScopeType.Tenant);
     if (tenantSchemaRefs.length > 0) {
         console.log('Resource Types (Tenant Scope):');
         for (const schemaRef of tenantSchemaRefs) {
             console.log('- ' + chalk.green(schemaRef.type));
         }
     }
-   
-    const managementGroupSchemaRefs = schemaRefs.filter(x => x.scope & ScopeType.ManagementGroup);
-    if (managementGroupSchemaRefs.length > 0) {2
+
+    const managementGroupSchemaRefs = references.filter(x => x.scope & ScopeType.ManagementGroup);
+    if (managementGroupSchemaRefs.length > 0) {
         console.log('Resource Types (Management Group Scope):');
         for (const schemaRef of managementGroupSchemaRefs) {
             console.log('- ' + chalk.green(schemaRef.type));
         }
     }
-   
-    const subscriptionSchemaRefs = schemaRefs.filter(x => x.scope & ScopeType.Subcription);
+
+    const subscriptionSchemaRefs = references.filter(x => x.scope & ScopeType.Subcription);
     if (subscriptionSchemaRefs.length > 0) {
         console.log('Resource Types (Subscription Scope):');
         for (const schemaRef of subscriptionSchemaRefs) {
             console.log('- ' + chalk.green(schemaRef.type));
         }
     }
-   
-    const resourceGroupSchemaRefs = schemaRefs.filter(x => x.scope & ScopeType.ResourceGroup);
+
+    const resourceGroupSchemaRefs = references.filter(x => x.scope & ScopeType.ResourceGroup);
     if (resourceGroupSchemaRefs.length > 0) {
         console.log('Resource Types (Resource Group Scope):');
         for (const schemaRef of resourceGroupSchemaRefs) {
             console.log('- ' + chalk.green(schemaRef.type));
         }
     }
-   
-    const extensionSchemaRefs = schemaRefs.filter(x => x.scope & ScopeType.Extension);
+
+    const extensionSchemaRefs = references.filter(x => x.scope & ScopeType.Extension);
     if (extensionSchemaRefs.length > 0) {
         console.log('Resource Types (Extension Scope):');
         for (const schemaRef of extensionSchemaRefs) {
             console.log('- ' + chalk.green(schemaRef.type));
         }
     }
-   
-    const unknownSchemaRefs = schemaRefs.filter(x => x.scope & ScopeType.Unknown);
+
+    const unknownSchemaRefs = references.filter(x => x.scope & ScopeType.Unknown);
     if (unknownSchemaRefs.length > 0) {
         console.log('Resource Types (Unknown Scope):');
         for (const schemaRef of unknownSchemaRefs) {
@@ -183,32 +258,23 @@ async function generateSchemaRefs(outputFile: string, namespace: string, apiVers
 
     console.log('================================================================================================================================');
 
-    return schemaRefs;
+    return {
+        references,
+        relativePath,
+    };
 }
 
-async function saveToSchemasDirectory(outputFile: string, schemaRefs: ResourceDefinition[], apiVersion: string) {
-    const templateContents = await readFile(constants.generatedSchemasTemplatePath, { encoding: 'utf8' });
-    const template = JSON.parse(templateContents);
+async function saveSchemaFile(outputFile: string, schemaConfig: SchemaConfiguration) {
+    const schemaRef = `${constants.schemasBaseUri}/${schemaConfig.relativePath}#`
 
-    const actualContents = await readFile(constants.generatedSchemasPath, { encoding: 'utf8' });
-    const actual = JSON.parse(actualContents);
+    const schemaPath = path.join(constants.schemasBasePath, schemaConfig.relativePath);
 
-    const currentRefsOneOf: {[path: string]: string}[] = actual.allOf[1].oneOf;
-    const currentRefs = currentRefsOneOf.map(v => v['$ref']);
+    await safeMkdir(path.dirname(schemaPath));
 
-    const resourceGroupRefs = schemaRefs.filter(r => r.scope & ScopeType.ResourceGroup).map(r => r.schemaRef);
+    const output = await readJsonFile(outputFile);
+    output.id = schemaRef;
 
-    const newRefs = [...new Set(currentRefs.concat(resourceGroupRefs))].sort(schemaRefComparer);
-
-    template.allOf[1].oneOf = newRefs.map(ref => ({ '$ref': ref }));
-
-    const schemaPath = path.join(constants.schemasBasePath, apiVersion);
-    if (!await exists(schemaPath)) {
-        await mkdir(schemaPath);
-    }
-
-    await copyFile(outputFile, path.join(schemaPath, path.basename(outputFile)));
-    await writeFile(constants.generatedSchemasPath, JSON.stringify(template, null, 2), { encoding: 'utf8' });
+    await writeJsonFile(schemaPath, output);
 }
 
 function schemaRefComparer(schemaRefA: string, schemaRefB: string) {
@@ -222,14 +288,44 @@ function schemaRefComparer(schemaRefA: string, schemaRefB: string) {
     );
 }
 
-async function clearAutogeneratedSchemas() {
-    const templateContents = await readFile(constants.generatedSchemasTemplatePath, { encoding: 'utf8' });
-    const template = JSON.parse(templateContents);
-
-    await writeFile(constants.generatedSchemasPath, JSON.stringify(template, null, 2), { encoding: 'utf8' });
+async function getCurrentTemplateRefs(scopeType: ScopeType, rootSchemaConfig: RootSchemaConfiguration) {
+    const current = await readJsonFile(rootSchemaConfig.file);
+    const currentRefsOneOf = get(current, rootSchemaConfig.jsonPath) as Dictionary<string>[];
+    return currentRefsOneOf.map(v => v['$ref']);
 }
 
-export {
-    clearAutogeneratedSchemas,
-    generateSchemas,
+export async function clearAutogeneratedSchemaRefs(whitelist: WhitelistConfig[]) {
+    RootSchemaConfigs.forEach(async (rootSchemaConfig, scopeType) => {
+        const currentRefs = await getCurrentTemplateRefs(scopeType, rootSchemaConfig);
+        const whitelistedFiles = new Set(whitelist.map(x => getSchemaFileName(x.namespace, x.suffix).toLowerCase()));
+        const schemasToRemove = [];
+        const schemasByFilePath = groupBy(currentRefs, getFilePathFromRef);
+        // clean up existing schemas to detect deletions
+        for (const schemaFile of keys(schemasByFilePath)) {
+            const fileName = path.basename(schemaFile).toLowerCase();
+            if (whitelistedFiles.has(fileName)) {
+                schemasToRemove.push(...schemasByFilePath[schemaFile]);
+                await safeUnlink(schemaFile);
+            }
+        }
+        const newRefs = difference(currentRefs, schemasToRemove);
+        const template = await readJsonFile(rootSchemaConfig.file);
+        set(template, rootSchemaConfig.jsonPath, newRefs.map(ref => ({ '$ref': ref })));
+        await writeJsonFile(rootSchemaConfig.file, template);
+    });
+}
+
+export async function saveAutogeneratedSchemaRefs(schemaConfigs: SchemaConfiguration[]) {
+    RootSchemaConfigs.forEach(async (rootSchemaConfig, scopeType) => {
+        const refs = flatten(schemaConfigs
+            .map(c => c.references
+                .filter(x => x.scope & scopeType)
+                .map(x => `${constants.schemasBaseUri}/${c.relativePath}#/${x.reference}`)));
+
+        const currentRefs = await getCurrentTemplateRefs(scopeType, rootSchemaConfig);
+        const newRefs = uniq(concat(currentRefs, refs)).sort(schemaRefComparer);
+        const template = await readJsonFile(rootSchemaConfig.file);
+        set(template, rootSchemaConfig.jsonPath, newRefs.map(ref => ({ '$ref': ref })));
+        await writeJsonFile(rootSchemaConfig.file, template);
+    });
 }

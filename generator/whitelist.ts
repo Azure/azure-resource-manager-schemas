@@ -125,6 +125,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DataFactory',
     },
     {
+        basePath: 'datacatalog/resource-manager',
+        namespace: 'Microsoft.DataCatalog',
+    },
+    {
         basePath: 'datalake-analytics/resource-manager',
         namespace: 'Microsoft.DataLakeAnalytics',
     },

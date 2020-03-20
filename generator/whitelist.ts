@@ -316,6 +316,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.NetApp',
     },
     {
+      basePath: 'notificationhubs/resource-manager',
+      namespace: 'Microsoft.NotificationHubs'
+    },
+    {
         basePath: 'policyinsights/resource-manager',
         namespace: 'Microsoft.PolicyInsights',
         resourceConfig: [

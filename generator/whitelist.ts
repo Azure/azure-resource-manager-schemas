@@ -125,6 +125,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.ContainerService',
     },
     {
+        basePath: 'commerce/resource-manager',
+        namespace: 'Microsoft.Commerce',
+    },
+    {
         basePath: 'databoxedge/resource-manager',
         namespace: 'Microsoft.DataBoxEdge',
     },
@@ -157,6 +161,16 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DeploymentManager',
     },
     {
+      basePath: 'digitaltwins/resource-manager',
+      namespace: 'Microsoft.DigitalTwins',
+      resourceConfig: [
+          {
+              type: 'integrationResources',
+              scopes: ScopeType.Extension,
+          }
+      ]
+    },
+    {
         basePath: 'deviceprovisioningservices/resource-manager',
         namespace: 'Microsoft.Devices',
         suffix: 'Provisioning',
@@ -172,6 +186,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'devtestlabs/resource-manager',
         namespace: 'Microsoft.DevTestLab',
+    },
+    {
+        basePath: 'guestconfiguration/resource-manager',
+        namespace: 'Microsoft.GuestConfiguration',
     },
     {
         basePath: 'resourcegraph/resource-manager',
@@ -200,6 +218,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'eventhub/resource-manager',
         namespace: 'Microsoft.EventHub',
+    },
+    {
+        basePath: 'engagementfabric/resource-manager',
+        namespace: 'Microsoft.EngagementFabric',
     },
     {
         basePath: 'hanaonazure/resource-manager',
@@ -282,12 +304,20 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DBforMySQL',
     },
     {
+        basePath: 'managementpartner/resource-manager',
+        namespace: 'Microsoft.ManagementPartner',
+    },
+    {
         basePath: 'maps/resource-manager',
         namespace: 'Microsoft.Maps',
     },
     {
         basePath: 'netapp/resource-manager',
         namespace: 'Microsoft.NetApp',
+    },
+    {
+      basePath: 'notificationhubs/resource-manager',
+      namespace: 'Microsoft.NotificationHubs'
     },
     {
         basePath: 'policyinsights/resource-manager',

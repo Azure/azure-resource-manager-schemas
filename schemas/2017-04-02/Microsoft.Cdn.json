@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2016-04-02/Microsoft.Cdn.json#",
+  "id": "https://schema.management.azure.com/schemas/2017-04-02/Microsoft.Cdn.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.Cdn",
   "description": "Microsoft Cdn Resource Types",
@@ -10,16 +10,27 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-04-02"
+            "2017-04-02"
           ]
         },
         "location": {
           "type": "string",
-          "description": "Profile location"
+          "description": "Resource location."
         },
         "name": {
           "type": "string",
-          "description": "Name of the CDN profile within the resource group."
+          "description": "Name of the CDN profile which is unique within the resource group."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ProfileProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The JSON object that contains the properties required to create a profile."
         },
         "resources": {
           "type": "array",
@@ -40,7 +51,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The SKU (pricing tier) of the CDN profile."
+          "description": "The pricing tier (defines a CDN provider, feature list and rate) of the CDN profile."
         },
         "tags": {
           "oneOf": [
@@ -55,7 +66,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Profile tags"
+          "description": "Resource tags."
         },
         "type": {
           "type": "string",
@@ -68,6 +79,7 @@
         "apiVersion",
         "location",
         "name",
+        "properties",
         "sku",
         "type"
       ],
@@ -79,34 +91,32 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-04-02"
+            "2017-04-02"
           ]
         },
         "location": {
           "type": "string",
-          "description": "Endpoint location"
+          "description": "Resource location."
         },
         "name": {
           "type": "string",
-          "description": "Name of the endpoint within the CDN profile."
+          "description": "Name of the endpoint under the profile which is unique globally."
         },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/EndpointPropertiesCreateParameters"
+              "$ref": "#/definitions/EndpointProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The JSON object that contains the properties required to create an endpoint."
         },
         "resources": {
           "type": "array",
           "items": {
             "oneOf": [
-              {
-                "$ref": "#/definitions/profiles_endpoints_origins_childResource"
-              },
               {
                 "$ref": "#/definitions/profiles_endpoints_customDomains_childResource"
               }
@@ -126,7 +136,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Endpoint tags"
+          "description": "Resource tags."
         },
         "type": {
           "type": "string",
@@ -150,7 +160,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-04-02"
+            "2017-04-02"
           ]
         },
         "name": {
@@ -165,7 +175,8 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The JSON object that contains the properties of the custom domain to create."
         },
         "type": {
           "type": "string",
@@ -181,44 +192,6 @@
         "type"
       ],
       "description": "Microsoft.Cdn/profiles/endpoints/customDomains"
-    },
-    "profiles_endpoints_origins": {
-      "type": "object",
-      "properties": {
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2016-04-02"
-          ]
-        },
-        "name": {
-          "type": "string",
-          "description": "Name of the origin, an arbitrary value but it needs to be unique under endpoint"
-        },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/OriginPropertiesParameters"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.Cdn/profiles/endpoints/origins"
-          ]
-        }
-      },
-      "required": [
-        "apiVersion",
-        "name",
-        "properties",
-        "type"
-      ],
-      "description": "Microsoft.Cdn/profiles/endpoints/origins"
     }
   },
   "definitions": {
@@ -232,7 +205,8 @@
       },
       "required": [
         "hostName"
-      ]
+      ],
+      "description": "The JSON object that contains the properties of the custom domain to create."
     },
     "DeepCreatedOrigin": {
       "type": "object",
@@ -250,25 +224,27 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Properties of deep created origin on a CDN endpoint."
+          "description": "Properties of the origin created on the CDN endpoint."
         }
       },
       "required": [
         "name"
       ],
-      "description": "Deep created origins within a CDN endpoint."
+      "description": "The main origin of CDN content which is added when creating a CDN endpoint."
     },
     "DeepCreatedOriginProperties": {
       "type": "object",
       "properties": {
         "hostName": {
           "type": "string",
-          "description": "The address of the origin. Domain names, IPv4 addresses, and IPv6 addresses are supported."
+          "description": "The address of the origin. It can be a domain name, IPv4 address, or IPv6 address."
         },
         "httpPort": {
           "oneOf": [
             {
-              "type": "integer"
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -279,7 +255,9 @@
         "httpsPort": {
           "oneOf": [
             {
-              "type": "integer"
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 65535
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -291,9 +269,9 @@
       "required": [
         "hostName"
       ],
-      "description": "Properties of deep created origin on a CDN endpoint."
+      "description": "Properties of the origin created on the CDN endpoint."
     },
-    "EndpointPropertiesCreateParameters": {
+    "EndpointProperties": {
       "type": "object",
       "properties": {
         "contentTypesToCompress": {
@@ -308,7 +286,21 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "List of content types on which compression will be applied. The value for the elements should be a valid MIME type."
+          "description": "List of content types on which compression applies. The value should be a valid MIME type."
+        },
+        "geoFilters": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/GeoFilter"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of rules defining the user's geo access within a CDN endpoint. Each geo filter defines an access rule to a specified path or content, e.g. block APAC for path /pictures/"
         },
         "isCompressionEnabled": {
           "oneOf": [
@@ -319,7 +311,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Indicates whether content compression is enabled. Default value is false. If compression is enabled, the content transferred from the CDN endpoint to the end user will be compressed. The requested content must be larger than 1 byte and smaller than 1 MB."
+          "description": "Indicates whether content compression is enabled on CDN. Default value is false. If compression is enabled, content will be served as compressed if user requests for a compressed version. Content won't be compressed on CDN when requested content is smaller than 1 byte or larger than 1 MB."
         },
         "isHttpAllowed": {
           "oneOf": [
@@ -341,15 +333,33 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Indicates whether https traffic is allowed on the endpoint. Default value is true. At least one protocol (HTTP or HTTPS) must be allowed."
+          "description": "Indicates whether HTTPS traffic is allowed on the endpoint. Default value is true. At least one protocol (HTTP or HTTPS) must be allowed."
+        },
+        "optimizationType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "GeneralWebDelivery",
+                "GeneralMediaStreaming",
+                "VideoOnDemandMediaStreaming",
+                "LargeFileDownload",
+                "DynamicSiteAcceleration"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies what scenario the customer wants this CDN endpoint to optimize for, e.g. Download, Media services. With this information, CDN can apply scenario driven optimization."
         },
         "originHostHeader": {
           "type": "string",
-          "description": "The host header CDN provider will send along with content requests to origins. The default value is the host name of the origin."
+          "description": "The host header value sent to the origin with each request. If you leave this blank, the request hostname determines this value. Azure CDN origins, such as Web Apps, Blob Storage, and Cloud Services require this host header value to match the origin hostname by default."
         },
         "originPath": {
           "type": "string",
-          "description": "The path used for origin requests."
+          "description": "A directory path on the origin that CDN can use to retrieve content from, e.g. contoso.cloudapp.net/originpath."
         },
         "origins": {
           "oneOf": [
@@ -363,7 +373,11 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The set of origins for the CDN endpoint. When multiple origins exist, the first origin will be used as primary and rest will be used as failover options."
+          "description": "The source of the content being delivered via CDN."
+        },
+        "probePath": {
+          "type": "string",
+          "description": "Path to a file hosted on the origin which helps accelerate delivery of the dynamic content and calculate the most optimal routes for the CDN. This is relative to the origin path."
         },
         "queryStringCachingBehavior": {
           "oneOf": [
@@ -380,46 +394,62 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Defines the query string caching behavior."
+          "description": "Defines how CDN caches requests that include query strings. You can ignore any query strings when caching, bypass caching to prevent requests that contain query strings from being cached, or cache every request with a unique URL."
         }
       },
       "required": [
         "origins"
-      ]
+      ],
+      "description": "The JSON object that contains the properties required to create an endpoint."
     },
-    "OriginPropertiesParameters": {
+    "GeoFilter": {
       "type": "object",
       "properties": {
-        "hostName": {
+        "action": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Block",
+                "Allow"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Action of the geo filter, i.e. allow or block access."
+        },
+        "countryCodes": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Two letter country codes defining user country access in a geo filter, e.g. AU, MX, US."
+        },
+        "relativePath": {
           "type": "string",
-          "description": "The address of the origin. Domain names, IPv4 addresses, and IPv6 addresses are supported."
-        },
-        "httpPort": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The value of the HTTP port. Must be between 1 and 65535."
-        },
-        "httpsPort": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The value of the HTTPS port. Must be between 1 and 65535."
+          "description": "Relative path applicable to geo filter. (e.g. '/mypictures', '/mypicture/kitty.jpg', and etc.)"
         }
       },
       "required": [
-        "hostName"
-      ]
+        "action",
+        "countryCodes",
+        "relativePath"
+      ],
+      "description": "Rules defining user's geo access within a CDN endpoint."
+    },
+    "ProfileProperties": {
+      "type": "object",
+      "properties": {},
+      "description": "The JSON object that contains the properties required to create a profile."
     },
     "profiles_endpoints_childResource": {
       "type": "object",
@@ -427,26 +457,27 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-04-02"
+            "2017-04-02"
           ]
         },
         "location": {
           "type": "string",
-          "description": "Endpoint location"
+          "description": "Resource location."
         },
         "name": {
           "type": "string",
-          "description": "Name of the endpoint within the CDN profile."
+          "description": "Name of the endpoint under the profile which is unique globally."
         },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/EndpointPropertiesCreateParameters"
+              "$ref": "#/definitions/EndpointProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The JSON object that contains the properties required to create an endpoint."
         },
         "tags": {
           "oneOf": [
@@ -461,7 +492,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Endpoint tags"
+          "description": "Resource tags."
         },
         "type": {
           "type": "string",
@@ -485,7 +516,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-04-02"
+            "2017-04-02"
           ]
         },
         "name": {
@@ -500,7 +531,8 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The JSON object that contains the properties of the custom domain to create."
         },
         "type": {
           "type": "string",
@@ -517,44 +549,6 @@
       ],
       "description": "Microsoft.Cdn/profiles/endpoints/customDomains"
     },
-    "profiles_endpoints_origins_childResource": {
-      "type": "object",
-      "properties": {
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2016-04-02"
-          ]
-        },
-        "name": {
-          "type": "string",
-          "description": "Name of the origin, an arbitrary value but it needs to be unique under endpoint"
-        },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/OriginPropertiesParameters"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "origins"
-          ]
-        }
-      },
-      "required": [
-        "apiVersion",
-        "name",
-        "properties",
-        "type"
-      ],
-      "description": "Microsoft.Cdn/profiles/endpoints/origins"
-    },
     "Sku": {
       "type": "object",
       "properties": {
@@ -566,7 +560,8 @@
                 "Standard_Verizon",
                 "Premium_Verizon",
                 "Custom_Verizon",
-                "Standard_Akamai"
+                "Standard_Akamai",
+                "Standard_ChinaCdn"
               ]
             },
             {
@@ -576,7 +571,7 @@
           "description": "Name of the pricing tier."
         }
       },
-      "description": "The SKU (pricing tier) of the CDN profile."
+      "description": "The pricing tier (defines a CDN provider, feature list and rate) of the CDN profile."
     }
   }
 }

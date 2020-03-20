@@ -8,6 +8,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'adhybridhealthservice/resource-manager',
         namespace: 'Microsoft.ADHybridHealthService',
     },
+    { 
+        basePath: 'cdn/resource-manager',
+        namespace: 'Microsoft.Cdn',
+    },
     {
         basePath: 'azureactivedirectory/resource-manager',
         namespace: 'Microsoft.Aadiam',

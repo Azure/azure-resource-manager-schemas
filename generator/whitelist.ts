@@ -339,6 +339,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.StorageSync',
     },
     {
+        basePath: 'synapse/resource-manager',
+        namespace: 'Microsoft.Synapse',
+    },
+    {
         basePath: 'securityinsights/resource-manager',
         namespace: 'Microsoft.SecurityInsights',
     },

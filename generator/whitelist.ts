@@ -137,6 +137,16 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DeploymentManager',
     },
     {
+      basePath: 'digitaltwins/resource-manager',
+      namespace: 'Microsoft.DigitalTwins',
+      resourceConfig: [
+          {
+              type: 'integrationResources',
+              scopes: ScopeType.Extension,
+          }
+      ]
+    },
+    {
         basePath: 'deviceprovisioningservices/resource-manager',
         namespace: 'Microsoft.Devices',
         suffix: 'Provisioning',

@@ -397,6 +397,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.StorageSync',
     },
     {
+        basePath: 'serialconsole/resource-manager',
+        namespace: 'Microsoft.SerialConsole',
+    },
+    {
         basePath: 'synapse/resource-manager',
         namespace: 'Microsoft.Synapse',
     },

@@ -1,0 +1,74 @@
+{
+  "tests": [
+    {
+      "name": "public IP address - minimal resource",
+      "definition": "https://schema.management.azure.com/schemas/2019-08-01/Microsoft.Network.json#/resourceDefinitions/publicIPAddresses",
+      "json": {
+        "apiVersion": "2019-08-01",
+        "type": "Microsoft.Network/publicIPAddresses",
+        "name": "[variables('publicIPAddressName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "publicIPAllocationMethod": "[parameters('publicIPAddressType')]"
+        }
+      }
+    },
+    {
+      "name": "public IP address - fqdn and idle timeout",
+      "definition": "https://schema.management.azure.com/schemas/2019-08-01/Microsoft.Network.json#/resourceDefinitions/publicIPAddresses",
+      "json": {
+        "apiVersion": "2019-08-01",
+        "type": "Microsoft.Network/publicIPAddresses",
+        "name": "[variables('publicIPAddressName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "publicIPAllocationMethod": "[parameters('publicIPAddressType')]",
+          "idleTimeoutInMinutes": 5,
+          "publicIPAddressVersion": "IPv4",
+          "dnsSettings": {
+            "domainNameLabel": "[parameters('dnsLabelPrefix')]",
+            "reverseFqdn": "[parameters('dnsLabelPrefix')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "public IP address - no name, location",
+      "definition": "https://schema.management.azure.com/schemas/2019-08-01/Microsoft.Network.json#/resourceDefinitions/publicIPAddresses",
+      "expectedErrors": [
+        {
+          "message": "Missing required property: name",
+          "dataPath": "/"
+        },
+        {
+          "message": "Missing required property: location",
+          "dataPath": "/"
+        }
+      ],
+      "json": {
+        "apiVersion": "2019-08-01",
+        "type": "Microsoft.Network/publicIPAddresses",
+        "properties": {
+          "publicIPAllocationMethod": "[parameters('publicIPAddressType')]"
+        }
+      }
+    },
+    {
+      "name": "public IP address - no publicIPAllocationMethod",
+      "definition": "https://schema.management.azure.com/schemas/2019-08-01/Microsoft.Network.json#/resourceDefinitions/publicIPAddresses",
+      "expectedErrors": [
+        {
+          "message": "Data does not match any schemas from \"oneOf\"",
+          "dataPath": "/properties"
+        }
+      ],
+      "json": {
+        "apiVersion": "2019-08-01",
+        "type": "Microsoft.Network/publicIPAddresses",
+        "name": "[variables('publicIPAddressName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {}
+      }
+    }
+  ]
+}

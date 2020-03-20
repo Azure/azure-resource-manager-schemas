@@ -125,6 +125,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DataFactory',
     },
     {
+        basePath: 'datacatalog/resource-manager',
+        namespace: 'Microsoft.DataCatalog',
+    },
+    {
         basePath: 'datalake-analytics/resource-manager',
         namespace: 'Microsoft.DataLakeAnalytics',
     },
@@ -160,6 +164,10 @@ const whitelist: WhitelistConfig[] = [
     { 
         basePath: 'redis/resource-manager',
         namespace: 'Microsoft.Cache',
+    },
+    {
+        basePath: 'hardwaresecuritymodules/resource-manager',
+        namespace: 'Microsoft.HardwareSecurityModules',
     },
     {
         basePath: 'hdinsight/resource-manager',
@@ -216,8 +224,16 @@ const whitelist: WhitelistConfig[] = [
         ],
     },
     {
+        basePath: 'machinelearning/resource-manager',
+        namespace: 'Microsoft.MachineLearning',
+    },
+    {
         basePath: 'machinelearningcompute/resource-manager',
         namespace: 'Microsoft.MachineLearningCompute',
+    },
+    {
+        basePath: 'machinelearningexperimentation/resource-manager',
+        namespace: 'Microsoft.MachineLearningExperimentation',
     },
     {
         basePath: 'maintenance/resource-manager',
@@ -244,6 +260,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'mysql/resource-manager',
         namespace: 'Microsoft.DBforMySQL',
+    },
+    {
+        basePath: 'maps/resource-manager',
+        namespace: 'Microsoft.Maps',
     },
     {
         basePath: 'netapp/resource-manager',
@@ -333,6 +353,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'vmwarevirtustream/resource-manager',
         namespace: 'Microsoft.VMwareVirtustream',
+    },
+    {
+        basePath: 'visualstudio/resource-manager',
+        namespace: 'Microsoft.VisualStudio',
     },
     { 
         basePath: 'sql/resource-manager',

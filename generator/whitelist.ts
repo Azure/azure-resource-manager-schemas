@@ -13,6 +13,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Cdn',
     },
     {
+        basePath: 'analysisservices/resource-manager',
+        namespace: 'Microsoft.AnalysisServices',
+    },
+    {
         basePath: 'azureactivedirectory/resource-manager',
         namespace: 'Microsoft.Aadiam',
     },

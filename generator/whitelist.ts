@@ -69,6 +69,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.CognitiveServices',
     },
     {
+        basePath: 'compute/resource-manager',
+        namespace: 'Microsoft.Compute',
+    },
+    {
         basePath: 'containerinstance/resource-manager',
         namespace: 'Microsoft.ContainerInstance',
     },

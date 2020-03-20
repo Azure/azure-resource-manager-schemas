@@ -125,6 +125,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.ContainerService',
     },
     {
+        basePath: 'commerce/resource-manager',
+        namespace: 'Microsoft.Commerce',
+    },
+    {
         basePath: 'databoxedge/resource-manager',
         namespace: 'Microsoft.DataBoxEdge',
     },

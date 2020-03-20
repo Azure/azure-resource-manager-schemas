@@ -133,6 +133,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DataLakeAnalytics',
     },
     {
+        basePath: 'datalake-store/resource-manager',
+        namespace: 'Microsoft.DataLakeStore',
+    },
+    {
         basePath: 'datashare/resource-manager',
         namespace: 'Microsoft.DataShare',
     },

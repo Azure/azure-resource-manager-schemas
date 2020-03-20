@@ -300,6 +300,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DBforMariaDB',
     },
     {
+        basePath: 'machinelearningservices/resource-manager',
+        namespace: 'Microsoft.MachineLearningServices',
+    },
+    {
         basePath: 'mysql/resource-manager',
         namespace: 'Microsoft.DBforMySQL',
     },

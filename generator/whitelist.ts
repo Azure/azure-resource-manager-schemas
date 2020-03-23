@@ -331,6 +331,20 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Relay',
     },
     {
+        basePath: 'resources/resource-manager',
+        namespace: 'Microsoft.Authorization',
+        resourceConfig: [
+            {
+                type: 'policyassignments',
+                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup,
+            },
+            {
+                type: 'locks',
+                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+        ]
+    },
+    {
         basePath: 'servicebus/resource-manager',
         namespace: 'Microsoft.ServiceBus',
     },

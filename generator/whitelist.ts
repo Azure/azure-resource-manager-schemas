@@ -5,6 +5,10 @@ import { lowerCaseEquals } from './utils';
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
 const whitelist: WhitelistConfig[] = [
     {
+        basePath: 'addons/resource-manager',
+        namespace: 'Microsoft.Addons',
+    },
+    {
         basePath: 'adhybridhealthservice/resource-manager',
         namespace: 'Microsoft.ADHybridHealthService',
     },
@@ -125,6 +129,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.ContainerService',
     },
     {
+        basePath: 'commerce/resource-manager',
+        namespace: 'Microsoft.Commerce',
+    },
+    {
         basePath: 'databoxedge/resource-manager',
         namespace: 'Microsoft.DataBoxEdge',
     },
@@ -157,6 +165,16 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DeploymentManager',
     },
     {
+      basePath: 'digitaltwins/resource-manager',
+      namespace: 'Microsoft.DigitalTwins',
+      resourceConfig: [
+          {
+              type: 'integrationResources',
+              scopes: ScopeType.Extension,
+          }
+      ]
+    },
+    {
         basePath: 'deviceprovisioningservices/resource-manager',
         namespace: 'Microsoft.Devices',
         suffix: 'Provisioning',
@@ -172,6 +190,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'devtestlabs/resource-manager',
         namespace: 'Microsoft.DevTestLab',
+    },
+    {
+        basePath: 'guestconfiguration/resource-manager',
+        namespace: 'Microsoft.GuestConfiguration',
     },
     {
         basePath: 'resourcegraph/resource-manager',
@@ -202,6 +224,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.EventHub',
     },
     {
+        basePath: 'engagementfabric/resource-manager',
+        namespace: 'Microsoft.EngagementFabric',
+    },
+    {
         basePath: 'hanaonazure/resource-manager',
         namespace: 'Microsoft.HanaOnAzure',
     },
@@ -228,6 +254,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'labservices/resource-manager',
         namespace: 'Microsoft.LabServices',
+    },
+    {
+        basePath: 'logic/resource-manager',
+        namespace: 'Microsoft.Logic',
     },
     { 
         basePath: 'eventgrid/resource-manager',
@@ -278,8 +308,16 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DBforMariaDB',
     },
     {
+        basePath: 'machinelearningservices/resource-manager',
+        namespace: 'Microsoft.MachineLearningServices',
+    },
+    {
         basePath: 'mysql/resource-manager',
         namespace: 'Microsoft.DBforMySQL',
+    },
+    {
+        basePath: 'managementpartner/resource-manager',
+        namespace: 'Microsoft.ManagementPartner',
     },
     {
         basePath: 'maps/resource-manager',
@@ -288,6 +326,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'netapp/resource-manager',
         namespace: 'Microsoft.NetApp',
+    },
+    {
+      basePath: 'notificationhubs/resource-manager',
+      namespace: 'Microsoft.NotificationHubs'
     },
     {
         basePath: 'policyinsights/resource-manager',
@@ -375,6 +417,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'storagesync/resource-manager',
         namespace: 'Microsoft.StorageSync',
+    },
+    {
+        basePath: 'serialconsole/resource-manager',
+        namespace: 'Microsoft.SerialConsole',
     },
     {
         basePath: 'synapse/resource-manager',

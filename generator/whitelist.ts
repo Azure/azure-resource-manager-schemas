@@ -255,6 +255,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'labservices/resource-manager',
         namespace: 'Microsoft.LabServices',
     },
+    {
+        basePath: 'logic/resource-manager',
+        namespace: 'Microsoft.Logic',
+    },
     { 
         basePath: 'eventgrid/resource-manager',
         namespace: 'Microsoft.EventGrid',
@@ -342,12 +346,20 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Peering',
     },
     {
+        basePath: 'powerbidedicated/resource-manager',
+        namespace: 'Microsoft.PowerBIDedicated',
+    },
+    {
         basePath: 'portal/resource-manager',
         namespace: 'Microsoft.Portal',
     },
     {
         basePath: 'postgresql/resource-manager',
         namespace: 'Microsoft.DBforPostgreSQL',
+    },
+    {
+        basePath: 'powerbiembedded/resource-manager',
+        namespace: 'Microsoft.PowerBI',
     },
     {
         basePath: 'resources/resource-manager',
@@ -429,13 +441,25 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Sql',
     },
     { 
-      basePath: 'storsimple8000series/resource-manager',
-      namespace: 'Microsoft.StorSimple',
-      suffix: '8000',
+        basePath: 'scheduler/resource-manager',
+        namespace: 'Microsoft.Scheduler',
     },
     {
         basePath: 'search/resource-manager',
         namespace: 'Microsoft.Search',
+    },
+    { 
+        basePath: 'subscription/resource-manager',
+        namespace: 'Microsoft.Subscription',
+    },
+    { 
+        basePath: 'storsimple8000series/resource-manager',
+        namespace: 'Microsoft.StorSimple',
+        suffix: '8000',
+    },
+    { 
+        basePath: 'support/resource-manager',
+        namespace: 'Microsoft.Support',
     },
     {
         basePath: 'timeseriesinsights/resource-manager',

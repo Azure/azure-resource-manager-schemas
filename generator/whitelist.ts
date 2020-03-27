@@ -437,6 +437,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Sql',
     },
     { 
+        basePath: 'scheduler/resource-manager',
+        namespace: 'Microsoft.Scheduler',
+    },
+    {
         basePath: 'search/resource-manager',
         namespace: 'Microsoft.Search',
     },

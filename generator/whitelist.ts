@@ -425,6 +425,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.SecurityInsights',
     },
     {
+        basePath: 'storageimportexport/resource-manager',
+        namespace: 'Microsoft.ImportExport'
+    },
+    {
         basePath: 'vmwarecloudsimple/resource-manager',
         namespace: 'Microsoft.VMwareCloudSimple',
     },

@@ -448,6 +448,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'search/resource-manager',
         namespace: 'Microsoft.Search',
     },
+    { 
+        basePath: 'support/resource-manager',
+        namespace: 'Microsoft.Support',
+    },
     {
         basePath: 'timeseriesinsights/resource-manager',
         namespace: 'Microsoft.TimeSeriesInsights',

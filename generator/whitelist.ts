@@ -451,6 +451,18 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'windowsiot/resource-manager',
         namespace: 'Microsoft.WindowsIoT',
+    },
+    {
+        basePath: 'web/resource-manager',
+        namespace: 'Microsoft.CertificateRegistration',
+    },
+    {
+        basePath: 'web/resource-manager',
+        namespace: 'Microsoft.DomainRegistration',
+    },
+    {
+        basePath: 'web/resource-manager',
+        namespace: 'Microsoft.Web',
     }
 ];
 

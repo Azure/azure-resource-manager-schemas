@@ -346,6 +346,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Peering',
     },
     {
+        basePath: 'powerbidedicated/resource-manager',
+        namespace: 'Microsoft.PowerBIDedicated',
+    },
+    {
         basePath: 'portal/resource-manager',
         namespace: 'Microsoft.Portal',
     },

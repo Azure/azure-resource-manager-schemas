@@ -7,15 +7,6 @@
     "jobs": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string"
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.ImportExport/jobs"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
@@ -26,8 +17,9 @@
           "type": "string",
           "description": "Specifies the supported Azure location where the job should be created"
         },
-        "tags": {
-          "description": "Specifies the tags that will be assigned to the job."
+        "name": {
+          "type": "string",
+          "description": "The name of the import/export job."
         },
         "properties": {
           "oneOf": [
@@ -39,13 +31,24 @@
             }
           ],
           "description": "Specifies the job properties"
+        },
+        "tags": {
+          "type": "object",
+          "properties": {},
+          "description": "Specifies the tags that will be assigned to the job."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ImportExport/jobs"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.ImportExport/jobs"
     }
@@ -54,13 +57,36 @@
     "DriveStatus": {
       "type": "object",
       "properties": {
+        "bitLockerKey": {
+          "type": "string",
+          "description": "The BitLocker key used to encrypt the drive."
+        },
+        "bytesSucceeded": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Bytes successfully transferred for the drive."
+        },
+        "copyStatus": {
+          "type": "string",
+          "description": "Detailed status about the data transfer process. This field is not returned in the response until the drive is in the Transferring state."
+        },
+        "driveHeaderHash": {
+          "type": "string",
+          "description": "The drive header hash value."
+        },
         "driveId": {
           "type": "string",
           "description": "The drive's hardware serial number, without spaces."
         },
-        "bitLockerKey": {
+        "errorLogUri": {
           "type": "string",
-          "description": "The BitLocker key used to encrypt the drive."
+          "description": "A URI that points to the blob containing the error log for the data transfer operation."
         },
         "manifestFile": {
           "type": "string",
@@ -70,9 +96,20 @@
           "type": "string",
           "description": "The Base16-encoded MD5 hash of the manifest file on the drive."
         },
-        "driveHeaderHash": {
+        "manifestUri": {
           "type": "string",
-          "description": "The drive header hash value."
+          "description": "A URI that points to the blob containing the drive manifest file. "
+        },
+        "percentComplete": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Percentage completed for the drive. "
         },
         "state": {
           "oneOf": [
@@ -94,43 +131,9 @@
           ],
           "description": "The drive's current state."
         },
-        "copyStatus": {
-          "type": "string",
-          "description": "Detailed status about the data transfer process. This field is not returned in the response until the drive is in the Transferring state."
-        },
-        "percentComplete": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Percentage completed for the drive. "
-        },
         "verboseLogUri": {
           "type": "string",
           "description": "A URI that points to the blob containing the verbose log for the data transfer operation. "
-        },
-        "errorLogUri": {
-          "type": "string",
-          "description": "A URI that points to the blob containing the error log for the data transfer operation."
-        },
-        "manifestUri": {
-          "type": "string",
-          "description": "A URI that points to the blob containing the drive manifest file. "
-        },
-        "bytesSucceeded": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Bytes successfully transferred for the drive."
         }
       },
       "description": "Provides information about the drive's status"
@@ -141,7 +144,7 @@
         "blobList": {
           "oneOf": [
             {
-              "$ref": "#/definitions/Export_blobList"
+              "$ref": "#/definitions/ExportBlobList"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -156,7 +159,7 @@
       },
       "description": "A property containing information about the blobs to be exported for an export job. This property is required for export jobs, but must not be specified for import jobs."
     },
-    "Export_blobList": {
+    "ExportBlobList": {
       "type": "object",
       "properties": {
         "blobPath": {
@@ -193,77 +196,6 @@
     "JobDetails": {
       "type": "object",
       "properties": {
-        "storageAccountId": {
-          "type": "string",
-          "description": "The resource identifier of the storage account where data will be imported to or exported from."
-        },
-        "jobType": {
-          "type": "string",
-          "description": "The type of job"
-        },
-        "returnAddress": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ReturnAddress"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Specifies the return address information for the job. "
-        },
-        "returnShipping": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ReturnShipping"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Specifies the return carrier and customer's account with the carrier. "
-        },
-        "shippingInformation": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ShippingInformation"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Contains information about the Microsoft datacenter to which the drives should be shipped. "
-        },
-        "deliveryPackage": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/PackageInfomation"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Contains information about the package being shipped by the customer to the Microsoft data center. "
-        },
-        "returnPackage": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/PackageInfomation"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Contains information about the package being shipped from the Microsoft data center to the customer to return the drives. The format is the same as the deliveryPackage property above. This property is not included if the drives have not yet been returned. "
-        },
-        "diagnosticsPath": {
-          "type": "string",
-          "description": "The virtual blob directory to which the copy logs and backups of drive manifest files (if enabled) will be stored."
-        },
-        "logLevel": {
-          "type": "string",
-          "description": "Default value is Error. Indicates whether error logging or verbose logging will be enabled."
-        },
         "backupDriveManifest": {
           "oneOf": [
             {
@@ -274,10 +206,6 @@
             }
           ],
           "description": "Default value is false. Indicates whether the manifest files on the drives should be copied to block blobs."
-        },
-        "state": {
-          "type": "string",
-          "description": "Current state of the job."
         },
         "cancelRequested": {
           "oneOf": [
@@ -290,20 +218,20 @@
           ],
           "description": "Indicates whether a request has been submitted to cancel the job."
         },
-        "percentComplete": {
+        "deliveryPackage": {
           "oneOf": [
             {
-              "type": "integer"
+              "$ref": "#/definitions/PackageInfomation"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Overall percentage completed for the job."
+          "description": "Contains information about the package being shipped by the customer to the Microsoft data center."
         },
-        "incompleteBlobListUri": {
+        "diagnosticsPath": {
           "type": "string",
-          "description": "A blob path that points to a block blob containing a list of blob names that were not exported due to insufficient drive space. If all blobs were exported successfully, then this element is not included in the response."
+          "description": "The virtual blob directory to which the copy logs and backups of drive manifest files (if enabled) will be stored."
         },
         "driveList": {
           "oneOf": [
@@ -328,11 +256,86 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "A property containing information about the blobs to be exported for an export job. This property is included for export jobs only."
+          "description": "A property containing information about the blobs to be exported for an export job. This property is required for export jobs, but must not be specified for import jobs."
+        },
+        "incompleteBlobListUri": {
+          "type": "string",
+          "description": "A blob path that points to a block blob containing a list of blob names that were not exported due to insufficient drive space. If all blobs were exported successfully, then this element is not included in the response."
+        },
+        "jobType": {
+          "type": "string",
+          "description": "The type of job"
+        },
+        "logLevel": {
+          "type": "string",
+          "description": "Default value is Error. Indicates whether error logging or verbose logging will be enabled."
+        },
+        "percentComplete": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Overall percentage completed for the job."
         },
         "provisioningState": {
           "type": "string",
           "description": "Specifies the provisioning state of the job."
+        },
+        "returnAddress": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ReturnAddress"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies the return address information for the job."
+        },
+        "returnPackage": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PackageInfomation"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Contains information about the package being shipped by the customer to the Microsoft data center."
+        },
+        "returnShipping": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ReturnShipping"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies the return carrier and customer's account with the carrier."
+        },
+        "shippingInformation": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ShippingInformation"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Contains information about the Microsoft datacenter to which the drives should be shipped."
+        },
+        "state": {
+          "type": "string",
+          "description": "Current state of the job."
+        },
+        "storageAccountId": {
+          "type": "string",
+          "description": "The resource identifier of the storage account where data will be imported to or exported from."
         }
       },
       "description": "Specifies the job properties"
@@ -343,10 +346,6 @@
         "carrierName": {
           "type": "string",
           "description": "The name of the carrier that is used to ship the import or export drives."
-        },
-        "trackingNumber": {
-          "type": "string",
-          "description": "The tracking number of the package."
         },
         "driveCount": {
           "oneOf": [
@@ -362,22 +361,50 @@
         "shipDate": {
           "type": "string",
           "description": "The date when the package is shipped."
+        },
+        "trackingNumber": {
+          "type": "string",
+          "description": "The tracking number of the package."
         }
       },
       "required": [
         "carrierName",
-        "trackingNumber",
         "driveCount",
-        "shipDate"
+        "shipDate",
+        "trackingNumber"
       ],
       "description": "Contains information about the package being shipped by the customer to the Microsoft data center."
     },
     "ReturnAddress": {
       "type": "object",
       "properties": {
+        "city": {
+          "type": "string",
+          "description": "The city name to use when returning the drives."
+        },
+        "countryOrRegion": {
+          "type": "string",
+          "description": "The country or region to use when returning the drives. "
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the recipient of the returned drives."
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number of the recipient of the returned drives."
+        },
+        "postalCode": {
+          "type": "string",
+          "description": "The postal code to use when returning the drives."
+        },
         "recipientName": {
           "type": "string",
           "description": "The name of the recipient who will receive the hard drives when they are returned. "
+        },
+        "stateOrProvince": {
+          "type": "string",
+          "description": "The state or province to use when returning the drives."
         },
         "streetAddress1": {
           "type": "string",
@@ -385,88 +412,44 @@
         },
         "streetAddress2": {
           "type": "string",
-          "description": "The second line of the street address to use when returning the drives. "
-        },
-        "city": {
-          "type": "string",
-          "description": "The city name to use when returning the drives."
-        },
-        "stateOrProvince": {
-          "type": "string",
-          "description": "The state or province to use when returning the drives."
-        },
-        "postalCode": {
-          "type": "string",
-          "description": "The postal code to use when returning the drives."
-        },
-        "countryOrRegion": {
-          "type": "string",
-          "description": "The country or region to use when returning the drives. "
-        },
-        "phone": {
-          "type": "string",
-          "description": "Phone number of the recipient of the returned drives."
-        },
-        "email": {
-          "type": "string",
-          "description": "Email address of the recipient of the returned drives."
+          "description": "The first line of the street address to use when returning the drives. "
         }
       },
       "required": [
-        "recipientName",
-        "streetAddress1",
         "city",
-        "postalCode",
         "countryOrRegion",
+        "email",
         "phone",
-        "email"
+        "postalCode",
+        "recipientName",
+        "streetAddress1"
       ],
       "description": "Specifies the return address information for the job."
     },
     "ReturnShipping": {
       "type": "object",
       "properties": {
-        "carrierName": {
-          "type": "string",
-          "description": "The carrier's name."
-        },
         "carrierAccountNumber": {
           "type": "string",
           "description": "The customer's account number with the carrier."
+        },
+        "carrierName": {
+          "type": "string",
+          "description": "The carrier's name."
         }
       },
       "required": [
-        "carrierName",
-        "carrierAccountNumber"
+        "carrierAccountNumber",
+        "carrierName"
       ],
       "description": "Specifies the return carrier and customer's account with the carrier."
     },
     "ShippingInformation": {
       "type": "object",
       "properties": {
-        "recipientName": {
-          "type": "string",
-          "description": "The name of the recipient who will receive the hard drives when they are returned. "
-        },
-        "streetAddress1": {
-          "type": "string",
-          "description": "The first line of the street address to use when returning the drives. "
-        },
-        "streetAddress2": {
-          "type": "string",
-          "description": "The second line of the street address to use when returning the drives. "
-        },
         "city": {
           "type": "string",
           "description": "The city name to use when returning the drives."
-        },
-        "stateOrProvince": {
-          "type": "string",
-          "description": "The state or province to use when returning the drives."
-        },
-        "postalCode": {
-          "type": "string",
-          "description": "The postal code to use when returning the drives."
         },
         "countryOrRegion": {
           "type": "string",
@@ -475,15 +458,35 @@
         "phone": {
           "type": "string",
           "description": "Phone number of the recipient of the returned drives."
+        },
+        "postalCode": {
+          "type": "string",
+          "description": "The postal code to use when returning the drives."
+        },
+        "recipientName": {
+          "type": "string",
+          "description": "The name of the recipient who will receive the hard drives when they are returned. "
+        },
+        "stateOrProvince": {
+          "type": "string",
+          "description": "The state or province to use when returning the drives."
+        },
+        "streetAddress1": {
+          "type": "string",
+          "description": "The first line of the street address to use when returning the drives. "
+        },
+        "streetAddress2": {
+          "type": "string",
+          "description": "The first line of the street address to use when returning the drives. "
         }
       },
       "required": [
-        "recipientName",
-        "streetAddress1",
         "city",
-        "stateOrProvince",
+        "countryOrRegion",
         "postalCode",
-        "countryOrRegion"
+        "recipientName",
+        "stateOrProvince",
+        "streetAddress1"
       ],
       "description": "Contains information about the Microsoft datacenter to which the drives should be shipped."
     }

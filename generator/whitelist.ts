@@ -449,6 +449,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Search',
     },
     { 
+        basePath: 'subscription/resource-manager',
+        namespace: 'Microsoft.Subscription',
+    },
+    { 
         basePath: 'support/resource-manager',
         namespace: 'Microsoft.Support',
     },

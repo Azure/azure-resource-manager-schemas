@@ -346,12 +346,20 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Peering',
     },
     {
+        basePath: 'powerbidedicated/resource-manager',
+        namespace: 'Microsoft.PowerBIDedicated',
+    },
+    {
         basePath: 'portal/resource-manager',
         namespace: 'Microsoft.Portal',
     },
     {
         basePath: 'postgresql/resource-manager',
         namespace: 'Microsoft.DBforPostgreSQL',
+    },
+    {
+        basePath: 'powerbiembedded/resource-manager',
+        namespace: 'Microsoft.PowerBI',
     },
     {
         basePath: 'resources/resource-manager',
@@ -417,6 +425,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.SecurityInsights',
     },
     {
+        basePath: 'storageimportexport/resource-manager',
+        namespace: 'Microsoft.ImportExport'
+    },
+    {
         basePath: 'vmwarecloudsimple/resource-manager',
         namespace: 'Microsoft.VMwareCloudSimple',
     },
@@ -433,8 +445,20 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Sql',
     },
     { 
+        basePath: 'scheduler/resource-manager',
+        namespace: 'Microsoft.Scheduler',
+    },
+    {
         basePath: 'search/resource-manager',
         namespace: 'Microsoft.Search',
+    },
+    { 
+        basePath: 'subscription/resource-manager',
+        namespace: 'Microsoft.Subscription',
+    },
+    { 
+        basePath: 'support/resource-manager',
+        namespace: 'Microsoft.Support',
     },
     {
         basePath: 'timeseriesinsights/resource-manager',

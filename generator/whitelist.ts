@@ -358,6 +358,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DBforPostgreSQL',
     },
     {
+        basePath: 'powerbiembedded/resource-manager',
+        namespace: 'Microsoft.PowerBI',
+    },
+    {
         basePath: 'resources/resource-manager',
         namespace: 'Microsoft.Resources',
         resourceConfig: [

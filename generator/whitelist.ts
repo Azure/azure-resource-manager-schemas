@@ -77,6 +77,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.BotService',
     },
     {
+        basePath: 'billing/resource-manager',
+        namespace: 'Microsoft.Billing',
+    },
+    {
         basePath: 'cognitiveservices/resource-manager',
         namespace: 'Microsoft.CognitiveServices',
     },

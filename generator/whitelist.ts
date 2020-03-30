@@ -466,6 +466,11 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Subscription',
     },
     { 
+        basePath: 'storsimple8000series/resource-manager',
+        namespace: 'Microsoft.StorSimple',
+        suffix: '8000',
+    },
+    { 
         basePath: 'support/resource-manager',
         namespace: 'Microsoft.Support',
     },

@@ -433,6 +433,11 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.ImportExport'
     },
     {
+        basePath: 'storSimple1200Series/resource-manager',
+        namespace: 'Microsoft.StorSimple',
+        suffix: '1200'
+    },
+    {
         basePath: 'vmwarecloudsimple/resource-manager',
         namespace: 'Microsoft.VMwareCloudSimple',
     },

@@ -32,10 +32,14 @@ async function readSchema(schemaUri: string) {
         throw new Error(`Invalid schema Uri ${schemaUri}`);
     }
 
-    const filePath = path.resolve(path.join(constants.schemasBasePath, schemaUri.substring(constants.schemasBaseUri.length + 1)));
-    const fileContents = await readFile(filePath, { encoding: 'utf8'});
-
-    return JSON.parse(fileContents);
+    try {
+        const filePath = path.resolve(path.join(constants.schemasBasePath, schemaUri.substring(constants.schemasBaseUri.length + 1)));
+        const fileContents = await readFile(filePath, { encoding: 'utf8'});
+    
+        return JSON.parse(fileContents);
+    } catch (e) {
+        throw new Error(`Caught error processing ${schemaUri}: ${e}`);
+    }
 }
 
 function findAllReferences(input: any) {

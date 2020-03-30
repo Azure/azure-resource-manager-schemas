@@ -77,6 +77,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.BotService',
     },
     {
+        basePath: 'billing/resource-manager',
+        namespace: 'Microsoft.Billing',
+    },
+    {
         basePath: 'cognitiveservices/resource-manager',
         namespace: 'Microsoft.CognitiveServices',
     },
@@ -424,6 +428,15 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'securityinsights/resource-manager',
         namespace: 'Microsoft.SecurityInsights',
     },
+    {
+        basePath: 'storageimportexport/resource-manager',
+        namespace: 'Microsoft.ImportExport'
+    },
+    {
+        basePath: 'storSimple1200Series/resource-manager',
+        namespace: 'Microsoft.StorSimple',
+        suffix: '1200'
+    },
     {
         basePath: 'vmwarecloudsimple/resource-manager',
         namespace: 'Microsoft.VMwareCloudSimple',

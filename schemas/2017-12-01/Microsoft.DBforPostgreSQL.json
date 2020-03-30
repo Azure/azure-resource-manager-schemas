@@ -13,6 +13,17 @@
             "2017-12-01"
           ]
         },
+        "identity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ResourceIdentity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Azure Active Directory identity configuration for a resource."
+        },
         "location": {
           "type": "string",
           "description": "The location the resource resides in."
@@ -47,6 +58,9 @@
               },
               {
                 "$ref": "#/definitions/servers_configurations_childResource"
+              },
+              {
+                "$ref": "#/definitions/servers_Administrators_childResource"
               },
               {
                 "$ref": "#/definitions/servers_securityAlertPolicies_childResource"
@@ -95,6 +109,52 @@
         "type"
       ],
       "description": "Microsoft.DBforPostgreSQL/servers"
+    },
+    "servers_Administrators": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2017-12-01"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^.*/activeDirectory$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ServerAdministratorProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties of an server Administrator."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.DBforPostgreSQL/servers/Administrators"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.DBforPostgreSQL/servers/Administrators"
     },
     "servers_configurations": {
       "type": "object",
@@ -363,6 +423,26 @@
       ],
       "description": "The properties of a server firewall rule."
     },
+    "ResourceIdentity": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "SystemAssigned"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The identity type. Set this to 'SystemAssigned' in order to automatically create and assign an Azure Active Directory principal for the resource."
+        }
+      },
+      "description": "Azure Active Directory identity configuration for a resource."
+    },
     "SecurityAlertPolicyProperties": {
       "type": "object",
       "properties": {
@@ -445,6 +525,60 @@
       ],
       "description": "Properties of a security alert policy."
     },
+    "ServerAdministratorProperties": {
+      "type": "object",
+      "properties": {
+        "administratorType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "ActiveDirectory"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The type of administrator."
+        },
+        "login": {
+          "type": "string",
+          "description": "The server administrator login account name."
+        },
+        "sid": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The server administrator Sid (Secure ID)."
+        },
+        "tenantId": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The server Active Directory Administrator tenant id."
+        }
+      },
+      "required": [
+        "administratorType",
+        "login",
+        "sid",
+        "tenantId"
+      ],
+      "description": "The properties of an server Administrator."
+    },
     "ServerPropertiesForCreate": {
       "type": "object",
       "oneOf": [
@@ -462,6 +596,53 @@
         }
       ],
       "properties": {
+        "infrastructureEncryption": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Enabled",
+                "Disabled"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Status showing whether the server enabled infrastructure encryption."
+        },
+        "minimalTlsVersion": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "TLS1_0",
+                "TLS1_1",
+                "TLS1_2",
+                "TLSEnforcementDisabled"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Enforce a minimal Tls version for the server."
+        },
+        "publicNetworkAccess": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Enabled",
+                "Disabled"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether or not public network access is allowed for this server. Value is optional but if passed in, must be 'Enabled' or 'Disabled'."
+        },
         "sslEnforcement": {
           "oneOf": [
             {
@@ -601,6 +782,47 @@
         "sourceServerId"
       ],
       "description": "The properties used to create a new server by restoring from a backup."
+    },
+    "servers_Administrators_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2017-12-01"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "enum": [
+            "activeDirectory"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ServerAdministratorProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties of an server Administrator."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Administrators"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.DBforPostgreSQL/servers/Administrators"
     },
     "servers_configurations_childResource": {
       "type": "object",

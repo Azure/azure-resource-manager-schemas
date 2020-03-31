@@ -1,5 +1,6 @@
 import { ScopeType, WhitelistConfig } from './models';
 import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
+import { postProcessor as storageProcessor } from './processors/Microsoft.Storage';
 import { lowerCaseEquals } from './utils';
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
@@ -437,6 +438,11 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.StorSimple',
         suffix: '1200'
     },
+    {
+        basePath: 'storage/resource-manager',
+        namespace: 'Microsoft.Storage',
+        postProcessor: storageProcessor
+    },
     {
         basePath: 'vmwarecloudsimple/resource-manager',
         namespace: 'Microsoft.VMwareCloudSimple',

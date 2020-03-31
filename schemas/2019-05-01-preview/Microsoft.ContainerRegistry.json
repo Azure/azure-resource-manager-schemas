@@ -7,29 +7,25 @@
     "registries_scopeMaps": {
       "type": "object",
       "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-05-01-preview"
+          ]
+        },
         "name": {
           "oneOf": [
             {
               "type": "string",
-              "pattern": "^[a-zA-Z0-9-_]*$"
+              "pattern": "^[a-zA-Z0-9-_]*$",
+              "minLength": 5,
+              "maxLength": 50
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The name of the scope map."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.ContainerRegistry/registries/scopeMaps"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2019-05-01-preview"
-          ]
         },
         "properties": {
           "oneOf": [
@@ -41,42 +37,44 @@
             }
           ],
           "description": "The properties of a scope map."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ContainerRegistry/registries/scopeMaps"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.ContainerRegistry/registries/scopeMaps"
     },
     "registries_tokens": {
       "type": "object",
       "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-05-01-preview"
+          ]
+        },
         "name": {
           "oneOf": [
             {
               "type": "string",
-              "pattern": "^[a-zA-Z0-9-]*$"
+              "pattern": "^[a-zA-Z0-9-]*$",
+              "minLength": 5,
+              "maxLength": 50
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The name of the token."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.ContainerRegistry/registries/tokens"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2019-05-01-preview"
-          ]
         },
         "properties": {
           "oneOf": [
@@ -88,25 +86,41 @@
             }
           ],
           "description": "The properties of a token."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ContainerRegistry/registries/tokens"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.ContainerRegistry/registries/tokens"
     }
   },
   "definitions": {
+    "ActiveDirectoryObject": {
+      "type": "object",
+      "properties": {
+        "objectId": {
+          "type": "string",
+          "description": "The user/group/application object ID for Active Directory Object that will be used for authenticating the token of a container registry."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "The tenant ID of user/group/application object Active Directory Object that will be used for authenticating the token of a container registry."
+        }
+      },
+      "description": "The Active Directory Object that will be used for authenticating the token of a container registry."
+    },
     "ScopeMapProperties": {
       "type": "object",
       "properties": {
-        "description": {
-          "type": "string",
-          "description": "The user friendly description of the scope map."
-        },
         "actions": {
           "oneOf": [
             {
@@ -120,6 +134,10 @@
             }
           ],
           "description": "The list of scoped permissions for registry artifacts.\r\nE.g. repositories/repository-name/content/read,\r\nrepositories/repository-name/metadata/write"
+        },
+        "description": {
+          "type": "string",
+          "description": "The user friendly description of the scope map."
         }
       },
       "required": [
@@ -130,6 +148,15 @@
     "TokenCertificate": {
       "type": "object",
       "properties": {
+        "encodedPemCertificate": {
+          "type": "string",
+          "description": "Base 64 encoded string of the public certificate1 in PEM format that will be used for authenticating the token."
+        },
+        "expiry": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The expiry datetime of the certificate."
+        },
         "name": {
           "oneOf": [
             {
@@ -144,18 +171,9 @@
             }
           ]
         },
-        "expiry": {
-          "type": "string",
-          "format": "date-time",
-          "description": "The expiry datetime of the certificate."
-        },
         "thumbprint": {
           "type": "string",
           "description": "The thumbprint of the certificate."
-        },
-        "encodedPemCertificate": {
-          "type": "string",
-          "description": "Base 64 encoded string of the public certificate1 in PEM format that will be used for authenticating the token."
         }
       },
       "description": "The properties of a certificate used for authenticating a token."
@@ -163,6 +181,17 @@
     "TokenCredentialsProperties": {
       "type": "object",
       "properties": {
+        "activeDirectoryObject": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ActiveDirectoryObject"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Active Directory Object that will be used for authenticating the token of a container registry."
+        },
         "certificates": {
           "oneOf": [
             {
@@ -226,14 +255,6 @@
     "TokenProperties": {
       "type": "object",
       "properties": {
-        "scopeMapId": {
-          "type": "string",
-          "description": "The resource ID of the scope map to which the token will be associated with."
-        },
-        "objectId": {
-          "type": "string",
-          "description": "The user/group/application object ID for which the token has to be created."
-        },
         "credentials": {
           "oneOf": [
             {
@@ -244,6 +265,10 @@
             }
           ],
           "description": "The properties of the credentials that can be used for authenticating the token."
+        },
+        "scopeMapId": {
+          "type": "string",
+          "description": "The resource ID of the scope map to which the token will be associated with."
         },
         "status": {
           "oneOf": [

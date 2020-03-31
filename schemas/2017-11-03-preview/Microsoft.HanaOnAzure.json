@@ -7,16 +7,6 @@
     "hanaInstances": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "Name of the SAP HANA on Azure instance."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.HanaOnAzure/hanaInstances"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
@@ -26,6 +16,10 @@
         "location": {
           "type": "string",
           "description": "Resource location"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the SAP HANA on Azure instance."
         },
         "properties": {
           "oneOf": [
@@ -37,29 +31,25 @@
             }
           ],
           "description": "Describes the properties of a HANA instance."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.HanaOnAzure/hanaInstances"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.HanaOnAzure/hanaInstances"
     },
     "sapMonitors": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "Name of the SAP monitor resource."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.HanaOnAzure/sapMonitors"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
@@ -69,6 +59,10 @@
         "location": {
           "type": "string",
           "description": "Resource location"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the SAP monitor resource."
         },
         "properties": {
           "oneOf": [
@@ -80,13 +74,19 @@
             }
           ],
           "description": "Describes the properties of a SAP monitor."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.HanaOnAzure/sapMonitors"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.HanaOnAzure/sapMonitors"
     }
@@ -95,10 +95,6 @@
     "Disk": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The disk name."
-        },
         "diskSizeGB": {
           "oneOf": [
             {
@@ -109,6 +105,10 @@
             }
           ],
           "description": "Specifies the size of an empty data disk in gigabytes."
+        },
+        "name": {
+          "type": "string",
+          "description": "The disk name."
         }
       },
       "description": "Specifies the disk information fo the HANA instance"
@@ -127,16 +127,16 @@
           ],
           "description": "Specifies the hardware settings for the HANA instance."
         },
-        "storageProfile": {
+        "networkProfile": {
           "oneOf": [
             {
-              "$ref": "#/definitions/StorageProfile"
+              "$ref": "#/definitions/NetworkProfile"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Specifies the storage settings for the HANA instance disks."
+          "description": "Specifies the network settings for the HANA instance disks."
         },
         "osProfile": {
           "oneOf": [
@@ -149,20 +149,20 @@
           ],
           "description": "Specifies the operating system settings for the HANA instance."
         },
-        "networkProfile": {
+        "partnerNodeId": {
+          "type": "string",
+          "description": "ARM ID of another HanaInstance that will share a network with this HanaInstance"
+        },
+        "storageProfile": {
           "oneOf": [
             {
-              "$ref": "#/definitions/NetworkProfile"
+              "$ref": "#/definitions/StorageProfile"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Specifies the network settings for the HANA instance disks."
-        },
-        "partnerNodeId": {
-          "type": "string",
-          "description": "ARM ID of another HanaInstance that will share a network with this HanaInstance"
+          "description": "Specifies the storage settings for the HANA instance disks."
         }
       },
       "description": "Describes the properties of a HANA instance."
@@ -219,17 +219,32 @@
     "SapMonitorProperties": {
       "type": "object",
       "properties": {
-        "hanaSubnet": {
-          "type": "string",
-          "description": "Specifies the SAP monitor unique ID."
+        "enableCustomerAnalytics": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The value indicating whether to send analytics to Microsoft"
         },
-        "hanaHostname": {
+        "hanaDbCredentialsMsiId": {
           "type": "string",
-          "description": "Hostname of the HANA instance."
+          "description": "MSI ID passed by customer which has access to customer's KeyVault and to be assigned to the Collector VM."
         },
         "hanaDbName": {
           "type": "string",
           "description": "Database name of the HANA instance."
+        },
+        "hanaDbPassword": {
+          "type": "string",
+          "description": "Database password of the HANA instance."
+        },
+        "hanaDbPasswordKeyVaultUrl": {
+          "type": "string",
+          "description": "KeyVault URL link to the password for the HANA database."
         },
         "hanaDbSqlPort": {
           "oneOf": [
@@ -246,21 +261,29 @@
           "type": "string",
           "description": "Database username of the HANA instance."
         },
-        "hanaDbPassword": {
+        "hanaHostname": {
           "type": "string",
-          "description": "Database password of the HANA instance."
+          "description": "Hostname of the HANA instance."
         },
-        "hanaDbPasswordKeyVaultUrl": {
+        "hanaSubnet": {
           "type": "string",
-          "description": "KeyVault URL link to the password for the HANA database."
-        },
-        "hanaDbCredentialsMsiId": {
-          "type": "string",
-          "description": "MSI ID passed by customer which has access to customer's KeyVault and to be assigned to the Collector VM."
+          "description": "Specifies the SAP monitor unique ID."
         },
         "keyVaultId": {
           "type": "string",
           "description": "Key Vault ID containing customer's HANA credentials."
+        },
+        "logAnalyticsWorkspaceArmId": {
+          "type": "string",
+          "description": "The ARM ID of the Log Analytics Workspace that is used for monitoring"
+        },
+        "logAnalyticsWorkspaceId": {
+          "type": "string",
+          "description": "The workspace ID of the log analytics workspace to be used for monitoring"
+        },
+        "logAnalyticsWorkspaceSharedKey": {
+          "type": "string",
+          "description": "The shared key of the log analytics workspace that is used for monitoring"
         }
       },
       "description": "Describes the properties of a SAP monitor."

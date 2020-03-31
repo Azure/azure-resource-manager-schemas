@@ -7,11 +7,27 @@
     "dataManagers": {
       "type": "object",
       "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2016-06-01"
+          ]
+        },
+        "etag": {
+          "type": "string",
+          "description": "Etag of the Resource."
+        },
+        "location": {
+          "type": "string",
+          "description": "The location of the resource. This will be one of the supported and registered Azure Geo Regions (e.g. West US, East\r\nUS, Southeast Asia, etc.). The geo region of a resource cannot be changed once it is created, but if an identical geo\r\nregion is specified on update the request will succeed."
+        },
         "name": {
           "oneOf": [
             {
               "type": "string",
-              "pattern": "^[-\\w\\.]+$"
+              "pattern": "^[-\\w\\.]+$",
+              "minLength": 3,
+              "maxLength": 24
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -19,21 +35,26 @@
           ],
           "description": "The name of the DataManager Resource within the specified resource group. DataManager names must be between 3 and 24 characters in length and use any alphanumeric and underscore only"
         },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.HybridData/dataManagers"
-          ]
+        "resources": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/dataManagers_dataStores_childResource"
+              }
+            ]
+          }
         },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2016-06-01"
-          ]
-        },
-        "location": {
-          "type": "string",
-          "description": "The location of the resource. This will be one of the supported and registered Azure Geo Regions (e.g. West US, East\r\nUS, Southeast Asia, etc.). The geo region of a resource cannot be changed once it is created, but if an identical geo\r\nregion is specified on update the request will succeed."
+        "sku": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Sku"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The sku type."
         },
         "tags": {
           "oneOf": [
@@ -50,58 +71,33 @@
           ],
           "description": "The list of key value pairs that describe the resource. These tags can be used in viewing and grouping this resource\r\n(across resource groups)."
         },
-        "sku": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/Sku"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The sku type."
-        },
-        "etag": {
+        "type": {
           "type": "string",
-          "description": "Etag of the Resource."
-        },
-        "resources": {
-          "type": "array",
-          "items": {
-            "oneOf": [
-              {
-                "$ref": "#/definitions/dataManagers_dataStores_childResource"
-              }
-            ]
-          }
+          "enum": [
+            "Microsoft.HybridData/dataManagers"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
-        "location"
+        "location",
+        "name",
+        "type"
       ],
       "description": "Microsoft.HybridData/dataManagers"
     },
     "dataManagers_dataServices_jobDefinitions": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The job definition name that is being queried."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.HybridData/dataManagers/dataServices/jobDefinitions"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
             "2016-06-01"
           ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The job definition name to be created or updated."
         },
         "properties": {
           "oneOf": [
@@ -113,34 +109,34 @@
             }
           ],
           "description": "Job Definition"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.HybridData/dataManagers/dataServices/jobDefinitions"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.HybridData/dataManagers/dataServices/jobDefinitions"
     },
     "dataManagers_dataStores": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The data store/repository name queried."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.HybridData/dataManagers/dataStores"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
             "2016-06-01"
           ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The data store/repository name to be created or updated."
         },
         "properties": {
           "oneOf": [
@@ -152,13 +148,19 @@
             }
           ],
           "description": "Data Store for sources and sinks"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.HybridData/dataManagers/dataStores"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.HybridData/dataManagers/dataStores"
     }
@@ -167,14 +169,6 @@
     "CustomerSecret": {
       "type": "object",
       "properties": {
-        "keyIdentifier": {
-          "type": "string",
-          "description": "The identifier to the data service input object which this secret corresponds to."
-        },
-        "keyValue": {
-          "type": "string",
-          "description": "It contains the encrypted customer secret."
-        },
         "algorithm": {
           "oneOf": [
             {
@@ -191,33 +185,35 @@
             }
           ],
           "description": "The encryption algorithm used to encrypt data."
+        },
+        "keyIdentifier": {
+          "type": "string",
+          "description": "The identifier to the data service input object which this secret corresponds to."
+        },
+        "keyValue": {
+          "type": "string",
+          "description": "It contains the encrypted customer secret."
         }
       },
       "required": [
+        "algorithm",
         "keyIdentifier",
-        "keyValue",
-        "algorithm"
+        "keyValue"
       ],
       "description": "The pair of customer secret."
     },
     "dataManagers_dataStores_childResource": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The data store/repository name queried."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "dataStores"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
             "2016-06-01"
           ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The data store/repository name to be created or updated."
         },
         "properties": {
           "oneOf": [
@@ -229,19 +225,48 @@
             }
           ],
           "description": "Data Store for sources and sinks"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "dataStores"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.HybridData/dataManagers/dataStores"
     },
     "DataStoreProperties": {
       "type": "object",
       "properties": {
+        "customerSecrets": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CustomerSecret"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of customer secrets containing a key identifier and key value. The key identifier is a way for the specific data source to understand the key. Value contains customer secret encrypted by the encryptionKeys."
+        },
+        "dataStoreTypeId": {
+          "type": "string",
+          "description": "The arm id of the data store type."
+        },
+        "extendedProperties": {
+          "type": "object",
+          "properties": {},
+          "description": "A generic json used differently by each data source type."
+        },
         "repositoryId": {
           "type": "string",
           "description": "Arm Id for the manager resource to which the data source is associated. This is optional."
@@ -261,16 +286,17 @@
             }
           ],
           "description": "State of the data source."
-        },
-        "extendedProperties": {
-          "type": "object",
-          "properties": {},
-          "description": "A generic json used differently by each data source type."
-        },
-        "dataStoreTypeId": {
-          "type": "string",
-          "description": "The arm id of the data store type."
-        },
+        }
+      },
+      "required": [
+        "dataStoreTypeId",
+        "state"
+      ],
+      "description": "Data Store for sources and sinks"
+    },
+    "JobDefinitionProperties": {
+      "type": "object",
+      "properties": {
         "customerSecrets": {
           "oneOf": [
             {
@@ -284,54 +310,19 @@
             }
           ],
           "description": "List of customer secrets containing a key identifier and key value. The key identifier is a way for the specific data source to understand the key. Value contains customer secret encrypted by the encryptionKeys."
-        }
-      },
-      "required": [
-        "state",
-        "dataStoreTypeId"
-      ],
-      "description": "Data Store for sources and sinks"
-    },
-    "JobDefinitionProperties": {
-      "type": "object",
-      "properties": {
-        "dataSourceId": {
-          "type": "string",
-          "description": "Data Source Id associated to the job definition."
+        },
+        "dataServiceInput": {
+          "type": "object",
+          "properties": {},
+          "description": "A generic json used differently by each data service type."
         },
         "dataSinkId": {
           "type": "string",
           "description": "Data Sink Id associated to the job definition."
         },
-        "schedules": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Schedule"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Schedule for running the job definition"
-        },
-        "state": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Disabled",
-                "Enabled",
-                "Supported"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "State of the job definition."
+        "dataSourceId": {
+          "type": "string",
+          "description": "Data Source Id associated to the job definition."
         },
         "lastModifiedTime": {
           "type": "string",
@@ -378,6 +369,36 @@
           ],
           "description": "This is the preferred geo location for the job to run."
         },
+        "schedules": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Schedule"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Schedule for running the job definition"
+        },
+        "state": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Disabled",
+                "Enabled",
+                "Supported"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "State of the job definition."
+        },
         "userConfirmation": {
           "oneOf": [
             {
@@ -392,30 +413,11 @@
             }
           ],
           "description": "Enum to detect if user confirmation is required. If not passed will default to NotRequired."
-        },
-        "dataServiceInput": {
-          "type": "object",
-          "properties": {},
-          "description": "A generic json used differently by each data service type."
-        },
-        "customerSecrets": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/CustomerSecret"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "List of customer secrets containing a key identifier and key value. The key identifier is a way for the specific data source to understand the key. Value contains customer secret encrypted by the encryptionKeys."
         }
       },
       "required": [
-        "dataSourceId",
         "dataSinkId",
+        "dataSourceId",
         "state"
       ],
       "description": "Job Definition"

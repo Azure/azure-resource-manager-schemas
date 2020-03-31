@@ -2,17 +2,11 @@
   "id": "https://schema.management.azure.com/schemas/2017-10-01/Microsoft.PowerBIDedicated.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.PowerBIDedicated",
-  "description": "Power BI capacities on Azure",
+  "description": "Microsoft PowerBIDedicated Resource Types",
   "resourceDefinitions": {
     "capacities": {
       "type": "object",
       "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.PowerBIDedicated/capacities"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
@@ -21,7 +15,43 @@
         },
         "location": {
           "type": "string",
-          "description": "Capacity location"
+          "description": "Location of the PowerBI Dedicated resource."
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9]*$",
+              "minLength": 3,
+              "maxLength": 63
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the Dedicated capacity. It must be a minimum of 3 characters, and a maximum of 63."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DedicatedCapacityProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of Dedicated Capacity resource."
+        },
+        "sku": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ResourceSku"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Represents the SKU name and Azure pricing tier for PowerBI Dedicated resource."
         },
         "tags": {
           "oneOf": [
@@ -29,103 +59,97 @@
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              }
+              },
+              "properties": {}
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Capacity tags"
+          "description": "Key-value pairs of additional resource provisioning properties."
         },
-        "sku": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/Sku"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "The SKU (pricing tier) of the Power BI capacity."
-        },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/CapacityProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.PowerBIDedicated/capacities"
           ]
         }
       },
       "required": [
-        "type",
         "apiVersion",
         "location",
+        "name",
+        "properties",
         "sku",
-        "properties"
+        "type"
       ],
       "description": "Microsoft.PowerBIDedicated/capacities"
     }
   },
   "definitions": {
-    "Sku": {
+    "DedicatedCapacityAdministrators": {
       "type": "object",
       "properties": {
-        "name": {
+        "members": {
           "oneOf": [
             {
-              "type": "string",
-              "enum": [
-                "A1",
-                "A2",
-                "A3",
-                "A4",
-                "A5",
-                "A6"
-              ]
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Name of the pricing tier. Possible values include: 'A1', 'A2', 'A3', 'A4', 'A5', 'A6'"
+          "description": "An array of administrator user identities."
         }
       },
-      "description": "The SKU (pricing tier) of the Power BI capacity."
+      "description": "An array of administrator user identities"
     },
-    "CapacityProperties": {
+    "DedicatedCapacityProperties": {
       "type": "object",
       "properties": {
         "administration": {
           "oneOf": [
             {
-              "type": "object",
-              "properties": {
-                "members": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/administrator"
-                  }
-                }
-              }
+              "$ref": "#/definitions/DedicatedCapacityAdministrators"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "required": [
-            "members"
-          ],
-          "description": "Microsoft.PowerBIDedicated/capacities: Login names of administrators"
+          "description": "An array of administrator user identities"
         }
-      }
+      },
+      "description": "Properties of Dedicated Capacity resource."
     },
-    "administrator": {
-      "type": "string",
-      "minLength": 1,
-      "description": "The UPN of the Power BI capacity administrator."
+    "ResourceSku": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the SKU level."
+        },
+        "tier": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "PBIE_Azure"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the Azure pricing tier to which the SKU applies."
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "Represents the SKU name and Azure pricing tier for PowerBI Dedicated resource."
     }
   }
 }

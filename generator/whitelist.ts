@@ -438,6 +438,10 @@ const whitelist: WhitelistConfig[] = [
         suffix: '1200'
     },
     {
+        basePath: 'mediaservices/resource-manager',
+        namespace: 'Microsoft.Media',
+    },
+    {
         basePath: 'vmwarecloudsimple/resource-manager',
         namespace: 'Microsoft.VMwareCloudSimple',
     },

@@ -433,7 +433,7 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'recoveryservicessiterecovery/resource-manager',
         namespace: 'Microsoft.RecoveryServices',
         suffix: 'SiteRecovery',
-    }
+    },
     {
         basePath: 'serialconsole/resource-manager',
         namespace: 'Microsoft.SerialConsole',

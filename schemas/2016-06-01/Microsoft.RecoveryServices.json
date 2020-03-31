@@ -7,16 +7,6 @@
     "vaults": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name of the recovery services vault."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.RecoveryServices/vaults"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
@@ -30,6 +20,45 @@
         "location": {
           "type": "string",
           "description": "Resource location."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the recovery services vault."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/VaultProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the vault."
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/vaults_certificates_childResource"
+              },
+              {
+                "$ref": "#/definitions/vaults_extendedInformation_childResource"
+              }
+            ]
+          }
+        },
+        "sku": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Sku"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Identifies the unique system identifier for each Azure resource."
         },
         "tags": {
           "oneOf": [
@@ -46,69 +75,34 @@
           ],
           "description": "Resource tags."
         },
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/VaultProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Properties of the vault."
-        },
-        "sku": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/Sku"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Identifies the unique system identifier for each Azure resource."
-        },
-        "resources": {
-          "type": "array",
-          "items": {
-            "oneOf": [
-              {
-                "$ref": "#/definitions/vaults_certificates_childResource"
-              },
-              {
-                "$ref": "#/definitions/vaults_extendedInformation_childResource"
-              }
-            ]
-          }
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.RecoveryServices/vaults"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
         "location",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.RecoveryServices/vaults"
     },
     "vaults_certificates": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "Certificate friendly name."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.RecoveryServices/vaults/certificates"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
             "2016-06-01"
           ]
+        },
+        "name": {
+          "type": "string",
+          "description": "Certificate friendly name."
         },
         "properties": {
           "oneOf": [
@@ -120,19 +114,35 @@
             }
           ],
           "description": "Raw certificate data."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.RecoveryServices/vaults/certificates"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.RecoveryServices/vaults/certificates"
     },
     "vaults_extendedInformation": {
       "type": "object",
       "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2016-06-01"
+          ]
+        },
+        "eTag": {
+          "type": "string",
+          "description": "Optional ETag."
+        },
         "name": {
           "oneOf": [
             {
@@ -144,22 +154,6 @@
             }
           ]
         },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.RecoveryServices/vaults/extendedInformation"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2016-06-01"
-          ]
-        },
-        "eTag": {
-          "type": "string",
-          "description": "Optional ETag."
-        },
         "properties": {
           "oneOf": [
             {
@@ -170,13 +164,19 @@
             }
           ],
           "description": "Vault extended information."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.RecoveryServices/vaults/extendedInformation"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.RecoveryServices/vaults/extendedInformation"
     }
@@ -252,9 +252,9 @@
     "VaultExtendedInfo": {
       "type": "object",
       "properties": {
-        "integrityKey": {
+        "algorithm": {
           "type": "string",
-          "description": "Integrity key."
+          "description": "Algorithm for Vault ExtendedInfo"
         },
         "encryptionKey": {
           "type": "string",
@@ -264,9 +264,9 @@
           "type": "string",
           "description": "Encryption key thumbprint."
         },
-        "algorithm": {
+        "integrityKey": {
           "type": "string",
-          "description": "Algorithm for Vault ExtendedInfo"
+          "description": "Integrity key."
         }
       },
       "description": "Vault extended information."
@@ -291,21 +291,15 @@
     "vaults_certificates_childResource": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "Certificate friendly name."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "certificates"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
             "2016-06-01"
           ]
+        },
+        "name": {
+          "type": "string",
+          "description": "Certificate friendly name."
         },
         "properties": {
           "oneOf": [
@@ -317,36 +311,25 @@
             }
           ],
           "description": "Raw certificate data."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "certificates"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.RecoveryServices/vaults/certificates"
     },
     "vaults_extendedInformation_childResource": {
       "type": "object",
       "properties": {
-        "name": {
-          "oneOf": [
-            {
-              "type": "string",
-              "pattern": "^.*/vaultExtendedInfo$"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "extendedInformation"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
@@ -356,6 +339,12 @@
         "eTag": {
           "type": "string",
           "description": "Optional ETag."
+        },
+        "name": {
+          "type": "string",
+          "enum": [
+            "vaultExtendedInfo"
+          ]
         },
         "properties": {
           "oneOf": [
@@ -367,13 +356,19 @@
             }
           ],
           "description": "Vault extended information."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "extendedInformation"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.RecoveryServices/vaults/extendedInformation"
     }

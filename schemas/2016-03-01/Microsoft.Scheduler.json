@@ -7,39 +7,19 @@
     "jobCollections": {
       "type": "object",
       "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.Scheduler/jobCollections"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
             "2016-03-01"
           ]
         },
-        "name": {
-          "type": "string",
-          "description": "Gets or sets the job collection resource name."
-        },
         "location": {
           "type": "string",
-          "description": "Gets or sets the job collection location."
+          "description": "Gets or sets the storage account location."
         },
-        "tags": {
-          "oneOf": [
-            {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Gets or sets the tags."
+        "name": {
+          "type": "string",
+          "description": "The job collection name."
         },
         "properties": {
           "oneOf": [
@@ -49,8 +29,7 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Gets or sets the job collection properties."
+          ]
         },
         "resources": {
           "type": "array",
@@ -61,29 +40,49 @@
               }
             ]
           }
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Gets or sets the tags."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Scheduler/jobCollections"
+          ]
         }
       },
       "required": [
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.Scheduler/jobCollections"
     },
     "jobCollections_jobs": {
       "type": "object",
       "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.Scheduler/jobCollections/jobs"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
             "2016-03-01"
           ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The job name."
         },
         "properties": {
           "oneOf": [
@@ -93,33 +92,96 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Gets or sets the job properties."
+          ]
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Scheduler/jobCollections/jobs"
+          ]
         }
       },
       "required": [
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.Scheduler/jobCollections/jobs"
     }
   },
   "definitions": {
-    "HttpAuthentication": {
+    "BasicAuthentication": {
       "type": "object",
       "properties": {
+        "password": {
+          "type": "string",
+          "description": "Gets or sets the password, return value will always be empty."
+        },
         "type": {
           "type": "string",
           "enum": [
-            "NotSpecified",
-            "ClientCertificate",
-            "ActiveDirectoryOAuth",
             "Basic"
-          ],
-          "description": "Gets or sets the http authentication type. Possible values include: 'NotSpecified', 'ClientCertificate', 'ActiveDirectoryOAuth', 'Basic'"
+          ]
+        },
+        "username": {
+          "type": "string",
+          "description": "Gets or sets the username."
         }
-      }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "ClientCertAuthentication": {
+      "type": "object",
+      "properties": {
+        "certificateExpirationDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Gets or sets the certificate expiration date."
+        },
+        "certificateSubjectName": {
+          "type": "string",
+          "description": "Gets or sets the certificate subject name."
+        },
+        "certificateThumbprint": {
+          "type": "string",
+          "description": "Gets or sets the certificate thumbprint."
+        },
+        "password": {
+          "type": "string",
+          "description": "Gets or sets the certificate password, return value will always be empty."
+        },
+        "pfx": {
+          "type": "string",
+          "description": "Gets or sets the pfx certificate. Accepts certification in base64 encoding, return value will always be empty."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "ClientCertificate"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "HttpAuthentication": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/ClientCertAuthentication"
+        },
+        {
+          "$ref": "#/definitions/BasicAuthentication"
+        },
+        {
+          "$ref": "#/definitions/OAuthAuthentication"
+        }
+      ],
+      "properties": {}
     },
     "HttpRequest": {
       "type": "object",
@@ -132,16 +194,7 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Gets or sets the http authentication."
-        },
-        "uri": {
-          "type": "string",
-          "description": "Gets or sets the Uri."
-        },
-        "method": {
-          "type": "string",
-          "description": "Gets or sets the method of the request."
+          ]
         },
         "body": {
           "type": "string",
@@ -153,40 +206,37 @@
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              }
+              },
+              "properties": {}
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Gets or sets the headers."
+        },
+        "method": {
+          "type": "string",
+          "description": "Gets or sets the method of the request."
+        },
+        "uri": {
+          "type": "string",
+          "description": "Gets or sets the URI of the request."
         }
       }
     },
     "JobAction": {
       "type": "object",
       "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "Http",
-            "Https",
-            "StorageQueue",
-            "ServiceBusQueue",
-            "ServiceBusTopic"
-          ],
-          "description": "Gets or sets the job action type. Possible values include: 'Http', 'Https', 'StorageQueue', 'ServiceBusQueue', 'ServiceBusTopic'"
-        },
-        "request": {
+        "errorAction": {
           "oneOf": [
             {
-              "$ref": "#/definitions/HttpRequest"
+              "$ref": "#/definitions/JobErrorAction"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Gets or sets the http requests."
+          ]
         },
         "queueMessage": {
           "oneOf": [
@@ -196,30 +246,17 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Gets or sets the storage queue message."
+          ]
         },
-        "serviceBusQueueMessage": {
+        "request": {
           "oneOf": [
             {
-              "$ref": "#/definitions/ServiceBusQueueMessage"
+              "$ref": "#/definitions/HttpRequest"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Gets or sets the service bus queue message."
-        },
-        "serviceBusTopicMessage": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ServiceBusTopicMessage"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Gets or sets the service bus topic message."
+          ]
         },
         "retryPolicy": {
           "oneOf": [
@@ -229,25 +266,61 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Gets or sets the retry policy."
+          ]
         },
-        "errorAction": {
+        "serviceBusQueueMessage": {
           "oneOf": [
             {
-              "$ref": "#/definitions/JobErrorAction"
+              "$ref": "#/definitions/ServiceBusQueueMessage"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "serviceBusTopicMessage": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ServiceBusTopicMessage"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Http",
+                "Https",
+                "StorageQueue",
+                "ServiceBusQueue",
+                "ServiceBusTopic"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Gets or sets the error action."
+          "description": "Gets or sets the job action type."
         }
       }
     },
     "JobCollectionProperties": {
       "type": "object",
       "properties": {
+        "quota": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/JobCollectionQuota"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
         "sku": {
           "oneOf": [
             {
@@ -256,8 +329,7 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Gets or sets the SKU."
+          ]
         },
         "state": {
           "oneOf": [
@@ -274,18 +346,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Gets or sets the state. Possible values include: 'Enabled', 'Disabled', 'Suspended', 'Deleted'"
-        },
-        "quota": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/JobCollectionQuota"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Gets or sets the job collection quota."
+          "description": "Gets or sets the state."
         }
       }
     },
@@ -322,25 +383,22 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Gets or set the maximum recurrence."
+          ]
         }
       }
     },
     "jobCollections_jobs_childResource": {
       "type": "object",
       "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "jobs"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
             "2016-03-01"
           ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The job name."
         },
         "properties": {
           "oneOf": [
@@ -350,30 +408,35 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Gets or sets the job properties."
+          ]
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "jobs"
+          ]
         }
       },
       "required": [
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.Scheduler/jobCollections/jobs"
     },
     "JobErrorAction": {
       "type": "object",
       "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "Http",
-            "Https",
-            "StorageQueue",
-            "ServiceBusQueue",
-            "ServiceBusTopic"
-          ],
-          "description": "Gets or sets the job error action type. Possible values include: 'Http', 'Https', 'StorageQueue', 'ServiceBusQueue', 'ServiceBusTopic'"
+        "queueMessage": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/StorageQueueMessage"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "request": {
           "oneOf": [
@@ -383,41 +446,7 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Gets or sets the http requests."
-        },
-        "queueMessage": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/StorageQueueMessage"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Gets or sets the storage queue message."
-        },
-        "serviceBusQueueMessage": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ServiceBusQueueMessage"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Gets or sets the service bus queue message."
-        },
-        "serviceBusTopicMessage": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ServiceBusTopicMessage"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Gets or sets the service bus topic message."
+          ]
         },
         "retryPolicy": {
           "oneOf": [
@@ -427,8 +456,45 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
+          ]
+        },
+        "serviceBusQueueMessage": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ServiceBusQueueMessage"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "serviceBusTopicMessage": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ServiceBusTopicMessage"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Http",
+                "Https",
+                "StorageQueue",
+                "ServiceBusQueue",
+                "ServiceBusTopic"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
           ],
-          "description": "Gets or sets the retry policy."
+          "description": "Gets or sets the job error action type."
         }
       }
     },
@@ -451,7 +517,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Gets or sets the frequency of recurrence (second, minute, hour, day, week, month). Possible values include: 'Minute', 'Hour', 'Day', 'Week', 'Month'"
+          "description": "Gets or sets the frequency of recurrence (second, minute, hour, day, week, month)."
         },
         "interval": {
           "oneOf": [
@@ -469,11 +535,6 @@
     "JobProperties": {
       "type": "object",
       "properties": {
-        "startTime": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Gets or sets the job start time."
-        },
         "action": {
           "oneOf": [
             {
@@ -482,8 +543,7 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Gets or sets the job action."
+          ]
         },
         "recurrence": {
           "oneOf": [
@@ -493,8 +553,12 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Gets or sets the job recurrence."
+          ]
+        },
+        "startTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Gets or sets the job start time."
         },
         "state": {
           "oneOf": [
@@ -511,42 +575,13 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Gets or set the job state. Possible values include: 'Enabled', 'Disabled', 'Faulted', 'Completed'"
+          "description": "Gets or set the job state."
         }
       }
     },
     "JobRecurrence": {
       "type": "object",
       "properties": {
-        "frequency": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Minute",
-                "Hour",
-                "Day",
-                "Week",
-                "Month"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Gets or sets the frequency of recurrence (second, minute, hour, day, week, month). Possible values include: 'Minute', 'Hour', 'Day', 'Week', 'Month'"
-        },
-        "interval": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Gets or sets the interval between retries."
-        },
         "count": {
           "oneOf": [
             {
@@ -563,6 +598,35 @@
           "format": "date-time",
           "description": "Gets or sets the time at which the job will complete."
         },
+        "frequency": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Minute",
+                "Hour",
+                "Day",
+                "Week",
+                "Month"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Gets or sets the frequency of recurrence (second, minute, hour, day, week, month)."
+        },
+        "interval": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Gets or sets the interval between retries."
+        },
         "schedule": {
           "oneOf": [
             {
@@ -578,25 +642,6 @@
     "JobRecurrenceSchedule": {
       "type": "object",
       "properties": {
-        "weekDays": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Sunday",
-                "Monday",
-                "Tuesday",
-                "Wednesday",
-                "Thursday",
-                "Friday",
-                "Saturday"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
         "hours": {
           "oneOf": [
             {
@@ -652,6 +697,29 @@
             }
           ],
           "description": "Gets or sets the occurrences of days within a month."
+        },
+        "weekDays": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Sunday",
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday"
+                ]
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Gets or sets the days of the week that the job should execute on."
         }
       }
     },
@@ -676,7 +744,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Gets or sets the day. Must be one of monday, tuesday, wednesday, thursday, friday, saturday, sunday. Possible values include: 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'"
+          "description": "Gets or sets the day. Must be one of monday, tuesday, wednesday, thursday, friday, saturday, sunday."
         },
         "Occurrence": {
           "oneOf": [
@@ -691,9 +759,55 @@
         }
       }
     },
+    "OAuthAuthentication": {
+      "type": "object",
+      "properties": {
+        "audience": {
+          "type": "string",
+          "description": "Gets or sets the audience."
+        },
+        "clientId": {
+          "type": "string",
+          "description": "Gets or sets the client identifier."
+        },
+        "secret": {
+          "type": "string",
+          "description": "Gets or sets the secret, return value will always be empty."
+        },
+        "tenant": {
+          "type": "string",
+          "description": "Gets or sets the tenant."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "ActiveDirectoryOAuth"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
     "RetryPolicy": {
       "type": "object",
       "properties": {
+        "retryCount": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Gets or sets the number of times a retry should be attempted."
+        },
+        "retryInterval": {
+          "type": "string",
+          "format": "duration",
+          "description": "Gets or sets the retry interval between retries, specify duration in ISO 8601 format."
+        },
         "retryType": {
           "oneOf": [
             {
@@ -707,22 +821,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Gets or sets the retry strategy to be used. Possible values include: 'None', 'Fixed'"
-        },
-        "retryInterval": {
-          "type": "string",
-          "description": "Gets or sets the retry interval between retries."
-        },
-        "retryCount": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Gets or sets the number of times a retry should be attempted."
+          "description": "Gets or sets the retry strategy to be used."
         }
       }
     },
@@ -738,12 +837,19 @@
           "description": "Gets or sets the SAS key name."
         },
         "type": {
-          "type": "string",
-          "enum": [
-            "NotSpecified",
-            "SharedAccessKey"
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "NotSpecified",
+                "SharedAccessKey"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
           ],
-          "description": "Gets or sets the authentication type. Possible values include: 'NotSpecified', 'SharedAccessKey'"
+          "description": "Gets or sets the authentication type."
         }
       }
     },
@@ -756,7 +862,7 @@
         },
         "correlationId": {
           "type": "string",
-          "description": "Gets or sets the correlation id."
+          "description": "Gets or sets the correlation ID."
         },
         "forcePersistence": {
           "oneOf": [
@@ -775,7 +881,7 @@
         },
         "messageId": {
           "type": "string",
-          "description": "Gets or sets the message id."
+          "description": "Gets or sets the message ID."
         },
         "partitionKey": {
           "type": "string",
@@ -787,7 +893,7 @@
         },
         "replyToSessionId": {
           "type": "string",
-          "description": "Gets or sets the reply to session id."
+          "description": "Gets or sets the reply to session ID."
         },
         "scheduledEnqueueTimeUtc": {
           "type": "string",
@@ -796,11 +902,11 @@
         },
         "sessionId": {
           "type": "string",
-          "description": "Gets or sets the session id."
+          "description": "Gets or sets the session ID."
         },
         "timeToLive": {
           "type": "string",
-          "format": "date-time",
+          "format": "duration",
           "description": "Gets or sets the time to live."
         },
         "to": {
@@ -824,8 +930,7 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Gets or sets the authentication."
+          ]
         },
         "brokeredMessageProperties": {
           "oneOf": [
@@ -835,8 +940,7 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Gets or sets the brokered message properties."
+          ]
         },
         "customMessageProperties": {
           "oneOf": [
@@ -844,7 +948,8 @@
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              }
+              },
+              "properties": {}
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -860,6 +965,10 @@
           "type": "string",
           "description": "Gets or sets the namespace."
         },
+        "queueName": {
+          "type": "string",
+          "description": "Gets or sets the queue name."
+        },
         "transportType": {
           "oneOf": [
             {
@@ -874,11 +983,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Gets or sets the transport type. Possible values include: 'NotSpecified', 'NetMessaging', 'AMQP'"
-        },
-        "queueName": {
-          "type": "string",
-          "description": "Gets or sets the queue name."
+          "description": "Gets or sets the transport type."
         }
       }
     },
@@ -893,8 +998,7 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Gets or sets the authentication."
+          ]
         },
         "brokeredMessageProperties": {
           "oneOf": [
@@ -904,8 +1008,7 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Gets or sets the brokered message properties."
+          ]
         },
         "customMessageProperties": {
           "oneOf": [
@@ -913,7 +1016,8 @@
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              }
+              },
+              "properties": {}
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -929,6 +1033,10 @@
           "type": "string",
           "description": "Gets or sets the namespace."
         },
+        "topicPath": {
+          "type": "string",
+          "description": "Gets or sets the topic path."
+        },
         "transportType": {
           "oneOf": [
             {
@@ -943,11 +1051,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Gets or sets the transport type. Possible values include: 'NotSpecified', 'NetMessaging', 'AMQP'"
-        },
-        "topicPath": {
-          "type": "string",
-          "description": "Gets or sets the topic path."
+          "description": "Gets or sets the transport type."
         }
       }
     },
@@ -969,16 +1073,16 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Gets or set the SKU. Possible values include: 'Standard', 'Free', 'P10Premium', 'P20Premium'"
+          "description": "Gets or set the SKU."
         }
       }
     },
     "StorageQueueMessage": {
       "type": "object",
       "properties": {
-        "storageAccount": {
+        "message": {
           "type": "string",
-          "description": "Gets or sets the storage account name."
+          "description": "Gets or sets the message."
         },
         "queueName": {
           "type": "string",
@@ -988,9 +1092,9 @@
           "type": "string",
           "description": "Gets or sets the SAS key."
         },
-        "message": {
+        "storageAccount": {
           "type": "string",
-          "description": "Gets or sets the message."
+          "description": "Gets or sets the storage account name."
         }
       }
     }

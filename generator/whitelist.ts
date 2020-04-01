@@ -308,6 +308,10 @@ const whitelist: WhitelistConfig[] = [
         ],
     },
     {
+        basePath: 'migrateprojects/resource-manager',
+        namespace: 'Microsoft.Migrate',
+    },
+    {
         basePath: 'mariadb/resource-manager',
         namespace: 'Microsoft.DBforMariaDB',
     },

@@ -5,6 +5,10 @@ import { lowerCaseEquals } from './utils';
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
 const whitelist: WhitelistConfig[] = [
     {
+        basePath: 'addons/resource-manager',
+        namespace: 'Microsoft.Addons',
+    },
+    {
         basePath: 'adhybridhealthservice/resource-manager',
         namespace: 'Microsoft.ADHybridHealthService',
     },
@@ -71,6 +75,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'botservice/resource-manager',
         namespace: 'Microsoft.BotService',
+    },
+    {
+        basePath: 'billing/resource-manager',
+        namespace: 'Microsoft.Billing',
     },
     {
         basePath: 'cognitiveservices/resource-manager',
@@ -255,6 +263,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'labservices/resource-manager',
         namespace: 'Microsoft.LabServices',
     },
+    {
+        basePath: 'logic/resource-manager',
+        namespace: 'Microsoft.Logic',
+    },
     { 
         basePath: 'eventgrid/resource-manager',
         namespace: 'Microsoft.EventGrid',
@@ -300,8 +312,16 @@ const whitelist: WhitelistConfig[] = [
         ],
     },
     {
+        basePath: 'migrateprojects/resource-manager',
+        namespace: 'Microsoft.Migrate',
+    },
+    {
         basePath: 'mariadb/resource-manager',
         namespace: 'Microsoft.DBforMariaDB',
+    },
+    {
+        basePath: 'machinelearningservices/resource-manager',
+        namespace: 'Microsoft.MachineLearningServices',
     },
     {
         basePath: 'mysql/resource-manager',
@@ -338,12 +358,20 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Peering',
     },
     {
+        basePath: 'powerbidedicated/resource-manager',
+        namespace: 'Microsoft.PowerBIDedicated',
+    },
+    {
         basePath: 'portal/resource-manager',
         namespace: 'Microsoft.Portal',
     },
     {
         basePath: 'postgresql/resource-manager',
         namespace: 'Microsoft.DBforPostgreSQL',
+    },
+    {
+        basePath: 'powerbiembedded/resource-manager',
+        namespace: 'Microsoft.PowerBI',
     },
     {
         basePath: 'resources/resource-manager',
@@ -397,6 +425,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.StorageSync',
     },
     {
+        basePath: 'serialconsole/resource-manager',
+        namespace: 'Microsoft.SerialConsole',
+    },
+    {
         basePath: 'synapse/resource-manager',
         namespace: 'Microsoft.Synapse',
     },
@@ -404,6 +436,15 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'securityinsights/resource-manager',
         namespace: 'Microsoft.SecurityInsights',
     },
+    {
+        basePath: 'storageimportexport/resource-manager',
+        namespace: 'Microsoft.ImportExport'
+    },
+    {
+        basePath: 'storSimple1200Series/resource-manager',
+        namespace: 'Microsoft.StorSimple',
+        suffix: '1200'
+    },
     {
         basePath: 'vmwarecloudsimple/resource-manager',
         namespace: 'Microsoft.VMwareCloudSimple',
@@ -421,8 +462,25 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Sql',
     },
     { 
+        basePath: 'scheduler/resource-manager',
+        namespace: 'Microsoft.Scheduler',
+    },
+    {
         basePath: 'search/resource-manager',
         namespace: 'Microsoft.Search',
+    },
+    { 
+        basePath: 'subscription/resource-manager',
+        namespace: 'Microsoft.Subscription',
+    },
+    { 
+        basePath: 'storsimple8000series/resource-manager',
+        namespace: 'Microsoft.StorSimple',
+        suffix: '8000',
+    },
+    { 
+        basePath: 'support/resource-manager',
+        namespace: 'Microsoft.Support',
     },
     {
         basePath: 'timeseriesinsights/resource-manager',

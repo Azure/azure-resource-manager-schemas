@@ -467,6 +467,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.RecoveryServices',
         suffix: "Backup"
     },
+    {
+        basePath: "recoveryservices/resource-manager",
+        namespace: "Microsoft.RecoveryServices"
+    },
     { 
         basePath: 'sql/resource-manager',
         namespace: 'Microsoft.Sql',

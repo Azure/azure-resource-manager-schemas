@@ -4,10 +4,10 @@ This is the repo for template deployment schemas hosted under `https://schema.ma
 
 ## Updating Schemas
 There are two processes for updating schemas:
-1. **Nightly autogeneration**: Schemas are automatically generated from definitions in the [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) repo. This requires [onboarding](/generator/README.md#onboarding-teams-to-autogeneration-pipeline) on a per-provider basis.
+1. **Daily autogeneration**: Schemas are automatically generated from definitions in the [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) repo. This requires [onboarding](/generator/README.md#onboarding-teams-to-autogeneration-pipeline) on a per-provider basis.
 2. **Manually**: Schemas are manually authored and committed via PR.
 
-### Has my team been onboarded for nightly autogeneration?
+### Has my team been onboarded for daily autogeneration?
 Please see [generator/whitelist.ts](/generator/whitelist) for the list of teams which have been onboarded. `basePath` refers to the path in the [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) repo, and `namespace` is the Resource Provider namespace.
 
 **If your team has been onboarded, we do not require any manual contributions to this repo and your schemas will automatically be kept up to date by the pipeline.**

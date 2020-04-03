@@ -8,7 +8,7 @@ There are two processes for updating schemas:
 2. **Manually**: Schemas are manually authored and committed via PR.
 
 ### Has my team been onboarded for daily autogeneration?
-Please see [generator/whitelist.ts](/generator/whitelist) for the list of teams which have been onboarded. `basePath` refers to the path in the [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) repo, and `namespace` is the Resource Provider namespace.
+Please see [generator/whitelist.ts](/generator/whitelist.ts) for the list of teams which have been onboarded. `basePath` refers to the path in the [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) repo, and `namespace` is the Resource Provider namespace.
 
 **If your team has been onboarded, we do not require any manual contributions to this repo and your schemas will automatically be kept up to date by the pipeline.**
 
@@ -18,7 +18,7 @@ Please see [generator/whitelist.ts](/generator/whitelist) for the list of teams 
 ### Authoring
 You can use the generator in this repo to automatically generate a schema from a swagger spec checked into the [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) repo.
 
-#### Generating instructions
+#### Generating locally
 1. Fork this repo, and clone it locally.
 2. Run the following commands (replace the base path accordingly - valid paths can be disovered with `npm run list-basepaths`):
 ```bash

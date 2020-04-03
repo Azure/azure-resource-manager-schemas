@@ -457,6 +457,11 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'visualstudio/resource-manager',
         namespace: 'Microsoft.VisualStudio',
     },
+    {
+        basePath: 'recoveryservicesbackup/resource-manager',
+        namespace: 'Microsoft.RecoveryServices',
+        suffix: "Backup"
+    },
     { 
         basePath: 'sql/resource-manager',
         namespace: 'Microsoft.Sql',

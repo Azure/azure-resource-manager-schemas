@@ -1,5 +1,6 @@
 import { ScopeType, WhitelistConfig } from './models';
 import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
+import { postProcessor as machineLearningPostProcessor } from './processors/Microsoft.MachineLearning';
 import { lowerCaseEquals } from './utils';
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
@@ -276,6 +277,7 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'machinelearning/resource-manager',
         namespace: 'Microsoft.MachineLearning',
+        postProcessor: machineLearningPostProcessor,
     },
     {
         basePath: 'machinelearningcompute/resource-manager',

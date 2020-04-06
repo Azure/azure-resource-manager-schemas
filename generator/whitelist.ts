@@ -256,6 +256,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.IoTSpaces',
     },
     {
+        basePath: 'keyvault/resource-manager',
+        namespace: 'Microsoft.KeyVault',
+    },
+    {
         basePath: 'labservices/resource-manager',
         namespace: 'Microsoft.LabServices',
     },

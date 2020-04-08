@@ -1,6 +1,7 @@
 import { ScopeType, WhitelistConfig } from './models';
 import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
 import { postProcessor as storageProcessor } from './processors/Microsoft.Storage';
+import { postProcessor as machineLearningPostProcessor } from './processors/Microsoft.MachineLearning';
 import { lowerCaseEquals } from './utils';
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
@@ -277,6 +278,7 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'machinelearning/resource-manager',
         namespace: 'Microsoft.MachineLearning',
+        postProcessor: machineLearningPostProcessor,
     },
     {
         basePath: 'machinelearningcompute/resource-manager',
@@ -309,6 +311,10 @@ const whitelist: WhitelistConfig[] = [
         ],
     },
     {
+        basePath: 'migrateprojects/resource-manager',
+        namespace: 'Microsoft.Migrate',
+    },
+    {
         basePath: 'mariadb/resource-manager',
         namespace: 'Microsoft.DBforMariaDB',
     },
@@ -319,6 +325,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'mysql/resource-manager',
         namespace: 'Microsoft.DBforMySQL',
+    },
+    {
+        basePath: 'managementgroups/resource-manager',
+        namespace: 'Microsoft.Management',
     },
     {
         basePath: 'managementpartner/resource-manager',

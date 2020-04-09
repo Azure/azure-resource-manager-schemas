@@ -3065,6 +3065,87 @@
       ],
       "description": "The Edifact agreement validation settings."
     },
+    "FlowAccessControlConfiguration": {
+      "type": "object",
+      "properties": {
+        "actions": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/FlowAccessControlConfigurationPolicy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The access control configuration policy."
+        },
+        "contents": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/FlowAccessControlConfigurationPolicy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The access control configuration policy."
+        },
+        "triggers": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/FlowAccessControlConfigurationPolicy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The access control configuration policy."
+        },
+        "workflowManagement": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/FlowAccessControlConfigurationPolicy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The access control configuration policy."
+        }
+      },
+      "description": "The access control configuration."
+    },
+    "FlowAccessControlConfigurationPolicy": {
+      "type": "object",
+      "properties": {
+        "allowedCallerIpAddresses": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/IpAddressRange"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The allowed caller IP address ranges."
+        },
+        "openAuthenticationPolicies": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/OpenAuthenticationAccessPolicies"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "AuthenticationPolicy of type Open."
+        }
+      },
+      "description": "The access control configuration policy."
+    },
     "FlowEndpoints": {
       "type": "object",
       "properties": {
@@ -4037,7 +4118,11 @@
                 "Registered",
                 "Unregistering",
                 "Unregistered",
-                "Completed"
+                "Completed",
+                "Renewing",
+                "Pending",
+                "Waiting",
+                "InProgress"
               ]
             },
             {
@@ -4138,6 +4223,16 @@
       },
       "description": "The ip address."
     },
+    "IpAddressRange": {
+      "type": "object",
+      "properties": {
+        "addressRange": {
+          "type": "string",
+          "description": "The IP address range."
+        }
+      },
+      "description": "The ip address range."
+    },
     "KeyVaultKeyReference": {
       "type": "object",
       "properties": {
@@ -4211,6 +4306,61 @@
         }
       },
       "description": "The network configuration."
+    },
+    "OpenAuthenticationAccessPolicies": {
+      "type": "object",
+      "properties": {
+        "policies": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/OpenAuthenticationAccessPolicy"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Open authentication policies."
+        }
+      },
+      "description": "AuthenticationPolicy of type Open."
+    },
+    "OpenAuthenticationAccessPolicy": {
+      "type": "object",
+      "properties": {
+        "claims": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/OpenAuthenticationPolicyClaim"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The access policy claims."
+        }
+      },
+      "description": "Open authentication access policy defined by user."
+    },
+    "OpenAuthenticationPolicyClaim": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the claim."
+        },
+        "value": {
+          "type": "string",
+          "description": "The value of the claim."
+        }
+      },
+      "description": "Open authentication policy claim."
     },
     "PartnerContent": {
       "type": "object",
@@ -4361,45 +4511,6 @@
       },
       "description": "The resource reference."
     },
-    "Sku": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "NotSpecified",
-                "Free",
-                "Shared",
-                "Basic",
-                "Standard",
-                "Premium"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The name."
-        },
-        "plan": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ResourceReference"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The resource reference."
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "description": "The sku type."
-    },
     "WorkflowParameter": {
       "type": "object",
       "properties": {
@@ -4443,6 +4554,17 @@
     "WorkflowProperties": {
       "type": "object",
       "properties": {
+        "accessControl": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/FlowAccessControlConfiguration"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The access control configuration."
+        },
         "definition": {
           "type": "object",
           "properties": {}
@@ -4494,17 +4616,6 @@
             }
           ],
           "description": "The parameters."
-        },
-        "sku": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/Sku"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The sku type."
         },
         "state": {
           "oneOf": [

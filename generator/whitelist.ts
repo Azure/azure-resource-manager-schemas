@@ -395,6 +395,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Relay',
     },
     {
+        basePath: 'reservations/resource-manager',
+        namespace: 'Microsoft.Capacity',
+    },
+    {
         basePath: 'servicebus/resource-manager',
         namespace: 'Microsoft.ServiceBus',
     },

@@ -147,6 +147,10 @@ const whitelist: WhitelistConfig[] = [
         ],
     },
     {
+        basePath: 'maps/resource-manager',
+        namespace: 'Microsoft.Maps',
+    },
+    {
         basePath: 'mariadb/resource-manager',
         namespace: 'Microsoft.DBforMariaDB',
     },

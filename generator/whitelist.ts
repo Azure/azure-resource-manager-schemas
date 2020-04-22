@@ -260,10 +260,6 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'labservices/resource-manager',
         namespace: 'Microsoft.LabServices',
     },
-    {
-        basePath: 'logic/resource-manager',
-        namespace: 'Microsoft.Logic',
-    },
     { 
         basePath: 'eventgrid/resource-manager',
         namespace: 'Microsoft.EventGrid',

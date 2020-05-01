@@ -233,6 +233,11 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.EngagementFabric',
     },
     {
+        basePath: 'frontdoor/resource-manager',
+        namespace: 'Microsoft.Network',
+        suffix: 'FrontDoor',
+    },
+    {
         basePath: 'hanaonazure/resource-manager',
         namespace: 'Microsoft.HanaOnAzure',
     },

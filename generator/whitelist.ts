@@ -247,6 +247,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'iotcentral/resource-manager',
         namespace: 'Microsoft.IotCentral',
     },
+	{
+        basePath: 'keyvault/resource-manager',
+        namespace: 'Microsoft.KeyVault',
+    },
     {
         basePath: 'iothub/resource-manager',
         namespace: 'Microsoft.Devices',

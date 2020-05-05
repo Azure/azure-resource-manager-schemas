@@ -391,13 +391,10 @@ const whitelist: WhitelistConfig[] = [
         ],
         postProcessor: resourcesPostProcessor,
     },
-    /* antmarti - temporarily commented out to unblock generation.
-                  this appears to have been broken by https://github.com/Azure/azure-rest-api-specs/pull/8903
     {
         basePath: 'relay/resource-manager',
         namespace: 'Microsoft.Relay',
     },
-    */
     {
         basePath: 'servicebus/resource-manager',
         namespace: 'Microsoft.ServiceBus',

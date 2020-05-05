@@ -1,5 +1,6 @@
 import { ScopeType, WhitelistConfig } from './models';
 import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
+import { postProcessor as machineLearningPostProcessor } from './processors/Microsoft.MachineLearning';
 import { lowerCaseEquals } from './utils';
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
@@ -232,6 +233,11 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.EngagementFabric',
     },
     {
+        basePath: 'frontdoor/resource-manager',
+        namespace: 'Microsoft.Network',
+        suffix: 'FrontDoor',
+    },
+    {
         basePath: 'hanaonazure/resource-manager',
         namespace: 'Microsoft.HanaOnAzure',
     },
@@ -259,10 +265,6 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'labservices/resource-manager',
         namespace: 'Microsoft.LabServices',
     },
-    {
-        basePath: 'logic/resource-manager',
-        namespace: 'Microsoft.Logic',
-    },
     { 
         basePath: 'eventgrid/resource-manager',
         namespace: 'Microsoft.EventGrid',
@@ -276,6 +278,7 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'machinelearning/resource-manager',
         namespace: 'Microsoft.MachineLearning',
+        postProcessor: machineLearningPostProcessor,
     },
     {
         basePath: 'machinelearningcompute/resource-manager',
@@ -308,6 +311,10 @@ const whitelist: WhitelistConfig[] = [
         ],
     },
     {
+        basePath: 'migrateprojects/resource-manager',
+        namespace: 'Microsoft.Migrate',
+    },
+    {
         basePath: 'mariadb/resource-manager',
         namespace: 'Microsoft.DBforMariaDB',
     },
@@ -318,6 +325,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'mysql/resource-manager',
         namespace: 'Microsoft.DBforMySQL',
+    },
+    {
+        basePath: 'managementgroups/resource-manager',
+        namespace: 'Microsoft.Management',
     },
     {
         basePath: 'managementpartner/resource-manager',
@@ -380,10 +391,13 @@ const whitelist: WhitelistConfig[] = [
         ],
         postProcessor: resourcesPostProcessor,
     },
+    /* antmarti - temporarily commented out to unblock generation.
+                  this appears to have been broken by https://github.com/Azure/azure-rest-api-specs/pull/8903
     {
         basePath: 'relay/resource-manager',
         namespace: 'Microsoft.Relay',
     },
+    */
     {
         basePath: 'servicebus/resource-manager',
         namespace: 'Microsoft.ServiceBus',
@@ -433,6 +447,11 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.ImportExport'
     },
     {
+        basePath: 'storSimple1200Series/resource-manager',
+        namespace: 'Microsoft.StorSimple',
+        suffix: '1200'
+    },
+    {
         basePath: 'vmwarecloudsimple/resource-manager',
         namespace: 'Microsoft.VMwareCloudSimple',
     },
@@ -459,6 +478,11 @@ const whitelist: WhitelistConfig[] = [
     { 
         basePath: 'subscription/resource-manager',
         namespace: 'Microsoft.Subscription',
+    },
+    { 
+        basePath: 'storsimple8000series/resource-manager',
+        namespace: 'Microsoft.StorSimple',
+        suffix: '8000',
     },
     { 
         basePath: 'support/resource-manager',

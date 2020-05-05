@@ -1,12 +1,25 @@
 import { ScopeType, WhitelistConfig } from './models';
 import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
+import { postProcessor as machineLearningPostProcessor } from './processors/Microsoft.MachineLearning';
 import { lowerCaseEquals } from './utils';
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
 const whitelist: WhitelistConfig[] = [
     {
+        basePath: 'addons/resource-manager',
+        namespace: 'Microsoft.Addons',
+    },
+    {
         basePath: 'adhybridhealthservice/resource-manager',
         namespace: 'Microsoft.ADHybridHealthService',
+    },
+    { 
+        basePath: 'cdn/resource-manager',
+        namespace: 'Microsoft.Cdn',
+    },
+    {
+        basePath: 'analysisservices/resource-manager',
+        namespace: 'Microsoft.AnalysisServices',
     },
     {
         basePath: 'azureactivedirectory/resource-manager',
@@ -80,6 +93,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.BotService',
     },
     {
+        basePath: 'billing/resource-manager',
+        namespace: 'Microsoft.Billing',
+    },
+    {
         basePath: 'cognitiveservices/resource-manager',
         namespace: 'Microsoft.CognitiveServices',
     },
@@ -124,8 +141,16 @@ const whitelist: WhitelistConfig[] = [
         ],
     },
     {
+        basePath: 'customerlockbox/resource-manager',
+        namespace: 'Microsoft.CustomerLockbox',
+    },
+    {
         basePath: 'containerservice/resource-manager',
         namespace: 'Microsoft.ContainerService',
+    },
+    {
+        basePath: 'commerce/resource-manager',
+        namespace: 'Microsoft.Commerce',
     },
     {
         basePath: 'databoxedge/resource-manager',
@@ -140,8 +165,16 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DataFactory',
     },
     {
+        basePath: 'datacatalog/resource-manager',
+        namespace: 'Microsoft.DataCatalog',
+    },
+    {
         basePath: 'datalake-analytics/resource-manager',
         namespace: 'Microsoft.DataLakeAnalytics',
+    },
+    {
+        basePath: 'datalake-store/resource-manager',
+        namespace: 'Microsoft.DataLakeStore',
     },
     {
         basePath: 'datashare/resource-manager',
@@ -150,6 +183,16 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'deploymentmanager/resource-manager',
         namespace: 'Microsoft.DeploymentManager',
+    },
+    {
+      basePath: 'digitaltwins/resource-manager',
+      namespace: 'Microsoft.DigitalTwins',
+      resourceConfig: [
+          {
+              type: 'integrationResources',
+              scopes: ScopeType.Extension,
+          }
+      ]
     },
     {
         basePath: 'deviceprovisioningservices/resource-manager',
@@ -168,9 +211,21 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'devtestlabs/resource-manager',
         namespace: 'Microsoft.DevTestLab',
     },
+    {
+        basePath: 'guestconfiguration/resource-manager',
+        namespace: 'Microsoft.GuestConfiguration',
+    },
+    {
+        basePath: 'resourcegraph/resource-manager',
+        namespace: 'Microsoft.ResourceGraph',
+    },
     { 
         basePath: 'redis/resource-manager',
         namespace: 'Microsoft.Cache',
+    },
+    {
+        basePath: 'hardwaresecuritymodules/resource-manager',
+        namespace: 'Microsoft.HardwareSecurityModules',
     },
     {
         basePath: 'hdinsight/resource-manager',
@@ -187,6 +242,15 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'eventhub/resource-manager',
         namespace: 'Microsoft.EventHub',
+    },
+    {
+        basePath: 'engagementfabric/resource-manager',
+        namespace: 'Microsoft.EngagementFabric',
+    },
+    {
+        basePath: 'frontdoor/resource-manager',
+        namespace: 'Microsoft.Network',
+        suffix: 'FrontDoor',
     },
     {
         basePath: 'hanaonazure/resource-manager',
@@ -227,12 +291,29 @@ const whitelist: WhitelistConfig[] = [
         ],
     },
     {
+        basePath: 'machinelearning/resource-manager',
+        namespace: 'Microsoft.MachineLearning',
+        postProcessor: machineLearningPostProcessor,
+    },
+    {
         basePath: 'machinelearningcompute/resource-manager',
         namespace: 'Microsoft.MachineLearningCompute',
     },
     {
+        basePath: 'machinelearningexperimentation/resource-manager',
+        namespace: 'Microsoft.MachineLearningExperimentation',
+    },
+    {
         basePath: 'maintenance/resource-manager',
         namespace: 'Microsoft.Maintenance',
+    },
+    {
+        basePath: 'migrate/resource-manager',
+        namespace: 'Microsoft.Migrate',
+    },
+    {
+        basePath: 'migrate/resource-manager',
+        namespace: 'Microsoft.OffAzure',
     },
     {
         basePath: 'managednetwork/resource-manager',
@@ -243,6 +324,10 @@ const whitelist: WhitelistConfig[] = [
                 scopes: ScopeType.Subcription,
             },
         ],
+    },
+    {
+        basePath: 'migrateprojects/resource-manager',
+        namespace: 'Microsoft.Migrate',
     },
     {
         basePath: 'mariadb/resource-manager',
@@ -267,12 +352,32 @@ const whitelist: WhitelistConfig[] = [
         ]
     },
     {
+        basePath: 'machinelearningservices/resource-manager',
+        namespace: 'Microsoft.MachineLearningServices',
+    },
+    {
         basePath: 'mysql/resource-manager',
         namespace: 'Microsoft.DBforMySQL',
     },
     {
+        basePath: 'managementgroups/resource-manager',
+        namespace: 'Microsoft.Management',
+    },
+    {
+        basePath: 'managementpartner/resource-manager',
+        namespace: 'Microsoft.ManagementPartner',
+    },
+    {
+        basePath: 'maps/resource-manager',
+        namespace: 'Microsoft.Maps',
+    },
+    {
         basePath: 'netapp/resource-manager',
         namespace: 'Microsoft.NetApp',
+    },
+    {
+      basePath: 'notificationhubs/resource-manager',
+      namespace: 'Microsoft.NotificationHubs'
     },
     {
         basePath: 'policyinsights/resource-manager',
@@ -289,12 +394,20 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Peering',
     },
     {
+        basePath: 'powerbidedicated/resource-manager',
+        namespace: 'Microsoft.PowerBIDedicated',
+    },
+    {
         basePath: 'portal/resource-manager',
         namespace: 'Microsoft.Portal',
     },
     {
         basePath: 'postgresql/resource-manager',
         namespace: 'Microsoft.DBforPostgreSQL',
+    },
+    {
+        basePath: 'powerbiembedded/resource-manager',
+        namespace: 'Microsoft.PowerBI',
     },
     {
         basePath: 'resources/resource-manager',
@@ -311,10 +424,13 @@ const whitelist: WhitelistConfig[] = [
         ],
         postProcessor: resourcesPostProcessor,
     },
+    /* antmarti - temporarily commented out to unblock generation.
+                  this appears to have been broken by https://github.com/Azure/azure-rest-api-specs/pull/8903
     {
         basePath: 'relay/resource-manager',
         namespace: 'Microsoft.Relay',
     },
+    */
     {
         basePath: 'servicebus/resource-manager',
         namespace: 'Microsoft.ServiceBus',
@@ -348,12 +464,62 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.StorageSync',
     },
     {
+        basePath: 'serialconsole/resource-manager',
+        namespace: 'Microsoft.SerialConsole',
+    },
+    {
+        basePath: 'synapse/resource-manager',
+        namespace: 'Microsoft.Synapse',
+    },
+    {
+        basePath: 'securityinsights/resource-manager',
+        namespace: 'Microsoft.SecurityInsights',
+    },
+    {
+        basePath: 'storageimportexport/resource-manager',
+        namespace: 'Microsoft.ImportExport'
+    },
+    {
+        basePath: 'storSimple1200Series/resource-manager',
+        namespace: 'Microsoft.StorSimple',
+        suffix: '1200'
+    },
+    {
         basePath: 'vmwarecloudsimple/resource-manager',
         namespace: 'Microsoft.VMwareCloudSimple',
+    },
+    {
+        basePath: 'vmwarevirtustream/resource-manager',
+        namespace: 'Microsoft.VMwareVirtustream',
+    },
+    {
+        basePath: 'visualstudio/resource-manager',
+        namespace: 'Microsoft.VisualStudio',
     },
     { 
         basePath: 'sql/resource-manager',
         namespace: 'Microsoft.Sql',
+    },
+    { 
+        basePath: 'scheduler/resource-manager',
+        namespace: 'Microsoft.Scheduler',
+    },
+    {
+        basePath: 'search/resource-manager',
+        namespace: 'Microsoft.Search',
+    },
+    { 
+        basePath: 'subscription/resource-manager',
+        namespace: 'Microsoft.Subscription',
+    },
+    { 
+        basePath: 'storsimple8000series/resource-manager',
+        namespace: 'Microsoft.StorSimple',
+        suffix: '8000',
+    },
+    { 
+        basePath: 'support/resource-manager',
+        namespace: 'Microsoft.Support',
     },
     {
         basePath: 'timeseriesinsights/resource-manager',

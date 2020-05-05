@@ -9,6 +9,7 @@ import { TextDocument } from 'vscode-languageserver-types';
 import draft4MetaSchema from 'ajv/lib/refs/json-schema-draft-04.json';
 import * as schemaTestsRunner from './schemaTestsRunner';
 import 'mocha';
+import { findCycle } from './cycleCheck';
 
 const readFile = promisify(fs.readFile);
 
@@ -85,17 +86,20 @@ function listSchemaPaths(basePath: string): string[] {
   return results;
 }
 
-const rootSchemaPaths = [
-  'https://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json',
-  'https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json',
-  'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json',
-  'https://schema.management.azure.com/schemas/2019-03-01-hybrid/deploymentTemplate.json',
-];
-
 const metaSchemaPaths = [
   'http://json-schema.org/draft-04/schema',
   testSchemasFolder + 'ResourceMetaSchema.json',
 ];
+
+// Cyclic schemas cause an issue for ARM export, but we have a few already
+// 'known' bad schemas. Please do not add to this list unless you are sure
+// this will not cause a problem in ARM.
+const schemasToSkipForCyclicValidation = new Set([
+  '2017-09-01-preview/Microsoft.DataFactory.json',
+  '2018-06-01/Microsoft.DataFactory.json',
+  '2018-07-01/Microsoft.Media.json',
+  '2018-11-01-preview/Microsoft.Billing.json',
+].map(p => path.resolve(`${schemasFolder}/${p}`)));
 
 const schemasToSkip = [
   '0.0.1-preview/CreateUIDefinition.CommonControl.json',
@@ -150,7 +154,7 @@ for (const testPath of schemaTestPaths) {
   schemaTestMap[testPath] = data;
 }
 
-describe('Validate resource schemas against meta-schemas', () => {
+describe('Validate individual resource schemas', () => {
   for (const schemaPath of schemaPaths) {
     describe(schemaPath, () => {
       for (const metaSchemaPath of metaSchemaPaths) {
@@ -165,17 +169,23 @@ describe('Validate resource schemas against meta-schemas', () => {
           expect(result, `Validation failed with errors ${JSON.stringify(validate.errors, null, 2)}`).to.be.true;
         });
       }
-    });
-  }
-});
 
-describe('Compile individual resource schemas', () => {
-  for (const schemaPath of schemaPaths) {
-    it(`Compile '${schemaPath}'`, async function() {
-      this.timeout(60000);
-      const schema = await loadSchema(schemaPath);
-
-      await ajvInstance.compileAsync(schema);
+      it(`Compile '${schemaPath}'`, async function() {
+        this.timeout(60000);
+        const schema = await loadSchema(schemaPath);
+  
+        await ajvInstance.compileAsync(schema);
+      });
+  
+      if (!schemasToSkipForCyclicValidation.has(schemaPath)) {
+        it(`Check '${schemaPath}' for cycles`, async function() {
+          this.timeout(60000);
+          const schema = await loadSchema(schemaPath);
+    
+          const cycle = findCycle(schema);
+          expect(cycle, `Found cycle ${cycle?.join(' -> ')}`).to.be.undefined;
+        });
+      }
     });
   }
 });

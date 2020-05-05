@@ -85,6 +85,9 @@
                 "$ref": "#/definitions/service_templates_childResource"
               },
               {
+                "$ref": "#/definitions/service_gateways_childResource"
+              },
+              {
                 "$ref": "#/definitions/service_groups_childResource"
               },
               {
@@ -1099,6 +1102,142 @@
       ],
       "description": "Microsoft.ApiManagement/service/diagnostics"
     },
+    "service_gateways": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-12-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "Gateway entity identifier. Must be unique in the current API Management service instance. Must not have value 'managed'"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/GatewayContractProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the Gateway contract."
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/service_gateways_hostnameConfigurations_childResource"
+              },
+              {
+                "$ref": "#/definitions/service_gateways_apis_childResource"
+              }
+            ]
+          }
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ApiManagement/service/gateways"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.ApiManagement/service/gateways"
+    },
+    "service_gateways_apis": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-12-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "API identifier. Must be unique in the current API Management service instance."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AssociationContractProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Association entity contract properties."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ApiManagement/service/gateways/apis"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.ApiManagement/service/gateways/apis"
+    },
+    "service_gateways_hostnameConfigurations": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-12-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "Gateway hostname configuration identifier. Must be unique in the scope of parent Gateway entity."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/GatewayHostnameConfigurationContractProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Gateway hostname configuration details."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ApiManagement/service/gateways/hostnameConfigurations"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.ApiManagement/service/gateways/hostnameConfigurations"
+    },
     "service_groups": {
       "type": "object",
       "properties": {
@@ -1466,7 +1605,7 @@
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/OpenidConnectProviderCreateContractProperties"
+              "$ref": "#/definitions/OpenidConnectProviderContractProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -2348,14 +2487,15 @@
             {
               "type": "object",
               "additionalProperties": {
-                "$ref": "#/definitions/Components16nk615schemasapimanagementserviceidentitypropertiesuserassignedidentitiesadditionalproperties"
+                "$ref": "#/definitions/UserIdentityProperties"
               },
               "properties": {}
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The list of user identities associated with the resource. The user identity \r\ndictionary key references will be ARM resource ids in the form: \r\n'/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/\r\n    providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}'."
         }
       },
       "required": [
@@ -2519,7 +2659,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Capacity of the SKU (number of deployed units of the SKU)."
+          "description": "Capacity of the SKU (number of deployed units of the SKU). For Consumption SKU capacity must be specified as 0."
         },
         "name": {
           "oneOf": [
@@ -2541,6 +2681,7 @@
         }
       },
       "required": [
+        "capacity",
         "name"
       ],
       "description": "API Management service resource SKU properties."
@@ -2658,6 +2799,26 @@
         "versioningScheme"
       ],
       "description": "Properties of an API Version Set."
+    },
+    "AssociationContractProperties": {
+      "type": "object",
+      "properties": {
+        "provisioningState": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "created"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Provisioning state."
+        }
+      },
+      "description": "Association entity contract properties."
     },
     "AuthenticationSettingsContract": {
       "type": "object",
@@ -3293,10 +3454,6 @@
       ],
       "description": "SSL certificate information."
     },
-    "Components16nk615schemasapimanagementserviceidentitypropertiesuserassignedidentitiesadditionalproperties": {
-      "type": "object",
-      "properties": {}
-    },
     "DiagnosticContractProperties": {
       "type": "object",
       "properties": {
@@ -3478,6 +3635,53 @@
         }
       },
       "description": "Email Template Update Contract properties."
+    },
+    "GatewayContractProperties": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "Gateway description"
+        },
+        "locationData": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ResourceLocationDataContract"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Resource location data properties."
+        }
+      },
+      "description": "Properties of the Gateway contract."
+    },
+    "GatewayHostnameConfigurationContractProperties": {
+      "type": "object",
+      "properties": {
+        "certificateId": {
+          "type": "string",
+          "description": "Identifier of Certificate entity that will be used for TLS connection establishment"
+        },
+        "hostname": {
+          "type": "string",
+          "description": "Hostname value. Supports valid domain name, partial or full wildcard"
+        },
+        "negotiateClientCertificate": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Determines whether gateway requests client certificate"
+        }
+      },
+      "description": "Gateway hostname configuration details."
     },
     "GroupCreateParametersProperties": {
       "type": "object",
@@ -3962,7 +4166,7 @@
       },
       "description": "API OAuth2 Authentication settings details."
     },
-    "OpenidConnectProviderCreateContractProperties": {
+    "OpenidConnectProviderContractProperties": {
       "type": "object",
       "properties": {
         "clientId": {
@@ -3989,7 +4193,6 @@
       },
       "required": [
         "clientId",
-        "clientSecret",
         "displayName",
         "metadataEndpoint"
       ],
@@ -4440,6 +4643,35 @@
         }
       },
       "description": "Operation request details."
+    },
+    "ResourceLocationDataContract": {
+      "type": "object",
+      "properties": {
+        "city": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "The city or locality where the resource is located."
+        },
+        "countryOrRegion": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "The country or region where the resource is located."
+        },
+        "district": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "The district, state, or province where the resource is located."
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "A canonical name for the geographic or physical location."
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "Resource location data properties."
     },
     "ResponseContract": {
       "type": "object",
@@ -5434,6 +5666,129 @@
       ],
       "description": "Microsoft.ApiManagement/service/diagnostics"
     },
+    "service_gateways_apis_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-12-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "API identifier. Must be unique in the current API Management service instance."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AssociationContractProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Association entity contract properties."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "apis"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.ApiManagement/service/gateways/apis"
+    },
+    "service_gateways_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-12-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "Gateway entity identifier. Must be unique in the current API Management service instance. Must not have value 'managed'"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/GatewayContractProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the Gateway contract."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "gateways"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.ApiManagement/service/gateways"
+    },
+    "service_gateways_hostnameConfigurations_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-12-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "Gateway hostname configuration identifier. Must be unique in the scope of parent Gateway entity."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/GatewayHostnameConfigurationContractProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Gateway hostname configuration details."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "hostnameConfigurations"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.ApiManagement/service/gateways/hostnameConfigurations"
+    },
     "service_groups_childResource": {
       "type": "object",
       "properties": {
@@ -5778,7 +6133,7 @@
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/OpenidConnectProviderCreateContractProperties"
+              "$ref": "#/definitions/OpenidConnectProviderContractProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -6510,6 +6865,20 @@
     "UserCreateParameterProperties": {
       "type": "object",
       "properties": {
+        "appType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "developerPortal"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Determines the type of application which send the create user request. Default is old publisher portal."
+        },
         "confirmation": {
           "oneOf": [
             {
@@ -6603,6 +6972,19 @@
         }
       },
       "description": "User identity details."
+    },
+    "UserIdentityProperties": {
+      "type": "object",
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "description": "The client id of user assigned identity."
+        },
+        "principalId": {
+          "type": "string",
+          "description": "The principal id of user assigned identity."
+        }
+      }
     },
     "VirtualNetworkConfiguration": {
       "type": "object",

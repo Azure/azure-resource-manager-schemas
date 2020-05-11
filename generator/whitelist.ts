@@ -170,6 +170,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DeploymentManager',
     },
     {
+        basePath: 'desktopvirtualization/resource-manager',
+        namespace: 'Microsoft.DesktopVirtualization',
+    },
+    {
       basePath: 'digitaltwins/resource-manager',
       namespace: 'Microsoft.DigitalTwins',
       resourceConfig: [

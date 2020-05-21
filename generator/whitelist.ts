@@ -327,6 +327,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DBforMariaDB',
     },
     {
+        basePath: 'marketplace/resource-manager',
+        namespace: 'Microsoft.Marketplace',
+    },
+    {
         basePath: 'machinelearningservices/resource-manager',
         namespace: 'Microsoft.MachineLearningServices',
     },

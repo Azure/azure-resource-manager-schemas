@@ -221,6 +221,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.HDInsight',
     },
     {
+        basePath: 'resourcehealth/resource-manager',
+        namespace: 'Microsoft.ResourceHealth',
+    }, 
+    {
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',
         namespace: 'Microsoft.EnterpriseKnowledgeGraph',
     },

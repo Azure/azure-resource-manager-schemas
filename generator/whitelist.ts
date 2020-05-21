@@ -301,6 +301,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Maintenance',
     },
     {
+        basePath: 'marketplaceordering/resource-manager',
+        namespace: 'Microsoft.MarketplaceOrdering',
+    },
+    {
         basePath: 'migrate/resource-manager',
         namespace: 'Microsoft.Migrate',
     },

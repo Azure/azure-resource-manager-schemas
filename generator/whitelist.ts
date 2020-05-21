@@ -221,6 +221,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.HDInsight',
     },
     {
+        basePath: 'resourcehealth/resource-manager',
+        namespace: 'Microsoft.ResourceHealth',
+    }, 
+    {
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',
         namespace: 'Microsoft.EnterpriseKnowledgeGraph',
     },
@@ -400,6 +404,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Relay',
     },
     {
+        basePath: 'reservations/resource-manager',
+        namespace: 'Microsoft.Capacity',
+    },
+    {
         basePath: 'servicebus/resource-manager',
         namespace: 'Microsoft.ServiceBus',
     },
@@ -488,6 +496,16 @@ const whitelist: WhitelistConfig[] = [
     { 
         basePath: 'support/resource-manager',
         namespace: 'Microsoft.Support',
+    },
+    {
+        basePath: 'softwareplan/resource-manager',
+        namespace: 'Microsoft.SoftwarePlan',
+        resourceConfig: [
+            {
+                type: 'hybridUseBenefits',
+                scopes: ScopeType.Extension,
+            },
+        ]
     },
     {
         basePath: 'timeseriesinsights/resource-manager',

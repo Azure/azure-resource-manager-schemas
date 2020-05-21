@@ -490,6 +490,16 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Support',
     },
     {
+        basePath: 'softwareplan/resource-manager',
+        namespace: 'Microsoft.SoftwarePlan',
+        resourceConfig: [
+            {
+                type: 'hybridUseBenefits',
+                scopes: ScopeType.Extension,
+            },
+        ]
+    },
+    {
         basePath: 'timeseriesinsights/resource-manager',
         namespace: 'Microsoft.TimeSeriesInsights',
     },

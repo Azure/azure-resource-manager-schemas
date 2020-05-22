@@ -74,6 +74,28 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Blockchain',
     },
     {
+        basePath: 'blueprint/resource-manager',
+        namespace: 'Microsoft.Blueprint',
+        resourceConfig: [
+            {
+                type: 'blueprintAssignments',
+                scopes: ScopeType.Subcription | ScopeType.ManagementGroup,
+            },
+            {
+                type: 'blueprints',
+                scopes: ScopeType.Subcription | ScopeType.ManagementGroup,
+            },
+            {
+                type: 'blueprints/artifacts',
+                scopes: ScopeType.Subcription | ScopeType.ManagementGroup,
+            },
+            {
+                type: 'blueprints/versions',
+                scopes: ScopeType.Subcription | ScopeType.ManagementGroup,
+            },
+        ]
+    },
+    {
         basePath: 'botservice/resource-manager',
         namespace: 'Microsoft.BotService',
     },

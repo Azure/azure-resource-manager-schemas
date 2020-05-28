@@ -341,6 +341,20 @@ const whitelist: WhitelistConfig[] = [
         ],
     },
     {
+        basePath: 'managedservices/resource-manager',
+        namespace: 'Microsoft.ManagedServices',
+        resourceConfig: [
+            {
+                type: 'registrationAssignments',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup,
+            },
+            {
+                type: 'registrationDefinitions',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup,
+            },
+        ],
+    },
+    {
         basePath: 'migrateprojects/resource-manager',
         namespace: 'Microsoft.Migrate',
     },

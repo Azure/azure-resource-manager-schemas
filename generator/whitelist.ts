@@ -381,6 +381,10 @@ const whitelist: WhitelistConfig[] = [
       namespace: 'Microsoft.NotificationHubs'
     },
     {
+      basePath: 'operationsmanagement/resource-manager',
+      namespace: 'Microsoft.OperationsManagement'
+    },
+    {
         basePath: 'policyinsights/resource-manager',
         namespace: 'Microsoft.PolicyInsights',
         resourceConfig: [

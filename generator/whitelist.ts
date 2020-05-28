@@ -251,8 +251,9 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.EnterpriseKnowledgeGraph',
     },
     { 
-        basePath: 'domainservices/resource-manager',
-        namespace: 'Microsoft.AAD',
+        basePath: 'dns/resource-manager',
+        namespace: 'Microsoft.Network',
+	suffix: 'DNS',
     },
     {
         basePath: 'eventhub/resource-manager',

@@ -49,6 +49,9 @@
             "oneOf": [
               {
                 "$ref": "#/definitions/domains_topics_childResource"
+              },
+              {
+                "$ref": "#/definitions/domains_privateEndpointConnections_childResource"
               }
             ]
           }
@@ -94,6 +97,45 @@
         "type"
       ],
       "description": "Microsoft.EventGrid/domains"
+    },
+    "domains_privateEndpointConnections": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-04-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the private endpoint connection connection."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PrivateEndpointConnectionProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the private endpoint connection resource."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.EventGrid/domains/privateEndpointConnections"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.EventGrid/domains/privateEndpointConnections"
     },
     "domains_topics": {
       "type": "object",
@@ -475,6 +517,16 @@
           ],
           "description": "Properties of the Topic"
         },
+        "resources": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/topics_privateEndpointConnections_childResource"
+              }
+            ]
+          }
+        },
         "sku": {
           "oneOf": [
             {
@@ -516,6 +568,45 @@
         "type"
       ],
       "description": "Microsoft.EventGrid/topics"
+    },
+    "topics_privateEndpointConnections": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-04-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the private endpoint connection connection."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PrivateEndpointConnectionProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the private endpoint connection resource."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.EventGrid/topics/privateEndpointConnections"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.EventGrid/topics/privateEndpointConnections"
     }
   },
   "unknown_resourceDefinitions": {
@@ -721,7 +812,7 @@
           "description": "Status of the connection."
         }
       },
-      "description": "ConnectionState Information."
+      "description": "ConnectionState information."
     },
     "DeadLetterDestination": {
       "type": "object",
@@ -865,6 +956,45 @@
       },
       "description": "Properties of the Domain."
     },
+    "domains_privateEndpointConnections_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-04-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the private endpoint connection connection."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PrivateEndpointConnectionProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the private endpoint connection resource."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "privateEndpointConnections"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.EventGrid/domains/privateEndpointConnections"
+    },
     "domains_topics_childResource": {
       "type": "object",
       "properties": {
@@ -910,6 +1040,26 @@
       },
       "description": "Properties of the destination of an event channel."
     },
+    "EventChannelFilter": {
+      "type": "object",
+      "properties": {
+        "advancedFilters": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AdvancedFilter"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "An array of advanced filters that are used for filtering event channels."
+        }
+      },
+      "description": "Filter for the Event Channel."
+    },
     "EventChannelProperties": {
       "type": "object",
       "properties": {
@@ -923,6 +1073,26 @@
             }
           ],
           "description": "Properties of the destination of an event channel."
+        },
+        "expirationTimeIfNotActivatedUtc": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Expiration time of the event channel. If this timer expires while the corresponding partner topic is never activated,\r\nthe event channel and corresponding partner topic are deleted."
+        },
+        "filter": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EventChannelFilter"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Filter for the Event Channel."
+        },
+        "partnerTopicFriendlyDescription": {
+          "type": "string",
+          "description": "Friendly description about the topic. This can be set by the publisher/partner to show custom description for the customer partner topic.\r\nThis will be helpful to remove any ambiguity of the origin of creation of the partner topic for the customer."
         },
         "source": {
           "oneOf": [
@@ -1663,9 +1833,25 @@
           ],
           "description": "List of Azure subscription Ids that are authorized to create a partner namespace\r\nassociated with this partner registration. This is an optional property. Creating\r\npartner namespaces is always permitted under the same Azure subscription as the one used\r\nfor creating the partner registration."
         },
+        "customerServiceUri": {
+          "type": "string",
+          "description": "The extension of the customer service URI of the publisher."
+        },
         "logoUri": {
           "type": "string",
           "description": "URI of the logo."
+        },
+        "longDescription": {
+          "type": "string",
+          "description": "Long description for the custom scenarios and integration to be displayed in the portal if needed.\r\nLength of this description should not exceed 2048 characters."
+        },
+        "partnerCustomerServiceExtension": {
+          "type": "string",
+          "description": "The extension of the customer service number of the publisher. Only digits are allowed and number of digits should not exceed 10."
+        },
+        "partnerCustomerServiceNumber": {
+          "type": "string",
+          "description": "The customer service number of the publisher. The expected phone format should start with a '+' sign \r\nfollowed by the country code. The remaining digits are then followed. Only digits and spaces are allowed and its\r\nlength cannot exceed 16 digits including country code. Examples of valid phone numbers are: +1 515 123 4567 and\r\n+966 7 5115 2471. Examples of invalid phone numbers are: +1 (515) 123-4567, 1 515 123 4567 and +966 121 5115 24 7 551 1234 43"
         },
         "partnerName": {
           "type": "string",
@@ -1673,7 +1859,7 @@
         },
         "partnerResourceTypeDescription": {
           "type": "string",
-          "description": "Description of the partner resource type."
+          "description": "Short description of the partner resource type. The length of this description should not exceed 256 characters."
         },
         "partnerResourceTypeDisplayName": {
           "type": "string",
@@ -1728,10 +1914,9 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Properties of the private endpoint connection resource"
+          "description": "Properties of the private endpoint connection resource."
         }
-      },
-      "description": "PrivateEndpointConnection resource information."
+      }
     },
     "PrivateEndpointConnectionProperties": {
       "type": "object",
@@ -1770,7 +1955,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "ConnectionState Information."
+          "description": "ConnectionState information."
         },
         "provisioningState": {
           "oneOf": [
@@ -1792,7 +1977,7 @@
           "description": "Provisioning state of the Private Endpoint Connection."
         }
       },
-      "description": "Properties of the private endpoint connection resource"
+      "description": "Properties of the private endpoint connection resource."
     },
     "ResourceSku": {
       "type": "object",
@@ -1810,7 +1995,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "the Sku name of the resource.\r\nthe possible values: Basic; Premium."
+          "description": "The Sku name of the resource. The possible values are: Basic or Premium."
         }
       },
       "description": "Describes an EventGrid Resource Sku."
@@ -2248,8 +2433,7 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "List of private endpoint connections."
+          ]
         },
         "publicNetworkAccess": {
           "oneOf": [
@@ -2268,6 +2452,45 @@
         }
       },
       "description": "Properties of the Topic"
+    },
+    "topics_privateEndpointConnections_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-04-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the private endpoint connection connection."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PrivateEndpointConnectionProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the private endpoint connection resource."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "privateEndpointConnections"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.EventGrid/topics/privateEndpointConnections"
     },
     "UserIdentityProperties": {
       "type": "object",

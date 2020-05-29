@@ -74,6 +74,28 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Blockchain',
     },
     {
+        basePath: 'blueprint/resource-manager',
+        namespace: 'Microsoft.Blueprint',
+        resourceConfig: [
+            {
+                type: 'blueprintAssignments',
+                scopes: ScopeType.Subcription | ScopeType.ManagementGroup,
+            },
+            {
+                type: 'blueprints',
+                scopes: ScopeType.Subcription | ScopeType.ManagementGroup,
+            },
+            {
+                type: 'blueprints/artifacts',
+                scopes: ScopeType.Subcription | ScopeType.ManagementGroup,
+            },
+            {
+                type: 'blueprints/versions',
+                scopes: ScopeType.Subcription | ScopeType.ManagementGroup,
+            },
+        ]
+    },
+    {
         basePath: 'botservice/resource-manager',
         namespace: 'Microsoft.BotService',
     },
@@ -170,6 +192,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DeploymentManager',
     },
     {
+        basePath: 'desktopvirtualization/resource-manager',
+        namespace: 'Microsoft.DesktopVirtualization',
+    },
+    {
       basePath: 'digitaltwins/resource-manager',
       namespace: 'Microsoft.DigitalTwins',
       resourceConfig: [
@@ -217,6 +243,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.HDInsight',
     },
     {
+        basePath: 'resourcehealth/resource-manager',
+        namespace: 'Microsoft.ResourceHealth',
+    }, 
+    {
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',
         namespace: 'Microsoft.EnterpriseKnowledgeGraph',
     },
@@ -231,6 +261,11 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'engagementfabric/resource-manager',
         namespace: 'Microsoft.EngagementFabric',
+    },
+    {
+        basePath: 'frontdoor/resource-manager',
+        namespace: 'Microsoft.Network',
+        suffix: 'FrontDoor',
     },
     {
         basePath: 'hanaonazure/resource-manager',
@@ -259,10 +294,6 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'labservices/resource-manager',
         namespace: 'Microsoft.LabServices',
-    },
-    {
-        basePath: 'logic/resource-manager',
-        namespace: 'Microsoft.Logic',
     },
     { 
         basePath: 'eventgrid/resource-manager',
@@ -316,6 +347,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'mariadb/resource-manager',
         namespace: 'Microsoft.DBforMariaDB',
+    },
+    {
+        basePath: 'marketplace/resource-manager',
+        namespace: 'Microsoft.Marketplace',
     },
     {
         basePath: 'machinelearningservices/resource-manager',
@@ -393,6 +428,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'relay/resource-manager',
         namespace: 'Microsoft.Relay',
+    },
+    {
+        basePath: 'reservations/resource-manager',
+        namespace: 'Microsoft.Capacity',
     },
     {
         basePath: 'resources/resource-manager',
@@ -497,6 +536,16 @@ const whitelist: WhitelistConfig[] = [
     { 
         basePath: 'support/resource-manager',
         namespace: 'Microsoft.Support',
+    },
+    {
+        basePath: 'softwareplan/resource-manager',
+        namespace: 'Microsoft.SoftwarePlan',
+        resourceConfig: [
+            {
+                type: 'hybridUseBenefits',
+                scopes: ScopeType.Extension,
+            },
+        ]
     },
     {
         basePath: 'timeseriesinsights/resource-manager',

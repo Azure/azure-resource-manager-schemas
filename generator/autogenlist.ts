@@ -1,10 +1,10 @@
-import { ScopeType, WhitelistConfig } from './models';
+import { ScopeType, AutogenlistConfig } from './models';
 import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
 import { postProcessor as machineLearningPostProcessor } from './processors/Microsoft.MachineLearning';
 import { lowerCaseEquals } from './utils';
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
-const whitelist: WhitelistConfig[] = [
+const autogenlist: AutogenlistConfig[] = [
     {
         basePath: 'addons/resource-manager',
         namespace: 'Microsoft.Addons',
@@ -551,10 +551,10 @@ const whitelist: WhitelistConfig[] = [
     }
 ];
 
-export function getWhitelist(): WhitelistConfig[] {
-    return whitelist;
+export function getAutogenlist(): AutogenlistConfig[] {
+    return autogenlist;
 }
 
-export function findWhitelistEntries(basePath: string): WhitelistConfig[] {
-    return whitelist.filter(w => lowerCaseEquals(w.basePath, basePath));
+export function findAutogenEntries(basePath: string): AutogenlistConfig[] {
+    return autogenlist.filter(w => lowerCaseEquals(w.basePath, basePath));
 }

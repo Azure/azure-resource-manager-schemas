@@ -8,15 +8,15 @@ export enum ScopeType {
   Extension = 1 << 5,
 }
 
-export interface WhitelistConfig {
+export interface AutogenlistConfig {
   basePath: string,
   namespace: string,
   suffix?: string,
-  resourceConfig?: WhitelistResourceConfig[],
+  resourceConfig?: AutogenlistResourceConfig[],
   postProcessor?: SchemaPostProcessor,
 }
 
-export interface WhitelistResourceConfig {
+export interface AutogenlistResourceConfig {
   type: string,
   scopes?: ScopeType,
 }

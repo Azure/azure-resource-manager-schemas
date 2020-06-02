@@ -33,7 +33,7 @@ export const autorestCoreVersion = '3.0.6274';
 export const azureresourceschemaVersion = '3.0.79';
 
 // paths in this list won't even appear in list-basepaths
-export const blacklist = [
+export const blocklist = [
     /* Azure Stack resource providers */
     'azsadmin/resource-manager/azurebridge',
     'azsadmin/resource-manager/backup',

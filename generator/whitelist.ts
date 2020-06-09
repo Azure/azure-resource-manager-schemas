@@ -17,6 +17,24 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'cdn/resource-manager',
         namespace: 'Microsoft.Cdn',
     },
+    { 
+        basePath: 'cost-management/resource-manager',
+        namespace: 'Microsoft.CostManagement',
+        resourceConfig: [
+            {
+                type: 'budgets',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.ManagementGroup,
+            },
+            {
+                type: 'views',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.ManagementGroup,
+            },
+            {
+                type: 'exports',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup,
+            },
+        ]
+    },
     {
         basePath: 'analysisservices/resource-manager',
         namespace: 'Microsoft.AnalysisServices',

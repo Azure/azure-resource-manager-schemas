@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2020-02-01/Microsoft.ContainerService.json#",
+  "id": "https://schema.management.azure.com/schemas/2020-04-01/Microsoft.ContainerService.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.ContainerService",
   "description": "Microsoft ContainerService Resource Types",
@@ -10,7 +10,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-02-01"
+            "2020-04-01"
           ]
         },
         "identity": {
@@ -63,6 +63,16 @@
             ]
           }
         },
+        "sku": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ManagedClusterSKU"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
         "tags": {
           "oneOf": [
             {
@@ -100,7 +110,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-02-01"
+            "2020-04-01"
           ]
         },
         "name": {
@@ -135,6 +145,16 @@
     }
   },
   "definitions": {
+    "AgentPoolUpgradeSettings": {
+      "type": "object",
+      "properties": {
+        "maxSurge": {
+          "type": "string",
+          "description": "Count or percentage of additional nodes to be added during upgrade. If empty uses AKS default"
+        }
+      },
+      "description": "Settings for upgrading an agentpool"
+    },
     "Componentsqit0etschemasmanagedclusterpropertiespropertiesidentityprofileadditionalproperties": {
       "type": "object",
       "properties": {
@@ -368,9 +388,34 @@
     "ManagedClusterAADProfile": {
       "type": "object",
       "properties": {
+        "adminGroupObjectIDs": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "AAD group object IDs that will have admin role of the cluster."
+        },
         "clientAppID": {
           "type": "string",
           "description": "The client AAD application ID."
+        },
+        "managed": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether to enable managed AAD."
         },
         "serverAppID": {
           "type": "string",
@@ -385,10 +430,6 @@
           "description": "The AAD tenant ID to use for authentication. If not specified, will use the tenant of the deployment subscription."
         }
       },
-      "required": [
-        "clientAppID",
-        "serverAppID"
-      ],
       "description": "AADProfile specifies attributes for Azure Active Directory integration."
     },
     "ManagedClusterAddonProfile": {
@@ -452,7 +493,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Number of agents (VMs) to host docker containers. Allowed values must be in the range of 1 to 100 (inclusive). The default value is 1."
+          "description": "Number of agents (VMs) to host docker containers. Allowed values must be in the range of 0 to 100 (inclusive) for user pools and in the range of 1 to 100 (inclusive) for system pools. The default value is 1."
         },
         "enableAutoScaling": {
           "oneOf": [
@@ -509,6 +550,21 @@
           ],
           "description": "Minimum number of nodes for auto-scaling"
         },
+        "mode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "System",
+                "User"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "AgentPoolMode represents mode of an agent pool."
+        },
         "name": {
           "oneOf": [
             {
@@ -520,6 +576,10 @@
             }
           ],
           "description": "Unique name of the agent pool profile in the context of the subscription and resource group."
+        },
+        "nodeImageVersion": {
+          "type": "string",
+          "description": "Version of node image"
         },
         "nodeLabels": {
           "oneOf": [
@@ -595,7 +655,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "ScaleSetEvictionPolicy to be used to specify eviction policy for Spot or low priority virtual machine scale set. Default to Delete."
+          "description": "ScaleSetEvictionPolicy to be used to specify eviction policy for Spot virtual machine scale set. Default to Delete."
         },
         "scaleSetPriority": {
           "oneOf": [
@@ -603,7 +663,6 @@
               "type": "string",
               "enum": [
                 "Spot",
-                "Low",
                 "Regular"
               ]
             },
@@ -654,6 +713,17 @@
             }
           ],
           "description": "AgentPoolType represents types of an agent pool."
+        },
+        "upgradeSettings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AgentPoolUpgradeSettings"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Settings for upgrading an agentpool"
         },
         "vmSize": {
           "oneOf": [
@@ -878,7 +948,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Number of agents (VMs) to host docker containers. Allowed values must be in the range of 1 to 100 (inclusive). The default value is 1."
+          "description": "Number of agents (VMs) to host docker containers. Allowed values must be in the range of 0 to 100 (inclusive) for user pools and in the range of 1 to 100 (inclusive) for system pools. The default value is 1."
         },
         "enableAutoScaling": {
           "oneOf": [
@@ -934,6 +1004,25 @@
             }
           ],
           "description": "Minimum number of nodes for auto-scaling"
+        },
+        "mode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "System",
+                "User"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "AgentPoolMode represents mode of an agent pool."
+        },
+        "nodeImageVersion": {
+          "type": "string",
+          "description": "Version of node image"
         },
         "nodeLabels": {
           "oneOf": [
@@ -1009,7 +1098,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "ScaleSetEvictionPolicy to be used to specify eviction policy for Spot or low priority virtual machine scale set. Default to Delete."
+          "description": "ScaleSetEvictionPolicy to be used to specify eviction policy for Spot virtual machine scale set. Default to Delete."
         },
         "scaleSetPriority": {
           "oneOf": [
@@ -1017,7 +1106,6 @@
               "type": "string",
               "enum": [
                 "Spot",
-                "Low",
                 "Regular"
               ]
             },
@@ -1068,6 +1156,17 @@
             }
           ],
           "description": "AgentPoolType represents types of an agent pool."
+        },
+        "upgradeSettings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AgentPoolUpgradeSettings"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Settings for upgrading an agentpool"
         },
         "vmSize": {
           "oneOf": [
@@ -1624,6 +1723,9 @@
     "ManagedClusterPropertiesAutoScalerProfile": {
       "type": "object",
       "properties": {
+        "balance-similar-node-groups": {
+          "type": "string"
+        },
         "max-graceful-termination-sec": {
           "type": "string"
         },
@@ -1668,13 +1770,47 @@
       ],
       "description": "Information about a service principal identity for the cluster to use for manipulating Azure APIs."
     },
+    "ManagedClusterSKU": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Basic"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Name of a managed cluster SKU."
+        },
+        "tier": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Paid",
+                "Free"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Tier of a managed cluster SKU."
+        }
+      }
+    },
     "managedClusters_agentPools_childResource": {
       "type": "object",
       "properties": {
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-02-01"
+            "2020-04-01"
           ]
         },
         "name": {

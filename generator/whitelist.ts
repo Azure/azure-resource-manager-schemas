@@ -292,6 +292,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.IoTSpaces',
     },
     {
+        basePath: 'intune/resource-manager',
+        namespace: 'Microsoft.Intune',
+    },
+    {
         basePath: 'labservices/resource-manager',
         namespace: 'Microsoft.LabServices',
     },

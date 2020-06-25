@@ -491,10 +491,6 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.VMwareCloudSimple',
     },
     {
-        basePath: 'vmwarevirtustream/resource-manager',
-        namespace: 'Microsoft.VMwareVirtustream',
-    },
-    {
         basePath: 'visualstudio/resource-manager',
         namespace: 'Microsoft.VisualStudio',
     },

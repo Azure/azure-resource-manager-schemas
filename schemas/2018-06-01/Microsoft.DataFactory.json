@@ -5137,9 +5137,31 @@
           "type": "string",
           "description": "Transformation description."
         },
+        "linkedService": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/LinkedServiceReference"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Linked service reference type."
+        },
         "name": {
           "type": "string",
           "description": "Transformation name."
+        },
+        "schemaLinkedService": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/LinkedServiceReference"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Linked service reference type."
         }
       },
       "required": [
@@ -5165,9 +5187,31 @@
           "type": "string",
           "description": "Transformation description."
         },
+        "linkedService": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/LinkedServiceReference"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Linked service reference type."
+        },
         "name": {
           "type": "string",
           "description": "Transformation name."
+        },
+        "schemaLinkedService": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/LinkedServiceReference"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Linked service reference type."
         }
       },
       "required": [
@@ -5295,6 +5339,9 @@
           "$ref": "#/definitions/AvroDataset"
         },
         {
+          "$ref": "#/definitions/ExcelDataset"
+        },
+        {
           "$ref": "#/definitions/ParquetDataset"
         },
         {
@@ -5302,6 +5349,9 @@
         },
         {
           "$ref": "#/definitions/JsonDataset"
+        },
+        {
+          "$ref": "#/definitions/XmlDataset"
         },
         {
           "$ref": "#/definitions/OrcDataset"
@@ -6930,6 +6980,84 @@
       },
       "description": "The entity reference."
     },
+    "ExcelDataset": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Excel"
+          ]
+        },
+        "typeProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ExcelDatasetTypeProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Excel dataset properties."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Excel dataset."
+    },
+    "ExcelDatasetTypeProperties": {
+      "type": "object",
+      "properties": {
+        "compression": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DatasetCompression"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The compression method used on a dataset."
+        },
+        "firstRowAsHeader": {
+          "type": "object",
+          "properties": {},
+          "description": "When used as input, treat the first row of data as headers. When used as output,write the headers into the output as the first row of data. The default value is false. Type: boolean (or Expression with resultType boolean)."
+        },
+        "location": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DatasetLocation"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Dataset location."
+        },
+        "nullValue": {
+          "type": "object",
+          "properties": {},
+          "description": "The null value string. Type: string (or Expression with resultType string)."
+        },
+        "range": {
+          "type": "object",
+          "properties": {},
+          "description": "The partial data of one sheet. Type: string (or Expression with resultType string)."
+        },
+        "sheetName": {
+          "type": "object",
+          "properties": {},
+          "description": "The sheet of excel file. Type: string (or Expression with resultType string)."
+        }
+      },
+      "required": [
+        "location",
+        "sheetName"
+      ],
+      "description": "Excel dataset properties."
+    },
     "ExecuteDataFlowActivity": {
       "type": "object",
       "properties": {
@@ -7771,6 +7899,21 @@
     "FactoryProperties": {
       "type": "object",
       "properties": {
+        "globalParameters": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/GlobalParameterSpecification"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Definition of all parameters for an entity."
+        },
         "repoConfiguration": {
           "oneOf": [
             {
@@ -8342,6 +8485,40 @@
         "dataset"
       ],
       "description": "GetMetadata activity properties."
+    },
+    "GlobalParameterSpecification": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Object",
+                "String",
+                "Int",
+                "Float",
+                "Bool",
+                "Array"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Global Parameter type."
+        },
+        "value": {
+          "type": "object",
+          "properties": {},
+          "description": "Value of parameter."
+        }
+      },
+      "required": [
+        "type",
+        "value"
+      ],
+      "description": "Definition of a single parameter for an entity."
     },
     "GoogleAdWordsLinkedService": {
       "type": "object",
@@ -18420,14 +18597,8 @@
       "type": "object",
       "properties": {
         "waitTimeInSeconds": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
+          "type": "object",
+          "properties": {},
           "description": "Duration in seconds."
         }
       },
@@ -18977,6 +19148,73 @@
         "type"
       ],
       "description": "Xero Service dataset."
+    },
+    "XmlDataset": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Xml"
+          ]
+        },
+        "typeProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/XmlDatasetTypeProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Xml dataset properties."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Xml dataset."
+    },
+    "XmlDatasetTypeProperties": {
+      "type": "object",
+      "properties": {
+        "compression": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DatasetCompression"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The compression method used on a dataset."
+        },
+        "encodingName": {
+          "type": "object",
+          "properties": {},
+          "description": "The code page name of the preferred encoding. If not specified, the default value is UTF-8, unless BOM denotes another Unicode encoding. Refer to the name column of the table in the following link to set supported values: https://msdn.microsoft.com/library/system.text.encoding.aspx. Type: string (or Expression with resultType string)."
+        },
+        "location": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DatasetLocation"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Dataset location."
+        },
+        "nullValue": {
+          "type": "object",
+          "properties": {},
+          "description": "The null value string. Type: string (or Expression with resultType string)."
+        }
+      },
+      "required": [
+        "location"
+      ],
+      "description": "Xml dataset properties."
     },
     "ZohoLinkedService": {
       "type": "object",

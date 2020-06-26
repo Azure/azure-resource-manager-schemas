@@ -292,6 +292,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.IoTSpaces',
     },
     {
+        basePath: 'intune/resource-manager',
+        namespace: 'Microsoft.Intune',
+    },
+    {
         basePath: 'labservices/resource-manager',
         namespace: 'Microsoft.LabServices',
     },
@@ -489,10 +493,6 @@ const autogenlist: AutogenlistConfig[] = [
     {
         basePath: 'vmwarecloudsimple/resource-manager',
         namespace: 'Microsoft.VMwareCloudSimple',
-    },
-    {
-        basePath: 'vmwarevirtustream/resource-manager',
-        namespace: 'Microsoft.VMwareVirtustream',
     },
     {
         basePath: 'visualstudio/resource-manager',

@@ -41,7 +41,7 @@ export async function cloneAndGenerateBasePaths(localPath: string, remoteUri: st
     return filePaths
         .map(p => p.substring(0, p.lastIndexOf(path.sep)))
         .map(getBasePathString.bind(null, localPath))
-        .filter(p => !isBlacklisted(p));
+        .filter(p => !isBlocklisted(p));
 }
 
 export function getBasePathString(localPath: string, basePath: string) {
@@ -51,6 +51,6 @@ export function getBasePathString(localPath: string, basePath: string) {
         .join('/');
 }
 
-function isBlacklisted(basePath: string) {
-    return constants.blacklist.includes(basePath);
+function isBlocklisted(basePath: string) {
+    return constants.blocklist.includes(basePath);
 }

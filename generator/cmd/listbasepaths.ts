@@ -1,7 +1,7 @@
 import * as constants from '../constants';
 import { cloneAndGenerateBasePaths, validateAndReturnReadmePath } from '../specs';
 import chalk from 'chalk';
-import { findWhitelistEntries } from '../whitelist';
+import { findAutogenEntries } from '../autogenlist';
 import { executeSynchronous, lowerCaseEquals } from '../utils';
 import { getApiVersionsByNamespace } from '../generate';
 import { keys, partition } from 'lodash';
@@ -12,18 +12,18 @@ executeSynchronous(async () => {
     for (const basePath of basePaths) {
         const readme = await validateAndReturnReadmePath(basePath);
         const namespaces = keys(await getApiVersionsByNamespace(readme));
-        const whitelistEntries = findWhitelistEntries(basePath);
+        const autogenlistEntries = findAutogenEntries(basePath);
 
-        const [whitelisted, unwhitelisted] = partition(
+        const [autogened, unautogened] = partition(
             namespaces,
-            n => whitelistEntries.findIndex(w => lowerCaseEquals(w.namespace, n)) > -1);
+            n => autogenlistEntries.findIndex(w => lowerCaseEquals(w.namespace, n)) > -1);
 
-        if (unwhitelisted.length === 0) {
-            console.log(`Discovered '${chalk.green(basePath)}'. Whitelisted for auto-generation: ${chalk.green('yes')}.`);
-        } else if (whitelisted.length > 0) {
-            console.log(`Discovered '${chalk.green(basePath)}'. Whitelisted for auto-generation: ${chalk.yellow('partial')}. Missing: ${unwhitelisted.map(p => chalk.yellow(p)).join(', ')}.`);
+        if (unautogened.length === 0) {
+            console.log(`Discovered '${chalk.green(basePath)}'. autogened for auto-generation: ${chalk.green('yes')}.`);
+        } else if (autogened.length > 0) {
+            console.log(`Discovered '${chalk.green(basePath)}'. autogened for auto-generation: ${chalk.yellow('partial')}. Missing: ${unautogened.map(p => chalk.yellow(p)).join(', ')}.`);
         } else {
-            console.log(`Discovered '${chalk.green(basePath)}'. Whitelisted for auto-generation: ${chalk.red('no')}. Missing: ${unwhitelisted.map(p => chalk.yellow(p)).join(', ')}.`);
+            console.log(`Discovered '${chalk.green(basePath)}'. autogened for auto-generation: ${chalk.red('no')}. Missing: ${unautogened.map(p => chalk.yellow(p)).join(', ')}.`);
         }
     }
 });

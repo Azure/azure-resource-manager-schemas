@@ -1174,6 +1174,149 @@
       },
       "description": "The configuration of the partition key to be used for partitioning data into multiple partitions"
     },
+    "DatabaseAccountRestoreParams": {
+      "type": "object",
+      "properties": {
+        "restoreMode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "PointInTime"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The restoring mode for the Cosmos DB account."
+        },
+        "restoreSource": {
+          "type": "string",
+          "description": "The uri of the source database account to restore from."
+        },
+        "restoreTimestampInUtc": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time stamp to restore the Cosmos DB account to."
+        },
+        "databasesToRestore": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DatabaseRestoreResource"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of Cosmos DB databases to be restored"
+        }
+      },
+      "required": [
+        "restoreMode",
+        "restoreSource",
+        "restoreTimestampInUtc"
+      ],
+      "description": "The restore parameters to restore the Cosmos DB database account."
+    },
+    "DatabaseRestoreResource": {
+      "type": "object",
+      "properties": {
+        "databaseName": {
+          "type": "string",
+          "description": "Name of the Cosmos DB database to be restored"
+        },
+        "collectionNames": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of Cosmos DB collections to be restored"
+        }
+      },
+      "description": "Cosmos DB database name and collection names to be restored"
+    },
+    "DatabaseAccountBackupPolicy": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Periodic",
+                "Continuous"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The backup type of the Cosmos DB account."
+        },
+        "periodicModeProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BackupPolicy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties for periodic restore mode"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "The backup policy for the Cosmos DB database account."
+    },
+    "BackupPolicy": {
+      "type": "object",
+      "properties": {
+        "backupIntervalInMinutes": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 60,
+              "maximum": 1440
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "When using Periodic restore mode, this value represents how often the backup is taken.  Accepted range for this value is 60-1440."
+        },
+        "backupRetentionIntervalInHours": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 24,
+              "maximum": 720
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "When using Periodic restore mode, this value represents how long the backup is kept around for.  Accepted range for this value is 24-720."
+        }
+      },
+      "required": [
+        "backupIntervalInMinutes",
+        "backupRetentionIntervalInHours"
+      ],
+      "description": "The properties for period restore mode."
+    },
     "DatabaseAccountCreateUpdateProperties": {
       "type": "object",
       "properties": {
@@ -1305,6 +1448,43 @@
             }
           ],
           "description": "List of Virtual Network ACL rules configured for the Cosmos DB account."
+        },
+        "createMode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Default",
+                "Restore"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The database account provision mode"
+        },
+        "restoreParameters": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DatabaseAccountRestoreParams"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The parameters for restoring the Cosmos DB database account."
+        },
+        "backupPolicy": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DatabaseAccountBackupPolicy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The backup policy for the Cosmos DB database account."
         }
       },
       "required": [

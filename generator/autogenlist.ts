@@ -22,6 +22,16 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.AnalysisServices',
     },
     {
+        basePath: 'advisor/resource-manager',
+        namespace: 'Microsoft.Advisor',
+        resourceConfig: [
+            {
+                type: 'recommendations/suppressions',
+                scopes: ScopeType.Extension,
+            }
+        ]
+    },
+    {
         basePath: 'azureactivedirectory/resource-manager',
         namespace: 'Microsoft.Aadiam',
     },

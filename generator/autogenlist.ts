@@ -120,6 +120,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.ContainerRegistry',
     },
     {
+        basePath: 'cpim/resource-manager',
+        namespace: 'Microsoft.AzureActiveDirectory',
+    },
+    {
         basePath: 'customproviders/resource-manager',
         namespace: 'Microsoft.CustomProviders',
         resourceConfig: [

@@ -104,6 +104,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.Billing',
     },
     {
+        basePath: 'changeanalysis/resource-manager',
+        namespace: 'Microsoft.ChangeAnalysis',
+    },
+    {
         basePath: 'cognitiveservices/resource-manager',
         namespace: 'Microsoft.CognitiveServices',
     },

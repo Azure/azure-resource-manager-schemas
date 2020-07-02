@@ -542,6 +542,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.VirtualMachineImages',
     },
     {
+        basePath: 'vmware/resource-manager',
+        namespace: 'Microsoft.AVS',
+    },
+    {
         basePath: 'windowsesu/resource-manager',
         namespace: 'Microsoft.WindowsESU',
     },

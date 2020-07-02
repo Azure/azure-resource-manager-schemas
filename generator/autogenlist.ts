@@ -415,6 +415,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.PowerBI',
     },
     {
+        basePath: 'redhatopenshift/resource-manager',
+        namespace: 'Microsoft.RedHatOpenShift',
+    },
+    {
         basePath: 'resources/resource-manager',
         namespace: 'Microsoft.Resources',
         resourceConfig: [

@@ -104,6 +104,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.Billing',
     },
     {
+        basePath: 'changeanalysis/resource-manager',
+        namespace: 'Microsoft.ChangeAnalysis',
+    },
+    {
         basePath: 'cognitiveservices/resource-manager',
         namespace: 'Microsoft.CognitiveServices',
     },
@@ -415,6 +419,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.PowerBI',
     },
     {
+        basePath: 'redhatopenshift/resource-manager',
+        namespace: 'Microsoft.RedHatOpenShift',
+    },
+    {
         basePath: 'resources/resource-manager',
         namespace: 'Microsoft.Resources',
         resourceConfig: [
@@ -540,6 +548,10 @@ const autogenlist: AutogenlistConfig[] = [
     {
         basePath: 'imagebuilder/resource-manager',
         namespace: 'Microsoft.VirtualMachineImages',
+    },
+    {
+        basePath: 'vmware/resource-manager',
+        namespace: 'Microsoft.AVS',
     },
     {
         basePath: 'windowsesu/resource-manager',

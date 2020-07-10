@@ -53,4 +53,5 @@ export const blocklist = [
     'customer-insights/resource-manager',
     /* Temporally moving to blacklist */
     'consumption/resource-manager',
+    'mariadb/resource-manager',
 ];

@@ -51,7 +51,4 @@ export const blocklist = [
     'azsadmin/resource-manager/user-subscriptions',
     /* Microsoft.CustomerInsights is deprecated */
     'customer-insights/resource-manager',
-    /* Temporally moving to blacklist */
-    'consumption/resource-manager',
-    'mariadb/resource-manager',
 ];

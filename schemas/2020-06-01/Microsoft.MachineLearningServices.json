@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2020-04-01/Microsoft.MachineLearningServices.json#",
+  "id": "https://schema.management.azure.com/schemas/2020-06-01/Microsoft.MachineLearningServices.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.MachineLearningServices",
   "description": "Microsoft MachineLearningServices Resource Types",
@@ -10,7 +10,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-04-01"
+            "2020-06-01"
           ]
         },
         "identity": {
@@ -47,6 +47,9 @@
           "type": "array",
           "items": {
             "oneOf": [
+              {
+                "$ref": "#/definitions/workspaces_connections_childResource"
+              },
               {
                 "$ref": "#/definitions/workspaces_computes_childResource"
               },
@@ -103,7 +106,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-04-01"
+            "2020-06-01"
           ]
         },
         "identity": {
@@ -177,13 +180,52 @@
       ],
       "description": "Microsoft.MachineLearningServices/workspaces/computes"
     },
+    "workspaces_connections": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-06-01"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "Friendly name of the workspace connection"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WorkspaceConnectionProps"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Workspace Connection specific properties."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.MachineLearningServices/workspaces/connections"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.MachineLearningServices/workspaces/connections"
+    },
     "workspaces_privateEndpointConnections": {
       "type": "object",
       "properties": {
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-04-01"
+            "2020-06-01"
           ]
         },
         "identity": {
@@ -365,21 +407,6 @@
           "type": "string",
           "description": "Cluster full qualified domain name"
         },
-        "clusterPurpose": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "FastProd",
-                "DenseProd",
-                "DevTest"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
         "sslConfiguration": {
           "oneOf": [
             {
@@ -508,6 +535,9 @@
           "$ref": "#/definitions/AmlCompute"
         },
         {
+          "$ref": "#/definitions/ComputeInstance"
+        },
+        {
           "$ref": "#/definitions/VirtualMachine"
         },
         {
@@ -538,6 +568,104 @@
         }
       },
       "description": "Machine Learning compute object."
+    },
+    "ComputeInstance": {
+      "type": "object",
+      "properties": {
+        "computeType": {
+          "type": "string",
+          "enum": [
+            "ComputeInstance"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ComputeInstanceProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Compute Instance properties"
+        }
+      },
+      "required": [
+        "computeType"
+      ],
+      "description": "An Azure Machine Learning compute instance."
+    },
+    "ComputeInstanceProperties": {
+      "type": "object",
+      "properties": {
+        "applicationSharingPolicy": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Personal",
+                "Shared"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Policy for sharing applications on this compute instance among users of parent workspace. If Personal, only the creator can access applications on this compute instance. When Shared, any workspace user can access applications on this instance depending on his/her assigned role."
+        },
+        "sshSettings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ComputeInstanceSshSettings"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies policy and settings for SSH access."
+        },
+        "subnet": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ResourceId"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Represents a resource ID. For example, for a subnet, it is the resource URL for the subnet."
+        },
+        "vmSize": {
+          "type": "string",
+          "description": "Virtual Machine Size"
+        }
+      },
+      "description": "Compute Instance properties"
+    },
+    "ComputeInstanceSshSettings": {
+      "type": "object",
+      "properties": {
+        "adminPublicKey": {
+          "type": "string",
+          "description": "Specifies the SSH rsa public key file as a string. Use \"ssh-keygen -t rsa -b 2048\" to generate your SSH key pairs."
+        },
+        "sshPublicAccess": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Enabled",
+                "Disabled"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "State of the public SSH port. Possible values are: Disabled - Indicates that the public ssh port is closed on this instance. Enabled - Indicates that the public ssh port is open and accessible according to the VNet/subnet policy if applicable."
+        }
+      },
+      "description": "Specifies policy and settings for SSH access."
     },
     "Databricks": {
       "type": "object",
@@ -722,7 +850,7 @@
               "enum": [
                 "SystemAssigned",
                 "UserAssigned",
-                "SystemAssigned,UserAssigned",
+                "SystemAssigned, UserAssigned",
                 "None"
               ]
             },
@@ -994,30 +1122,13 @@
           "type": "string",
           "description": "Key data"
         },
-        "leafDomainLabel": {
-          "type": "string",
-          "description": "The leaf domain label name"
-        },
-        "overwriteExistingDomain": {
-          "oneOf": [
-            {
-              "type": "boolean",
-              "default": false
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Boolean value for overwriting the domain"
-        },
         "status": {
           "oneOf": [
             {
               "type": "string",
               "enum": [
                 "Disabled",
-                "Enabled",
-                "Auto"
+                "Enabled"
               ]
             },
             {
@@ -1132,6 +1243,28 @@
       },
       "description": "Admin credentials for virtual machine"
     },
+    "WorkspaceConnectionProps": {
+      "type": "object",
+      "properties": {
+        "authType": {
+          "type": "string",
+          "description": "Authorization type of the workspace connection."
+        },
+        "category": {
+          "type": "string",
+          "description": "Category of the workspace connection."
+        },
+        "target": {
+          "type": "string",
+          "description": "Target of the workspace connection."
+        },
+        "value": {
+          "type": "string",
+          "description": "Value details of the workspace connection."
+        }
+      },
+      "description": "Workspace Connection specific properties."
+    },
     "WorkspaceProperties": {
       "type": "object",
       "properties": {
@@ -1224,7 +1357,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-04-01"
+            "2020-06-01"
           ]
         },
         "identity": {
@@ -1298,13 +1431,52 @@
       ],
       "description": "Microsoft.MachineLearningServices/workspaces/computes"
     },
+    "workspaces_connections_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-06-01"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "Friendly name of the workspace connection"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WorkspaceConnectionProps"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Workspace Connection specific properties."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "connections"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.MachineLearningServices/workspaces/connections"
+    },
     "workspaces_privateEndpointConnections_childResource": {
       "type": "object",
       "properties": {
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-04-01"
+            "2020-06-01"
           ]
         },
         "identity": {

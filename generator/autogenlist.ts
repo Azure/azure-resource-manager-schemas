@@ -13,7 +13,7 @@ const autogenlist: AutogenlistConfig[] = [
         basePath: 'adhybridhealthservice/resource-manager',
         namespace: 'Microsoft.ADHybridHealthService',
     },
-    { 
+    {
         basePath: 'cdn/resource-manager',
         namespace: 'Microsoft.Cdn',
     },
@@ -61,11 +61,11 @@ const autogenlist: AutogenlistConfig[] = [
         basePath: 'azurestack/resource-manager',
         namespace: 'Microsoft.AzureStack',
     },
-    { 
+    {
         basePath: 'batch/resource-manager',
         namespace: 'Microsoft.Batch',
     },
-    { 
+    {
         basePath: 'batchai/resource-manager',
         namespace: 'Microsoft.BatchAI',
     },
@@ -137,7 +137,7 @@ const autogenlist: AutogenlistConfig[] = [
         basePath: 'databox/resource-manager',
         namespace: 'Microsoft.DataBox',
     },
-    { 
+    {
         basePath: 'operationalinsights/resource-manager',
         namespace: 'Microsoft.OperationalInsights',
     },
@@ -234,7 +234,7 @@ const autogenlist: AutogenlistConfig[] = [
         basePath: 'resourcegraph/resource-manager',
         namespace: 'Microsoft.ResourceGraph',
     },
-    { 
+    {
         basePath: 'redis/resource-manager',
         namespace: 'Microsoft.Cache',
     },
@@ -249,12 +249,12 @@ const autogenlist: AutogenlistConfig[] = [
     {
         basePath: 'resourcehealth/resource-manager',
         namespace: 'Microsoft.ResourceHealth',
-    }, 
+    },
     {
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',
         namespace: 'Microsoft.EnterpriseKnowledgeGraph',
     },
-    { 
+    {
         basePath: 'domainservices/resource-manager',
         namespace: 'Microsoft.AAD',
     },
@@ -303,7 +303,7 @@ const autogenlist: AutogenlistConfig[] = [
         basePath: 'labservices/resource-manager',
         namespace: 'Microsoft.LabServices',
     },
-    { 
+    {
         basePath: 'eventgrid/resource-manager',
         namespace: 'Microsoft.EventGrid',
         resourceConfig: [
@@ -506,11 +506,11 @@ const autogenlist: AutogenlistConfig[] = [
         basePath: 'visualstudio/resource-manager',
         namespace: 'Microsoft.VisualStudio',
     },
-    { 
+    {
         basePath: 'sql/resource-manager',
         namespace: 'Microsoft.Sql',
     },
-    { 
+    {
         basePath: 'scheduler/resource-manager',
         namespace: 'Microsoft.Scheduler',
     },
@@ -518,16 +518,16 @@ const autogenlist: AutogenlistConfig[] = [
         basePath: 'search/resource-manager',
         namespace: 'Microsoft.Search',
     },
-    { 
+    {
         basePath: 'subscription/resource-manager',
         namespace: 'Microsoft.Subscription',
     },
-    { 
+    {
         basePath: 'storsimple8000series/resource-manager',
         namespace: 'Microsoft.StorSimple',
         suffix: '8000',
     },
-    { 
+    {
         basePath: 'support/resource-manager',
         namespace: 'Microsoft.Support',
     },
@@ -569,4 +569,12 @@ export function getAutogenlist(): AutogenlistConfig[] {
 
 export function findAutogenEntries(basePath: string): AutogenlistConfig[] {
     return autogenlist.filter(w => lowerCaseEquals(w.basePath, basePath));
+}
+
+export function findAutogenEntriesByNamespace(namespace: string): AutogenlistConfig {
+    const autogenlistConfig = autogenlist.filter(w => lowerCaseEquals(w.namespace, namespace));
+    if (autogenlistConfig.length !== 1) {
+        throw new Error(`Namespace ${namespace} has no or more than one AutogenlistConfig`);
+    }
+    return autogenlistConfig[0];
 }

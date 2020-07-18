@@ -14,7 +14,7 @@ function getSchemaFileName(namespace: string, suffix: string | undefined) {
 }
 
 executeSynchronous(async () => {
-    const generatedSchemasFolder = '/home/codespace/workspace/azure-resource-manager-schemas/tmp';
+    const generatedSchemasFolder = path.join(constants.generatorRoot, 'tmp');
     const generatedSchemas = await findRecursive(generatedSchemasFolder, p => path.extname(p) === '.json');
     try {
         for (const generatedSchema of generatedSchemas) {

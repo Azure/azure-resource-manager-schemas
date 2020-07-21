@@ -37,10 +37,10 @@ const autogenlist: AutogenlistConfig[] = [
         basePath: 'appconfiguration/resource-manager',
         namespace: 'Microsoft.AppConfiguration',
     },
-    /*{ Note(jcotillo) Temp exclusion due to an autorest issue.
+    {
         basePath: 'apimanagement/resource-manager',
         namespace: 'Microsoft.ApiManagement',
-    },*/
+    },
     {
         basePath: 'appplatform/resource-manager',
         namespace: 'Microsoft.AppPlatform',

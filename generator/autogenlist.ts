@@ -37,10 +37,10 @@ const autogenlist: AutogenlistConfig[] = [
         basePath: 'appconfiguration/resource-manager',
         namespace: 'Microsoft.AppConfiguration',
     },
-    {
+    /*{ Note(jcotillo) Temp exclusion due to an autorest issue.
         basePath: 'apimanagement/resource-manager',
         namespace: 'Microsoft.ApiManagement',
-    },
+    },*/
     {
         basePath: 'appplatform/resource-manager',
         namespace: 'Microsoft.AppPlatform',
@@ -102,6 +102,10 @@ const autogenlist: AutogenlistConfig[] = [
     {
         basePath: 'billing/resource-manager',
         namespace: 'Microsoft.Billing',
+    },
+    {
+        basePath: 'changeanalysis/resource-manager',
+        namespace: 'Microsoft.ChangeAnalysis',
     },
     {
         basePath: 'cognitiveservices/resource-manager',
@@ -419,6 +423,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.PowerBI',
     },
     {
+        basePath: 'redhatopenshift/resource-manager',
+        namespace: 'Microsoft.RedHatOpenShift',
+    },
+    {
         basePath: 'resources/resource-manager',
         namespace: 'Microsoft.Resources',
         resourceConfig: [
@@ -544,6 +552,10 @@ const autogenlist: AutogenlistConfig[] = [
     {
         basePath: 'imagebuilder/resource-manager',
         namespace: 'Microsoft.VirtualMachineImages',
+    },
+    {
+        basePath: 'vmware/resource-manager',
+        namespace: 'Microsoft.AVS',
     },
     {
         basePath: 'windowsesu/resource-manager',

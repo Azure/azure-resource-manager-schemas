@@ -209,30 +209,18 @@
       "properties": {
         "clientApplication": {
           "type": "string",
-          "description": "Azure active directory client application."
+          "description": "Azure active directory client application id."
         },
         "clusterApplication": {
           "type": "string",
-          "description": "Azure active directory cluster application."
+          "description": "Azure active directory cluster application id."
         },
         "tenantId": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
+          "type": "string",
           "description": "Azure active directory tenant id."
         }
       },
-      "required": [
-        "clientApplication",
-        "clusterApplication",
-        "tenantId"
-      ],
-      "description": "Azure active directory."
+      "description": "The settings to enable AAD authentication on the cluster."
     },
     "ClientCertificate": {
       "type": "object",
@@ -578,7 +566,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Azure active directory."
+          "description": "The settings to enable AAD authentication on the cluster."
         },
         "clientConnectionPort": {
           "oneOf": [
@@ -595,13 +583,16 @@
         "clients": {
           "oneOf": [
             {
-              "$ref": "#/definitions/ClientCertificate"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ClientCertificate"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Client Certificate definition."
+          "description": "client certificates for the cluster."
         },
         "clusterCodeVersion": {
           "type": "string",
@@ -640,13 +631,16 @@
         "fabricSettings": {
           "oneOf": [
             {
-              "$ref": "#/definitions/SettingsSectionDescription"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SettingsSectionDescription"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Describes a section in the fabric settings of the cluster."
+          "description": "The list of custom fabric settings to configure the cluster."
         },
         "httpGatewayConnectionPort": {
           "oneOf": [
@@ -663,13 +657,16 @@
         "loadBalancingRules": {
           "oneOf": [
             {
-              "$ref": "#/definitions/LoadBalancingRule"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/LoadBalancingRule"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Describes a load balancing rule."
+          "description": "Describes load balancing rules."
         },
         "reverseProxyEndpointPort": {
           "oneOf": [
@@ -681,6 +678,17 @@
             }
           ],
           "description": "The endpoint used by reverse proxy."
+        },
+        "useTestExtension": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Use service fabric test vm extension, by default it's false."
         }
       },
       "required": [
@@ -772,7 +780,7 @@
           ],
           "description": "The capacity tags applied to the nodes in the node type, the cluster resource manager uses these tags to understand how much resource a node has."
         },
-        "diskSizeInGB": {
+        "dataDiskSizeGB": {
           "oneOf": [
             {
               "type": "integer"
@@ -883,7 +891,7 @@
         }
       },
       "required": [
-        "diskSizeInGB",
+        "dataDiskSizeGB",
         "isPrimary",
         "vmInstanceCount"
       ],
@@ -1101,21 +1109,28 @@
           ],
           "description": "Indicates whether the extension should use a newer minor version if one is available at deployment time. Once deployed, however, the extension will not upgrade minor versions unless redeployed, even with this property set to true."
         },
-        "enableAutomaticUpgrade": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Indicates if the extension will upgrade automatically."
+        "forceUpdateTag": {
+          "type": "string",
+          "description": "If a value is provided and is different from the previous value, the extension handler will be forced to update even if the extension configuration has not changed."
         },
         "protectedSettings": {
           "type": "object",
           "properties": {},
           "description": "The extension can contain either protectedSettings or protectedSettingsFromKeyVault or no protected settings at all."
+        },
+        "provisionAfterExtensions": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Collection of extension names after which this extension needs to be provisioned."
         },
         "publisher": {
           "type": "string",

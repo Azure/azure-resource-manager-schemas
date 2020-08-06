@@ -11,7 +11,7 @@ async function getChangedSchemas(repoPath: string) {
     const status = await git.status(repo);
     const changedSchemas: { path: string, isNew: boolean }[] = [];
     for (const stat of status) {
-        if (stat.path.toString().split(path.sep).indexOf('schemas') != -1
+        if (stat.path.toString().split(path.sep).indexOf('schemas') !== -1
             && path.extname(stat.path) === '.json') {
             if (stat.status !== 'modified' && stat.status !== 'new') {
                 throw new Error(`Undefined file status for '${stat.path}'.`);

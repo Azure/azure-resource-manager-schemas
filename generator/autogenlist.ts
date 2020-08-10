@@ -1,10 +1,10 @@
-import { ScopeType, WhitelistConfig } from './models';
+import { ScopeType, AutogenlistConfig } from './models';
 import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
 import { postProcessor as machineLearningPostProcessor } from './processors/Microsoft.MachineLearning';
 import { lowerCaseEquals } from './utils';
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
-const whitelist: WhitelistConfig[] = [
+const autogenlist: AutogenlistConfig[] = [
     {
         basePath: 'addons/resource-manager',
         namespace: 'Microsoft.Addons',
@@ -37,10 +37,10 @@ const whitelist: WhitelistConfig[] = [
         basePath: 'appconfiguration/resource-manager',
         namespace: 'Microsoft.AppConfiguration',
     },
-    {
+    /*{ Note(jcotillo) Temp exclusion due to an autorest issue.
         basePath: 'apimanagement/resource-manager',
         namespace: 'Microsoft.ApiManagement',
-    },
+    },*/
     {
         basePath: 'appplatform/resource-manager',
         namespace: 'Microsoft.AppPlatform',
@@ -74,12 +74,38 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Blockchain',
     },
     {
+        basePath: 'blueprint/resource-manager',
+        namespace: 'Microsoft.Blueprint',
+        resourceConfig: [
+            {
+                type: 'blueprintAssignments',
+                scopes: ScopeType.Subcription | ScopeType.ManagementGroup,
+            },
+            {
+                type: 'blueprints',
+                scopes: ScopeType.Subcription | ScopeType.ManagementGroup,
+            },
+            {
+                type: 'blueprints/artifacts',
+                scopes: ScopeType.Subcription | ScopeType.ManagementGroup,
+            },
+            {
+                type: 'blueprints/versions',
+                scopes: ScopeType.Subcription | ScopeType.ManagementGroup,
+            },
+        ]
+    },
+    {
         basePath: 'botservice/resource-manager',
         namespace: 'Microsoft.BotService',
     },
     {
         basePath: 'billing/resource-manager',
         namespace: 'Microsoft.Billing',
+    },
+    {
+        basePath: 'changeanalysis/resource-manager',
+        namespace: 'Microsoft.ChangeAnalysis',
     },
     {
         basePath: 'cognitiveservices/resource-manager',
@@ -170,6 +196,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.DeploymentManager',
     },
     {
+        basePath: 'desktopvirtualization/resource-manager',
+        namespace: 'Microsoft.DesktopVirtualization',
+    },
+    {
       basePath: 'digitaltwins/resource-manager',
       namespace: 'Microsoft.DigitalTwins',
       resourceConfig: [
@@ -217,6 +247,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.HDInsight',
     },
     {
+        basePath: 'resourcehealth/resource-manager',
+        namespace: 'Microsoft.ResourceHealth',
+    }, 
+    {
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',
         namespace: 'Microsoft.EnterpriseKnowledgeGraph',
     },
@@ -260,6 +294,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'iotspaces/resource-manager',
         namespace: 'Microsoft.IoTSpaces',
+    },
+    {
+        basePath: 'intune/resource-manager',
+        namespace: 'Microsoft.Intune',
     },
     {
         basePath: 'labservices/resource-manager',
@@ -317,6 +355,10 @@ const whitelist: WhitelistConfig[] = [
     {
         basePath: 'mariadb/resource-manager',
         namespace: 'Microsoft.DBforMariaDB',
+    },
+    {
+        basePath: 'marketplace/resource-manager',
+        namespace: 'Microsoft.Marketplace',
     },
     {
         basePath: 'machinelearningservices/resource-manager',
@@ -377,6 +419,10 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.PowerBI',
     },
     {
+        basePath: 'redhatopenshift/resource-manager',
+        namespace: 'Microsoft.RedHatOpenShift',
+    },
+    {
         basePath: 'resources/resource-manager',
         namespace: 'Microsoft.Resources',
         resourceConfig: [
@@ -391,13 +437,14 @@ const whitelist: WhitelistConfig[] = [
         ],
         postProcessor: resourcesPostProcessor,
     },
-    /* antmarti - temporarily commented out to unblock generation.
-                  this appears to have been broken by https://github.com/Azure/azure-rest-api-specs/pull/8903
     {
         basePath: 'relay/resource-manager',
         namespace: 'Microsoft.Relay',
     },
-    */
+    {
+        basePath: 'reservations/resource-manager',
+        namespace: 'Microsoft.Capacity',
+    },
     {
         basePath: 'servicebus/resource-manager',
         namespace: 'Microsoft.ServiceBus',
@@ -456,10 +503,6 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.VMwareCloudSimple',
     },
     {
-        basePath: 'vmwarevirtustream/resource-manager',
-        namespace: 'Microsoft.VMwareVirtustream',
-    },
-    {
         basePath: 'visualstudio/resource-manager',
         namespace: 'Microsoft.VisualStudio',
     },
@@ -489,12 +532,26 @@ const whitelist: WhitelistConfig[] = [
         namespace: 'Microsoft.Support',
     },
     {
+        basePath: 'softwareplan/resource-manager',
+        namespace: 'Microsoft.SoftwarePlan',
+        resourceConfig: [
+            {
+                type: 'hybridUseBenefits',
+                scopes: ScopeType.Extension,
+            },
+        ]
+    },
+    {
         basePath: 'timeseriesinsights/resource-manager',
         namespace: 'Microsoft.TimeSeriesInsights',
     },
     {
         basePath: 'imagebuilder/resource-manager',
         namespace: 'Microsoft.VirtualMachineImages',
+    },
+    {
+        basePath: 'vmware/resource-manager',
+        namespace: 'Microsoft.AVS',
     },
     {
         basePath: 'windowsesu/resource-manager',
@@ -506,10 +563,10 @@ const whitelist: WhitelistConfig[] = [
     }
 ];
 
-export function getWhitelist(): WhitelistConfig[] {
-    return whitelist;
+export function getAutogenlist(): AutogenlistConfig[] {
+    return autogenlist;
 }
 
-export function findWhitelistEntries(basePath: string): WhitelistConfig[] {
-    return whitelist.filter(w => lowerCaseEquals(w.basePath, basePath));
+export function findAutogenEntries(basePath: string): AutogenlistConfig[] {
+    return autogenlist.filter(w => lowerCaseEquals(w.basePath, basePath));
 }

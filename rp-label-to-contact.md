@@ -1,4 +1,4 @@
-# RP Team Labels-to-Contact List
+# RP Team Label-to-Contact List
 This table specifies what GitHub handle our bot is currently configured to notify when an issue or PR is labeled for a resource provider. If you'd like to onboard a new service or change a contact, please submit a PR with the desired change. 
 
 *Last bot configuration update: 8/19/20.*

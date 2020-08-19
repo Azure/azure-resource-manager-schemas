@@ -75,5 +75,8 @@ Once this is running, you can create a basic template with the following structu
 ```
 **NOTE** Many client tools will cache responses from schema servers, so you may need to clear this cache if you are testing modifications, or alternatively, change the port between retries.
 
+## RP Schemas Repo Issues Bot Notifications
+To get quickly notified on GitHub issues for your RP's schema, please update the [rp-label-to-contact.md](/rp-label-to-contat.md) by submitting a PR with the desired GitHub handle(s) and label for your RP.
+
 ---
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.

@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2018-04-01/Microsoft.Compute.json#",
+  "id": "https://schema.management.azure.com/schemas/2018-09-30/Microsoft.Compute.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.Compute",
   "description": "Microsoft Compute Resource Types",
@@ -10,7 +10,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-04-01"
+            "2018-09-30"
           ]
         },
         "location": {
@@ -41,7 +41,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The disks sku name. Can be Standard_LRS, Premium_LRS, or StandardSSD_LRS."
+          "description": "The disks sku name. Can be Standard_LRS, Premium_LRS, StandardSSD_LRS, or UltraSSD_LRS."
         },
         "tags": {
           "oneOf": [
@@ -94,7 +94,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-04-01"
+            "2018-09-30"
           ]
         },
         "location": {
@@ -108,13 +108,13 @@
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/DiskProperties"
+              "$ref": "#/definitions/SnapshotProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Disk resource properties."
+          "description": "Snapshot resource properties."
         },
         "sku": {
           "oneOf": [
@@ -173,7 +173,8 @@
                 "FromImage",
                 "Import",
                 "Copy",
-                "Restore"
+                "Restore",
+                "Upload"
               ]
             },
             {
@@ -225,6 +226,28 @@
           ],
           "description": "Data used when creating a disk."
         },
+        "diskIOPSReadWrite": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The number of IOPS allowed for this disk; only settable for UltraSSD disks. One operation can transfer between 4k and 256k bytes."
+        },
+        "diskMBpsReadWrite": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The bandwidth allowed for this disk; only settable for UltraSSD disks. MBps means millions of bytes per second - MB here uses the ISO notation, of powers of 10."
+        },
         "diskSizeGB": {
           "oneOf": [
             {
@@ -236,16 +259,31 @@
           ],
           "description": "If creationData.createOption is Empty, this field is mandatory and it indicates the size of the VHD to create. If this field is present for updates or creation with other options, it indicates a resize. Resizes are only allowed if the disk is not attached to a running VM, and can only increase the disk's size."
         },
-        "encryptionSettings": {
+        "encryptionSettingsCollection": {
           "oneOf": [
             {
-              "$ref": "#/definitions/EncryptionSettings"
+              "$ref": "#/definitions/EncryptionSettingsCollection"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Encryption settings for disk or snapshot"
+        },
+        "hyperVGeneration": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "V1",
+                "V2"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The hypervisor generation of the Virtual Machine. Applicable to OS disks only."
         },
         "osType": {
           "oneOf": [
@@ -278,7 +316,8 @@
               "enum": [
                 "Standard_LRS",
                 "Premium_LRS",
-                "StandardSSD_LRS"
+                "StandardSSD_LRS",
+                "UltraSSD_LRS"
               ]
             },
             {
@@ -288,9 +327,43 @@
           "description": "The sku name."
         }
       },
-      "description": "The disks sku name. Can be Standard_LRS, Premium_LRS, or StandardSSD_LRS."
+      "description": "The disks sku name. Can be Standard_LRS, Premium_LRS, StandardSSD_LRS, or UltraSSD_LRS."
     },
-    "EncryptionSettings": {
+    "EncryptionSettingsCollection": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Set this flag to true and provide DiskEncryptionKey and optional KeyEncryptionKey to enable encryption. Set this flag to false and remove DiskEncryptionKey and KeyEncryptionKey to disable encryption. If EncryptionSettings is null in the request object, the existing settings remain unchanged."
+        },
+        "encryptionSettings": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/EncryptionSettingsElement"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A collection of encryption settings, one for each disk volume."
+        }
+      },
+      "required": [
+        "enabled"
+      ],
+      "description": "Encryption settings for disk or snapshot"
+    },
+    "EncryptionSettingsElement": {
       "type": "object",
       "properties": {
         "diskEncryptionKey": {
@@ -304,17 +377,6 @@
           ],
           "description": "Key Vault Secret Url and vault id of the encryption key "
         },
-        "enabled": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Set this flag to true and provide DiskEncryptionKey and optional KeyEncryptionKey to enable encryption. Set this flag to false and remove DiskEncryptionKey and KeyEncryptionKey to disable encryption. If EncryptionSettings is null in the request object, the existing settings remain unchanged."
-        },
         "keyEncryptionKey": {
           "oneOf": [
             {
@@ -327,7 +389,7 @@
           "description": "Key Vault Key Url and vault id of KeK, KeK is optional and when provided is used to unwrap the encryptionKey"
         }
       },
-      "description": "Encryption settings for disk or snapshot"
+      "description": "Encryption settings for one disk volume."
     },
     "ImageDiskReference": {
       "type": "object",
@@ -402,6 +464,78 @@
         "sourceVault"
       ],
       "description": "Key Vault Secret Url and vault id of the encryption key "
+    },
+    "SnapshotProperties": {
+      "type": "object",
+      "properties": {
+        "creationData": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CreationData"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Data used when creating a disk."
+        },
+        "diskSizeGB": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "If creationData.createOption is Empty, this field is mandatory and it indicates the size of the VHD to create. If this field is present for updates or creation with other options, it indicates a resize. Resizes are only allowed if the disk is not attached to a running VM, and can only increase the disk's size."
+        },
+        "encryptionSettingsCollection": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EncryptionSettingsCollection"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Encryption settings for disk or snapshot"
+        },
+        "hyperVGeneration": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "V1",
+                "V2"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The hypervisor generation of the Virtual Machine. Applicable to OS disks only."
+        },
+        "osType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Windows",
+                "Linux"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Operating System type."
+        }
+      },
+      "required": [
+        "creationData"
+      ],
+      "description": "Snapshot resource properties."
     },
     "SnapshotSku": {
       "type": "object",

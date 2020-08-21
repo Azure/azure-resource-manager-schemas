@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2019-10-01/Microsoft.ContainerService.json#",
+  "id": "https://schema.management.azure.com/schemas/2020-07-01/Microsoft.ContainerService.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.ContainerService",
   "description": "Microsoft ContainerService Resource Types",
@@ -10,7 +10,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-10-01"
+            "2020-07-01"
           ]
         },
         "identity": {
@@ -59,9 +59,22 @@
             "oneOf": [
               {
                 "$ref": "#/definitions/managedClusters_agentPools_childResource"
+              },
+              {
+                "$ref": "#/definitions/managedClusters_privateEndpointConnections_childResource"
               }
             ]
           }
+        },
+        "sku": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ManagedClusterSKU"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "tags": {
           "oneOf": [
@@ -100,7 +113,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-10-01"
+            "2020-07-01"
           ]
         },
         "name": {
@@ -132,9 +145,79 @@
         "type"
       ],
       "description": "Microsoft.ContainerService/managedClusters/agentPools"
+    },
+    "managedClusters_privateEndpointConnections": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-07-01"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the private endpoint connection."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PrivateEndpointConnectionProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of a private endpoint connection."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ContainerService/managedClusters/privateEndpointConnections"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.ContainerService/managedClusters/privateEndpointConnections"
     }
   },
   "definitions": {
+    "AgentPoolUpgradeSettings": {
+      "type": "object",
+      "properties": {
+        "maxSurge": {
+          "type": "string",
+          "description": "Count or percentage of additional nodes to be added during upgrade. If empty uses AKS default"
+        }
+      },
+      "description": "Settings for upgrading an agentpool"
+    },
+    "Components1umhcm8schemasmanagedclusteridentitypropertiesuserassignedidentitiesadditionalproperties": {
+      "type": "object",
+      "properties": {}
+    },
+    "Componentsqit0etschemasmanagedclusterpropertiespropertiesidentityprofileadditionalproperties": {
+      "type": "object",
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "description": "The client id of the user assigned identity."
+        },
+        "objectId": {
+          "type": "string",
+          "description": "The object id of the user assigned identity."
+        },
+        "resourceId": {
+          "type": "string",
+          "description": "The resource id of the user assigned identity."
+        }
+      }
+    },
     "ContainerServiceLinuxProfile": {
       "type": "object",
       "properties": {
@@ -206,7 +289,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Profile of the managed cluster load balancer"
+          "description": "Profile of the managed cluster load balancer."
         },
         "loadBalancerSku": {
           "oneOf": [
@@ -222,6 +305,21 @@
             }
           ],
           "description": "The load balancer sku for the managed cluster."
+        },
+        "networkMode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "transparent",
+                "bridge"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Network mode used for building Kubernetes network."
         },
         "networkPlugin": {
           "oneOf": [
@@ -252,6 +350,21 @@
             }
           ],
           "description": "Network policy used for building Kubernetes network."
+        },
+        "outboundType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "loadBalancer",
+                "userDefinedRouting"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The outbound (egress) routing method."
         },
         "podCidr": {
           "oneOf": [
@@ -321,9 +434,45 @@
     "ManagedClusterAADProfile": {
       "type": "object",
       "properties": {
+        "adminGroupObjectIDs": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "AAD group object IDs that will have admin role of the cluster."
+        },
         "clientAppID": {
           "type": "string",
           "description": "The client AAD application ID."
+        },
+        "enableAzureRBAC": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether to enable Azure RBAC for Kubernetes authorization."
+        },
+        "managed": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether to enable managed AAD."
         },
         "serverAppID": {
           "type": "string",
@@ -338,10 +487,6 @@
           "description": "The AAD tenant ID to use for authentication. If not specified, will use the tenant of the deployment subscription."
         }
       },
-      "required": [
-        "clientAppID",
-        "serverAppID"
-      ],
       "description": "AADProfile specifies attributes for Azure Active Directory integration."
     },
     "ManagedClusterAddonProfile": {
@@ -394,7 +539,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "(PREVIEW) Availability zones for nodes. Must use VirtualMachineScaleSets AgentPoolType."
+          "description": "Availability zones for nodes. Must use VirtualMachineScaleSets AgentPoolType."
         },
         "count": {
           "oneOf": [
@@ -405,7 +550,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Number of agents (VMs) to host docker containers. Allowed values must be in the range of 1 to 100 (inclusive). The default value is 1."
+          "description": "Number of agents (VMs) to host docker containers. Allowed values must be in the range of 0 to 100 (inclusive) for user pools and in the range of 1 to 100 (inclusive) for system pools. The default value is 1."
         },
         "enableAutoScaling": {
           "oneOf": [
@@ -462,6 +607,21 @@
           ],
           "description": "Minimum number of nodes for auto-scaling"
         },
+        "mode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "System",
+                "User"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "AgentPoolMode represents mode of an agent pool."
+        },
         "name": {
           "oneOf": [
             {
@@ -473,6 +633,21 @@
             }
           ],
           "description": "Unique name of the agent pool profile in the context of the subscription and resource group."
+        },
+        "nodeLabels": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Agent pool node labels to be persisted across all nodes in agent pool."
         },
         "nodeTaints": {
           "oneOf": [
@@ -520,6 +695,10 @@
           ],
           "description": "OsType to be used to specify os type. Choose from Linux and Windows. Default to Linux."
         },
+        "proximityPlacementGroupID": {
+          "type": "string",
+          "description": "The ID for Proximity Placement Group."
+        },
         "scaleSetEvictionPolicy": {
           "oneOf": [
             {
@@ -533,14 +712,14 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "ScaleSetEvictionPolicy to be used to specify eviction policy for low priority virtual machine scale set. Default to Delete."
+          "description": "ScaleSetEvictionPolicy to be used to specify eviction policy for Spot virtual machine scale set. Default to Delete."
         },
         "scaleSetPriority": {
           "oneOf": [
             {
               "type": "string",
               "enum": [
-                "Low",
+                "Spot",
                 "Regular"
               ]
             },
@@ -549,6 +728,33 @@
             }
           ],
           "description": "ScaleSetPriority to be used to specify virtual machine scale set priority. Default to regular."
+        },
+        "spotMaxPrice": {
+          "oneOf": [
+            {
+              "type": "number",
+              "default": -1
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "SpotMaxPrice to be used to specify the maximum price you are willing to pay in US Dollars. Possible values are any decimal value greater than zero or -1 which indicates default price to be up-to on-demand."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Agent pool tags to be persisted on the agent pool virtual machine scale set."
         },
         "type": {
           "oneOf": [
@@ -564,6 +770,17 @@
             }
           ],
           "description": "AgentPoolType represents types of an agent pool."
+        },
+        "upgradeSettings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AgentPoolUpgradeSettings"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Settings for upgrading an agentpool"
         },
         "vmSize": {
           "oneOf": [
@@ -777,7 +994,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "(PREVIEW) Availability zones for nodes. Must use VirtualMachineScaleSets AgentPoolType."
+          "description": "Availability zones for nodes. Must use VirtualMachineScaleSets AgentPoolType."
         },
         "count": {
           "oneOf": [
@@ -788,7 +1005,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Number of agents (VMs) to host docker containers. Allowed values must be in the range of 1 to 100 (inclusive). The default value is 1."
+          "description": "Number of agents (VMs) to host docker containers. Allowed values must be in the range of 0 to 100 (inclusive) for user pools and in the range of 1 to 100 (inclusive) for system pools. The default value is 1."
         },
         "enableAutoScaling": {
           "oneOf": [
@@ -845,6 +1062,36 @@
           ],
           "description": "Minimum number of nodes for auto-scaling"
         },
+        "mode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "System",
+                "User"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "AgentPoolMode represents mode of an agent pool."
+        },
+        "nodeLabels": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Agent pool node labels to be persisted across all nodes in agent pool."
+        },
         "nodeTaints": {
           "oneOf": [
             {
@@ -891,6 +1138,10 @@
           ],
           "description": "OsType to be used to specify os type. Choose from Linux and Windows. Default to Linux."
         },
+        "proximityPlacementGroupID": {
+          "type": "string",
+          "description": "The ID for Proximity Placement Group."
+        },
         "scaleSetEvictionPolicy": {
           "oneOf": [
             {
@@ -904,14 +1155,14 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "ScaleSetEvictionPolicy to be used to specify eviction policy for low priority virtual machine scale set. Default to Delete."
+          "description": "ScaleSetEvictionPolicy to be used to specify eviction policy for Spot virtual machine scale set. Default to Delete."
         },
         "scaleSetPriority": {
           "oneOf": [
             {
               "type": "string",
               "enum": [
-                "Low",
+                "Spot",
                 "Regular"
               ]
             },
@@ -920,6 +1171,33 @@
             }
           ],
           "description": "ScaleSetPriority to be used to specify virtual machine scale set priority. Default to regular."
+        },
+        "spotMaxPrice": {
+          "oneOf": [
+            {
+              "type": "number",
+              "default": -1
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "SpotMaxPrice to be used to specify the maximum price you are willing to pay in US Dollars. Possible values are any decimal value greater than zero or -1 which indicates default price to be up-to on-demand."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Agent pool tags to be persisted on the agent pool virtual machine scale set."
         },
         "type": {
           "oneOf": [
@@ -935,6 +1213,17 @@
             }
           ],
           "description": "AgentPoolType represents types of an agent pool."
+        },
+        "upgradeSettings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AgentPoolUpgradeSettings"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Settings for upgrading an agentpool"
         },
         "vmSize": {
           "oneOf": [
@@ -1170,6 +1459,7 @@
               "type": "string",
               "enum": [
                 "SystemAssigned",
+                "UserAssigned",
                 "None"
               ]
             },
@@ -1178,6 +1468,21 @@
             }
           ],
           "description": "The type of identity used for the managed cluster. Type 'SystemAssigned' will use an implicitly created identity in master components and an auto-created user assigned identity in MC_ resource group in agent nodes. Type 'None' will not use MSI for the managed cluster, service principal will be used instead."
+        },
+        "userAssignedIdentities": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/Components1umhcm8schemasmanagedclusteridentitypropertiesuserassignedidentitiesadditionalproperties"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The user identity associated with the managed cluster. This identity will be used in control plane and only one user assigned identity is allowed. The user identity dictionary key references will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}'."
         }
       },
       "description": "Identity for the managed cluster."
@@ -1185,6 +1490,20 @@
     "ManagedClusterLoadBalancerProfile": {
       "type": "object",
       "properties": {
+        "allocatedOutboundPorts": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 64000,
+              "default": "0"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Desired number of allocated SNAT ports per VM. Allowed values must be in the range of 0 to 64000 (inclusive). The default value is 0 which results in Azure dynamically allocating ports."
+        },
         "effectiveOutboundIPs": {
           "oneOf": [
             {
@@ -1198,6 +1517,20 @@
             }
           ],
           "description": "The effective outbound IP resources of the cluster load balancer."
+        },
+        "idleTimeoutInMinutes": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 4,
+              "maximum": 120,
+              "default": "30"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Desired outbound flow idle timeout in minutes. Allowed values must be in the range of 4 to 120 (inclusive). The default value is 30 minutes."
         },
         "managedOutboundIPs": {
           "oneOf": [
@@ -1233,7 +1566,7 @@
           "description": "Desired outbound IP resources for the cluster load balancer."
         }
       },
-      "description": "Profile of the managed cluster load balancer"
+      "description": "Profile of the managed cluster load balancer."
     },
     "ManagedClusterLoadBalancerProfileManagedOutboundIPs": {
       "type": "object",
@@ -1349,6 +1682,21 @@
           ],
           "description": "Access profile for managed cluster API server."
         },
+        "autoScalerProfile": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ManagedClusterPropertiesAutoScalerProfile"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Parameters to be applied to the cluster-autoscaler when enabled"
+        },
+        "diskEncryptionSetID": {
+          "type": "string",
+          "description": "ResourceId of the disk encryption set to use for enabling encryption at rest."
+        },
         "dnsPrefix": {
           "type": "string",
           "description": "DNS prefix specified when creating the managed cluster."
@@ -1374,6 +1722,21 @@
             }
           ],
           "description": "Whether to enable Kubernetes Role-Based Access Control."
+        },
+        "identityProfile": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/Componentsqit0etschemasmanagedclusterpropertiespropertiesidentityprofileadditionalproperties"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Identities associated with the cluster."
         },
         "kubernetesVersion": {
           "type": "string",
@@ -1430,6 +1793,39 @@
       },
       "description": "Properties of the managed cluster."
     },
+    "ManagedClusterPropertiesAutoScalerProfile": {
+      "type": "object",
+      "properties": {
+        "balance-similar-node-groups": {
+          "type": "string"
+        },
+        "max-graceful-termination-sec": {
+          "type": "string"
+        },
+        "scale-down-delay-after-add": {
+          "type": "string"
+        },
+        "scale-down-delay-after-delete": {
+          "type": "string"
+        },
+        "scale-down-delay-after-failure": {
+          "type": "string"
+        },
+        "scale-down-unneeded-time": {
+          "type": "string"
+        },
+        "scale-down-unready-time": {
+          "type": "string"
+        },
+        "scale-down-utilization-threshold": {
+          "type": "string"
+        },
+        "scan-interval": {
+          "type": "string"
+        }
+      },
+      "description": "Parameters to be applied to the cluster-autoscaler when enabled"
+    },
     "ManagedClusterServicePrincipalProfile": {
       "type": "object",
       "properties": {
@@ -1447,13 +1843,47 @@
       ],
       "description": "Information about a service principal identity for the cluster to use for manipulating Azure APIs."
     },
+    "ManagedClusterSKU": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Basic"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Name of a managed cluster SKU."
+        },
+        "tier": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Paid",
+                "Free"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Tier of a managed cluster SKU."
+        }
+      }
+    },
     "managedClusters_agentPools_childResource": {
       "type": "object",
       "properties": {
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-10-01"
+            "2020-07-01"
           ]
         },
         "name": {
@@ -1486,6 +1916,45 @@
       ],
       "description": "Microsoft.ContainerService/managedClusters/agentPools"
     },
+    "managedClusters_privateEndpointConnections_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-07-01"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the private endpoint connection."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PrivateEndpointConnectionProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of a private endpoint connection."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "privateEndpointConnections"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.ContainerService/managedClusters/privateEndpointConnections"
+    },
     "ManagedClusterWindowsProfile": {
       "type": "object",
       "properties": {
@@ -1512,12 +1981,95 @@
             }
           ],
           "description": "The administrator username to use for Windows VMs."
+        },
+        "licenseType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "None",
+                "Windows_Server"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The licenseType to use for Windows VMs. Windows_Server is used to enable Azure Hybrid User Benefits for Windows VMs."
         }
       },
       "required": [
         "adminUsername"
       ],
       "description": "Profile for Windows VMs in the container service cluster."
+    },
+    "PrivateEndpoint": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The resource Id for private endpoint"
+        }
+      },
+      "description": "Private endpoint which a connection belongs to."
+    },
+    "PrivateEndpointConnectionProperties": {
+      "type": "object",
+      "properties": {
+        "privateEndpoint": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PrivateEndpoint"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Private endpoint which a connection belongs to."
+        },
+        "privateLinkServiceConnectionState": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PrivateLinkServiceConnectionState"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The state of a private link service connection."
+        }
+      },
+      "required": [
+        "privateLinkServiceConnectionState"
+      ],
+      "description": "Properties of a private endpoint connection."
+    },
+    "PrivateLinkServiceConnectionState": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "The private link service connection description."
+        },
+        "status": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Pending",
+                "Approved",
+                "Rejected",
+                "Disconnected"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The private link service connection status."
+        }
+      },
+      "description": "The state of a private link service connection."
     },
     "ResourceReference": {
       "type": "object",

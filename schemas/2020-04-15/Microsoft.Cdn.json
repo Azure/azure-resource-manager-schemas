@@ -971,6 +971,9 @@
           "$ref": "#/definitions/UrlRedirectAction"
         },
         {
+          "$ref": "#/definitions/UrlSigningAction"
+        },
+        {
           "$ref": "#/definitions/UrlRewriteAction"
         },
         {
@@ -4093,6 +4096,101 @@
       ],
       "description": "Defines the parameters for the url rewrite action."
     },
+    "UrlSigningAction": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": [
+            "UrlSigning"
+          ]
+        },
+        "parameters": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/UrlSigningActionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Defines the parameters for the Url Signing action."
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "description": "Defines the url signing action for the delivery rule."
+    },
+    "UrlSigningActionParameters": {
+      "type": "object",
+      "properties": {
+        "@odata.type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "#Microsoft.Azure.Cdn.Models.DeliveryRuleUrlSigningActionParameters"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "algorithm": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "SHA256"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Algorithm to use for URL signing."
+        },
+        "ipSubnets": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Match values to match against. Supports CIDR ranges (both IPv4 and IPv6)."
+        },
+        "keyId": {
+          "type": "string",
+          "description": "Id reference of the key to be used to verify the hash and should be defined in UrlSigningKeys"
+        },
+        "parameterNameOverride": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/UrlSigningParamIdentifier"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Defines which query string parameters in the url to be considered for expires, key id etc. "
+        }
+      },
+      "required": [
+        "keyId"
+      ],
+      "description": "Defines the parameters for the Url Signing action."
+    },
     "UrlSigningKey": {
       "type": "object",
       "properties": {
@@ -4117,6 +4215,36 @@
         "keySourceParameters"
       ],
       "description": "Url signing key"
+    },
+    "UrlSigningParamIdentifier": {
+      "type": "object",
+      "properties": {
+        "paramIndicator": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Expires",
+                "KeyId",
+                "Signature"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates the purpose of the parameter."
+        },
+        "paramName": {
+          "type": "string",
+          "description": "Parameter name"
+        }
+      },
+      "required": [
+        "paramIndicator",
+        "paramName"
+      ],
+      "description": "Defines how to identify a parameter for a specific purpose e.g. expires"
     }
   }
 }

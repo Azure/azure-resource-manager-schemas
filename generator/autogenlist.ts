@@ -284,6 +284,24 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.HybridData',
     },
     {
+        basePath: 'monitor/resource-manager',
+        namespace: 'Microsoft.Insights',
+        resourceConfig: [
+            {
+                type: 'diagnosticSettings',
+                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.Extension
+            },
+            {
+                type: 'dataCollectionRuleAssociations',
+                scopes: ScopeType.Extension
+            },
+            {
+                type: 'guestDiagnosticSettingsAssociation',
+                scopes: ScopeType.Extension
+            },
+        ],
+    },
+    {
         basePath: 'iotcentral/resource-manager',
         namespace: 'Microsoft.IotCentral',
     },

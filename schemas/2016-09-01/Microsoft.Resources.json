@@ -13,6 +13,10 @@
             "2016-09-01"
           ]
         },
+        "location": {
+          "type": "string",
+          "description": "The location to store the deployment data."
+        },
         "name": {
           "oneOf": [
             {
@@ -43,6 +47,67 @@
           "enum": [
             "Microsoft.Resources/deployments"
           ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.Resources/deployments"
+    }
+  },
+  "subscription_resourceDefinitions": {
+    "deployments": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2016-09-01"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "The location to store the deployment data."
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[-\\w\\._\\(\\)]+$",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the deployment."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DeploymentProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Deployment properties."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Resources/deployments"
+          ]
+        },
+        "resourceGroup": {
+          "type": "string",
+          "description": "The resource group to deploy to",
+          "pattern": "^[-\\w\\._\\(\\)]+$",
+          "maxLength": 90
         }
       },
       "required": [
@@ -92,6 +157,17 @@
           ],
           "description": "The mode that is used to deploy resources. This value can be either Incremental or Complete. In Incremental mode, resources are deployed without deleting existing resources that are not included in the template. In Complete mode, resources are deployed and existing resources in the resource group that are not included in the template are deleted. Be careful when using Complete mode as you may unintentionally delete resources."
         },
+        "onErrorDeployment": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/OnErrorDeployment"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Deployment on error behavior."
+        },
         "parameters": {
           "type": "object",
           "properties": {},
@@ -129,6 +205,31 @@
         "mode"
       ],
       "description": "Deployment properties."
+    },
+    "OnErrorDeployment": {
+      "type": "object",
+      "properties": {
+        "deploymentName": {
+          "type": "string",
+          "description": "The deployment to be used on error case."
+        },
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "LastSuccessful",
+                "SpecificDeployment"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The deployment on error behavior type. Possible values are LastSuccessful and SpecificDeployment."
+        }
+      },
+      "description": "Deployment on error behavior."
     },
     "ParametersLink": {
       "type": "object",

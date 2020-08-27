@@ -7,7 +7,7 @@ import { ScopeType, AutogenlistConfig } from './models';
 import { resetFile } from './git';
 import { get, set, flatten, uniq, concat, Dictionary, groupBy, keys, difference, pickBy, flatMap, values, uniqBy } from 'lodash';
 
-const autorestBinary = os.platform() === 'win32' ? 'autorest-beta.cmd' : 'autorest-beta';
+const autorestBinary = os.platform() === 'win32' ? 'autorest.cmd' : 'autorest';
 const apiVersionRegex = /^\d{4}-\d{2}-\d{2}(|-preview)$/;
 
 export interface SchemaConfiguration {
@@ -50,30 +50,27 @@ export async function generateSchemas(readme: string, autogenlistConfig?: Autoge
         await getApiVersionsByNamespace(readme),
         (_, key) => !autogenlistConfig || lowerCaseEquals(key, autogenlistConfig.namespace));
 
-    const apiVersions = uniqBy(flatMap(values(apiVersionsByNamespace)), s => s.toLowerCase());
     const namespaces = keys(apiVersionsByNamespace);
 
     const schemaConfigs: SchemaConfiguration[] = [];
-    for (const apiVersion of apiVersions) {
-        const tmpFolder = path.join(os.tmpdir(), Math.random().toString(36).substr(2));
+    const tmpFolder = path.join(os.tmpdir(), Math.random().toString(36).substr(2));
 
-        try {
-            const generatedSchemas = await generateSchema(readme, tmpFolder, apiVersion);
+    try {
+        const generatedSchemas = await generateSchema(readme, tmpFolder);
 
-            for (const schemaPath of generatedSchemas) {
-                const namespace = path.basename(schemaPath.substring(0, schemaPath.lastIndexOf(path.extname(schemaPath))));
-                if (!lowerCaseContains(namespaces, namespace)) {
-                    continue;
-                }
-
-                const generatedSchemaConfig = await handleGeneratedSchema(readme, schemaPath, autogenlistConfig);
-
-                schemaConfigs.push(generatedSchemaConfig);
+        for (const schemaPath of generatedSchemas) {
+            const namespace = path.basename(schemaPath.substring(0, schemaPath.lastIndexOf(path.extname(schemaPath))));
+            if (!lowerCaseContains(namespaces, namespace)) {
+                continue;
             }
+
+            const generatedSchemaConfig = await handleGeneratedSchema(readme, schemaPath, autogenlistConfig);
+
+            schemaConfigs.push(generatedSchemaConfig);
         }
-        finally {
-            await rmdirRecursive(tmpFolder);
-        }
+    }
+    finally {
+        await rmdirRecursive(tmpFolder);
     }
 
     return schemaConfigs;
@@ -134,14 +131,13 @@ async function execAutoRest(tmpFolder: string, params: string[]) {
     return await findRecursive(tmpFolder, p => path.extname(p) === '.json');
 }
 
-async function generateSchema(readme: string, tmpFolder: string, apiVersion: string) {
+async function generateSchema(readme: string, tmpFolder: string) {
     const autoRestParams = [
         `--version=${constants.autorestCoreVersion}`,
         `--use=@autorest/azureresourceschema@${constants.azureresourceschemaVersion}`,
         '--azureresourceschema',
         `--output-folder=${tmpFolder}`,
-        `--tag=all-api-versions`,
-        `--api-version=${apiVersion}`,
+        `--multiapi`,
         '--title=none',
         '--pass-thru:subset-reducer',
         readme,

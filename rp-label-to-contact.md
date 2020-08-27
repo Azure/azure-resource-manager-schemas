@@ -1,10 +1,11 @@
 # RP Team Label-to-Contact List
-This table specifies what GitHub handle our bot is currently configured to notify when an issue or PR is labeled for a resource provider. If you'd like to onboard a new service or change a contact, please submit a PR with the desired change. 
+This table specifies what GitHub handle our bot is currently configured to notify when an issue or PR is labeled for a resource provider. If you'd like to onboard a new service or change a contact, please submit a PR with the desired change.
 
-*Last bot configuration update: 8/19/20.*
+*Last bot configuration update: 8/27/20.*
 
 | RP Label                   | GitHub Handle(s)                  |
 | -------------------------- | --------------------------------- |
+| RP:AAD                     | adamedx                           |
 | RP:Authorization           | darshanhs90, AshishGargMicrosoft  |
 | RP:Automation              | zjakexander                       |
 | RP:AppConfiguration        | shenmuxiaosen, avanigupta         |
@@ -17,6 +18,7 @@ This table specifies what GitHub handle our bot is currently configured to notif
 | RP:EventHub                | jfggdl                            |
 | RP:KeyVault                | randalllilama, schaabs            |
 | RP:Logic                   | logicappspm                       |
+| RP:Media                   | akucer                            |
 | RP:Network                 | aznetsuppgithub                   |
 | RP:Policy                  | kenieva                           |
 | RP:RecoveryServices        | rajeswari-mamilla                 |

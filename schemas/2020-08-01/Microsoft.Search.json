@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2019-10-01-preview/Microsoft.Search.json#",
+  "id": "https://schema.management.azure.com/schemas/2020-08-01/Microsoft.Search.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.Search",
   "description": "Microsoft Search Resource Types",
@@ -10,7 +10,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-10-01-preview"
+            "2020-08-01"
           ]
         },
         "identity": {
@@ -26,7 +26,7 @@
         },
         "location": {
           "type": "string",
-          "description": "The geographic location of the resource. This must be one of the supported and registered Azure Geo Regions (for example, West US, East US, Southeast Asia, and so forth). This property is required when creating a new resource."
+          "description": "The geo-location where the resource lives"
         },
         "name": {
           "type": "string",
@@ -49,6 +49,9 @@
             "oneOf": [
               {
                 "$ref": "#/definitions/searchServices_privateEndpointConnections_childResource"
+              },
+              {
+                "$ref": "#/definitions/searchServices_sharedPrivateLinkResources_childResource"
               }
             ]
           }
@@ -77,7 +80,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Tags to help categorize the resource in the Azure portal."
+          "description": "Resource tags."
         },
         "type": {
           "type": "string",
@@ -88,6 +91,7 @@
       },
       "required": [
         "apiVersion",
+        "location",
         "name",
         "properties",
         "type"
@@ -100,12 +104,8 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-10-01-preview"
+            "2020-08-01"
           ]
-        },
-        "id": {
-          "type": "string",
-          "description": "The ID of the private endpoint connection. This can be used with the Azure Resource Manager to link resources together."
         },
         "name": {
           "type": "string",
@@ -136,6 +136,45 @@
         "type"
       ],
       "description": "Microsoft.Search/searchServices/privateEndpointConnections"
+    },
+    "searchServices_sharedPrivateLinkResources": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-08-01"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the shared private link resource managed by the Azure Cognitive Search service within the specified resource group."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SharedPrivateLinkResourceProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Describes the properties of an existing Shared Private Link Resource managed by the Azure Cognitive Search service."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Search/searchServices/sharedPrivateLinkResources"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.Search/searchServices/sharedPrivateLinkResources"
     }
   },
   "definitions": {
@@ -176,21 +215,6 @@
     "NetworkRuleSet": {
       "type": "object",
       "properties": {
-        "endpointAccess": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Public",
-                "Private"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The level of access to the search service endpoint. Public, the search service endpoint is reachable from the internet. Private, the search service endpoint can only be accessed via private endpoints. Default is Public."
-        },
         "ipRules": {
           "oneOf": [
             {
@@ -203,7 +227,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "A list of IP restriction rules that defines the inbound network access to the search service endpoint. These restriction rules are applied only when the EndpointAccess of the search service is Public."
+          "description": "A list of IP restriction rules that defines the inbound network(s) with allowing access to the search service endpoint. At the meantime, all other public IP networks are blocked by the firewall. These restriction rules are applied only when the 'publicNetworkAccess' of the search service is 'enabled'; otherwise, traffic over public interface is not allowed even with any public IP rules, and private endpoint connections would be the exclusive access method."
         }
       },
       "description": "Network specific rules that determine how the Azure Cognitive Search service may be reached."
@@ -321,6 +345,21 @@
           ],
           "description": "The number of partitions in the Search service; if specified, it can be 1, 2, 3, 4, 6, or 12. Values greater than 1 are only valid for standard SKUs. For 'standard3' services with hostingMode set to 'highDensity', the allowed values are between 1 and 3."
         },
+        "publicNetworkAccess": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "enabled",
+                "disabled"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "This value can be set to 'enabled' to avoid breaking changes on existing customer resources and templates. If set to 'disabled', traffic over public interface is not allowed, and private endpoint connections would be the exclusive access method."
+        },
         "replicaCount": {
           "oneOf": [
             {
@@ -344,12 +383,8 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-10-01-preview"
+            "2020-08-01"
           ]
-        },
-        "id": {
-          "type": "string",
-          "description": "The ID of the private endpoint connection. This can be used with the Azure Resource Manager to link resources together."
         },
         "name": {
           "type": "string",
@@ -380,6 +415,102 @@
         "type"
       ],
       "description": "Microsoft.Search/searchServices/privateEndpointConnections"
+    },
+    "searchServices_sharedPrivateLinkResources_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-08-01"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the shared private link resource managed by the Azure Cognitive Search service within the specified resource group."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SharedPrivateLinkResourceProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Describes the properties of an existing Shared Private Link Resource managed by the Azure Cognitive Search service."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "sharedPrivateLinkResources"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.Search/searchServices/sharedPrivateLinkResources"
+    },
+    "SharedPrivateLinkResourceProperties": {
+      "type": "object",
+      "properties": {
+        "groupId": {
+          "type": "string",
+          "description": "The group id from the provider of resource the shared private link resource is for."
+        },
+        "privateLinkResourceId": {
+          "type": "string",
+          "description": "The resource id of the resource the shared private link resource is for."
+        },
+        "provisioningState": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Updating",
+                "Deleting",
+                "Failed",
+                "Succeeded",
+                "Incomplete"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The provisioning state of the shared private link resource. Can be Updating, Deleting, Failed, Succeeded or Incomplete."
+        },
+        "requestMessage": {
+          "type": "string",
+          "description": "The request message for requesting approval of the shared private link resource."
+        },
+        "resourceRegion": {
+          "type": "string",
+          "description": "Optional. Can be used to specify the Azure Resource Manager location of the resource to which a shared private link is to be created. This is only required for those resources whose DNS configuration are regional (such as Azure Kubernetes Service)."
+        },
+        "status": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Pending",
+                "Approved",
+                "Rejected",
+                "Disconnected"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Status of the shared private link resource. Can be Pending, Approved, Rejected or Disconnected."
+        }
+      },
+      "description": "Describes the properties of an existing Shared Private Link Resource managed by the Azure Cognitive Search service."
     },
     "Sku": {
       "type": "object",

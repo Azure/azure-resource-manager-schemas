@@ -6,6 +6,8 @@ This table specifies what GitHub handle our bot is currently configured to notif
 | RP Label                   | GitHub Handle(s)                  |
 | -------------------------- | --------------------------------- |
 | RP:AAD                     | adamedx                           |
+| RP:Advisor                 | mojayara, prasanna-padmanabhan    |
+| RP:AlertsManagement        | liadtal, yairgil                  |
 | RP:Authorization           | darshanhs90, AshishGargMicrosoft  |
 | RP:Automation              | zjakexander                       |
 | RP:AppConfiguration        | shenmuxiaosen, avanigupta         |

@@ -17,6 +17,12 @@ This table specifies what GitHub handle our bot is currently configured to notif
 | RP:Blueprint               | alex-frankel, filizt              |
 | RP:BotService              | sgellock                          |
 | RP:Compute                 | viabhav-agar, avirishuv, amjads1  |
+| RP:ContainerInstances      | dkkapur                           |
+| RP:ContainerRegistry       | toddysm, yugangw-MSFT             |
+| RP:ContainerService        | qike-ms, jwilder, seanmck         |
+| RP:Cosmos                  | shurd, zfoster, southpolesteve    |
+| RP:CustomProviders         | MSEvanhi                          |
+| RP:DataBricks              | yagupta                           |
 | RP:DataFactory             | shawnxzq, lmy269                  |
 | RP:DBforPostgreSQL         | rachel-msft                       |
 | RP:EventGrid               | jfggdl                            |

@@ -8,9 +8,12 @@ This table specifies what GitHub handle our bot is currently configured to notif
 | RP:AAD                     | adamedx                           |
 | RP:Advisor                 | mojayara, prasanna-padmanabhan    |
 | RP:AlertsManagement        | liadtal, yairgil                  |
+| RP:AnalysisServices        | athipp, taiwu, minghan            |
 | RP:Authorization           | darshanhs90, AshishGargMicrosoft  |
 | RP:Automation              | zjakexander                       |
+| RP:APIManagement           | miaojiang                         |
 | RP:AppConfiguration        | shenmuxiaosen, avanigupta         |
+| RP:Batch                   | mksuni, bgklein, mscurrell        |
 | RP:Blueprint               | alex-frankel, filizt              |
 | RP:BotService              | sgellock                          |
 | RP:Compute                 | viabhav-agar, avirishuv, amjads1  |

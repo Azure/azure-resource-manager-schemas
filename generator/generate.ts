@@ -139,7 +139,6 @@ async function generateSchema(readme: string, tmpFolder: string) {
         `--output-folder=${tmpFolder}`,
         `--multiapi`,
         '--title=none',
-        '--pass-thru:subset-reducer',
         readme,
     ];
 

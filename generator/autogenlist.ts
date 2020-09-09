@@ -51,6 +51,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.Attestation',
     },
     {
+        basePath: 'authorization/resource-manager',
+        namespace: 'Microsoft.Authorization',
+    },
+    {
         basePath: 'automation/resource-manager',
         namespace: 'Microsoft.Automation',
     },

@@ -25,7 +25,7 @@ async function getChangedSchemas(repoPath: string) {
     const repo = await Git.Repository.open(repoPath);
     const files = await repo.getStatus();
     let status = [];
-    if (!files.length) {
+    if (files.length) {
         status = files.map(getStatus);
     }
     const changedSchemas: { path: string, isNew: boolean }[] = [];

@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2020-03-01/Microsoft.Batch.json#",
+  "id": "https://schema.management.azure.com/schemas/2020-09-01/Microsoft.Batch.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.Batch",
   "description": "Microsoft Batch Resource Types",
@@ -10,8 +10,19 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-03-01"
+            "2020-09-01"
           ]
+        },
+        "identity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BatchAccountIdentity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The identity of the Batch account, if configured. This is only used when the user specifies 'Microsoft.KeyVault' as their Batch account encryption configuration."
         },
         "location": {
           "type": "string",
@@ -95,7 +106,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-03-01"
+            "2020-09-01"
           ]
         },
         "name": {
@@ -154,7 +165,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-03-01"
+            "2020-09-01"
           ]
         },
         "name": {
@@ -203,7 +214,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-03-01"
+            "2020-09-01"
           ]
         },
         "name": {
@@ -252,7 +263,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-03-01"
+            "2020-09-01"
           ]
         },
         "name": {
@@ -489,7 +500,8 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Configures how customer data is encrypted inside the Batch account. By default, accounts are encrypted using a Microsoft managed key. For additional control, a customer-managed key can be used instead."
         },
         "keyVaultReference": {
           "oneOf": [
@@ -535,13 +547,37 @@
       },
       "description": "The properties of a Batch account."
     },
+    "BatchAccountIdentity": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "SystemAssigned",
+                "None"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The type of identity used for the Batch account."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "The identity of the Batch account, if configured. This is only used when the user specifies 'Microsoft.KeyVault' as their Batch account encryption configuration."
+    },
     "batchAccounts_applications_childResource": {
       "type": "object",
       "properties": {
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-03-01"
+            "2020-09-01"
           ]
         },
         "name": {
@@ -590,7 +626,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-03-01"
+            "2020-09-01"
           ]
         },
         "name": {
@@ -639,7 +675,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-03-01"
+            "2020-09-01"
           ]
         },
         "name": {
@@ -688,7 +724,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-03-01"
+            "2020-09-01"
           ]
         },
         "name": {
@@ -969,7 +1005,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The lun is used to uniquely identify each data disk. If attaching multiple disks, each should have a distinct lun."
+          "description": "The lun is used to uniquely identify each data disk. If attaching multiple disks, each should have a distinct lun. The value must be between 0 and 63, inclusive."
         },
         "storageAccountType": {
           "oneOf": [
@@ -1068,9 +1104,11 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "KeyVault configuration when using an encryption KeySource of Microsoft.KeyVault."
         }
-      }
+      },
+      "description": "Configures how customer data is encrypted inside the Batch account. By default, accounts are encrypted using a Microsoft managed key. For additional control, a customer-managed key can be used instead."
     },
     "EnvironmentSetting": {
       "type": "object",
@@ -1242,9 +1280,10 @@
       "properties": {
         "keyIdentifier": {
           "type": "string",
-          "description": "Full path to the versioned secret. Example https://mykeyvault.vault.azure.net/keys/testkey/6e34a81fef704045975661e297a4c053"
+          "description": "Full path to the versioned secret. Example https://mykeyvault.vault.azure.net/keys/testkey/6e34a81fef704045975661e297a4c053. To be usable the following prerequisites must be met:\n\n The Batch Account has a System Assigned identity\n The account identity has been granted Key/Get, Key/Unwrap and Key/Wrap permissions\n The KeyVault has soft-delete and purge protection enabled"
         }
-      }
+      },
+      "description": "KeyVault configuration when using an encryption KeySource of Microsoft.KeyVault."
     },
     "KeyVaultReference": {
       "type": "object",
@@ -1475,7 +1514,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The maximum number of inbound NAT pools per Batch pool is 5. If the maximum number of inbound NAT pools is exceeded the request fails with HTTP status code 400."
+          "description": "The maximum number of inbound NAT pools per Batch pool is 5. If the maximum number of inbound NAT pools is exceeded the request fails with HTTP status code 400. This cannot be specified if the IPAddressProvisioningType is NoPublicIPAddresses."
         }
       },
       "required": [
@@ -1556,17 +1595,6 @@
           ],
           "description": "This imposes restrictions on which nodes can be assigned to the pool. Enabling this value can reduce the chance of the requested number of nodes to be allocated in the pool. If not specified, this value defaults to 'Disabled'."
         },
-        "maxTasksPerNode": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The default value is 1. The maximum value is the smaller of 4 times the number of cores of the vmSize of the pool or 256."
-        },
         "metadata": {
           "oneOf": [
             {
@@ -1638,6 +1666,17 @@
             }
           ]
         },
+        "taskSlotsPerNode": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The default value is 1. The maximum value is the smaller of 4 times the number of cores of the vmSize of the pool or 256."
+        },
         "userAccounts": {
           "oneOf": [
             {
@@ -1673,7 +1712,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The number of IPs specified here limits the maximum size of the Pool - 50 dedicated nodes or 20 low-priority nodes can be allocated for each public IP. For example, a pool needing 150 dedicated VMs would need at least 3 public IPs specified. Each element of this collection is of the form: /subscriptions/{subscription}/resourceGroups/{group}/providers/Microsoft.Network/publicIPAddresses/{ip}."
+          "description": "The number of IPs specified here limits the maximum size of the Pool - 100 dedicated nodes or 100 low-priority nodes can be allocated for each public IP. For example, a pool needing 250 dedicated VMs would need at least 3 public IPs specified. Each element of this collection is of the form: /subscriptions/{subscription}/resourceGroups/{group}/providers/Microsoft.Network/publicIPAddresses/{ip}."
         },
         "provision": {
           "oneOf": [

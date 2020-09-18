@@ -1153,6 +1153,24 @@
       },
       "description": "AML Compute properties"
     },
+    "AssignedUser": {
+      "type": "object",
+      "properties": {
+        "objectId": {
+          "type": "string",
+          "description": "User’s AAD Object Id."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "User’s AAD Tenant Id."
+        }
+      },
+      "required": [
+        "objectId",
+        "tenantId"
+      ],
+      "description": "A user that can be assigned to a compute instance."
+    },
     "Compute": {
       "type": "object",
       "oneOf": [
@@ -1161,6 +1179,9 @@
         },
         {
           "$ref": "#/definitions/AmlCompute"
+        },
+        {
+          "$ref": "#/definitions/ComputeInstance"
         },
         {
           "$ref": "#/definitions/VirtualMachine"
@@ -1193,6 +1214,129 @@
         }
       },
       "description": "Machine Learning compute object."
+    },
+    "ComputeInstance": {
+      "type": "object",
+      "properties": {
+        "computeType": {
+          "type": "string",
+          "enum": [
+            "ComputeInstance"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ComputeInstanceProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Compute Instance properties"
+        }
+      },
+      "required": [
+        "computeType"
+      ],
+      "description": "An Azure Machine Learning compute instance."
+    },
+    "ComputeInstanceProperties": {
+      "type": "object",
+      "properties": {
+        "applicationSharingPolicy": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Personal",
+                "Shared"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Policy for sharing applications on this compute instance among users of parent workspace. If Personal, only the creator can access applications on this compute instance. When Shared, any workspace user can access applications on this instance depending on his/her assigned role."
+        },
+        "computeInstanceAuthorizationType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "personal"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Compute Instance Authorization type. Available values are personal (default)."
+        },
+        "personalComputeInstanceSettings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PersonalComputeInstanceSettings"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Settings for a personal compute instance."
+        },
+        "sshSettings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ComputeInstanceSshSettings"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies policy and settings for SSH access."
+        },
+        "subnet": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ResourceId"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Represents a resource ID. For example, for a subnet, it is the resource URL for the subnet."
+        },
+        "vmSize": {
+          "type": "string",
+          "description": "Virtual Machine Size"
+        }
+      },
+      "description": "Compute Instance properties"
+    },
+    "ComputeInstanceSshSettings": {
+      "type": "object",
+      "properties": {
+        "adminPublicKey": {
+          "type": "string",
+          "description": "Specifies the SSH rsa public key file as a string. Use \"ssh-keygen -t rsa -b 2048\" to generate your SSH key pairs."
+        },
+        "sshPublicAccess": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Enabled",
+                "Disabled"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "State of the public SSH port. Possible values are: Disabled - Indicates that the public ssh port is closed on this instance. Enabled - Indicates that the public ssh port is open and accessible according to the VNet/subnet policy if applicable."
+        }
+      },
+      "description": "Specifies policy and settings for SSH access."
     },
     "ContainerResourceRequirements": {
       "type": "object",
@@ -2150,6 +2294,23 @@
         }
       },
       "description": "The configuration for a Spark environment."
+    },
+    "PersonalComputeInstanceSettings": {
+      "type": "object",
+      "properties": {
+        "assignedUser": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AssignedUser"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A user that can be assigned to a compute instance."
+        }
+      },
+      "description": "Settings for a personal compute instance."
     },
     "PrivateEndpoint": {
       "type": "object",

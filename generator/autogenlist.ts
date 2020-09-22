@@ -113,6 +113,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.CognitiveServices',
     },
     {
+        basePath: 'communication/resource-manager',
+        namespace: 'Microsoft.Communication',
+    },
+    {
         basePath: 'containerinstance/resource-manager',
         namespace: 'Microsoft.ContainerInstance',
     },

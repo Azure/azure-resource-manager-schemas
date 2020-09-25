@@ -447,6 +447,20 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.Relay',
     },
     {
+        basePath: 'recoveryservicessiterecovery/resource-manager',
+        namespace: 'Microsoft.RecoveryServices',
+        suffix: 'SiteRecovery',
+    },
+    {
+        basePath: 'recoveryservicesbackup/resource-manager',
+        namespace: 'Microsoft.RecoveryServices',
+        suffix: "Backup"
+    },
+    {
+        basePath: "recoveryservices/resource-manager",
+        namespace: "Microsoft.RecoveryServices"
+    },
+    {
         basePath: 'reservations/resource-manager',
         namespace: 'Microsoft.Capacity',
     },

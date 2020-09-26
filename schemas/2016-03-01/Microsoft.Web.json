@@ -7,74 +7,159 @@
     "certificates": {
       "type": "object",
       "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2016-03-01"
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "description": "Kind of resource."
+        },
+        "location": {
+          "type": "string",
+          "description": "Resource Location."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the certificate."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CertificateProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Certificate resource specific properties"
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Resource tags."
+        },
         "type": {
           "type": "string",
           "enum": [
             "Microsoft.Web/certificates"
           ]
-        },
+        }
+      },
+      "required": [
+        "apiVersion",
+        "location",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.Web/certificates"
+    }
+  },
+  "tenant_resourceDefinitions": {
+    "publishingUsers": {
+      "type": "object",
+      "properties": {
         "apiVersion": {
           "type": "string",
           "enum": [
             "2016-03-01"
           ]
         },
+        "kind": {
+          "type": "string",
+          "description": "Kind of resource."
+        },
+        "name": {
+          "type": "string",
+          "enum": [
+            "web"
+          ]
+        },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/Certificate_properties"
+              "$ref": "#/definitions/UserProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "ARM envelope properties"
-        }
-      },
-      "required": [
-        "type",
-        "apiVersion",
-        "properties"
-      ],
-      "description": "Microsoft.Web/certificates"
-    },
-    "csrs": {
-      "type": "object",
-      "properties": {
+          "description": "User resource specific properties"
+        },
         "type": {
           "type": "string",
           "enum": [
-            "Microsoft.Web/csrs"
+            "Microsoft.Web/publishingUsers"
           ]
-        },
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.Web/publishingUsers"
+    },
+    "sourcecontrols": {
+      "type": "object",
+      "properties": {
         "apiVersion": {
           "type": "string",
           "enum": [
             "2016-03-01"
           ]
         },
+        "kind": {
+          "type": "string",
+          "description": "Kind of resource."
+        },
+        "name": {
+          "type": "string",
+          "description": "Type of source control"
+        },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/Csr_properties"
+              "$ref": "#/definitions/SourceControlProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "ARM envelope properties"
+          "description": "SourceControl resource specific properties"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Web/sourcecontrols"
+          ]
         }
       },
       "required": [
-        "type",
         "apiVersion",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
-      "description": "Microsoft.Web/csrs"
+      "description": "Microsoft.Web/sourcecontrols"
     }
   },
   "definitions": {
-    "Certificate_properties": {
+    "CertificateProperties": {
       "type": "object",
       "properties": {
         "hostNames": {
@@ -91,26 +176,6 @@
           ],
           "description": "Host names the certificate applies to."
         },
-        "pfxBlob": {
-          "oneOf": [
-            {
-              "type": "string",
-              "contentEncoding": "base64"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Pfx blob."
-        },
-        "password": {
-          "type": "string",
-          "description": "Certificate password."
-        },
-        "cerBlob": {
-          "type": "string",
-          "description": "Raw bytes of .cer file"
-        },
         "keyVaultId": {
           "type": "string",
           "description": "Key Vault Csm resource Id."
@@ -119,46 +184,92 @@
           "type": "string",
           "description": "Key Vault secret name."
         },
+        "password": {
+          "type": "string",
+          "description": "Certificate password."
+        },
+        "pfxBlob": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Pfx blob."
+        },
         "serverFarmId": {
           "type": "string",
           "description": "Resource ID of the associated App Service plan, formatted as: \"/subscriptions/{subscriptionID}/resourceGroups/{groupName}/providers/Microsoft.Web/serverfarms/{appServicePlanName}\"."
         }
       },
-      "description": "ARM envelope properties"
+      "required": [
+        "password"
+      ],
+      "description": "Certificate resource specific properties"
     },
-    "Csr_properties": {
+    "SourceControlProperties": {
+      "type": "object",
+      "properties": {
+        "expirationTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "OAuth token expiration."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name or source control type."
+        },
+        "refreshToken": {
+          "type": "string",
+          "description": "OAuth refresh token."
+        },
+        "token": {
+          "type": "string",
+          "description": "OAuth access token."
+        },
+        "tokenSecret": {
+          "type": "string",
+          "description": "OAuth access token secret."
+        }
+      },
+      "description": "SourceControl resource specific properties"
+    },
+    "UserProperties": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name used to locate CSR object."
+          "description": "Username"
         },
-        "distinguishedName": {
+        "publishingPassword": {
           "type": "string",
-          "description": "Distinguished name of certificate to be created."
+          "format": "password",
+          "description": "Password used for publishing."
         },
-        "csrString": {
+        "publishingPasswordHash": {
           "type": "string",
-          "description": "Actual CSR string created."
+          "format": "password",
+          "description": "Password hash used for publishing."
         },
-        "pfxBlob": {
+        "publishingPasswordHashSalt": {
           "type": "string",
-          "description": "PFX certifcate of created certificate."
+          "format": "password",
+          "description": "Password hash salt used for publishing."
         },
-        "password": {
+        "publishingUserName": {
           "type": "string",
-          "description": "PFX password."
-        },
-        "publicKeyHash": {
-          "type": "string",
-          "description": "Hash of the certificate's public key."
-        },
-        "hostingEnvironment": {
-          "type": "string",
-          "description": "App Service Environment."
+          "description": "Username used for publishing."
         }
       },
-      "description": "ARM envelope properties"
+      "required": [
+        "publishingUserName"
+      ],
+      "description": "User resource specific properties"
     }
   }
 }

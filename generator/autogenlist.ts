@@ -281,6 +281,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.HanaOnAzure',
     },
     {
+        basePath: 'healthcareapis/resource-manager',
+        namespace: 'Microsoft.HealthcareApis',
+    },
+    {
         basePath: 'hybridcompute/resource-manager',
         namespace: 'Microsoft.HybridCompute',
     },

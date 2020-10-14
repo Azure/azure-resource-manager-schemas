@@ -283,7 +283,7 @@ const autogenlist: AutogenlistConfig[] = [
     {
         basePath: 'healthcareapis/resource-manager',
         namespace: 'Microsoft.HealthcareApis',
-    },
+    }, 
     {
         basePath: 'hybridcompute/resource-manager',
         namespace: 'Microsoft.HybridCompute',

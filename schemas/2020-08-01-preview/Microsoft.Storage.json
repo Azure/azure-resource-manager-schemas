@@ -904,6 +904,17 @@
           ],
           "description": "Versioning is enabled if set to true."
         },
+        "lastAccessTimeTrackingPolicy": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/LastAccessTimeTrackingPolicy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The blob service properties for Last access time based tracking policy."
+        },
         "restorePolicy": {
           "oneOf": [
             {
@@ -1145,6 +1156,19 @@
     "DateAfterModification": {
       "type": "object",
       "properties": {
+        "daysAfterLastAccessTimeGreaterThan": {
+          "oneOf": [
+            {
+              "type": "number",
+              "multipleOf": 1,
+              "minimum": 0
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Value indicating the age in days after last blob access. This property can only be used in conjunction with last access time tracking policy"
+        },
         "daysAfterModificationGreaterThan": {
           "oneOf": [
             {
@@ -1159,9 +1183,6 @@
           "description": "Value indicating the age in days after last modification"
         }
       },
-      "required": [
-        "daysAfterModificationGreaterThan"
-      ],
       "description": "Object to define the number of days after last modification."
     },
     "DeleteRetentionPolicy": {
@@ -1428,6 +1449,17 @@
           ],
           "description": "Sets the CORS rules. You can include up to five CorsRule elements in the request. "
         },
+        "protocolSettings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ProtocolSettings"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Protocol settings for file service"
+        },
         "shareDeleteRetentionPolicy": {
           "oneOf": [
             {
@@ -1620,6 +1652,65 @@
       },
       "description": "Properties of key vault."
     },
+    "LastAccessTimeTrackingPolicy": {
+      "type": "object",
+      "properties": {
+        "blobType": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "An array of predefined supported blob types. Only blockBlob is the supported value. This field is currently read only"
+        },
+        "enable": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "When set to true last access time based tracking is enabled."
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "AccessTimeTracking"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Name of the policy. The valid value is AccessTimeTracking. This field is currently read only."
+        },
+        "trackingGranularityInDays": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The field specifies blob object tracking granularity in days, typically how often the blob object should be tracked.This field is currently read only with value as 1"
+        }
+      },
+      "required": [
+        "enable"
+      ],
+      "description": "The blob service properties for Last access time based tracking policy."
+    },
     "ManagementPolicyAction": {
       "type": "object",
       "properties": {
@@ -1661,6 +1752,17 @@
             }
           ],
           "description": "Object to define the number of days after last modification."
+        },
+        "enableAutoTierToHotFromCool": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "This property enables auto tiering of a blob from cool to hot on a blob access. This property requires tierToCool.daysAfterLastAccessTimeGreaterThan."
         },
         "tierToArchive": {
           "oneOf": [
@@ -1879,6 +1981,23 @@
         }
       },
       "description": "Management policy action for snapshot."
+    },
+    "Multichannel": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates whether multichannel is enabled"
+        }
+      },
+      "description": "Multichannel setting. Applies to Premium FileStorage only."
     },
     "NetworkRuleSet": {
       "type": "object",
@@ -2134,6 +2253,23 @@
       },
       "description": "A collection of information about the state of the connection between service consumer and provider."
     },
+    "ProtocolSettings": {
+      "type": "object",
+      "properties": {
+        "smb": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SmbSetting"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Setting for SMB protocol"
+        }
+      },
+      "description": "Protocol settings for file service"
+    },
     "QueueProperties": {
       "type": "object",
       "properties": {
@@ -2303,6 +2439,23 @@
         "name"
       ],
       "description": "The SKU of the storage account."
+    },
+    "SmbSetting": {
+      "type": "object",
+      "properties": {
+        "multichannel": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Multichannel"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Multichannel setting. Applies to Premium FileStorage only."
+        }
+      },
+      "description": "Setting for SMB protocol"
     },
     "StorageAccountPropertiesCreateParameters": {
       "type": "object",

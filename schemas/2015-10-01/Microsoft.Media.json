@@ -2,98 +2,122 @@
   "id": "https://schema.management.azure.com/schemas/2015-10-01/Microsoft.Media.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.Media",
-  "description": "Microsoft Media Service Resource Type",
+  "description": "Microsoft Media Resource Types",
   "resourceDefinitions": {
-    "mediaServices": {
+    "mediaservices": {
       "type": "object",
       "properties": {
-        "type": {
-          "enum": [
-            "Microsoft.Media/mediaServices"
-          ]
-        },
         "apiVersion": {
+          "type": "string",
           "enum": [
             "2015-10-01"
           ]
+        },
+        "location": {
+          "type": "string",
+          "description": "The geographic location of the resource. This must be one of the supported and registered Azure Geo Regions (for example, West US, East US, Southeast Asia, and so forth)."
         },
         "name": {
           "oneOf": [
             {
               "type": "string",
-              "pattern": "^[a-z0-9]{3,26}$"
+              "pattern": "^[a-z0-9]{3,24}$",
+              "minLength": 3,
+              "maxLength": 24
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Name of the Media Service."
         },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/storageAccounts"
+              "$ref": "#/definitions/MediaServiceProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
+          ],
+          "description": "The additional properties of a Media Service resource."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Tags to help categorize the resource in the Azure portal."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Media/mediaservices"
           ]
         }
       },
       "required": [
-        "type",
         "apiVersion",
-        "location"
+        "name",
+        "properties",
+        "type"
       ],
-      "description": "Microsoft.Media/mediaServices"
+      "description": "Microsoft.Media/mediaservices"
     }
   },
-  "definitions" : {
-    "storageAccounts": {
+  "definitions": {
+    "MediaServiceProperties": {
+      "type": "object",
       "properties": {
         "storageAccounts": {
-          "oneOf" : [
+          "oneOf": [
             {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/storageAccount"
-              }  
+                "$ref": "#/definitions/StorageAccount"
+              }
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression" 
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The storage accounts for this resource."
         }
       },
-      "type": "object"
+      "description": "The additional properties of a Media Service resource."
     },
-    "storageAccount": {
-      "oneOf": [
-        {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string"
-            },
-            "isPrimary": {
-              "oneOf": [
-                {
-                  "type": "boolean"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression" 
-                }
-              ]
-            }
-            },
-            "required": [
-              "id",
-              "isPrimary"
-            ]
+    "StorageAccount": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id of the storage account resource. Media Services relies on tables and queues as well as blobs, so the primary storage account must be a Standard Storage account (either Microsoft.ClassicStorage or Microsoft.Storage). Blob only storage accounts can be added as secondary storage accounts (isPrimary false)."
         },
-        {
-          "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression" 
+        "isPrimary": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Is this storage account resource the primary storage account for the Media Service resource. Blob only storage must set this to false."
         }
-      ]
+      },
+      "required": [
+        "id",
+        "isPrimary"
+      ],
+      "description": "The properties of a storage account associated with this resource."
     }
   }
 }

@@ -82,6 +82,9 @@
                 "$ref": "#/definitions/storageAccounts_managementPolicies_childResource"
               },
               {
+                "$ref": "#/definitions/storageAccounts_inventoryPolicies_childResource"
+              },
+              {
                 "$ref": "#/definitions/storageAccounts_privateEndpointConnections_childResource"
               },
               {
@@ -435,6 +438,63 @@
         "type"
       ],
       "description": "Microsoft.Storage/storageAccounts/fileServices/shares"
+    },
+    "storageAccounts_inventoryPolicies": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-08-01-preview"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^.*/default$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the storage account blob inventory policy. It should always be 'default'"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BlobInventoryPolicyProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The storage account blob inventory policy properties."
+        },
+        "systemData": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SystemData"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Metadata pertaining to creation and last modification of the resource."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Storage/storageAccounts/inventoryPolicies"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "type"
+      ],
+      "description": "Microsoft.Storage/storageAccounts/inventoryPolicies"
     },
     "storageAccounts_managementPolicies": {
       "type": "object",
@@ -830,6 +890,197 @@
         "directoryServiceOptions"
       ],
       "description": "Settings for Azure Files identity based authentication."
+    },
+    "BlobInventoryPolicyDefinition": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BlobInventoryPolicyFilter"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "An object that defines the blob inventory rule filter conditions."
+        }
+      },
+      "required": [
+        "filters"
+      ],
+      "description": "An object that defines the blob inventory rule. Each definition consists of a set of filters."
+    },
+    "BlobInventoryPolicyFilter": {
+      "type": "object",
+      "properties": {
+        "blobTypes": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "An array of predefined enum values. Valid values include blockBlob, appendBlob, pageBlob. Hns accounts does not support pageBlobs."
+        },
+        "includeBlobVersions": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Includes blob versions in blob inventory when value set to true."
+        },
+        "includeSnapshots": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Includes blob snapshots in blob inventory when value set to true."
+        },
+        "prefixMatch": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "An array of strings for blob prefixes to be matched."
+        }
+      },
+      "required": [
+        "blobTypes"
+      ],
+      "description": "An object that defines the blob inventory rule filter conditions."
+    },
+    "BlobInventoryPolicyProperties": {
+      "type": "object",
+      "properties": {
+        "policy": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BlobInventoryPolicySchema"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The storage account blob inventory policy rules."
+        }
+      },
+      "required": [
+        "policy"
+      ],
+      "description": "The storage account blob inventory policy properties."
+    },
+    "BlobInventoryPolicyRule": {
+      "type": "object",
+      "properties": {
+        "definition": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BlobInventoryPolicyDefinition"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "An object that defines the blob inventory rule. Each definition consists of a set of filters."
+        },
+        "enabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Rule is enabled when set to true."
+        },
+        "name": {
+          "type": "string",
+          "description": "A rule name can contain any combination of alpha numeric characters. Rule name is case-sensitive. It must be unique within a policy."
+        }
+      },
+      "required": [
+        "definition",
+        "enabled",
+        "name"
+      ],
+      "description": "An object that wraps the blob inventory rule. Each rule is uniquely defined by name."
+    },
+    "BlobInventoryPolicySchema": {
+      "type": "object",
+      "properties": {
+        "destination": {
+          "type": "string",
+          "description": "Container name where blob inventory files are stored. Must be pre-created."
+        },
+        "enabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Policy is enabled if set to true."
+        },
+        "rules": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/BlobInventoryPolicyRule"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The storage account blob inventory policy rules. The rule is applied when it is enabled."
+        },
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Inventory"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The valid value is Inventory"
+        }
+      },
+      "required": [
+        "destination",
+        "enabled",
+        "rules",
+        "type"
+      ],
+      "description": "The storage account blob inventory policy rules."
     },
     "BlobServicePropertiesProperties": {
       "type": "object",
@@ -2846,6 +3097,59 @@
       ],
       "description": "Microsoft.Storage/storageAccounts/fileServices/shares"
     },
+    "storageAccounts_inventoryPolicies_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-08-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "enum": [
+            "default"
+          ],
+          "description": "The name of the storage account blob inventory policy. It should always be 'default'"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BlobInventoryPolicyProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The storage account blob inventory policy properties."
+        },
+        "systemData": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SystemData"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Metadata pertaining to creation and last modification of the resource."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "inventoryPolicies"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.Storage/storageAccounts/inventoryPolicies"
+    },
     "storageAccounts_managementPolicies_childResource": {
       "type": "object",
       "properties": {
@@ -3135,6 +3439,64 @@
         "type"
       ],
       "description": "Microsoft.Storage/storageAccounts/tableServices/tables"
+    },
+    "SystemData": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp of resource creation (UTC)."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "The identity that created the resource."
+        },
+        "createdByType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "User",
+                "Application",
+                "ManagedIdentity",
+                "Key"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The type of identity that created the resource."
+        },
+        "lastModifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The type of identity that last modified the resource."
+        },
+        "lastModifiedBy": {
+          "type": "string",
+          "description": "The identity that last modified the resource."
+        },
+        "lastModifiedByType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "User",
+                "Application",
+                "ManagedIdentity",
+                "Key"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The type of identity that last modified the resource."
+        }
+      },
+      "description": "Metadata pertaining to creation and last modification of the resource."
     },
     "TableServicePropertiesProperties": {
       "type": "object",

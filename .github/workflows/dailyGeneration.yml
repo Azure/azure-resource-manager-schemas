@@ -20,14 +20,14 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       
-      - name: Integrate master branch
+      - name: Integrate main branch
         env:
           key: ${{secrets.GHA_Deploy_Key}}
         run: |
-          git checkout $(Build.SourceBranchName)
+          git checkout ${{ github.event.pull_request.base.ref }}
           git pull
           git merge --no-commit --no-ff --strategy-option=theirs origin/master
           if ! git diff-index --quiet HEAD --; then
-            git commit -m "Merge remote-tracking branch 'origin/master' into $(Build.SourceBranchName)"
-            git push origin $(Build.SourceBranchName)
+            git commit -m "Merge remote-tracking branch 'origin/master' into ${{ github.event.pull_request.base.ref }}"
+            git push origin ${{ github.event.pull_request.base.ref }}
           fi

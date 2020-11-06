@@ -20,14 +20,20 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       
+      - name: Step that prints name of pull request's base branch
+      run: |
+        echo "Pull request's base branch is: ${BASE_BRANCH}"
+      env:
+        BASE_BRANCH: ${{ github.base_ref }}
+      
       - name: Integrate main branch
         env:
           key: ${{secrets.GHA_Deploy_Key}}
         run: |
-          git checkout ${{ github.event.pull_request.base.ref }}
+          git checkout master
           git pull
           git merge --no-commit --no-ff --strategy-option=theirs origin/master
           if ! git diff-index --quiet HEAD --; then
-            git commit -m "Merge remote-tracking branch 'origin/master' into ${{ github.event.pull_request.base.ref }}"
-            git push origin ${{ github.event.pull_request.base.ref }}
+            git commit -m "Merge remote-tracking branch 'origin/master' into master"
+            git push origin master
           fi

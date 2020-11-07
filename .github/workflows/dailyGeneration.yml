@@ -20,20 +20,18 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       
-      - name: Step that prints name of pull request's base branch
-        run: |
-          echo "$GITHUB_CONTEXT"
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
+      - name: Branch name
+        run: echo running on branch ${GITHUB_REF##*/}
       
       - name: Integrate main branch
-        env:
-          key: ${{secrets.GHA_Deploy_Key}}
-          main_branch: ${{ github.repository.master_branch }} 
         run: |
-          git pull
-          git merge --no-commit --no-ff --strategy-option=theirs origin/$main_branch
+          git merge --no-commit --no-ff --strategy-option=theirs origin/master
           if ! git diff-index --quiet HEAD --; then
-            git commit -m "Merge remote-tracking branch 'origin/$main_branch"' into autogenerate"
-            git push
+            git commit -m "Merge remote-tracking branch 'origin/master' into $(Build.SourceBranchName)"
+            git push origin $(Build.SourceBranchName)
           fi
+          
+      - name: Install packages
+        run: npm install
+        working-directory: ./generator
+          

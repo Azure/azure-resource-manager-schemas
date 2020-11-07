@@ -27,11 +27,17 @@ jobs:
         run: |
           git merge --no-commit --no-ff --strategy-option=theirs origin/master
           if ! git diff-index --quiet HEAD --; then
-            git commit -m "Merge remote-tracking branch 'origin/master' into $(Build.SourceBranchName)"
-            git push origin $(Build.SourceBranchName)
+            git commit -m "Merge remote-tracking branch 'origin/master' into autogenerate"
+            git push origin autogenerate
           fi
           
       - name: Install packages
         run: npm install
+        working-directory: ./generator
+        
+      - name: Generate Schemas
+        env:
+          batch: "{\"batchCount\": 4, \"batchIndex\": 0}"
+        run: npm run generate-all $batch
         working-directory: ./generator
           

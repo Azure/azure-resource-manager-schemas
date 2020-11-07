@@ -14,17 +14,20 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    
+    env:
+      branch_name: ${GITHUB_REF##*/}
+      main_branch: ${{ github.repository.master_branch }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       
-      - name: Branch name
-        run: echo running on branch ${GITHUB_REF##*/}
-      
       - name: Integrate main branch
         run: |
+          git checkout $branch_name
+          git pull
           git merge --no-commit --no-ff --strategy-option=theirs origin/master
           if ! git diff-index --quiet HEAD --; then
             git commit -m "Merge remote-tracking branch 'origin/master' into autogenerate"

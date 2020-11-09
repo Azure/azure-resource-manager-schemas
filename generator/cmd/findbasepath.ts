@@ -18,8 +18,10 @@ executeSynchronous(async () => {
 
     if (autogenEntries.length === 0) {
         //not found
-        throw new Error(`Base path: '${basePath}' not found in autogenlist, this means RP hasn't been onboarded in schema autogeneration process yet.`)
+        console.log("false");
+        return;
     }
 
     console.log(`Base path: '${basePath} found in autogenlist.`);
+    console.log("true");
 });

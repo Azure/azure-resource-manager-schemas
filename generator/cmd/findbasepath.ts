@@ -5,7 +5,7 @@ import { findAutogenEntries } from '../autogenlist';
 // if not found, it throws an error
 executeSynchronous(async () => {
     if (!process.argv[2]) {
-        throw new Error("Branch name missing. This cmd expects a branch name with the following format: 'AzureSDKAutomation:sdkAutomation/[basepath]'");
+        throw new Error("Branch name missing. This cmd expects a branch name with the following format: 'sdkAutomation/[basepath]'");
     }
     
     const prName = process.argv[2];

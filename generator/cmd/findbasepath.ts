@@ -9,7 +9,7 @@ executeSynchronous(async () => {
     }
     
     const prName = process.argv[2];
-    let basePath = prName.replace("AzureSDKAutomation:sdkAutomation/", "");
+    let basePath = prName.replace("sdkAutomation/", "");
 
     // format basePath
     basePath = `${basePath}/resource-manager`;

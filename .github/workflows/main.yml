@@ -27,6 +27,7 @@ jobs:
   automerge:
     runs-on: ubuntu-latest
     needs: build
+    if: ${{ github.actor == 'AzureSDKAutomation' && startsWith(github.head_ref, 'sdkAutomation') }}
     steps:
       - uses: actions/checkout@v2
 
@@ -35,8 +36,11 @@ jobs:
         with:
           node-version: 10.x
 
+      - name: Install NPM modules
+        run: npm ci
+        working-directory: ./generator
+
       - name: Check RP in Autogenlist
-        if: ${{ github.actor == 'AzureSDKAutomation' && startsWith(github.head_ref, 'sdkAutomation') }}
         run: |
           check_result='';
           exec=$(npm run find-basepath ${{ github.head_ref }}); 
@@ -52,7 +56,6 @@ jobs:
         working-directory: ./generator
 
       - name: Automerge
-        if: ${{ github.actor == 'AzureSDKAutomation' && startsWith(github.head_ref, 'sdkAutomation') && env.AUTOGENLIST_CHECK_RESULT == 'true' }}
         uses: "pascalgn/automerge-action@v0.12.0"
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"          

@@ -65,6 +65,20 @@ const autogenlist: AutogenlistConfig[] = [
         ]
     },
     {
+        basePath: 'resource/resource-manager',
+        namespace: 'Microsoft.Authorization',
+        resourceConfig: [
+            {
+                type: 'roleAssignments',
+                scopes: ScopeType.Tenant | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.ManagementGroup,
+            },
+            {
+                type: 'roleDefinitions',
+                scopes: ScopeType.Tenant | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.ManagementGroup,
+            },
+        ]
+    },
+    {
         basePath: 'automation/resource-manager',
         namespace: 'Microsoft.Automation',
     },

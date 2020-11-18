@@ -94,6 +94,79 @@
         "type"
       ],
       "description": "Microsoft.OperationalInsights/clusters"
+    },
+    "workspaces": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-10-01"
+          ]
+        },
+        "eTag": {
+          "type": "string",
+          "description": "The ETag of the workspace."
+        },
+        "location": {
+          "type": "string",
+          "description": "The geo-location where the resource lives"
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9-]+[A-Za-z0-9]$",
+              "minLength": 4,
+              "maxLength": 63
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the workspace."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WorkspaceProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Workspace properties."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Resource tags."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.OperationalInsights/workspaces"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "location",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.OperationalInsights/workspaces"
     }
   },
   "definitions": {
@@ -229,15 +302,7 @@
           "type": "string",
           "description": "The name of the key associated with the Log Analytics cluster."
         },
-        "keyVaultUri": {
-          "type": "string",
-          "description": "The Key Vault uri which holds they key associated with the Log Analytics cluster."
-        },
-        "keyVersion": {
-          "type": "string",
-          "description": "The version of the key associated with the Log Analytics cluster."
-        },
-        "rsaKeySize": {
+        "keyRsaSize": {
           "oneOf": [
             {
               "type": "integer"
@@ -246,7 +311,15 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Selected key minimum required key size."
+          "description": "Selected key minimum required size."
+        },
+        "keyVaultUri": {
+          "type": "string",
+          "description": "The Key Vault uri which holds they key associated with the Log Analytics cluster."
+        },
+        "keyVersion": {
+          "type": "string",
+          "description": "The version of the key associated with the Log Analytics cluster."
         }
       },
       "description": "The key vault properties."
@@ -255,6 +328,165 @@
       "type": "object",
       "properties": {},
       "description": "User assigned identity properties."
+    },
+    "WorkspaceCapping": {
+      "type": "object",
+      "properties": {
+        "dailyQuotaGb": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The workspace daily quota for ingestion."
+        }
+      },
+      "description": "The daily volume cap for ingestion."
+    },
+    "WorkspaceProperties": {
+      "type": "object",
+      "properties": {
+        "forceQueryCmk": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates whether customer managed storage is mandatory for query management."
+        },
+        "provisioningState": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Creating",
+                "Succeeded",
+                "Failed",
+                "Canceled",
+                "Deleting",
+                "ProvisioningAccount",
+                "Updating"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The provisioning state of the workspace."
+        },
+        "publicNetworkAccessForIngestion": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Enabled",
+                "Disabled"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The network access type for accessing Log Analytics ingestion."
+        },
+        "publicNetworkAccessForQuery": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Enabled",
+                "Disabled"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The network access type for accessing Log Analytics query."
+        },
+        "retentionInDays": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 30,
+              "maximum": 730
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The workspace data retention in days, between 30 and 730."
+        },
+        "sku": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WorkspaceSku"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The SKU (tier) of a workspace."
+        },
+        "workspaceCapping": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WorkspaceCapping"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The daily volume cap for ingestion."
+        }
+      },
+      "description": "Workspace properties."
+    },
+    "WorkspaceSku": {
+      "type": "object",
+      "properties": {
+        "capacityReservationLevel": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The capacity reservation level for this workspace, when CapacityReservation sku is selected."
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Free",
+                "Standard",
+                "Premium",
+                "PerNode",
+                "PerGB2018",
+                "Standalone",
+                "CapacityReservation"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the SKU."
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "The SKU (tier) of a workspace."
     }
   }
 }

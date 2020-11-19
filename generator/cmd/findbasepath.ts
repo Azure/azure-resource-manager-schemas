@@ -9,7 +9,8 @@ executeSynchronous(async () => {
     }
     
     const prName = process.argv[2];
-    let basePath = prName.replace("sdkAutomation/", "");
+    const prPrefix = process.argv[3];
+    let basePath = prName.replace(prPrefix, "");
 
     // format basePath
     basePath = `${basePath}/resource-manager`;

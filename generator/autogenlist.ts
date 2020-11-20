@@ -14,7 +14,7 @@ const autogenlist: AutogenlistConfig[] = [
         basePath: 'adhybridhealthservice/resource-manager',
         namespace: 'Microsoft.ADHybridHealthService',
     },
-    {
+    { 
         basePath: 'cdn/resource-manager',
         namespace: 'Microsoft.Cdn',
     },
@@ -51,20 +51,6 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.Attestation',
     },
     {
-        basePath: 'authorization/resource-manager',
-        namespace: 'Microsoft.Authorization',
-        resourceConfig: [
-            {
-                type: 'roleAssignments',
-                scopes: ScopeType.Tenant | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.ManagementGroup,
-            },
-            {
-                type: 'roleDefinitions',
-                scopes: ScopeType.Tenant | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.ManagementGroup,
-            },
-        ]
-    },
-    {
         basePath: 'automation/resource-manager',
         namespace: 'Microsoft.Automation',
     },
@@ -76,11 +62,11 @@ const autogenlist: AutogenlistConfig[] = [
         basePath: 'azurestack/resource-manager',
         namespace: 'Microsoft.AzureStack',
     },
-    {
+    { 
         basePath: 'batch/resource-manager',
         namespace: 'Microsoft.Batch',
     },
-    {
+    { 
         basePath: 'batchai/resource-manager',
         namespace: 'Microsoft.BatchAI',
     },
@@ -156,7 +142,7 @@ const autogenlist: AutogenlistConfig[] = [
         basePath: 'databox/resource-manager',
         namespace: 'Microsoft.DataBox',
     },
-    {
+    { 
         basePath: 'operationalinsights/resource-manager',
         namespace: 'Microsoft.OperationalInsights',
     },
@@ -219,14 +205,14 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.DesktopVirtualization',
     },
     {
-        basePath: 'digitaltwins/resource-manager',
-        namespace: 'Microsoft.DigitalTwins',
-        resourceConfig: [
-            {
-                type: 'integrationResources',
-                scopes: ScopeType.Extension,
-            }
-        ]
+      basePath: 'digitaltwins/resource-manager',
+      namespace: 'Microsoft.DigitalTwins',
+      resourceConfig: [
+          {
+              type: 'integrationResources',
+              scopes: ScopeType.Extension,
+          }
+      ]
     },
     {
         basePath: 'deviceprovisioningservices/resource-manager',
@@ -253,7 +239,7 @@ const autogenlist: AutogenlistConfig[] = [
         basePath: 'resourcegraph/resource-manager',
         namespace: 'Microsoft.ResourceGraph',
     },
-    {
+    { 
         basePath: 'redis/resource-manager',
         namespace: 'Microsoft.Cache',
     },
@@ -266,14 +252,14 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.HDInsight',
     },
     {
-        basePath: 'resourcehealth/resource-manager',
-        namespace: 'Microsoft.ResourceHealth',
-    },
+        basePath: 'resourcehealth/resource-manager',
+        namespace: 'Microsoft.ResourceHealth',
+    }, 
     {
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',
         namespace: 'Microsoft.EnterpriseKnowledgeGraph',
     },
-    {
+    { 
         basePath: 'domainservices/resource-manager',
         namespace: 'Microsoft.AAD',
     },
@@ -326,7 +312,7 @@ const autogenlist: AutogenlistConfig[] = [
         basePath: 'labservices/resource-manager',
         namespace: 'Microsoft.LabServices',
     },
-    {
+    { 
         basePath: 'eventgrid/resource-manager',
         namespace: 'Microsoft.EventGrid',
         resourceConfig: [
@@ -408,8 +394,8 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.NetApp',
     },
     {
-        basePath: 'notificationhubs/resource-manager',
-        namespace: 'Microsoft.NotificationHubs'
+      basePath: 'notificationhubs/resource-manager',
+      namespace: 'Microsoft.NotificationHubs'
     },
     {
         basePath: 'policyinsights/resource-manager',
@@ -517,10 +503,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.ImportExport'
     },
     {
-        basePath: 'storSimple1200Series/resource-manager',
-        namespace: 'Microsoft.StorSimple',
+        basePath: 'storSimple1200Series/resource-manager',
+        namespace: 'Microsoft.StorSimple',
         suffix: '1200'
-    },
+    },
     {
         basePath: 'storage/resource-manager',
         namespace: 'Microsoft.Storage',
@@ -534,11 +520,11 @@ const autogenlist: AutogenlistConfig[] = [
         basePath: 'visualstudio/resource-manager',
         namespace: 'Microsoft.VisualStudio',
     },
-    {
+    { 
         basePath: 'sql/resource-manager',
         namespace: 'Microsoft.Sql',
     },
-    {
+    { 
         basePath: 'scheduler/resource-manager',
         namespace: 'Microsoft.Scheduler',
     },
@@ -546,16 +532,16 @@ const autogenlist: AutogenlistConfig[] = [
         basePath: 'search/resource-manager',
         namespace: 'Microsoft.Search',
     },
-    {
+    { 
         basePath: 'subscription/resource-manager',
         namespace: 'Microsoft.Subscription',
     },
-    {
+    { 
         basePath: 'storsimple8000series/resource-manager',
         namespace: 'Microsoft.StorSimple',
         suffix: '8000',
     },
-    {
+    { 
         basePath: 'support/resource-manager',
         namespace: 'Microsoft.Support',
     },

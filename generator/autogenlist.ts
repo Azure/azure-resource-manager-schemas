@@ -376,6 +376,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.Migrate',
     },
     {
+        basePath: 'resourcemover/resource-manager',
+        namespace: 'Microsoft.Migrate',
+    },
+    {
         basePath: 'mariadb/resource-manager',
         namespace: 'Microsoft.DBforMariaDB',
     },

@@ -3,7 +3,6 @@ name: CI
 on:
   pull_request:
     branches: [ master ]
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -32,7 +31,9 @@ jobs:
   automerge:
     runs-on: ubuntu-latest
     needs: build
-    if: ${{ contains(github.actor, 'openapi-sdkautomation') && startsWith(github.head_ref, 'sdkAuto/') }}
+    env:
+      PR_PREFIX: sdkAuto/
+    if: ${{ github.actor == 'openapi-sdkautomation' }}
     steps:
       - uses: actions/checkout@v2
 
@@ -48,7 +49,7 @@ jobs:
       - name: Check RP in Autogenlist
         run: |
           check_result='';
-          exec=$(npm run find-basepath ${{ github.head_ref }}); 
+          exec=$(npm run find-basepath ${{ github.head_ref }} $PR_PREFIX); 
           while read line; 
           do
             # overriding check_result until the last line is read, last line contains

@@ -38,9 +38,23 @@
             "oneOf": [
               {
                 "$ref": "#/definitions/Spring_apps_childResource"
+              },
+              {
+                "$ref": "#/definitions/Spring_certificates_childResource"
               }
             ]
           }
+        },
+        "sku": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Sku"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Sku of Azure Spring Cloud"
         },
         "tags": {
           "oneOf": [
@@ -81,6 +95,17 @@
             "2019-05-01-preview"
           ]
         },
+        "identity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ManagedIdentityProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Managed identity properties retrieved from ARM request headers."
+        },
         "location": {
           "type": "string",
           "description": "The GEO location of the application, always the same with its parent resource"
@@ -106,6 +131,9 @@
             "oneOf": [
               {
                 "$ref": "#/definitions/Spring_apps_bindings_childResource"
+              },
+              {
+                "$ref": "#/definitions/Spring_apps_domains_childResource"
               },
               {
                 "$ref": "#/definitions/Spring_apps_deployments_childResource"
@@ -205,6 +233,84 @@
         "type"
       ],
       "description": "Microsoft.AppPlatform/Spring/apps/deployments"
+    },
+    "Spring_apps_domains": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-05-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the custom domain resource."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CustomDomainProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Custom domain of app resource payload."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.AppPlatform/Spring/apps/domains"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.AppPlatform/Spring/apps/domains"
+    },
+    "Spring_certificates": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-05-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the certificate resource."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CertificateProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Certificate resource payload."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.AppPlatform/Spring/certificates"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.AppPlatform/Spring/certificates"
     }
   },
   "definitions": {
@@ -214,6 +320,21 @@
         "activeDeploymentName": {
           "type": "string",
           "description": "Name of the active deployment of the App"
+        },
+        "fqdn": {
+          "type": "string",
+          "description": "Fully qualified dns Name."
+        },
+        "httpsOnly": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicate if only https is allowed."
         },
         "persistentDisk": {
           "oneOf": [
@@ -277,17 +398,31 @@
         "resourceId": {
           "type": "string",
           "description": "The Azure resource id of the bound resource"
-        },
-        "resourceName": {
-          "type": "string",
-          "description": "The name of the bound resource"
-        },
-        "resourceType": {
-          "type": "string",
-          "description": "The standard Azure resource type of the bound resource"
         }
       },
       "description": "Binding resource properties payload"
+    },
+    "CertificateProperties": {
+      "type": "object",
+      "properties": {
+        "certVersion": {
+          "type": "string",
+          "description": "The certificate version of key vault."
+        },
+        "keyVaultCertName": {
+          "type": "string",
+          "description": "The certificate name of key vault."
+        },
+        "vaultUri": {
+          "type": "string",
+          "description": "The vault uri of user key vault."
+        }
+      },
+      "required": [
+        "keyVaultCertName",
+        "vaultUri"
+      ],
+      "description": "Certificate resource payload."
     },
     "ClusterResourceProperties": {
       "type": "object",
@@ -302,6 +437,17 @@
             }
           ],
           "description": "Config server git properties payload"
+        },
+        "networkProfile": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/NetworkProfile"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Service network profile payload"
         },
         "trace": {
           "oneOf": [
@@ -438,6 +584,20 @@
       },
       "description": "The settings of config server."
     },
+    "CustomDomainProperties": {
+      "type": "object",
+      "properties": {
+        "certName": {
+          "type": "string",
+          "description": "The bound certificate name of domain."
+        },
+        "thumbprint": {
+          "type": "string",
+          "description": "The thumbprint of bound certificate."
+        }
+      },
+      "description": "Custom domain of app resource payload."
+    },
     "DeploymentResourceProperties": {
       "type": "object",
       "properties": {
@@ -473,15 +633,13 @@
           "oneOf": [
             {
               "type": "integer",
-              "minimum": 1,
-              "maximum": 4,
               "default": "1"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Required CPU"
+          "description": "Required CPU, basic tier should be 1, standard tier should be in range (1, 4)"
         },
         "environmentVariables": {
           "oneOf": [
@@ -502,15 +660,13 @@
           "oneOf": [
             {
               "type": "integer",
-              "minimum": 1,
-              "maximum": 20,
               "default": "1"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Instance count"
+          "description": "Instance count, basic tier should be in range (1, 25), standard tier should be in range (1, 500)"
         },
         "jvmOptions": {
           "type": "string",
@@ -520,15 +676,17 @@
           "oneOf": [
             {
               "type": "integer",
-              "minimum": 1,
-              "maximum": 8,
               "default": "1"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Required Memory size in GB"
+          "description": "Required Memory size in GB, basic tier should be in range (1, 2), standard tier should be in range (1, 8)"
+        },
+        "netCoreMainEntryPath": {
+          "type": "string",
+          "description": "The path to the .NET executable relative to zip root"
         },
         "runtimeVersion": {
           "oneOf": [
@@ -536,7 +694,8 @@
               "type": "string",
               "enum": [
                 "Java_8",
-                "Java_11"
+                "Java_11",
+                "NetCore_31"
               ]
             },
             {
@@ -643,6 +802,60 @@
       ],
       "description": "Git repository property payload"
     },
+    "ManagedIdentityProperties": {
+      "type": "object",
+      "properties": {
+        "principalId": {
+          "type": "string"
+        },
+        "tenantId": {
+          "type": "string"
+        },
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "None",
+                "SystemAssigned",
+                "UserAssigned",
+                "SystemAssigned,UserAssigned"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "description": "Managed identity properties retrieved from ARM request headers."
+    },
+    "NetworkProfile": {
+      "type": "object",
+      "properties": {
+        "appNetworkResourceGroup": {
+          "type": "string",
+          "description": "Name of the resource group containing network resources of Azure Spring Cloud Apps"
+        },
+        "appSubnetId": {
+          "type": "string",
+          "description": "Fully qualified resource Id of the subnet to host Azure Spring Cloud Apps"
+        },
+        "serviceCidr": {
+          "type": "string",
+          "description": "Azure Spring Cloud service reserved CIDR"
+        },
+        "serviceRuntimeNetworkResourceGroup": {
+          "type": "string",
+          "description": "Name of the resource group containing network resources of Azure Spring Cloud Service Runtime"
+        },
+        "serviceRuntimeSubnetId": {
+          "type": "string",
+          "description": "Fully qualified resource Id of the subnet to host Azure Spring Cloud Service Runtime"
+        }
+      },
+      "description": "Service network profile payload"
+    },
     "PersistentDisk": {
       "type": "object",
       "properties": {
@@ -665,6 +878,31 @@
         }
       },
       "description": "Persistent disk payload"
+    },
+    "Sku": {
+      "type": "object",
+      "properties": {
+        "capacity": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Current capacity of the target resource"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the Sku"
+        },
+        "tier": {
+          "type": "string",
+          "description": "Tier of the Sku"
+        }
+      },
+      "description": "Sku of Azure Spring Cloud"
     },
     "Spring_apps_bindings_childResource": {
       "type": "object",
@@ -713,6 +951,17 @@
           "enum": [
             "2019-05-01-preview"
           ]
+        },
+        "identity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ManagedIdentityProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Managed identity properties retrieved from ARM request headers."
         },
         "location": {
           "type": "string",
@@ -787,6 +1036,84 @@
       ],
       "description": "Microsoft.AppPlatform/Spring/apps/deployments"
     },
+    "Spring_apps_domains_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-05-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the custom domain resource."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CustomDomainProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Custom domain of app resource payload."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "domains"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.AppPlatform/Spring/apps/domains"
+    },
+    "Spring_certificates_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-05-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the certificate resource."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CertificateProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Certificate resource payload."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "certificates"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.AppPlatform/Spring/certificates"
+    },
     "TemporaryDisk": {
       "type": "object",
       "properties": {
@@ -859,6 +1186,7 @@
               "type": "string",
               "enum": [
                 "Jar",
+                "NetCoreZip",
                 "Source"
               ]
             },

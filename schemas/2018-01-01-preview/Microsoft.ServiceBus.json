@@ -13,14 +13,23 @@
             "2018-01-01-preview"
           ]
         },
+        "identity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Identity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties to configure Identity for Bring your Own Keys"
+        },
         "location": {
           "type": "string",
           "description": "The Geo-location where the resource lives"
         },
         "name": {
           "type": "string",
-          "minLength": 6,
-          "maxLength": 50,
           "description": "The namespace name."
         },
         "properties": {
@@ -42,10 +51,13 @@
                 "$ref": "#/definitions/namespaces_ipfilterrules_childResource"
               },
               {
+                "$ref": "#/definitions/namespaces_networkrulesets_childResource"
+              },
+              {
                 "$ref": "#/definitions/namespaces_virtualnetworkrules_childResource"
               },
               {
-                "$ref": "#/definitions/namespaces_networkrulesets_childResource"
+                "$ref": "#/definitions/namespaces_privateEndpointConnections_childResource"
               }
             ]
           }
@@ -178,6 +190,45 @@
       ],
       "description": "Microsoft.ServiceBus/namespaces/networkrulesets"
     },
+    "namespaces_privateEndpointConnections": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-01-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The PrivateEndpointConnection name"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PrivateEndpointConnectionProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the private endpoint connection resource."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ServiceBus/namespaces/privateEndpointConnections"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.ServiceBus/namespaces/privateEndpointConnections"
+    },
     "namespaces_virtualnetworkrules": {
       "type": "object",
       "properties": {
@@ -220,6 +271,33 @@
     }
   },
   "definitions": {
+    "ConnectionState": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Description of the connection state."
+        },
+        "status": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Pending",
+                "Approved",
+                "Rejected",
+                "Disconnected"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Status of the connection."
+        }
+      },
+      "description": "ConnectionState information."
+    },
     "Encryption": {
       "type": "object",
       "properties": {
@@ -403,6 +481,45 @@
       ],
       "description": "Microsoft.ServiceBus/namespaces/networkrulesets"
     },
+    "namespaces_privateEndpointConnections_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-01-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The PrivateEndpointConnection name"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PrivateEndpointConnectionProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the private endpoint connection resource."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "privateEndpointConnections"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.ServiceBus/namespaces/privateEndpointConnections"
+    },
     "namespaces_virtualnetworkrules_childResource": {
       "type": "object",
       "properties": {
@@ -544,6 +661,63 @@
       },
       "description": "The response from the List namespace operation."
     },
+    "PrivateEndpoint": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The ARM identifier for Private Endpoint."
+        }
+      },
+      "description": "PrivateEndpoint information."
+    },
+    "PrivateEndpointConnectionProperties": {
+      "type": "object",
+      "properties": {
+        "privateEndpoint": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PrivateEndpoint"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "PrivateEndpoint information."
+        },
+        "privateLinkServiceConnectionState": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ConnectionState"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "ConnectionState information."
+        },
+        "provisioningState": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Creating",
+                "Updating",
+                "Deleting",
+                "Succeeded",
+                "Canceled",
+                "Failed"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Provisioning state of the Private Endpoint Connection."
+        }
+      },
+      "description": "Properties of the private endpoint connection resource."
+    },
     "SBNamespaceProperties": {
       "type": "object",
       "properties": {
@@ -557,17 +731,6 @@
             }
           ],
           "description": "Properties to configure Encryption"
-        },
-        "identity": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/Identity"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Properties to configure Identity for Bring your Own Keys"
         },
         "zoneRedundant": {
           "oneOf": [

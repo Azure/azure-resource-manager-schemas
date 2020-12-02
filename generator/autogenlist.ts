@@ -578,6 +578,10 @@ const autogenlist: AutogenlistConfig[] = [
     {
         basePath: 'windowsiot/resource-manager',
         namespace: 'Microsoft.WindowsIoT',
+    },
+    {
+        basePath: 'compute/resource-manager',
+        namespace: 'Microsoft.Compute',
     }
 ];
 

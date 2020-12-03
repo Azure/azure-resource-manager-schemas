@@ -61,22 +61,15 @@ jobs:
           echo "AUTOGENLIST_CHECK_RESULT=$check_result" >> $GITHUB_ENV;
         working-directory: ./generator
         
-      - name : Apply Merge Label
+      - uses: hmarr/auto-approve-action@v2.0.0
         if: ${{ env.AUTOGENLIST_CHECK_RESULT == 'true' }}
-        uses: actions/github-script@v3
         with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            github.issues.addLabels({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: [ 'automerge', 'bot' ]
-            })
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
             
       - name: Automerge
         if: ${{ env.AUTOGENLIST_CHECK_RESULT == 'true' }}
         uses: "pascalgn/automerge-action@v0.12.0"
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"          
-          MERGE_LABELS: "automerge, bot"
+          MERGE_LABELS: ""
+          UPDATE_LABELS: ""

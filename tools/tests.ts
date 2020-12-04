@@ -56,11 +56,8 @@ async function loadRawSchema(uri: string) : Promise<string> {
 
 async function loadSchema(uri: string) : Promise<object> {
   const rawSchema = await loadRawSchema(uri);
-  return JSON.parse(stripUtf8Bom(rawSchema));
-}
 
-function stripUtf8Bom(value: string) {
-  return value ? value.replace(/^\uFEFF/, '') : value;
+  return JSON.parse(rawSchema);
 }
 
 function listSchemaPaths(basePath: string): string[] {
@@ -157,8 +154,14 @@ for (const testPath of schemaTestPaths) {
 describe('Validate individual resource schemas', () => {
   for (const schemaPath of schemaPaths) {
     describe(schemaPath, () => {
+      it(`can be parsed with JSON.parse`, async function () {
+        const schema = await loadRawSchema(schemaPath);
+
+        expect(() => JSON.parse(schema)).not.to.throw();
+      });
+
       for (const metaSchemaPath of metaSchemaPaths) {
-        it(`Validate against '${metaSchemaPath}'`, async function() {
+        it(`validates against '${metaSchemaPath}'`, async function() {
           this.timeout(60000);
           const schema = await loadSchema(schemaPath);
           const metaSchema = await loadSchema(metaSchemaPath);
@@ -170,7 +173,7 @@ describe('Validate individual resource schemas', () => {
         });
       }
 
-      it(`Compile '${schemaPath}'`, async function() {
+      it(`can be compiled`, async function() {
         this.timeout(60000);
         const schema = await loadSchema(schemaPath);
   
@@ -178,7 +181,7 @@ describe('Validate individual resource schemas', () => {
       });
   
       if (!schemasToSkipForCyclicValidation.has(schemaPath)) {
-        it(`Check '${schemaPath}' for cycles`, async function() {
+        it(`does not contain any cycles`, async function() {
           this.timeout(60000);
           const schema = await loadSchema(schemaPath);
     

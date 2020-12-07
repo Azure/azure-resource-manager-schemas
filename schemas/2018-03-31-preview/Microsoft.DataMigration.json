@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2017-11-15-preview/Microsoft.DataMigration.json#",
+  "id": "https://schema.management.azure.com/schemas/2018-03-31-preview/Microsoft.DataMigration.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.DataMigration",
   "description": "Microsoft DataMigration Resource Types",
@@ -10,7 +10,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2017-11-15-preview"
+            "2018-03-31-preview"
           ]
         },
         "etag": {
@@ -98,7 +98,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2017-11-15-preview"
+            "2018-03-31-preview"
           ]
         },
         "location": {
@@ -167,7 +167,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2017-11-15-preview"
+            "2018-03-31-preview"
           ]
         },
         "etag": {
@@ -206,6 +206,19 @@
     }
   },
   "definitions": {
+    "BlobShare": {
+      "type": "object",
+      "properties": {
+        "sasUri": {
+          "type": "string",
+          "description": "SAS URI of Azure Storage Account Container."
+        }
+      },
+      "required": [
+        "sasUri"
+      ],
+      "description": "Blob container storage information."
+    },
     "ConnectionInfo": {
       "type": "object",
       "oneOf": [
@@ -242,6 +255,30 @@
             }
           ],
           "description": "Permission group for validations."
+        },
+        "CollectAgentJobs": {
+          "oneOf": [
+            {
+              "type": "boolean",
+              "default": false
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Flag for whether to collect agent jobs from source server."
+        },
+        "CollectLogins": {
+          "oneOf": [
+            {
+              "type": "boolean",
+              "default": false
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Flag for whether to collect logins from source server."
         },
         "sourceConnectionInfo": {
           "oneOf": [
@@ -332,6 +369,52 @@
       ],
       "description": "Properties for the task that validates connection to SQL DB and target server requirements"
     },
+    "ConnectToTargetSqlMITaskInput": {
+      "type": "object",
+      "properties": {
+        "targetConnectionInfo": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SqlConnectionInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Information for connecting to SQL database server"
+        }
+      },
+      "required": [
+        "targetConnectionInfo"
+      ],
+      "description": "Input for the task that validates connection to Azure SQL Database Managed Instance."
+    },
+    "ConnectToTargetSqlMITaskProperties": {
+      "type": "object",
+      "properties": {
+        "input": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ConnectToTargetSqlMITaskInput"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Input for the task that validates connection to Azure SQL Database Managed Instance."
+        },
+        "taskType": {
+          "type": "string",
+          "enum": [
+            "ConnectToTarget.AzureSqlDbMI"
+          ]
+        }
+      },
+      "required": [
+        "taskType"
+      ],
+      "description": "Properties for the task that validates connection to Azure SQL Database Managed Instance"
+    },
     "DatabaseInfo": {
       "type": "object",
       "properties": {
@@ -361,6 +444,27 @@
         "virtualSubnetId"
       ],
       "description": "Properties of the Data Migration service instance"
+    },
+    "FileShare": {
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string",
+          "description": "Password credential used to connect to the share location."
+        },
+        "path": {
+          "type": "string",
+          "description": "The folder path for this share."
+        },
+        "userName": {
+          "type": "string",
+          "description": "User name credential to connect to the share location"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "description": "File share information with Path, Username, and Password."
     },
     "GetUserTablesSqlTaskInput": {
       "type": "object",
@@ -547,6 +651,159 @@
       ],
       "description": "Properties for the task that migrates on-prem SQL Server databases to Azure SQL Database"
     },
+    "MigrateSqlServerSqlMIDatabaseInput": {
+      "type": "object",
+      "properties": {
+        "backupFileShare": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/FileShare"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "File share information with Path, Username, and Password."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the database"
+        },
+        "restoreDatabaseName": {
+          "type": "string",
+          "description": "Name of the database at destination"
+        }
+      },
+      "required": [
+        "name",
+        "restoreDatabaseName"
+      ],
+      "description": "Database specific information for SQL to Azure SQL DB Managed Instance migration task inputs"
+    },
+    "MigrateSqlServerSqlMITaskInput": {
+      "type": "object",
+      "properties": {
+        "backupBlobShare": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BlobShare"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Blob container storage information."
+        },
+        "backupFileShare": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/FileShare"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "File share information with Path, Username, and Password."
+        },
+        "selectedAgentJobs": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Agent Jobs to migrate."
+        },
+        "selectedDatabases": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MigrateSqlServerSqlMIDatabaseInput"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Databases to migrate"
+        },
+        "selectedLogins": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Logins to migrate."
+        },
+        "sourceConnectionInfo": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SqlConnectionInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Information for connecting to SQL database server"
+        },
+        "targetConnectionInfo": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SqlConnectionInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Information for connecting to SQL database server"
+        }
+      },
+      "required": [
+        "backupBlobShare",
+        "selectedDatabases",
+        "sourceConnectionInfo",
+        "targetConnectionInfo"
+      ],
+      "description": "Input for task that migrates SQL Server databases to Azure SQL Database Managed Instance."
+    },
+    "MigrateSqlServerSqlMITaskProperties": {
+      "type": "object",
+      "properties": {
+        "input": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MigrateSqlServerSqlMITaskInput"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Input for task that migrates SQL Server databases to Azure SQL Database Managed Instance."
+        },
+        "taskType": {
+          "type": "string",
+          "enum": [
+            "Migrate.SqlServer.AzureSqlDbMI"
+          ]
+        }
+      },
+      "required": [
+        "taskType"
+      ],
+      "description": "Properties for task that migrates SQL Server databases to Azure SQL Database Managed Instance"
+    },
     "MigrationValidationOptions": {
       "type": "object",
       "properties": {
@@ -646,6 +903,7 @@
               "type": "string",
               "enum": [
                 "SQLDB",
+                "SQLMI",
                 "Unknown"
               ]
             },
@@ -669,13 +927,22 @@
           "$ref": "#/definitions/ConnectToSourceSqlServerTaskProperties"
         },
         {
+          "$ref": "#/definitions/ConnectToTargetSqlMITaskProperties"
+        },
+        {
           "$ref": "#/definitions/ConnectToTargetSqlDbTaskProperties"
         },
         {
           "$ref": "#/definitions/GetUserTablesSqlTaskProperties"
         },
         {
+          "$ref": "#/definitions/MigrateSqlServerSqlMITaskProperties"
+        },
+        {
           "$ref": "#/definitions/MigrateSqlServerSqlDbTaskProperties"
+        },
+        {
+          "$ref": "#/definitions/ValidateMigrationInputSqlServerSqlMITaskProperties"
         }
       ],
       "properties": {},
@@ -720,7 +987,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2017-11-15-preview"
+            "2018-03-31-preview"
           ]
         },
         "location": {
@@ -779,7 +1046,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2017-11-15-preview"
+            "2018-03-31-preview"
           ]
         },
         "etag": {
@@ -889,6 +1156,90 @@
         "type"
       ],
       "description": "Information for connecting to SQL database server"
+    },
+    "ValidateMigrationInputSqlServerSqlMITaskInput": {
+      "type": "object",
+      "properties": {
+        "backupBlobShare": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BlobShare"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Blob container storage information."
+        },
+        "backupFileShare": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/FileShare"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "File share information with Path, Username, and Password."
+        },
+        "selectedDatabases": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MigrateSqlServerSqlMIDatabaseInput"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Databases to migrate"
+        },
+        "targetConnectionInfo": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SqlConnectionInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Information for connecting to SQL database server"
+        }
+      },
+      "required": [
+        "backupBlobShare",
+        "selectedDatabases",
+        "targetConnectionInfo"
+      ],
+      "description": "Input for task that validates migration input for SQL to Azure SQL Managed Instance"
+    },
+    "ValidateMigrationInputSqlServerSqlMITaskProperties": {
+      "type": "object",
+      "properties": {
+        "input": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ValidateMigrationInputSqlServerSqlMITaskInput"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Input for task that validates migration input for SQL to Azure SQL Managed Instance"
+        },
+        "taskType": {
+          "type": "string",
+          "enum": [
+            "ValidateMigrationInput.SqlServer.AzureSqlDbMI"
+          ]
+        }
+      },
+      "required": [
+        "taskType"
+      ],
+      "description": "Properties for task that validates migration input for SQL to Azure SQL Database Managed Instance"
     }
   }
 }

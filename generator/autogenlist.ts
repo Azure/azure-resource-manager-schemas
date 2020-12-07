@@ -578,6 +578,42 @@ const autogenlist: AutogenlistConfig[] = [
     {
         basePath: 'windowsiot/resource-manager',
         namespace: 'Microsoft.WindowsIoT',
+    },
+    {
+        basePath: 'adp/resource-manager',
+        namespace: 'Microsoft.AutonomousDevelopmentPlatform',
+    },
+    {
+        basePath: 'automanage/resource-manager',
+        namespace: 'Microsoft.Automanage',
+    },
+    {
+        basePath: 'confluent/resource-manager',
+        namespace: 'Microsoft.Confluent',
+    },
+    {
+        basePath: 'datamigration/resource-manager',
+        namespace: 'Microsoft.DataMigration',
+    },
+    {
+        basePath: 'datadog/resource-manager',
+        namespace: 'Microsoft.Datadog',
+    },
+    {
+        basePath: 'healthbot/resource-manager',
+        namespace: 'Microsoft.HealthBot',
+    },
+    {
+        basePath: 'hybridkubernetes/resource-manager',
+        namespace: 'Microsoft.Kubernetes',
+    },
+    {
+        basePath: 'hybridnetwork/resource-manager',
+        namespace: 'Microsoft.HybridNetwork',
+    },
+    {
+        basePath: 'powerplatform/resource-manager',
+        namespace: 'Microsoft.PowerPlatform',
     }
 ];
 

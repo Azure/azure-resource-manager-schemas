@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2020-03-01/Microsoft.Devices.json#",
+  "id": "https://schema.management.azure.com/schemas/2020-09-01-preview/Microsoft.Devices.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.Devices",
   "description": "Microsoft Devices Resource Types",
@@ -10,12 +10,23 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-03-01"
+            "2020-09-01-preview"
           ]
         },
         "etag": {
           "type": "string",
           "description": "The Etag field is *not* required. If it is provided in the response body, it must also be provided as a header per the normal ETag convention."
+        },
+        "identity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ArmIdentity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The set of ARM identities associated with the IoT DPS resource."
         },
         "location": {
           "type": "string",
@@ -98,7 +109,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-03-01"
+            "2020-09-01-preview"
           ]
         },
         "certificate": {
@@ -129,7 +140,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-03-01"
+            "2020-09-01-preview"
           ]
         },
         "name": {
@@ -164,6 +175,81 @@
     }
   },
   "definitions": {
+    "ArmIdentity": {
+      "type": "object",
+      "properties": {
+        "identityType": {
+          "type": "string",
+          "description": "Identity type. Only allowed values are SystemAssigned and UserAssigned. Comma separated if both for ex: SystemAssigned,UserAssigned."
+        },
+        "userAssignedIdentities": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/ArmUserIdentity"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The set of UserAssigned identities associated with the IoT DPS resource."
+        }
+      },
+      "description": "The set of ARM identities associated with the IoT DPS resource."
+    },
+    "ArmUserIdentity": {
+      "type": "object",
+      "properties": {},
+      "description": "The ARM UserAssigned identity information"
+    },
+    "EncryptionKeyIdentity": {
+      "type": "object",
+      "properties": {
+        "userAssignedIdentity": {
+          "type": "string",
+          "description": "The user assigned identity."
+        }
+      },
+      "description": "The properties of the identity used to access the key encryption key in KeyVault."
+    },
+    "EncryptionPropertiesDescription": {
+      "type": "object",
+      "properties": {
+        "identity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EncryptionKeyIdentity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties of the identity used to access the key encryption key in KeyVault."
+        },
+        "keySource": {
+          "type": "string",
+          "description": "The source of the encryption key. Typically, Microsoft.KeyVault"
+        },
+        "keyVaultProperties": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/KeyVaultKeyProperties"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties of the encryption key configured in KeyVault."
+        }
+      },
+      "description": "The customer-managed encryption key (CMK) properties for the IoT DPS instance."
+    },
     "IotDpsPropertiesDescription": {
       "type": "object",
       "properties": {
@@ -196,6 +282,17 @@
             }
           ],
           "description": "List of authorization keys for a provisioning service."
+        },
+        "encryption": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EncryptionPropertiesDescription"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The customer-managed encryption key (CMK) properties for the IoT DPS instance."
         },
         "iotHubs": {
           "oneOf": [
@@ -407,6 +504,16 @@
       ],
       "description": "The IP filter rules for a provisioning Service."
     },
+    "KeyVaultKeyProperties": {
+      "type": "object",
+      "properties": {
+        "keyIdentifier": {
+          "type": "string",
+          "description": "The identifier of the key."
+        }
+      },
+      "description": "The properties of the KeyVault key."
+    },
     "PrivateEndpoint": {
       "type": "object",
       "properties": {},
@@ -504,7 +611,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-03-01"
+            "2020-09-01-preview"
           ]
         },
         "certificate": {
@@ -535,7 +642,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-03-01"
+            "2020-09-01-preview"
           ]
         },
         "name": {

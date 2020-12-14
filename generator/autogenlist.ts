@@ -499,6 +499,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.Synapse',
     },
     {
+        basePath: 'security/resource-manager',
+        namespace: 'Microsoft.Security',
+    },
+    {
         basePath: 'securityinsights/resource-manager',
         namespace: 'Microsoft.SecurityInsights',
     },

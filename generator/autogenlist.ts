@@ -499,6 +499,32 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.Synapse',
     },
     {
+        basePath: 'security/resource-manager',
+        namespace: 'Microsoft.Security',
+        resourceConfig: [
+            {
+                type: 'advancedThreatProtectionSettings',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'assessments',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'deviceSecurityGroups',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'iotSensors',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'informationProtectionPolicies',
+                scopes: ScopeType.ManagementGroup | ScopeType.Extension,
+            },
+        ]
+    },
+    {
         basePath: 'securityinsights/resource-manager',
         namespace: 'Microsoft.SecurityInsights',
     },
@@ -507,10 +533,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.ImportExport'
     },
     {
-        basePath: 'storSimple1200Series/resource-manager',
-        namespace: 'Microsoft.StorSimple',
+        basePath: 'storSimple1200Series/resource-manager',
+        namespace: 'Microsoft.StorSimple',
         suffix: '1200'
-    },
+    },
     {
         basePath: 'storage/resource-manager',
         namespace: 'Microsoft.Storage',

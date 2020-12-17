@@ -33,7 +33,7 @@ jobs:
     needs: build
     env:
       PR_PREFIX: sdkAuto/
-    if: ${{ github.actor == 'jorgecotillo' }}
+    if: ${{ github.actor == 'openapi-sdkautomation[bot]' }}
     steps:
       - uses: actions/checkout@v2
 
@@ -46,7 +46,23 @@ jobs:
         run: npm ci
         working-directory: ./generator
 
+      - name: Check RP in Autogenlist
+        run: |
+          check_result='';
+          exec=$(npm run find-basepath ${{ github.head_ref }} $PR_PREFIX); 
+          while read line; 
+          do
+            # overriding check_result until the last line is read, last line contains
+            # the result to whether or not the basepath was found in autogenlist.
+            check_result=$line; 
+            echo $check_result;
+          done <<< "$exec";
+          
+          echo "AUTOGENLIST_CHECK_RESULT=$check_result" >> $GITHUB_ENV;
+        working-directory: ./generator
+            
       - name: Automerge
+        if: ${{ env.AUTOGENLIST_CHECK_RESULT == 'true' }}
         uses: "pascalgn/automerge-action@v0.12.0"
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"          

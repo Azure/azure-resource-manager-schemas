@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2019-07-01-preview/Microsoft.DevOps.json#",
+  "id": "https://schema.management.azure.com/schemas/2020-07-13-preview/Microsoft.DevOps.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.DevOps",
   "description": "Microsoft DevOps Resource Types",
@@ -10,7 +10,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-07-01-preview"
+            "2020-07-13-preview"
           ]
         },
         "location": {
@@ -19,7 +19,7 @@
         },
         "name": {
           "type": "string",
-          "description": "The name of the Azure Pipeline resource in ARM."
+          "description": "The name of the Pipeline resource in ARM."
         },
         "properties": {
           "oneOf": [
@@ -102,10 +102,49 @@
       ],
       "description": "Authorization info used to access a resource (like code repository)."
     },
+    "AzurePipelineProperties": {
+      "type": "object",
+      "properties": {
+        "organization": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/OrganizationReference"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Reference to an Azure DevOps Organization."
+        },
+        "pipelineType": {
+          "type": "string",
+          "enum": [
+            "azurePipeline"
+          ]
+        },
+        "project": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ProjectReference"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Reference to an Azure DevOps Project."
+        }
+      },
+      "required": [
+        "organization",
+        "pipelineType",
+        "project"
+      ],
+      "description": "Custom properties of a Azure Pipeline."
+    },
     "BootstrapConfiguration": {
       "type": "object",
       "properties": {
-        "repository": {
+        "sourceRepository": {
           "oneOf": [
             {
               "$ref": "#/definitions/CodeRepository"
@@ -193,6 +232,33 @@
       ],
       "description": "Repository containing the source code for a pipeline."
     },
+    "GithubWorkflowProperties": {
+      "type": "object",
+      "properties": {
+        "pipelineType": {
+          "type": "string",
+          "enum": [
+            "githubWorkflow"
+          ]
+        },
+        "repository": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CodeRepository"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Repository containing the source code for a pipeline."
+        }
+      },
+      "required": [
+        "pipelineType",
+        "repository"
+      ],
+      "description": "Custom properties of an Github Pipeline."
+    },
     "OrganizationReference": {
       "type": "object",
       "properties": {
@@ -208,6 +274,14 @@
     },
     "PipelineProperties": {
       "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/AzurePipelineProperties"
+        },
+        {
+          "$ref": "#/definitions/GithubWorkflowProperties"
+        }
+      ],
       "properties": {
         "bootstrapConfiguration": {
           "oneOf": [
@@ -219,34 +293,10 @@
             }
           ],
           "description": "Configuration used to bootstrap a Pipeline."
-        },
-        "organization": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/OrganizationReference"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Reference to an Azure DevOps Organization."
-        },
-        "project": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ProjectReference"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Reference to an Azure DevOps Project."
         }
       },
       "required": [
-        "bootstrapConfiguration",
-        "organization",
-        "project"
+        "bootstrapConfiguration"
       ],
       "description": "Custom properties of a Pipeline."
     },

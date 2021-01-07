@@ -13,6 +13,17 @@
             "2020-08-01-preview"
           ]
         },
+        "extendedLocation": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ExtendedLocation"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The complex type of the extended location."
+        },
         "identity": {
           "oneOf": [
             {
@@ -69,6 +80,9 @@
             "oneOf": [
               {
                 "$ref": "#/definitions/storageAccounts_managementPolicies_childResource"
+              },
+              {
+                "$ref": "#/definitions/storageAccounts_inventoryPolicies_childResource"
               },
               {
                 "$ref": "#/definitions/storageAccounts_privateEndpointConnections_childResource"
@@ -424,6 +438,63 @@
         "type"
       ],
       "description": "Microsoft.Storage/storageAccounts/fileServices/shares"
+    },
+    "storageAccounts_inventoryPolicies": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-08-01-preview"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^.*/default$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the storage account blob inventory policy. It should always be 'default'"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BlobInventoryPolicyProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The storage account blob inventory policy properties."
+        },
+        "systemData": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SystemData"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Metadata pertaining to creation and last modification of the resource."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Storage/storageAccounts/inventoryPolicies"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "type"
+      ],
+      "description": "Microsoft.Storage/storageAccounts/inventoryPolicies"
     },
     "storageAccounts_managementPolicies": {
       "type": "object",
@@ -820,6 +891,197 @@
       ],
       "description": "Settings for Azure Files identity based authentication."
     },
+    "BlobInventoryPolicyDefinition": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BlobInventoryPolicyFilter"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "An object that defines the blob inventory rule filter conditions."
+        }
+      },
+      "required": [
+        "filters"
+      ],
+      "description": "An object that defines the blob inventory rule. Each definition consists of a set of filters."
+    },
+    "BlobInventoryPolicyFilter": {
+      "type": "object",
+      "properties": {
+        "blobTypes": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "An array of predefined enum values. Valid values include blockBlob, appendBlob, pageBlob. Hns accounts does not support pageBlobs."
+        },
+        "includeBlobVersions": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Includes blob versions in blob inventory when value set to true."
+        },
+        "includeSnapshots": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Includes blob snapshots in blob inventory when value set to true."
+        },
+        "prefixMatch": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "An array of strings for blob prefixes to be matched."
+        }
+      },
+      "required": [
+        "blobTypes"
+      ],
+      "description": "An object that defines the blob inventory rule filter conditions."
+    },
+    "BlobInventoryPolicyProperties": {
+      "type": "object",
+      "properties": {
+        "policy": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BlobInventoryPolicySchema"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The storage account blob inventory policy rules."
+        }
+      },
+      "required": [
+        "policy"
+      ],
+      "description": "The storage account blob inventory policy properties."
+    },
+    "BlobInventoryPolicyRule": {
+      "type": "object",
+      "properties": {
+        "definition": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BlobInventoryPolicyDefinition"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "An object that defines the blob inventory rule. Each definition consists of a set of filters."
+        },
+        "enabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Rule is enabled when set to true."
+        },
+        "name": {
+          "type": "string",
+          "description": "A rule name can contain any combination of alpha numeric characters. Rule name is case-sensitive. It must be unique within a policy."
+        }
+      },
+      "required": [
+        "definition",
+        "enabled",
+        "name"
+      ],
+      "description": "An object that wraps the blob inventory rule. Each rule is uniquely defined by name."
+    },
+    "BlobInventoryPolicySchema": {
+      "type": "object",
+      "properties": {
+        "destination": {
+          "type": "string",
+          "description": "Container name where blob inventory files are stored. Must be pre-created."
+        },
+        "enabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Policy is enabled if set to true."
+        },
+        "rules": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/BlobInventoryPolicyRule"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The storage account blob inventory policy rules. The rule is applied when it is enabled."
+        },
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Inventory"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The valid value is Inventory"
+        }
+      },
+      "required": [
+        "destination",
+        "enabled",
+        "rules",
+        "type"
+      ],
+      "description": "The storage account blob inventory policy rules."
+    },
     "BlobServicePropertiesProperties": {
       "type": "object",
       "properties": {
@@ -892,6 +1154,17 @@
             }
           ],
           "description": "Versioning is enabled if set to true."
+        },
+        "lastAccessTimeTrackingPolicy": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/LastAccessTimeTrackingPolicy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The blob service properties for Last access time based tracking policy."
         },
         "restorePolicy": {
           "oneOf": [
@@ -1134,6 +1407,19 @@
     "DateAfterModification": {
       "type": "object",
       "properties": {
+        "daysAfterLastAccessTimeGreaterThan": {
+          "oneOf": [
+            {
+              "type": "number",
+              "multipleOf": 1,
+              "minimum": 0
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Value indicating the age in days after last blob access. This property can only be used in conjunction with last access time tracking policy"
+        },
         "daysAfterModificationGreaterThan": {
           "oneOf": [
             {
@@ -1148,9 +1434,6 @@
           "description": "Value indicating the age in days after last modification"
         }
       },
-      "required": [
-        "daysAfterModificationGreaterThan"
-      ],
       "description": "Object to define the number of days after last modification."
     },
     "DeleteRetentionPolicy": {
@@ -1379,6 +1662,30 @@
       },
       "description": "A list of services that support encryption."
     },
+    "ExtendedLocation": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the extended location."
+        },
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "EdgeZone"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The type of the extended location."
+        }
+      },
+      "description": "The complex type of the extended location."
+    },
     "FileServicePropertiesProperties": {
       "type": "object",
       "properties": {
@@ -1392,6 +1699,17 @@
             }
           ],
           "description": "Sets the CORS rules. You can include up to five CorsRule elements in the request. "
+        },
+        "protocolSettings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ProtocolSettings"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Protocol settings for file service"
         },
         "shareDeleteRetentionPolicy": {
           "oneOf": [
@@ -1585,6 +1903,65 @@
       },
       "description": "Properties of key vault."
     },
+    "LastAccessTimeTrackingPolicy": {
+      "type": "object",
+      "properties": {
+        "blobType": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "An array of predefined supported blob types. Only blockBlob is the supported value. This field is currently read only"
+        },
+        "enable": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "When set to true last access time based tracking is enabled."
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "AccessTimeTracking"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Name of the policy. The valid value is AccessTimeTracking. This field is currently read only."
+        },
+        "trackingGranularityInDays": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The field specifies blob object tracking granularity in days, typically how often the blob object should be tracked.This field is currently read only with value as 1"
+        }
+      },
+      "required": [
+        "enable"
+      ],
+      "description": "The blob service properties for Last access time based tracking policy."
+    },
     "ManagementPolicyAction": {
       "type": "object",
       "properties": {
@@ -1626,6 +2003,17 @@
             }
           ],
           "description": "Object to define the number of days after last modification."
+        },
+        "enableAutoTierToHotFromCool": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "This property enables auto tiering of a blob from cool to hot on a blob access. This property requires tierToCool.daysAfterLastAccessTimeGreaterThan."
         },
         "tierToArchive": {
           "oneOf": [
@@ -1845,6 +2233,23 @@
       },
       "description": "Management policy action for snapshot."
     },
+    "Multichannel": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates whether multichannel is enabled"
+        }
+      },
+      "description": "Multichannel setting. Applies to Premium FileStorage only."
+    },
     "NetworkRuleSet": {
       "type": "object",
       "properties": {
@@ -1893,6 +2298,19 @@
             }
           ],
           "description": "Sets the IP ACL rules"
+        },
+        "resourceAccessRules": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ResourceAccessRule"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "virtualNetworkRules": {
           "oneOf": [
@@ -2086,6 +2504,23 @@
       },
       "description": "A collection of information about the state of the connection between service consumer and provider."
     },
+    "ProtocolSettings": {
+      "type": "object",
+      "properties": {
+        "smb": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SmbSetting"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Setting for SMB protocol"
+        }
+      },
+      "description": "Protocol settings for file service"
+    },
     "QueueProperties": {
       "type": "object",
       "properties": {
@@ -2122,6 +2557,20 @@
         }
       },
       "description": "The properties of a storage account’s Queue service."
+    },
+    "ResourceAccessRule": {
+      "type": "object",
+      "properties": {
+        "resourceId": {
+          "type": "string",
+          "description": "Resource Id"
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Tenant Id"
+        }
+      },
+      "description": "Resource Access Rule."
     },
     "RestorePolicyProperties": {
       "type": "object",
@@ -2241,6 +2690,23 @@
         "name"
       ],
       "description": "The SKU of the storage account."
+    },
+    "SmbSetting": {
+      "type": "object",
+      "properties": {
+        "multichannel": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Multichannel"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Multichannel setting. Applies to Premium FileStorage only."
+        }
+      },
+      "description": "Setting for SMB protocol"
     },
     "StorageAccountPropertiesCreateParameters": {
       "type": "object",
@@ -2631,6 +3097,59 @@
       ],
       "description": "Microsoft.Storage/storageAccounts/fileServices/shares"
     },
+    "storageAccounts_inventoryPolicies_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-08-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "enum": [
+            "default"
+          ],
+          "description": "The name of the storage account blob inventory policy. It should always be 'default'"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BlobInventoryPolicyProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The storage account blob inventory policy properties."
+        },
+        "systemData": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SystemData"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Metadata pertaining to creation and last modification of the resource."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "inventoryPolicies"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.Storage/storageAccounts/inventoryPolicies"
+    },
     "storageAccounts_managementPolicies_childResource": {
       "type": "object",
       "properties": {
@@ -2920,6 +3439,64 @@
         "type"
       ],
       "description": "Microsoft.Storage/storageAccounts/tableServices/tables"
+    },
+    "SystemData": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp of resource creation (UTC)."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "The identity that created the resource."
+        },
+        "createdByType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "User",
+                "Application",
+                "ManagedIdentity",
+                "Key"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The type of identity that created the resource."
+        },
+        "lastModifiedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The type of identity that last modified the resource."
+        },
+        "lastModifiedBy": {
+          "type": "string",
+          "description": "The identity that last modified the resource."
+        },
+        "lastModifiedByType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "User",
+                "Application",
+                "ManagedIdentity",
+                "Key"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The type of identity that last modified the resource."
+        }
+      },
+      "description": "Metadata pertaining to creation and last modification of the resource."
     },
     "TableServicePropertiesProperties": {
       "type": "object",

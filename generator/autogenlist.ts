@@ -38,10 +38,10 @@ const autogenlist: AutogenlistConfig[] = [
         basePath: 'appconfiguration/resource-manager',
         namespace: 'Microsoft.AppConfiguration',
     },
-    /*{ Note(jcotillo) Temp exclusion due to an autorest issue.
+    {
         basePath: 'apimanagement/resource-manager',
         namespace: 'Microsoft.ApiManagement',
-    },*/
+    },
     {
         basePath: 'appplatform/resource-manager',
         namespace: 'Microsoft.AppPlatform',
@@ -281,6 +281,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.HanaOnAzure',
     },
     {
+        basePath: 'healthcareapis/resource-manager',
+        namespace: 'Microsoft.HealthcareApis',
+    }, 
+    {
         basePath: 'hybridcompute/resource-manager',
         namespace: 'Microsoft.HybridCompute',
     },
@@ -355,6 +359,10 @@ const autogenlist: AutogenlistConfig[] = [
     },
     {
         basePath: 'migrateprojects/resource-manager',
+        namespace: 'Microsoft.Migrate',
+    },
+    {
+        basePath: 'resourcemover/resource-manager',
         namespace: 'Microsoft.Migrate',
     },
     {
@@ -505,6 +513,32 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.Synapse',
     },
     {
+        basePath: 'security/resource-manager',
+        namespace: 'Microsoft.Security',
+        resourceConfig: [
+            {
+                type: 'advancedThreatProtectionSettings',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'assessments',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'deviceSecurityGroups',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'iotSensors',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'informationProtectionPolicies',
+                scopes: ScopeType.ManagementGroup | ScopeType.Extension,
+            },
+        ]
+    },
+    {
         basePath: 'securityinsights/resource-manager',
         namespace: 'Microsoft.SecurityInsights',
     },
@@ -513,10 +547,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.ImportExport'
     },
     {
-        basePath: 'storSimple1200Series/resource-manager',
-        namespace: 'Microsoft.StorSimple',
+        basePath: 'storSimple1200Series/resource-manager',
+        namespace: 'Microsoft.StorSimple',
         suffix: '1200'
-    },
+    },
     {
         basePath: 'storage/resource-manager',
         namespace: 'Microsoft.Storage',
@@ -584,6 +618,42 @@ const autogenlist: AutogenlistConfig[] = [
     {
         basePath: 'windowsiot/resource-manager',
         namespace: 'Microsoft.WindowsIoT',
+    },
+    {
+        basePath: 'adp/resource-manager',
+        namespace: 'Microsoft.AutonomousDevelopmentPlatform',
+    },
+    {
+        basePath: 'automanage/resource-manager',
+        namespace: 'Microsoft.Automanage',
+    },
+    {
+        basePath: 'confluent/resource-manager',
+        namespace: 'Microsoft.Confluent',
+    },
+    {
+        basePath: 'datamigration/resource-manager',
+        namespace: 'Microsoft.DataMigration',
+    },
+    {
+        basePath: 'datadog/resource-manager',
+        namespace: 'Microsoft.Datadog',
+    },
+    {
+        basePath: 'healthbot/resource-manager',
+        namespace: 'Microsoft.HealthBot',
+    },
+    {
+        basePath: 'hybridkubernetes/resource-manager',
+        namespace: 'Microsoft.Kubernetes',
+    },
+    {
+        basePath: 'hybridnetwork/resource-manager',
+        namespace: 'Microsoft.HybridNetwork',
+    },
+    {
+        basePath: 'powerplatform/resource-manager',
+        namespace: 'Microsoft.PowerPlatform',
     }
 ];
 

@@ -4,6 +4,45 @@
   "title": "Microsoft.Sql",
   "description": "Microsoft Sql Resource Types",
   "resourceDefinitions": {
+    "locations_serverTrustGroups": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-02-02-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the server trust group."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ServerTrustGroupProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of a server trust group."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Sql/locations/serverTrustGroups"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.Sql/locations/serverTrustGroups"
+    },
     "managedInstances": {
       "type": "object",
       "properties": {
@@ -301,7 +340,7 @@
       ],
       "description": "Microsoft.Sql/servers/azureADOnlyAuthentications"
     },
-    "servers_databases_backupShortTermRetentionPolicies": {
+    "servers_databases": {
       "type": "object",
       "properties": {
         "apiVersion": {
@@ -310,43 +349,76 @@
             "2020-02-02-preview"
           ]
         },
+        "location": {
+          "type": "string",
+          "description": "Resource location."
+        },
         "name": {
-          "oneOf": [
-            {
-              "type": "string",
-              "pattern": "^.*/default$"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The policy name. Should always be \"default\"."
+          "type": "string",
+          "description": "The name of the database."
         },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/BackupShortTermRetentionPolicyProperties"
+              "$ref": "#/definitions/DatabaseProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Properties of a short term retention policy"
+          "description": "The database's properties."
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/servers_databases_securityAlertPolicies_childResource"
+              }
+            ]
+          }
+        },
+        "sku": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Sku"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "An ARM Resource SKU."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Resource tags."
         },
         "type": {
           "type": "string",
           "enum": [
-            "Microsoft.Sql/servers/databases/backupShortTermRetentionPolicies"
+            "Microsoft.Sql/servers/databases"
           ]
         }
       },
       "required": [
         "apiVersion",
+        "location",
         "name",
         "properties",
         "type"
       ],
-      "description": "Microsoft.Sql/servers/databases/backupShortTermRetentionPolicies"
+      "description": "Microsoft.Sql/servers/databases"
     },
     "servers_databases_securityAlertPolicies": {
       "type": "object",
@@ -464,10 +536,10 @@
       ],
       "description": "Properties of a active directory only authentication."
     },
-    "BackupShortTermRetentionPolicyProperties": {
+    "DatabaseProperties": {
       "type": "object",
       "properties": {
-        "diffBackupIntervalInHours": {
+        "autoPauseDelay": {
           "oneOf": [
             {
               "type": "integer"
@@ -476,9 +548,74 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The differential backup interval in hours. This is how many interval hours between each differential backup will be supported. This is only applicable to live databases but not dropped databases."
+          "description": "Time in minutes after which database is automatically paused. A value of -1 means that automatic pause is disabled"
         },
-        "retentionDays": {
+        "catalogCollation": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "DATABASE_DEFAULT",
+                "SQL_Latin1_General_CP1_CI_AS"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Collation of the metadata catalog."
+        },
+        "collation": {
+          "type": "string",
+          "description": "The collation of the database."
+        },
+        "createMode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Default",
+                "Copy",
+                "Secondary",
+                "PointInTimeRestore",
+                "Restore",
+                "Recovery",
+                "RestoreExternalBackup",
+                "RestoreExternalBackupSecondary",
+                "RestoreLongTermRetentionBackup",
+                "OnlineSecondary"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies the mode of database creation.\r\n\r\nDefault: regular database creation.\r\n\r\nCopy: creates a database as a copy of an existing database. sourceDatabaseId must be specified as the resource ID of the source database.\r\n\r\nSecondary: creates a database as a secondary replica of an existing database. sourceDatabaseId must be specified as the resource ID of the existing primary database.\r\n\r\nPointInTimeRestore: Creates a database by restoring a point in time backup of an existing database. sourceDatabaseId must be specified as the resource ID of the existing database, and restorePointInTime must be specified.\r\n\r\nRecovery: Creates a database by restoring a geo-replicated backup. sourceDatabaseId must be specified as the recoverable database resource ID to restore.\r\n\r\nRestore: Creates a database by restoring a backup of a deleted database. sourceDatabaseId must be specified. If sourceDatabaseId is the database's original resource ID, then sourceDatabaseDeletionDate must be specified. Otherwise sourceDatabaseId must be the restorable dropped database resource ID and sourceDatabaseDeletionDate is ignored. restorePointInTime may also be specified to restore from an earlier point in time.\r\n\r\nRestoreLongTermRetentionBackup: Creates a database by restoring from a long term retention vault. recoveryServicesRecoveryPointResourceId must be specified as the recovery point resource ID.\r\n\r\nCopy, Secondary, and RestoreLongTermRetentionBackup are not supported for DataWarehouse edition."
+        },
+        "elasticPoolId": {
+          "type": "string",
+          "description": "The resource identifier of the elastic pool containing this database."
+        },
+        "licenseType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "LicenseIncluded",
+                "BasePrice"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The license type to apply for this database. `LicenseIncluded` if you need a license, or `BasePrice` if you have a license and are eligible for the Azure Hybrid Benefit."
+        },
+        "longTermRetentionBackupResourceId": {
+          "type": "string",
+          "description": "The resource identifier of the long term retention backup associated with create operation of this database."
+        },
+        "maxSizeBytes": {
           "oneOf": [
             {
               "type": "integer"
@@ -487,10 +624,116 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The backup retention period in days. This is how many days Point-in-Time Restore will be supported."
+          "description": "The max size of the database expressed in bytes."
+        },
+        "minCapacity": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Minimal capacity that database will always have allocated, if not paused"
+        },
+        "readReplicaCount": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The number of readonly secondary replicas associated with the database."
+        },
+        "readScale": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Enabled",
+                "Disabled"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The state of read-only routing. If enabled, connections that have application intent set to readonly in their connection string may be routed to a readonly secondary replica in the same region."
+        },
+        "recoverableDatabaseId": {
+          "type": "string",
+          "description": "The resource identifier of the recoverable database associated with create operation of this database."
+        },
+        "recoveryServicesRecoveryPointId": {
+          "type": "string",
+          "description": "The resource identifier of the recovery point associated with create operation of this database."
+        },
+        "restorableDroppedDatabaseId": {
+          "type": "string",
+          "description": "The resource identifier of the restorable dropped database associated with create operation of this database."
+        },
+        "restorePointInTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Specifies the point in time (ISO8601 format) of the source database that will be restored to create the new database."
+        },
+        "sampleName": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "AdventureWorksLT",
+                "WideWorldImportersStd",
+                "WideWorldImportersFull"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the sample schema to apply when creating this database."
+        },
+        "sourceDatabaseDeletionDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Specifies the time that the database was deleted."
+        },
+        "sourceDatabaseId": {
+          "type": "string",
+          "description": "The resource identifier of the source database associated with create operation of this database."
+        },
+        "storageAccountType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "GRS",
+                "LRS",
+                "ZRS"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The storage account type used to store backups for this database."
+        },
+        "zoneRedundant": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether or not this database is zone redundant, which means the replicas of this database will be spread across multiple availability zones."
         }
       },
-      "description": "Properties of a short term retention policy"
+      "description": "The database's properties."
     },
     "ManagedDatabaseProperties": {
       "type": "object",
@@ -741,6 +984,17 @@
             }
           ],
           "description": "The number of vCores. Allowed values: 8, 16, 24, 32, 40, 64, 80."
+        },
+        "zoneRedundant": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether or not the multi-az is enabled."
         }
       },
       "description": "The properties of a managed instance."
@@ -896,7 +1150,9 @@
             {
               "type": "string",
               "enum": [
-                "SystemAssigned"
+                "None",
+                "SystemAssigned",
+                "UserAssigned"
               ]
             },
             {
@@ -931,6 +1187,102 @@
         "state"
       ],
       "description": "Properties of a security alert policy."
+    },
+    "ServerInfo": {
+      "type": "object",
+      "properties": {
+        "serverId": {
+          "type": "string",
+          "description": "Server Id."
+        }
+      },
+      "required": [
+        "serverId"
+      ],
+      "description": "Server info for the server trust group."
+    },
+    "servers_databases_securityAlertPolicies_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-02-02-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "enum": [
+            "default"
+          ],
+          "description": "The name of the security alert policy."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecurityAlertsPolicyProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of a security alert policy."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "securityAlertPolicies"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.Sql/servers/databases/securityAlertPolicies"
+    },
+    "ServerTrustGroupProperties": {
+      "type": "object",
+      "properties": {
+        "groupMembers": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ServerInfo"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Group members information for the server trust group."
+        },
+        "trustScopes": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "GlobalTransactions"
+                ]
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Trust scope of the server trust group."
+        }
+      },
+      "required": [
+        "groupMembers",
+        "trustScopes"
+      ],
+      "description": "Properties of a server trust group."
     },
     "Sku": {
       "type": "object",

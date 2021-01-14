@@ -658,7 +658,30 @@ const autogenlist: AutogenlistConfig[] = [
     {
         basePath: 'powerplatform/resource-manager',
         namespace: 'Microsoft.PowerPlatform',
-    }
+    },
+    {
+        basePath: 'monitor/resource-manager',
+        namespace: 'Microsoft.Insights',
+        resourceConfig: [
+            {
+                type: 'diagnosticSettings',
+                scopes: ScopeType.Subcription | ScopeType.Extension,
+            },
+            {
+                type: 'guestDiagnosticSettingsAssociation',
+                scopes: ScopeType.Extension,
+            },
+            {
+                type: 'dataCollectionRuleAssociations',
+                scopes: ScopeType.Extension,
+            },
+        ],
+    },
+    {
+        basePath: 'applicationinsights/resource-manager',
+        namespace: 'Microsoft.Insights',
+        suffix: 'Application',
+    },
 ];
 
 export function getAutogenlist(): AutogenlistConfig[] {

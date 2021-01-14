@@ -72,7 +72,7 @@ async function getResourceInfo(schemaRef: string) {
         schema = schema[pathElement];
     }
 
-    if (!schema['properties'] || !schema['properties']['type'] || !schema['properties']['type']['enum'] || !schema['properties']['apiVersion'] || !schema['properties']['apiVersion']['enum']) {
+    if (!schema?.properties?.type?.enum || !schema?.properties?.apiVersion?.enum) {
         throw new Error(`Unable to find expected properties for ${schemaRef}`)
     }
     

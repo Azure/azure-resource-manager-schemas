@@ -394,6 +394,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.Maps',
     },
     {
+        basePath: 'mixedreality/resource-manager',
+        namespace: 'Microsoft.MixedReality',
+    },
+    {
         basePath: 'netapp/resource-manager',
         namespace: 'Microsoft.NetApp',
     },

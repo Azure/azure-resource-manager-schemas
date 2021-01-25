@@ -30,6 +30,9 @@
       "$ref": "#/definitions/Microsoft.Common.Selector-common"
     },
     {
+      "$ref": "#/definitions/Microsoft.Common.CheckBox"
+    },
+    {
       "$ref": "#/definitions/Microsoft.Compute.UserNameTextBox"
     },
     {
@@ -37,6 +40,12 @@
     },
     {
       "$ref": "#/definitions/Microsoft.Compute.CredentialsCombo-linux"
+    },
+    {
+      "$ref": "#/definitions/Microsoft.Common.EditableGrid"
+    },
+    {
+      "$ref": "#/definitions/Microsoft.Common.ServicePrincipalSelector"
     }
   ],
   "definitions": {
@@ -55,6 +64,9 @@
         "label": {
           "type": "string"
         },
+        "placeholder": {
+          "type": "string"
+        },
         "defaultValue": {
           "type": "string"
         },
@@ -62,19 +74,71 @@
           "type": "string"
         },
         "constraints": {
-          "type": "object",
-          "properties": {
-            "required": {
-              "type": [ "boolean", "string" ]
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "required": {
+                  "type": [ "boolean", "string" ]
+                },
+                "regex": {
+                  "type": "string"
+                },
+                "validationMessage": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
             },
-            "regex": {
-              "type": "string"
-            },
-            "validationMessage": {
-              "type": "string"
+            {
+              "type": "object",
+              "properties": {
+                "required": {
+                  "type": [ "boolean", "string" ]
+                },
+                "validations": {
+                  "type": "array",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "message": {
+                            "type": "string"
+                          },
+                          "isValid": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                          "message",
+                          "isValid"
+                        ]
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "message": {
+                            "type": "string"
+                          },
+                          "regex": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                          "message",
+                          "regex"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
             }
-          },
-          "additionalProperties": false
+          ]
         },
         "visible": {
           "type": [ "boolean", "string" ]
@@ -166,6 +230,9 @@
           ]
         },
         "label": {
+          "type": "string"
+        },
+        "placeholder": {
           "type": "string"
         },
         "defaultValue": {
@@ -559,6 +626,46 @@
         "elements"
       ]
     },
+    "Microsoft.Common.CheckBox": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Common.CheckBox"
+          ]
+        },
+        "label": {
+          "type": "string"
+        },
+        "toolTip": {
+          "type": "string"
+        },
+        "constraints": {
+          "type": "object",
+          "properties": {
+            "required": {
+              "type": [ "boolean", "string" ]
+            },
+            "validationMessage": {
+              "type": "string"
+            }
+          }
+        },
+        "visible": {
+          "type": [ "boolean", "string" ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "type",
+        "label"
+      ]
+    },
     "Microsoft.Compute.UserNameTextBox": {
       "type": "object",
       "properties": {
@@ -783,6 +890,195 @@
         "type",
         "label",
         "osPlatform"
+      ]
+    },
+    "Microsoft.Common.EditableGrid": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Common.EditableGrid"
+          ]
+        },
+        "label": {
+          "type": "string"
+        },
+        "ariaLabel": {
+          "type": "string"
+        },
+        "constraints": {
+          "type": "object",
+          "properties": {
+            "columns": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "header": {
+                    "type": "string"
+                  },
+                  "width": {
+                    "type": "string"
+                  },
+                  "element": {
+                    "type": "object"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [
+                  "id",
+                  "header",
+                  "element"
+                ]
+              },
+              "minItems": 1
+            },
+            "rows": {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "type": "object",
+                  "properties": {
+                    "min": {
+                      "type": "integer"
+                    },
+                    "max": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            },
+            "width": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "columns"
+          ]
+        },
+        "visible": {
+          "type": [ "boolean", "string" ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "type",
+        "label",
+        "ariaLabel",
+        "constraints"
+      ]
+    },
+    "Microsoft.Common.ServicePrincipalSelector": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Common.ServicePrincipalSelector"
+          ]
+        },
+        "label": {
+          "type": "object",
+          "properties": {
+            "principalId": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "certificateThumbprint": {
+              "type": "string"
+            },
+            "authenticationType": {
+              "type": "string"
+            },
+            "sectionHeader": {
+              "type": "string"
+            }
+          }
+        },
+        "toolTip": {
+          "type": "object",
+          "properties": {
+            "principalId": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            },
+            "certificateThumbprint": {
+              "type": "string"
+            },
+            "authenticationType": {
+              "type": "string"
+            }
+          }
+        },
+        "defaultValue": {
+          "type": "object",
+          "properties": {
+            "principalId": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        },
+        "visible": {
+          "type": [
+            "boolean",
+            "string"
+          ]
+        },
+        "options": {
+          "type": "object",
+          "properties": {
+            "hideCertificate": {
+              "type": [
+                "boolean",
+                "string"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "constraints": {
+          "type": "object",
+          "properties": {
+            "required": {
+              "type": [
+                "boolean",
+                "string"
+              ]
+            },
+            "regex": {
+              "type": "string"
+            },
+            "validationMessage": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "type"
       ]
     }
   }

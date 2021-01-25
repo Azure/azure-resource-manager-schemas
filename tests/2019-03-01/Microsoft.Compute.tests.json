@@ -1,0 +1,1645 @@
+{
+  "tests": [
+    {
+      "name": "VirtualMachines - Basic",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.json#/resourceDefinitions/virtualMachines",
+      "json": {
+        "apiVersion": "2019-03-01",
+        "type": "Microsoft.Compute/virtualMachines",
+        "name": "[concat(variables('vmName'), copyindex())]",
+        "location": "[variables('location')]",
+        "tags": {
+          "Tag1": "ManagedVM"
+        },
+        "copy": {
+          "name": "VMLoop",
+          "count": "[parameters('numberOfVMInstances')]"
+        },
+        "dependsOn": [
+          "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'), copyindex())]"
+        ],
+        "properties": {
+          "availabilitySet": {
+            "id": "[resourceId('Microsoft.Compute/availabilitySets', 'availabilitySet1')]"
+          },
+          "hardwareProfile": {
+            "vmSize": "[variables('vmSize')]"
+          },
+          "osProfile": {
+            "computerName": "[concat(variables('vmName'), copyindex())]",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminPassword": "[parameters('adminPassword')]"
+          },
+          "storageProfile": {
+            "imageReference": {
+              "publisher": "[variables('imagePublisher')]",
+              "offer": "[variables('imageOffer')]",
+              "sku": "[parameters('windowsOSVersion')]",
+              "version": "latest"
+            },
+            "dataDisks": [
+              {
+                "lun": 0,
+                "createOption": "Empty",
+                "diskSizeGB": 1023
+              }
+            ]
+          },
+          "networkProfile": {
+            "networkInterfaces": [
+              {
+                "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicName'), copyindex()))]"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "VirtualMachineScaleSets Virtual Machines",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.json#/resourceDefinitions/virtualMachineScaleSets_virtualmachines",
+      "json": {
+        "type": "Microsoft.Compute/virtualMachineScaleSets/virtualmachines",
+        "name": "[variables('namingInfix')]",
+        "location": "[resourceGroup().location]",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "hardwareProfile": {
+            "vmSize": "Basic_A0"
+          },
+          "storageProfile": {
+            "imageReference": {
+              "id": "id",
+              "publisher": "publisher",
+              "offer": "offer",
+              "sku": "sku",
+              "version": "version"
+            },
+            "osDisk": {
+             "createOption": "FromImage"
+            },
+            "dataDisks": [{
+              "lun": 1,
+              "createOption": "FromImage"
+            }]
+          },
+          "additionalCapabilities": {
+            "ultraSSDEnabled": true
+          },
+          "osProfile": {
+            "computerName": "computerName",
+            "adminUsername": "adminUsername",
+            "adminPassword": "adminPassword",
+            "customData": "customData",
+            "windowsConfiguration": {
+              "provisionVMAgent": true,
+              "enableAutomaticUpdates": true,
+              "timeZone": "Pacific Standard Time",
+              "additionalUnattendContent": [{
+                "passName": "OobeSystem",
+                "componentName": "Microsoft-Windows-Shell-Setup",
+                "settingName": "AutoLogon",
+                "content": "content"
+              }],
+              "winRM": {
+                "listeners": [{
+                  "protocol": "Https",
+                  "certificateUrl": "certificateUrl"
+                }]
+              }
+            },
+            "linuxConfiguration": {
+              "disablePasswordAuthentication": true,
+              "ssh": {
+                "publicKeys": [{
+                  "path": "/home/user/.ssh/authorized_keys",
+                  "keyData": "keyData"
+                }]
+              },
+              "provisionVMAgent": true
+            },
+            "secrets": [{
+              "sourceVault": {
+                "id": "id"
+              },
+              "vaultCertificates": [{
+                "certificateUrl": "certificateUrl",
+                "certificateStore": "certificateStore"
+              }]
+            }],
+            "allowExtensionOperations": true
+          },
+          "networkProfile": {
+            "networkInterfaces": [{
+              "id": "id",
+              "properties": {
+                "primary": true
+              }
+            }]
+          },
+          "networkProfileConfiguration": {
+            "networkInterfaceConfigurations": [{
+              "name": "name"
+            }]
+          },
+          "diagnosticsProfile": {
+            "bootDiagnostics": {
+              "enabled": true,
+              "storageUri": "storageUri"
+            }
+          },
+          "availabilitySet": {
+            "id": "id"
+          },
+          "licenseType": "licenseType",
+          "protectionPolicy": {
+            "protectFromScaleIn": true,
+            "protectFromScaleSetActions": true
+          }
+        }
+      }
+    },
+    {
+      "name": "Host Groups",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.json#/resourceDefinitions/hostGroups",
+      "json": {
+        "type": "Microsoft.Compute/hostGroups",
+        "name": "myHostGroup",
+        "apiVersion": "2019-03-01",
+        "location": "[variables('location')]",
+        "properties": {
+            "platformFaultDomainCount": 1
+        }
+      }
+    },
+    {
+      "name": "Host Groups Hosts",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.json#/resourceDefinitions/hostGroups_hosts",
+      "json": {
+        "type": "Microsoft.Compute/hostGroups/hosts",
+        "name": "myHostGroupHost",
+        "apiVersion": "2019-03-01",
+        "location": "[variables('location')]",
+        "properties": {
+            "platformFaultDomain": 1
+        },
+        "sku": {
+          "name": "name",
+          "tier": "tier",
+          "capacity": 1
+        }
+      }
+    },
+    {
+      "name": "AvailabilitySet",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.json#/resourceDefinitions/availabilitySets",
+      "json": {
+        "type": "Microsoft.Compute/availabilitySets",
+        "name": "availabilitySet1",
+        "apiVersion": "2019-03-01",
+        "location": "[variables('location')]",
+        "properties": {
+          "platformFaultDomainCount": 2,
+          "platformUpdateDomainCount": 2,
+          "managed": true
+        }
+      }
+    },
+    {
+      "name": "Proximity Placement Group",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.json#/resourceDefinitions/proximityPlacementGroups",
+      "json": {
+        "type": "Microsoft.Compute/proximityPlacementGroups",
+        "name": "proximityPlacementGroup1",
+        "apiVersion": "2019-03-01",
+        "location": "[variables('location')]",
+        "properties": {
+          "proximityPlacementGroupType": "Standard"
+        }
+      }
+    },
+    {
+      "name": "Images",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.json#/resourceDefinitions/images",
+      "json": {
+        "type": "Microsoft.Compute/images",
+        "apiVersion": "2019-03-01",
+        "name": "[parameters('imageName')]",
+        "location": "[variables('location')]",
+        "properties": {
+          "storageProfile": {
+            "osDisk": {
+              "osType": "Windows",
+              "osState": "Generalized",
+              "blobUri": "[parameters('imageOSDiskBlobUri')]",
+              "caching": "ReadWrite",
+              "storageAccountType": "Standard_LRS"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Storage Account Type: UltraSSD_LRS",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.json#/resourceDefinitions/images",
+      "json": {
+        "type": "Microsoft.Compute/images",
+        "apiVersion": "2019-03-01",
+        "name": "[parameters('imageName')]",
+        "location": "[variables('location')]",
+        "properties": {
+          "storageProfile": {
+            "osDisk": {
+              "osType": "Windows",
+              "osState": "Generalized",
+              "blobUri": "[parameters('imageOSDiskBlobUri')]",
+              "caching": "ReadWrite",
+              "storageAccountType": "UltraSSD_LRS"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "VirtualMachineScaleSets with Managed Data Disks",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.json#/resourceDefinitions/virtualMachineScaleSets",
+      "json": {
+        "type": "Microsoft.Compute/virtualMachineScaleSets",
+        "name": "[variables('namingInfix')]",
+        "location": "[resourceGroup().location]",
+        "apiVersion": "2019-03-01",
+        "dependsOn": [
+          "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
+          "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+        ],
+        "sku": {
+          "name": "[parameters('vmSku')]",
+          "tier": "Standard",
+          "capacity": "[parameters('instanceCount')]"
+        },
+        "properties": {
+          "overprovision": true,
+          "upgradePolicy": {
+            "mode": "Manual"
+          },
+          "virtualMachineProfile": {
+            "storageProfile": {
+              "osDisk": {
+                "createOption": "FromImage"
+              },
+              "imageReference": "[variables('imageReference')]",
+              "dataDisks": [
+                {
+                  "lun": 2,
+                  "name": "myManagedDataDisk",
+                  "createOption": "Attach",
+                  "managedDisk": {
+                    "id": "[resourceId('Microsoft.Compute/disks', 'myManagedDataDisk')]"
+                  }
+                },
+                {
+                  "lun": 3,
+                  "name": "myManagedDataDisk1",
+                  "createOption": "Attach",
+                  "managedDisk": {
+                    "id": "[resourceId('Microsoft.Compute/disks', 'myManagedDataDisk1')]"
+                  }
+                }
+              ]
+            },
+            "osProfile": {
+              "computerNamePrefix": "[variables('namingInfix')]",
+              "adminUsername": "[parameters('adminUsername')]",
+              "adminPassword": "[parameters('adminPassword')]"
+            },
+            "networkProfile": {
+              "networkInterfaceConfigurations": [
+                {
+                  "name": "[variables('nicName')]",
+                  "properties": {
+                    "primary": true,
+                    "ipConfigurations": [
+                      {
+                        "name": "[variables('ipConfigName')]",
+                        "properties": {
+                          "subnet": {
+                            "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'), '/subnets/', variables('subnetName'))]"
+                          },
+                          "loadBalancerBackendAddressPools": [
+                            {
+                              "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/backendAddressPools/', variables('bePoolName'))]"
+                            }
+                          ],
+                          "loadBalancerInboundNatPools": [
+                            {
+                              "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/inboundNatPools/', variables('natPoolName'))]"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "VirtualMachineScaleSets Extensions",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachineScaleSets_extensions",
+      "json": {
+          "type": "Microsoft.Compute/virtualMachineScaleSets/extensions",
+          "name": "myScaleSet/myCustomScriptExtension",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2019-03-01",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachineScaleSets/', variables('scaleSetName'))]"
+          ],
+          "properties": {
+            "publisher": "Microsoft.Compute",
+            "type": "CustomScriptExtension",
+            "typeHandlerVersion": "Test Type Handler Version",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+            "fileUris": [
+              "test file uri",
+              "test file uri 2"
+            ],
+            "commandToExecute": "ls"
+            }
+          }
+      }
+    },
+    {
+      "name": "VirtualMachineScaleSets with Managed Data Disks and Low-Priority",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.json#/resourceDefinitions/virtualMachineScaleSets",
+      "json": {
+        "type": "Microsoft.Compute/virtualMachineScaleSets",
+        "name": "[variables('namingInfix')]",
+        "location": "[resourceGroup().location]",
+        "apiVersion": "2019-03-01",
+        "dependsOn": [
+          "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
+          "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+        ],
+        "sku": {
+          "name": "[parameters('vmSku')]",
+          "tier": "Standard",
+          "capacity": "[parameters('instanceCount')]"
+        },
+        "properties": {
+          "overprovision": true,
+          "upgradePolicy": {
+            "mode": "Manual"
+          },
+          "virtualMachineProfile": {
+            "storageProfile": {
+              "osDisk": {
+                "createOption": "FromImage"
+              },
+              "imageReference": "[variables('imageReference')]",
+              "dataDisks": [
+                {
+                  "lun": 2,
+                  "name": "myManagedDataDisk",
+                  "createOption": "Attach",
+                  "managedDisk": {
+                    "id": "[resourceId('Microsoft.Compute/disks', 'myManagedDataDisk')]"
+                  }
+                },
+                {
+                  "lun": 3,
+                  "name": "myManagedDataDisk1",
+                  "createOption": "Attach",
+                  "managedDisk": {
+                    "id": "[resourceId('Microsoft.Compute/disks', 'myManagedDataDisk1')]"
+                  }
+                }
+              ]
+            },
+            "osProfile": {
+              "computerNamePrefix": "[variables('namingInfix')]",
+              "adminUsername": "[parameters('adminUsername')]",
+              "adminPassword": "[parameters('adminPassword')]"
+            },
+            "priority": "Low",
+            "networkProfile": {
+              "networkInterfaceConfigurations": [
+                {
+                  "name": "[variables('nicName')]",
+                  "properties": {
+                    "primary": true,
+                    "ipConfigurations": [
+                      {
+                        "name": "[variables('ipConfigName')]",
+                        "properties": {
+                          "subnet": {
+                            "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'), '/subnets/', variables('subnetName'))]"
+                          },
+                          "loadBalancerBackendAddressPools": [
+                            {
+                              "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/backendAddressPools/', variables('bePoolName'))]"
+                            }
+                          ],
+                          "loadBalancerInboundNatPools": [
+                            {
+                              "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/inboundNatPools/', variables('natPoolName'))]"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "VM with Managed Data Disk",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.json#/resourceDefinitions/virtualMachines",
+      "json": {
+        "type": "Microsoft.Compute/virtualMachines",
+        "name": "[variables('vmName')]",
+        "apiVersion": "2019-03-01",
+        "location": "[variables('location')]",
+        "properties": {
+          "hardwareProfile": {
+            "vmSize": "[variables('vmSize')]"
+          },
+          "osProfile": {
+            "computerName": "[variables('vmName')]",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminPassword": "[parameters('adminPassword')]"
+          },
+          "storageProfile": {
+            "imageReference": {
+              "publisher": "[variables('imagePublisher')]",
+              "offer": "[variables('imageOffer')]",
+              "sku": "[parameters('windowsOSVersion')]",
+              "version": "latest"
+            },
+            "osDisk": {
+              "name": "myOSDisk",
+              "createOption": "FromImage"
+            },
+            "dataDisks": [
+              {
+                "lun": 2,
+                "name": "myManagedDataDisk",
+                "createOption": "Attach",
+                "managedDisk": {
+                  "id": "[resourceId('Microsoft.Compute/disks', 'myManagedDataDisk')]"
+                }
+              },
+              {
+                "lun": 3,
+                "name": "myManagedDataDisk1",
+                "createOption": "Attach",
+                "managedDisk": {
+                  "id": "[resourceId('Microsoft.Compute/disks', 'myManagedDataDisk1')]"
+                }
+              }
+            ]
+          },
+          "networkProfile": {
+            "networkInterfaces": [
+              {
+                "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+              }
+            ]
+          }
+        },
+        "dependsOn": [
+          "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
+          "Microsoft.Compute/disks/myManagedDataDisk",
+          "Microsoft.Compute/disks/myManagedDataDisk1"
+        ]
+      }
+    },
+{
+      "name": "VM with Ephemeral Managed Data Disk",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.json#/resourceDefinitions/virtualMachines",
+      "json": {
+        "type": "Microsoft.Compute/virtualMachines",
+        "name": "[variables('vmName')]",
+        "apiVersion": "2019-03-01",
+        "location": "[variables('location')]",
+        "properties": {
+          "hardwareProfile": {
+            "vmSize": "[variables('vmSize')]"
+          },
+          "osProfile": {
+            "computerName": "[variables('vmName')]",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminPassword": "[parameters('adminPassword')]"
+          },
+          "storageProfile": {
+            "imageReference": {
+              "publisher": "[variables('imagePublisher')]",
+              "offer": "[variables('imageOffer')]",
+              "sku": "[parameters('windowsOSVersion')]",
+              "version": "latest"
+            },
+            "osDisk": {
+              "caching": "ReadOnly",
+              "diffDiskSettings": {
+                "option": "Local"
+              },
+              "managedDisk": {
+                "storageAccountType": "Standard_LRS"
+              },
+              "createOption": "FromImage",
+              "name": "myVMosdisk"
+            },
+            "dataDisks": [
+              {
+                "lun": 2,
+                "name": "myManagedDataDisk",
+                "createOption": "Attach",
+                "managedDisk": {
+                  "id": "[resourceId('Microsoft.Compute/disks', 'myManagedDataDisk')]"
+                }
+              },
+              {
+                "lun": 3,
+                "name": "myManagedDataDisk1",
+                "createOption": "Attach",
+                "managedDisk": {
+                  "id": "[resourceId('Microsoft.Compute/disks', 'myManagedDataDisk1')]"
+                }
+              }
+            ]
+          },
+          "networkProfile": {
+            "networkInterfaces": [
+              {
+                "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+              }
+            ]
+          }
+        },
+        "dependsOn": [
+          "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
+          "Microsoft.Compute/disks/myManagedDataDisk",
+          "Microsoft.Compute/disks/myManagedDataDisk1"
+        ]
+      }
+    },
+    {
+      "name": "VirtualMachines - Basic with Zone info",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.json#/resourceDefinitions/virtualMachines",
+      "json": {
+        "apiVersion": "2019-03-01",
+        "type": "Microsoft.Compute/virtualMachines",
+        "name": "[concat(variables('vmName'), copyindex())]",
+        "location": "[variables('location')]",
+        "tags": {
+          "Tag1": "ManagedVM"
+        },
+        "copy": {
+          "name": "VMLoop",
+          "count": "[parameters('numberOfVMInstances')]"
+        },
+        "dependsOn": [
+          "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'), copyindex())]"
+        ],
+        "zones": [ "1" ],
+        "properties": {
+          "availabilitySet": {
+            "id": "[resourceId('Microsoft.Compute/availabilitySets', 'availabilitySet1')]"
+          },
+          "hardwareProfile": {
+            "vmSize": "[variables('vmSize')]"
+          },
+          "osProfile": {
+            "computerName": "[concat(variables('vmName'), copyindex())]",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminPassword": "[parameters('adminPassword')]"
+          },
+          "storageProfile": {
+            "imageReference": {
+              "publisher": "[variables('imagePublisher')]",
+              "offer": "[variables('imageOffer')]",
+              "sku": "[parameters('windowsOSVersion')]",
+              "version": "latest"
+            },
+            "dataDisks": [
+              {
+                "lun": 0,
+                "createOption": "Empty",
+                "diskSizeGB": 1023
+              }
+            ]
+          },
+          "networkProfile": {
+            "networkInterfaces": [
+              {
+                "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('nicName'), copyindex()))]"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "VirtualMachineScaleSets with Zones and Managed Data Disks",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.json#/resourceDefinitions/virtualMachineScaleSets",
+      "json": {
+        "type": "Microsoft.Compute/virtualMachineScaleSets",
+        "name": "[variables('namingInfix')]",
+        "location": "[resourceGroup().location]",
+        "apiVersion": "2019-03-01",
+        "dependsOn": [
+          "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]",
+          "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+        ],
+        "sku": {
+          "name": "[parameters('vmSku')]",
+          "tier": "Standard",
+          "capacity": "[parameters('instanceCount')]"
+        },
+        "zones": [ "1", "2", "3" ],
+        "properties": {
+          "overprovision": true,
+          "upgradePolicy": {
+            "mode": "Manual"
+          },
+          "virtualMachineProfile": {
+            "storageProfile": {
+              "osDisk": {
+                "createOption": "FromImage"
+              },
+              "imageReference": "[variables('imageReference')]",
+              "dataDisks": [
+                {
+                  "lun": 2,
+                  "name": "myManagedDataDisk",
+                  "createOption": "Attach",
+                  "managedDisk": {
+                    "id": "[resourceId('Microsoft.Compute/disks', 'myManagedDataDisk')]"
+                  }
+                },
+                {
+                  "lun": 3,
+                  "name": "myManagedDataDisk1",
+                  "createOption": "Attach",
+                  "managedDisk": {
+                    "id": "[resourceId('Microsoft.Compute/disks', 'myManagedDataDisk1')]"
+                  }
+                }
+              ]
+            },
+            "osProfile": {
+              "computerNamePrefix": "[variables('namingInfix')]",
+              "adminUsername": "[parameters('adminUsername')]",
+              "adminPassword": "[parameters('adminPassword')]"
+            },
+            "networkProfile": {
+              "networkInterfaceConfigurations": [
+                {
+                  "name": "[variables('nicName')]",
+                  "properties": {
+                    "primary": true,
+                    "ipConfigurations": [
+                      {
+                        "name": "[variables('ipConfigName')]",
+                        "properties": {
+                          "subnet": {
+                            "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'), '/subnets/', variables('subnetName'))]"
+                          },
+                          "loadBalancerBackendAddressPools": [
+                            {
+                              "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/backendAddressPools/', variables('bePoolName'))]"
+                            }
+                          ],
+                          "loadBalancerInboundNatPools": [
+                            {
+                              "id": "[concat('/subscriptions/', subscription().subscriptionId,'/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('loadBalancerName'), '/inboundNatPools/', variables('natPoolName'))]"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "extensions - Minimal",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions/properties/properties",
+      "json": {
+        "publisher": "Test Publisher",
+        "type": "Test Type",
+        "typeHandlerVersion": "Test Type Handler Version",
+        "settings": { }
+      }
+    },
+
+    {
+      "name": "extensions - Test IaaSDiagnostics",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Microsoft.Azure.Diagnostics",
+          "type": "IaaSDiagnostics",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "xmlCfg": "Test XML Config",
+            "StorageAccount": "Test Storage Account"
+          },
+          "protectedSettings": {
+            "storageAccountName": "Test Storage Account Name",
+            "storageAccountKey": "Test Storage Account Key",
+            "storageAccountEndPoint": "Test Storage Account End Point"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test IaaSAntimalware",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Microsoft.Azure.Security",
+          "type": "IaaSAntimalware",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "AntimalwareEnabled": true,
+            "Exclusions": {
+              "Paths": "Test Paths",
+              "Extensions": "Test Extensions",
+              "Processes": "Test Processes"
+            },
+            "RealtimeProtectionEnabled": "true",
+            "ScheduledScanSettings": {
+              "isEnabled": "false",
+              "scanType": "Test Scan Type",
+              "day": "Test Day",
+              "time": "Test Time"
+            }
+          }
+        }
+      }
+    },
+    
+    {
+      "name": "extensions - Test CustomScriptExtension",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Microsoft.Compute",
+          "type": "CustomScriptExtension",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "fileUris": [
+              "test file uri",
+              "test file uri 2"
+            ],
+            "commandToExecute": "ls"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensionsChild - Minimal",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.json#/definitions/virtualMachines_extensions_childResource",
+      "json": {
+        "name": "Test Name",
+        "type": "extensions",
+        "apiVersion": "2019-03-01",
+        "location": "West Us",
+        "properties": {
+          "publisher": "Test Publisher",
+          "type": "Test Type",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "settings": { }
+        }
+      }
+    },
+    
+    {
+      "name": "extensionsChild - CustomScriptExtension",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.json#/definitions/virtualMachines_extensions_childResource",
+      "json": {
+        "name": "Test Name",
+        "type": "extensions",
+        "apiVersion": "2019-03-01",
+        "location": "West Us",
+        "properties": {
+          "publisher": "Microsoft.Compute",
+          "type": "CustomScriptExtension",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "fileUris": [
+              "test file uri",
+              "test file uri 2"
+            ],
+            "commandToExecute": "ls"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test customScriptForLinux",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Microsoft.OSTCExtensions",
+          "type": "CustomScriptForLinux",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "fileUris": [
+              "test file uri",
+              "test file uri 2"
+            ],
+            "commandToExecute": "ls"
+          },
+          "protectedSettings": {
+            "commandToExecute": "ls",
+            "storageAccountName": "Test Storage Account Name",
+            "storageAccountKey": "Test Storage Account Key",
+            "storageAccountEndPoint": "Test Storage Account End Point"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test linuxDiagnostic",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Microsoft.OSTCExtensions",
+          "type": "LinuxDiagnostic",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "enableSyslog": "test syslog",
+            "mdsdHttpProxy": "test proxy",
+            "perCfg": "test cfg",
+            "fileCfg": "test filecfg",
+            "xmlCfg": "test xmlcfg",
+            "ladCfg": "test ladcfg",
+            "syslogCfg": "test syslogcfg",
+            "eventVolume": "test eventvolume",
+            "mdsdCfg": "test mdsdcfg"
+          },
+          "protectedSettings": {
+            "mdsdHttpProxy": "Test mdsd http proxy",
+            "storageAccountName": "Test Storage Account Name",
+            "storageAccountKey": "Test Storage Account Key",
+            "storageAccountEndPoint": "Test Storage Account End Point"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test vmAccessForLinux",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Microsoft.OSTCExtensions",
+          "type": "VMAccessForLinux",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "check_disk": true,
+            "repair_disk": true
+          },
+          "protectedSettings": {
+            "username": "Testusername",
+            "password": "Testp@ssw0rd",
+            "ssh_key": "TestSSHKey",
+            "reset_ssh": "Test reset_ssh",
+            "remove_user": "Test remove_user",
+            "expiration": "2019-03-01"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test bgInfo",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Microsoft.Compute",
+          "type": "bginfo",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": false
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test vmAccessAgent",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Microsoft.Compute",
+          "type": "VMAccessAgent",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "username": "testusername"
+          },
+          "protectedSettings": {
+            "password": "Testp@ssw0rd"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test dscExtension",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Microsoft.Powershell",
+          "type": "DSC",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "modulesUrl": "testUrl",
+            "configurationFunction": "testconfig",
+            "properties": "testargs",
+            "wmfVersion": "2.20",
+            "dataCollection": "On"
+          },
+          "protectedSettings": {
+            "dataBlobUri": "TestUri"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test OSPatchingForLinux",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Microsoft.OSTCExtensions",
+          "type": "OSPatchingForLinux",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "disabled": true,
+            "stop": false,
+            "installDuration": "testduration",
+            "intervalOfWeeks": 5,
+            "dayOfWeek": "testday",
+            "startTime": "testtime",
+            "rebootAfterPatch": "testreboot",
+            "catgeory": "testcategory",
+            "oneoff": true,
+            "local": true,
+            "idleTestScript": "testscript",
+            "healthyTestScript": "testscript2",
+            "distUpgradeList": "testlist",
+            "distUpgradeAll": "testall",
+            "vmStatusTest": "teststatus"
+          },
+          "protectedSettings": {
+            "storageAccountName": "TestAccountName123",
+            "storageAccountKey": "TestStorageKey123"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test VMSnapshot",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Microsoft.Azure.RecoveryServices",
+          "type": "VMSnapshot",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "locale": "test locale",
+            "taskId": "test id",
+            "commandToExecute": "test cmd",
+            "objectStr": "test objstr",
+            "logsBlobUri": "test log uri",
+            "statusBlobUri": "test blob uri",
+            "commandStartTimeUTCTicks": "test cmd starttime",
+            "vmType": "microsoft.compute/virtualmachines"
+          }
+        },
+        "id": "test id",
+        "name": "Test Name",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "location": "Test Location",
+        "tags": {}
+      }
+    },
+
+    {
+      "name": "extensions - Test VMSnapshotLinux",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Microsoft.Azure.RecoveryServices",
+          "type": "VMSnapshotLinux",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "locale": "test locale",
+            "taskId": "test id",
+            "commandToExecute": "test cmd",
+            "objectStr": "test objstr",
+            "logsBlobUri": "test log uri",
+            "statusBlobUri": "test blob uri",
+            "commandStartTimeUTCTicks": "test cmd starttime",
+            "vmType": "microsoft.compute/virtualmachines"
+          }
+        },
+        "id": "test id",
+        "name": "Test Name",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "location": "Test Location",
+        "tags": {}
+      }
+    },
+
+    {
+      "name": "extensions - Test AcronisBackupLinux",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Acronis.Backup",
+          "type": "AcronisBackupLinux",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "absURL": "test url"
+          },
+          "protectedSettings": {
+            "userLogin": "TestAccountName123",
+            "userPassword": "TestP@ssword"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test AcronisBackup",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Acronis.Backup",
+          "type": "AcronisBackup",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "absURL": "test url"
+          },
+          "protectedSettings": {
+            "userLogin": "TestAccountName123",
+            "userPassword": "TestP@ssword"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test LinuxChefClient",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Chef.Bootstrap.WindowsAzure",
+          "type": "LinuxChefClient",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "bootstrap_version": "test version",
+            "bootstrap_options": {
+              "chef_node_name": "test name",
+              "chef_server_url": "test url",
+              "validation_client_name": "test client name",
+              "node_ssl_verify_mode": "test mode",
+              "environment": "test environment"
+            },
+            "runlist": "test runlist",
+            "client_rb": "test client_rb"
+          },
+          "protectedSettings": {
+            "validation_key": "TestAccountName123",
+            "chef_server_crt": "TestP@ssword",
+            "secret": "test secret"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test ChefClient",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Chef.Bootstrap.WindowsAzure",
+          "type": "ChefClient",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "bootstrap_options": {
+              "chef_node_name": "test name",
+              "chef_server_url": "test url",
+              "validation_client_name": "test client name",
+              "node_ssl_verify_mode": "test mode",
+              "environment": "test environment"
+            },
+            "runlist": "test runlist",
+            "client_rb": "test client_rb"
+          },
+          "protectedSettings": {
+            "validation_key": "TestAccountName123",
+            "chef_server_crt": "TestP@ssword",
+            "secret": "test secret"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test datadogLinuxAgent",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Datadog.Agent",
+          "type": "DatadogLinuxAgent",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "api_key": "test apikey"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test datadogWindowsAgent",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Datadog.Agent",
+          "type": "DatadogWindowsAgent",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "api_key": "test apikey"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test dockerExtension",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Microsoft.Azure.Extensions",
+          "type": "DockerExtension",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "docker": {
+              "port": "test port"
+            }
+          },
+          "protectedSettings": {
+            "certs": {
+              "ca": "test ca",
+              "cert": "test cert",
+              "key": "test key"
+            }
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test dynatraceLinux",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "dynatrace.ruxit",
+          "type": "oneAgentLinux",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "tenantId": "test id",
+            "token": "test token"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test dynatraceWindows",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "dynatrace.ruxit",
+          "type": "oneAgentWindows",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "tenantId": "test id",
+            "token": "test token"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test eset",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "ESET",
+          "type": "FileSecurity",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "LicenseKey": "test key",
+            "Install-RealtimeProtection": "test realtime",
+            "Install-ProtocolFiltering": "test ProtocolFiltering",
+            "Install-DeviceControl": "test DeviceControl",
+            "Enable-Cloud": "test Cloud",
+            "Enable-PUA": "test PUA",
+            "ERAAgentCfgUrl": "test cfgurl"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test hpeSecurityApplicationDefender",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "HPE.Security.ApplicationDefender",
+          "type": "DotnetAgent",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "protectedSettings": {
+            "key": "test key",
+            "serverURL": "test serverURL"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test puppetAgent",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Puppet",
+          "type": "PuppetAgent",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {},
+          "protectedSettings": {
+            "PUPPET_MASTER_SERVER": "test server"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test site24x7LinuxServerExtn",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Site24x7",
+          "type": "Site24x7LinuxServerExtn",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "site24x7AgentType": "azurevmextnlinuxserver"
+          },
+          "protectedSettings": {
+            "site24x7LicenseKey": "test key"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test site24x7LinuxServerExtn",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Site24x7",
+          "type": "Site24x7WindowsServerExtn",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "site24x7AgentType": "azurevmextnwindowsserver"
+          },
+          "protectedSettings": {
+            "site24x7LicenseKey": "test key"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test site24x7ApmInsightExtn",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Site24x7",
+          "type": "Site24x7ApmInsightExtn",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "site24x7AgentType": "azurevmextnapminsightclassic"
+          },
+          "protectedSettings": {
+            "site24x7LicenseKey": "test key"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test trendMicroDSALinux",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "TrendMicro.DeepSecurity",
+          "type": "TrendMicroDSALinux",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "DSMname": "test dsmname",
+            "DSMport": "test dsmport",
+            "policyNameorID": "test policyname"
+          },
+          "protectedSettings": {
+            "tenantID": "test id",
+            "tenantPassword": "test password"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test trendMicroDSA",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "TrendMicro.DeepSecurity",
+          "type": "TrendMicroDSA",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "DSMname": "test dsmname",
+            "DSMport": "test dsmport",
+            "policyNameorID": "test policyname"
+          },
+          "protectedSettings": {
+            "tenantID": "test id",
+            "tenantPassword": "test password"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test bmcCtmAgentLinux",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "ctm.bmc.com",
+          "type": "BmcCtmAgentLinux",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "Control-M Server Name": "test server",
+            "Agent Port": "test port",
+            "Host Group": "test group",
+            "User Account": "test account"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test bmcCtmAgentWindows",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "bmc.ctm",
+          "type": "AgentWinExt",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "Control-M Server Name": "test server",
+            "Agent Port": "test port",
+            "Host Group": "test group"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test customScript",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Microsoft.Azure.Extensions",
+          "type": "CustomScript",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true,
+          "settings": {
+            "fileUris": ["test file"]
+          },
+          "protectedSettings": {
+            "storageAccountName": "test account name",
+            "storageAccountKey": "test account key",
+            "commandToExecute": "test cmd"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test networkWatcherAgentWindows",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Microsoft.Azure.NetworkWatcher",
+          "type": "NetworkWatcherAgentWindows",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true
+        }
+      }
+    },
+
+    {
+      "name": "extensions - Test networkWatcherAgentLinux",
+      "definition": "https://schema.management.azure.com/schemas/2019-03-01/Microsoft.Compute.Extensions.json#/resourceDefinitions/virtualMachines_extensions",
+      "json": {
+        "name": "Test Name",
+        "location": "Test Location",
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2019-03-01",
+        "properties": {
+          "publisher": "Microsoft.Azure.NetworkWatcher",
+          "type": "NetworkWatcherAgentLinux",
+          "typeHandlerVersion": "Test Type Handler Version",
+          "autoUpgradeMinorVersion": true
+        }
+      }
+    }
+  ]
+}

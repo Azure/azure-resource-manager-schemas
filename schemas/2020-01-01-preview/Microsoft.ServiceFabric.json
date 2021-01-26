@@ -140,70 +140,6 @@
     }
   },
   "definitions": {
-    "ApplicationDeltaHealthPolicy": {
-      "type": "object",
-      "properties": {
-        "defaultServiceTypeDeltaHealthPolicy": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ServiceTypeDeltaHealthPolicy"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Represents the delta health policy used to evaluate the health of services belonging to a service type when upgrading the cluster.\n"
-        },
-        "serviceTypeDeltaHealthPolicies": {
-          "oneOf": [
-            {
-              "type": "object",
-              "additionalProperties": {
-                "$ref": "#/definitions/ServiceTypeDeltaHealthPolicy"
-              },
-              "properties": {}
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Defines a map that contains specific delta health policies for different service types.\nEach entry specifies as key the service type name and as value a ServiceTypeDeltaHealthPolicy used to evaluate the service health when upgrading the cluster.\nThe map is empty by default.\n"
-        }
-      },
-      "description": "Defines a delta health policy used to evaluate the health of an application or one of its child entities when upgrading the cluster.\n"
-    },
-    "ApplicationHealthPolicy": {
-      "type": "object",
-      "properties": {
-        "defaultServiceTypeHealthPolicy": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ServiceTypeHealthPolicy"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Represents the health policy used to evaluate the health of services belonging to a service type.\n"
-        },
-        "serviceTypeHealthPolicies": {
-          "oneOf": [
-            {
-              "type": "object",
-              "additionalProperties": {
-                "$ref": "#/definitions/ServiceTypeHealthPolicy"
-              },
-              "properties": {}
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Defines a ServiceTypeHealthPolicy per service type name.\n\nThe entries in the map replace the default service type health policy for each specified service type.\nFor example, in an application that contains both a stateless gateway service type and a stateful engine service type, the health policies for the stateless and stateful services can be configured differently.\nWith policy per service type, there's more granular control of the health of the service.\n\nIf no policy is specified for a service type name, the DefaultServiceTypeHealthPolicy is used for evaluation.\n"
-        }
-      },
-      "description": "Defines a health policy used to evaluate the health of an application or one of its children entities.\n"
-    },
     "AzureActiveDirectory": {
       "type": "object",
       "properties": {
@@ -242,7 +178,7 @@
         },
         "issuerThumbprint": {
           "type": "string",
-          "description": "Issuer thumbprint for the certificate. Its only use CommonName is used."
+          "description": "Issuer thumbprint for the certificate. Only used together with CommonName."
         },
         "thumbprint": {
           "type": "string",
@@ -253,192 +189,6 @@
         "isAdmin"
       ],
       "description": "Client Certificate definition."
-    },
-    "ClusterHealthPolicy": {
-      "type": "object",
-      "properties": {
-        "applicationHealthPolicies": {
-          "oneOf": [
-            {
-              "type": "object",
-              "additionalProperties": {
-                "$ref": "#/definitions/ApplicationHealthPolicy"
-              },
-              "properties": {}
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Defines a map that contains specific application health policies for different applications.\nEach entry specifies as key the application name and as value an ApplicationHealthPolicy used to evaluate the application health.\nThe application name should include the 'fabric:' URI scheme.\nThe map is empty by default.\n"
-        },
-        "maxPercentUnhealthyApplications": {
-          "oneOf": [
-            {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 100,
-              "default": "0"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The maximum allowed percentage of unhealthy applications before reporting an error. For example, to allow 10% of applications to be unhealthy, this value would be 10.\n\nThe percentage represents the maximum tolerated percentage of applications that can be unhealthy before the cluster is considered in error.\nIf the percentage is respected but there is at least one unhealthy application, the health is evaluated as Warning.\nThis is calculated by dividing the number of unhealthy applications over the total number of application instances in the cluster, excluding applications of application types that are included in the ApplicationTypeHealthPolicyMap.\nThe computation rounds up to tolerate one failure on small numbers of applications. Default percentage is zero.\n"
-        },
-        "maxPercentUnhealthyNodes": {
-          "oneOf": [
-            {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 100,
-              "default": "0"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The maximum allowed percentage of unhealthy nodes before reporting an error. For example, to allow 10% of nodes to be unhealthy, this value would be 10.\n\nThe percentage represents the maximum tolerated percentage of nodes that can be unhealthy before the cluster is considered in error.\nIf the percentage is respected but there is at least one unhealthy node, the health is evaluated as Warning.\nThe percentage is calculated by dividing the number of unhealthy nodes over the total number of nodes in the cluster.\nThe computation rounds up to tolerate one failure on small numbers of nodes. Default percentage is zero.\n\nIn large clusters, some nodes will always be down or out for repairs, so this percentage should be configured to tolerate that.\n"
-        }
-      },
-      "description": "Defines a health policy used to evaluate the health of the cluster or of a cluster node.\n"
-    },
-    "ClusterUpgradeDeltaHealthPolicy": {
-      "type": "object",
-      "properties": {
-        "applicationDeltaHealthPolicies": {
-          "oneOf": [
-            {
-              "type": "object",
-              "additionalProperties": {
-                "$ref": "#/definitions/ApplicationDeltaHealthPolicy"
-              },
-              "properties": {}
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Defines a map that contains specific application delta health policies for different applications.\nEach entry specifies as key the application name and as value an ApplicationDeltaHealthPolicy used to evaluate the application health when upgrading the cluster.\nThe application name should include the 'fabric:' URI scheme.\nThe map is empty by default.\n"
-        },
-        "maxPercentDeltaUnhealthyApplications": {
-          "oneOf": [
-            {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 100
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The maximum allowed percentage of applications health degradation allowed during cluster upgrades.\nThe delta is measured between the state of the applications at the beginning of upgrade and the state of the applications at the time of the health evaluation.\nThe check is performed after every upgrade domain upgrade completion to make sure the global state of the cluster is within tolerated limits. System services are not included in this.\n"
-        },
-        "maxPercentDeltaUnhealthyNodes": {
-          "oneOf": [
-            {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 100
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The maximum allowed percentage of nodes health degradation allowed during cluster upgrades.\nThe delta is measured between the state of the nodes at the beginning of upgrade and the state of the nodes at the time of the health evaluation.\nThe check is performed after every upgrade domain upgrade completion to make sure the global state of the cluster is within tolerated limits.\n"
-        },
-        "maxPercentUpgradeDomainDeltaUnhealthyNodes": {
-          "oneOf": [
-            {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 100
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The maximum allowed percentage of upgrade domain nodes health degradation allowed during cluster upgrades.\nThe delta is measured between the state of the upgrade domain nodes at the beginning of upgrade and the state of the upgrade domain nodes at the time of the health evaluation.\nThe check is performed after every upgrade domain upgrade completion for all completed upgrade domains to make sure the state of the upgrade domains is within tolerated limits.\n"
-        }
-      },
-      "required": [
-        "maxPercentDeltaUnhealthyApplications",
-        "maxPercentDeltaUnhealthyNodes",
-        "maxPercentUpgradeDomainDeltaUnhealthyNodes"
-      ],
-      "description": "Describes the delta health policies for the cluster upgrade."
-    },
-    "ClusterUpgradePolicy": {
-      "type": "object",
-      "properties": {
-        "deltaHealthPolicy": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ClusterUpgradeDeltaHealthPolicy"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Describes the delta health policies for the cluster upgrade."
-        },
-        "forceRestart": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "If true, then processes are forcefully restarted during upgrade even when the code version has not changed (the upgrade only changes configuration or data)."
-        },
-        "healthCheckRetryTimeout": {
-          "type": "string",
-          "description": "The amount of time to retry health evaluation when the application or cluster is unhealthy before the upgrade rolls back. The timeout can be in either hh:mm:ss or in d.hh:mm:ss.ms format."
-        },
-        "healthCheckStableDuration": {
-          "type": "string",
-          "description": "The amount of time that the application or cluster must remain healthy before the upgrade proceeds to the next upgrade domain. The duration can be in either hh:mm:ss or in d.hh:mm:ss.ms format."
-        },
-        "healthCheckWaitDuration": {
-          "type": "string",
-          "description": "The length of time to wait after completing an upgrade domain before performing health checks. The duration can be in either hh:mm:ss or in d.hh:mm:ss.ms format."
-        },
-        "healthPolicy": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ClusterHealthPolicy"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Defines a health policy used to evaluate the health of the cluster or of a cluster node.\n"
-        },
-        "upgradeDomainTimeout": {
-          "type": "string",
-          "description": "The amount of time each upgrade domain has to complete before the upgrade rolls back. The timeout can be in either hh:mm:ss or in d.hh:mm:ss.ms format."
-        },
-        "upgradeReplicaSetCheckTimeout": {
-          "type": "string",
-          "description": "The maximum amount of time to block processing of an upgrade domain and prevent loss of availability when there are unexpected issues. When this timeout expires, processing of the upgrade domain will proceed regardless of availability loss issues. The timeout is reset at the start of each upgrade domain. The timeout can be in either hh:mm:ss or in d.hh:mm:ss.ms format."
-        },
-        "upgradeTimeout": {
-          "type": "string",
-          "description": "The amount of time the overall upgrade has to complete before the upgrade rolls back. The timeout can be in either hh:mm:ss or in d.hh:mm:ss.ms format."
-        }
-      },
-      "required": [
-        "healthCheckRetryTimeout",
-        "healthCheckStableDuration",
-        "healthCheckWaitDuration",
-        "healthPolicy",
-        "upgradeDomainTimeout",
-        "upgradeReplicaSetCheckTimeout",
-        "upgradeTimeout"
-      ],
-      "description": "Describes the policy used when upgrading the cluster."
     },
     "EndpointRangeDescription": {
       "type": "object",
@@ -548,6 +298,25 @@
     "ManagedClusterProperties": {
       "type": "object",
       "properties": {
+        "addonFeatures": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "DnsService",
+                  "BackupRestoreService",
+                  "ResourceMonitorService"
+                ]
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "client certificates for the cluster."
+        },
         "adminPassword": {
           "type": "string",
           "format": "password",
@@ -597,32 +366,6 @@
         "clusterCodeVersion": {
           "type": "string",
           "description": "The Service Fabric runtime version of the cluster. This property can only by set the user when **upgradeMode** is set to 'Manual'. To get list of available Service Fabric versions for new clusters use [ClusterVersion API](./ClusterVersion.md). To get the list of available version for existing clusters use **availableClusterVersions**."
-        },
-        "clusterUpgradeDescription": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ClusterUpgradePolicy"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Describes the policy used when upgrading the cluster."
-        },
-        "clusterUpgradeMode": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Automatic",
-                "Manual"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The upgrade mode of the cluster when new Service Fabric runtime version is available.\n\n  - Automatic - The cluster will be automatically upgraded to the latest Service Fabric runtime version as soon as it is available.\n  - Manual - The cluster will not be automatically upgraded to the latest Service Fabric runtime version. The cluster is upgraded by setting the **clusterCodeVersion** property in the cluster resource.\n."
         },
         "dnsName": {
           "type": "string",
@@ -875,46 +618,6 @@
       ],
       "description": "Describes a node type in the cluster, each node type represents sub set of nodes in the cluster."
     },
-    "ServiceTypeDeltaHealthPolicy": {
-      "type": "object",
-      "properties": {
-        "maxPercentDeltaUnhealthyServices": {
-          "oneOf": [
-            {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 100,
-              "default": "0"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The maximum allowed percentage of services health degradation allowed during cluster upgrades.\nThe delta is measured between the state of the services at the beginning of upgrade and the state of the services at the time of the health evaluation.\nThe check is performed after every upgrade domain upgrade completion to make sure the global state of the cluster is within tolerated limits.\n"
-        }
-      },
-      "description": "Represents the delta health policy used to evaluate the health of services belonging to a service type when upgrading the cluster.\n"
-    },
-    "ServiceTypeHealthPolicy": {
-      "type": "object",
-      "properties": {
-        "maxPercentUnhealthyServices": {
-          "oneOf": [
-            {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 100,
-              "default": "0"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The maximum percentage of services allowed to be unhealthy before your application is considered in error.\n"
-        }
-      },
-      "description": "Represents the health policy used to evaluate the health of services belonging to a service type.\n"
-    },
     "SettingsParameterDescription": {
       "type": "object",
       "properties": {
@@ -977,7 +680,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Sku Name. Basic will have a minimum of 3 seed nodes and Standard a minimum of 5. Basic only allows 1 node type."
+          "description": "Sku Name."
         }
       },
       "required": [

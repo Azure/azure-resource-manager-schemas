@@ -12,13 +12,13 @@ executeSynchronous(async () => {
     const prPrefix = process.argv[3];
     let basePath = prName.replace(prPrefix, "");
 
-    // format basePath
+    // format basePath.
     basePath = `${basePath}/resource-manager`;
 
     const autogenEntries = findAutogenEntries(basePath);
 
     if (autogenEntries.length === 0) {
-        //not found
+        // not onboarded in autogeneration
         console.log("false");
         return;
     }

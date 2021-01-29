@@ -682,6 +682,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.Insights',
         suffix: 'Application',
     },
+    {
+        basePath: 'quantum/resource-manager',
+        namespace: 'Microsoft.Quantum',
+    },
 ];
 
 export function getAutogenlist(): AutogenlistConfig[] {

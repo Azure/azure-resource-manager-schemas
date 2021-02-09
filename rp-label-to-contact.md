@@ -16,6 +16,7 @@ This table specifies what GitHub handle our bot is currently configured to notif
 | RP:Batch                   | mksuni, bgklein, mscurrell        |
 | RP:Blueprint               | alex-frankel, filizt              |
 | RP:BotService              | sgellock                          |
+| RP:ClusterConfiguration    | nanthi, nizlati, safeerm          |
 | RP:Communication           | bviglietta, usvoyager             |
 | RP:Compute                 | viabhav-agar, avirishuv, amjads1  |
 | RP:ContainerInstances      | dkkapur                           |

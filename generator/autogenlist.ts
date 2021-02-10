@@ -686,6 +686,16 @@ const autogenlist: AutogenlistConfig[] = [
         basePath: 'quantum/resource-manager',
         namespace: 'Microsoft.Quantum',
     },
+    {
+        basePath: 'kubernetesconfiguration/resource-manager',
+        namespace: 'Microsoft.KubernetesConfiguration',
+        resourceConfig: [
+            {
+                type: 'sourceControlConfigurations',
+                scopes: ScopeType.Extension
+            }
+        ]
+    }
 ];
 
 export function getAutogenlist(): AutogenlistConfig[] {

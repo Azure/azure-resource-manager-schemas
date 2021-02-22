@@ -540,6 +540,10 @@ const autogenlist: AutogenlistConfig[] = [
                 type: 'informationProtectionPolicies',
                 scopes: ScopeType.ManagementGroup | ScopeType.Extension,
             },
+            {
+                type: 'sqlVulnerabilityAssessments/baselineRules',
+                scopes: ScopeType.Extension,
+            },
         ]
     },
     {

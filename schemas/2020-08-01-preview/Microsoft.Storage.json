@@ -1193,6 +1193,19 @@
             }
           ],
           "description": "Indicates whether change feed event logging is enabled for the Blob service."
+        },
+        "retentionInDays": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 146000
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates the duration of changeFeed retention in days. Minimum value is 1 day and maximum value is 146000 days (400 years). A null value indicates an infinite retention of the change feed."
         }
       },
       "description": "The blob service properties for change feed events."
@@ -1434,7 +1447,7 @@
           "description": "Value indicating the age in days after last modification"
         }
       },
-      "description": "Object to define the number of days after last modification."
+      "description": "Object to define the number of days after object last modification Or last access. Properties daysAfterModificationGreaterThan and daysAfterLastAccessTimeGreaterThan are mutually exclusive."
     },
     "DeleteRetentionPolicy": {
       "type": "object",
@@ -1986,6 +1999,17 @@
             }
           ],
           "description": "Management policy action for snapshot."
+        },
+        "version": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ManagementPolicyVersion"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Management policy action for blob version."
         }
       },
       "description": "Actions are applied to the filtered blobs when the execution condition is met."
@@ -2002,7 +2026,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Object to define the number of days after last modification."
+          "description": "Object to define the number of days after object last modification Or last access. Properties daysAfterModificationGreaterThan and daysAfterLastAccessTimeGreaterThan are mutually exclusive."
         },
         "enableAutoTierToHotFromCool": {
           "oneOf": [
@@ -2024,7 +2048,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Object to define the number of days after last modification."
+          "description": "Object to define the number of days after object last modification Or last access. Properties daysAfterModificationGreaterThan and daysAfterLastAccessTimeGreaterThan are mutually exclusive."
         },
         "tierToCool": {
           "oneOf": [
@@ -2035,7 +2059,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Object to define the number of days after last modification."
+          "description": "Object to define the number of days after object last modification Or last access. Properties daysAfterModificationGreaterThan and daysAfterLastAccessTimeGreaterThan are mutually exclusive."
         }
       },
       "description": "Management policy action for base blob."
@@ -2100,7 +2124,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "An array of predefined enum values. Only blockBlob is supported."
+          "description": "An array of predefined enum values. Currently blockBlob supports all tiering and delete actions. Only delete actions are supported for appendBlob."
         },
         "prefixMatch": {
           "oneOf": [
@@ -2229,9 +2253,70 @@
             }
           ],
           "description": "Object to define the number of days after creation."
+        },
+        "tierToArchive": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DateAfterCreation"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Object to define the number of days after creation."
+        },
+        "tierToCool": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DateAfterCreation"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Object to define the number of days after creation."
         }
       },
       "description": "Management policy action for snapshot."
+    },
+    "ManagementPolicyVersion": {
+      "type": "object",
+      "properties": {
+        "delete": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DateAfterCreation"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Object to define the number of days after creation."
+        },
+        "tierToArchive": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DateAfterCreation"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Object to define the number of days after creation."
+        },
+        "tierToCool": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DateAfterCreation"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Object to define the number of days after creation."
+        }
+      },
+      "description": "Management policy action for blob version."
     },
     "Multichannel": {
       "type": "object",
@@ -2736,6 +2821,17 @@
             }
           ],
           "description": "Allow or disallow public access to all blobs or containers in the storage account. The default interpretation is true for this property."
+        },
+        "allowSharedKeyAccess": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates whether the storage account permits requests to be authorized with the account access key via Shared Key. If false, then all requests, including shared access signatures, must be authorized with Azure Active Directory (Azure AD). The default value is null, which is equivalent to true."
         },
         "azureFilesIdentityBasedAuthentication": {
           "oneOf": [

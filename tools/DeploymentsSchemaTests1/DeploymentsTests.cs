@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 
-namespace deploymentsSchemaTests
+namespace DeploymentsSchemaTests
 {
     [TestClass]
     public class DeploymentsTests
@@ -11,12 +11,10 @@ namespace deploymentsSchemaTests
         [TestMethod]
         public void TestSchemaLoader()
         {
-            // Calling Path.Combine to construct the path to schemas folder
-            var schemasPath = Path.Combine(new string[] { "..", "..", "..", "..", "..", "schemas" });
             Action createAssemblyFunc = () =>
                 TestSchemaCache.CreateFromFilePaths(
                     filePaths: Directory.EnumerateFiles(
-                        path: schemasPath,
+                        path: "schemas",
                         searchPattern: "*.json",
                         searchOption: SearchOption.AllDirectories));
             createAssemblyFunc.Should().NotThrow();

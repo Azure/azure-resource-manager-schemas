@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace deploymentsSchemaTests
+namespace DeploymentsSchemaTests
 {
     /// <summary>
     /// Test schema cache

@@ -34,13 +34,12 @@ npm run generate-single myprovider/resource-manager
 Alternatively, you can hand-author your schema, but **please note** that this process is error-prone, and ARM will not be responsible for reviewing for accuracy when validating your PR.
 
 ### Submitting a PR
-* Ensure that any new resource types that you are adding have been added to the following top-level template schemas:
-  * [schemas/2014-04-01-preview/deploymentTemplate.json](/schemas/2014-04-01-preview/deploymentTemplate.json)
-  * [schemas/2015-01-01/deploymentTemplate.json](/schemas/2015-01-01/deploymentTemplate.json)
-  * [schemas/2019-04-01/deploymentTemplate.json](/schemas/2019-04-01/deploymentTemplate.json)
+* Ensure that any $refs to resource types that you are adding has been added to the following top-level template schema: [schemas/2019-04-01/deploymentTemplate.json](/schemas/2019-04-01/deploymentTemplate.json)
 * If your schema has been manually generated, please ensure you include appropriate tests in [tests](/tests/)
 * If adding a new resource type, please add examples to the templates in [tools/templateTests](/tools/templateTests/)
 * Ensure that the test suite passes (see [Tests](#tests))
+
+> **NOTE**: We will no longer be taking any updates to the [2015-01-01](/schemas/2015-01-01/deploymentTemplate.json) or [2014-04-01-preview](/schemas/2014-04-01-preview/deploymentTemplate.json) root schemas. If you are authoring a template which references one of these schemas, please upgrade it to use the [2019-04-01](/schemas/2019-04-01/deploymentTemplate.json) root schema by setting the `$schema` property to `https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#"`.
 
 ### Runing Unit Tests
 Use the following commands to execute the test suite locally:

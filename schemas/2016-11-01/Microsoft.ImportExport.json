@@ -54,6 +54,39 @@
     }
   },
   "definitions": {
+    "DeliveryPackageInformation": {
+      "type": "object",
+      "properties": {
+        "carrierName": {
+          "type": "string",
+          "description": "The name of the carrier that is used to ship the import or export drives."
+        },
+        "driveCount": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The number of drives included in the package."
+        },
+        "shipDate": {
+          "type": "string",
+          "description": "The date when the package is shipped."
+        },
+        "trackingNumber": {
+          "type": "string",
+          "description": "The tracking number of the package."
+        }
+      },
+      "required": [
+        "carrierName",
+        "trackingNumber"
+      ],
+      "description": "Contains information about the delivery package being shipped by the customer to the Microsoft data center."
+    },
     "DriveStatus": {
       "type": "object",
       "properties": {
@@ -138,6 +171,35 @@
       },
       "description": "Provides information about the drive's status"
     },
+    "EncryptionKeyDetails": {
+      "type": "object",
+      "properties": {
+        "kekType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "MicrosoftManaged",
+                "CustomerManaged"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The type of kek encryption key."
+        },
+        "kekUrl": {
+          "type": "string",
+          "description": "Specifies the url for kek encryption key. "
+        },
+        "kekVaultResourceID": {
+          "type": "string",
+          "description": "Specifies the keyvault resource id for kek encryption key. "
+        }
+      },
+      "description": "Specifies the encryption key properties"
+    },
     "Export": {
       "type": "object",
       "properties": {
@@ -152,7 +214,7 @@
           ],
           "description": "A list of the blobs to be exported."
         },
-        "blobListblobPath": {
+        "blobListBlobPath": {
           "type": "string",
           "description": "The relative URI to the block blob that contains the list of blob paths or blob path prefixes as defined above, beginning with the container name. If the blob is in root container, the URI must begin with $root. "
         }
@@ -221,13 +283,13 @@
         "deliveryPackage": {
           "oneOf": [
             {
-              "$ref": "#/definitions/PackageInfomation"
+              "$ref": "#/definitions/DeliveryPackageInformation"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Contains information about the package being shipped by the customer to the Microsoft data center."
+          "description": "Contains information about the delivery package being shipped by the customer to the Microsoft data center."
         },
         "diagnosticsPath": {
           "type": "string",
@@ -246,6 +308,17 @@
             }
           ],
           "description": "List of up to ten drives that comprise the job. The drive list is a required element for an import job; it is not specified for export jobs."
+        },
+        "encryptionKey": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EncryptionKeyDetails"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies the encryption key properties"
         },
         "export": {
           "oneOf": [
@@ -480,14 +553,6 @@
           "description": "The first line of the street address to use when returning the drives. "
         }
       },
-      "required": [
-        "city",
-        "countryOrRegion",
-        "postalCode",
-        "recipientName",
-        "stateOrProvince",
-        "streetAddress1"
-      ],
       "description": "Contains information about the Microsoft datacenter to which the drives should be shipped."
     }
   }

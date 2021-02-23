@@ -13,15 +13,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2.1.2
         with:
-          node-version: 10.x
-      
-      - name: GitHub context (actor and head ref)
-        run: |          
-          echo ${{ github.actor }}
-          echo ${{ github.head_ref }}
+          node-version: 14.x
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1.7.2
 
       - name: Install NPM modules
         run: npm ci
+        working-directory: ./tools
+
+      - name: Deployments Schema tests
+        run: dotnet test DeploymentsSchemaTests/DeploymentsSchemaTests.csproj
         working-directory: ./tools
 
       - name: Run CI tests
@@ -33,14 +35,14 @@ jobs:
     needs: build
     env:
       PR_PREFIX: sdkAuto/
-    if: ${{ github.actor == 'openapi-sdkautomation[bot]' }}
+    if: ${{ github.event.pull_request.user.login == 'openapi-sdkautomation[bot]' }}
     steps:
       - uses: actions/checkout@v2
 
       - name: Setup Node.js
         uses: actions/setup-node@v2.1.2
         with:
-          node-version: 10.x
+          node-version: 14.x
 
       - name: Install NPM modules
         run: npm ci
@@ -58,18 +60,7 @@ jobs:
             echo $check_result;
           done <<< "$exec";
           
-          echo "AUTOGENLIST_CHECK_RESULT=$check_result" >> $GITHUB_ENV;
+          if [ $check_result == 'false' ] ; then
+            exit 1
+          fi
         working-directory: ./generator
-        
-      - uses: hmarr/auto-approve-action@v2.0.0
-        if: ${{ env.AUTOGENLIST_CHECK_RESULT == 'true' }}
-        with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-            
-      - name: Automerge
-        if: ${{ env.AUTOGENLIST_CHECK_RESULT == 'true' }}
-        uses: "pascalgn/automerge-action@v0.12.0"
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"          
-          MERGE_LABELS: ""
-          UPDATE_LABELS: ""

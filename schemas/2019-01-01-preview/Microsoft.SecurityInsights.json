@@ -9,7 +9,13 @@
       "type": "object",
       "oneOf": [
         {
+          "$ref": "#/definitions/MLBehaviorAnalyticsAlertRule"
+        },
+        {
           "$ref": "#/definitions/FusionAlertRule"
+        },
+        {
+          "$ref": "#/definitions/ThreatIntelligenceAlertRule"
         },
         {
           "$ref": "#/definitions/MicrosoftSecurityIncidentCreationAlertRule"
@@ -350,6 +356,9 @@
           "$ref": "#/definitions/AwsCloudTrailDataConnector"
         },
         {
+          "$ref": "#/definitions/Dynamics365DataConnector"
+        },
+        {
           "$ref": "#/definitions/MCASDataConnector"
         },
         {
@@ -667,6 +676,16 @@
           ],
           "description": "Describes watchlist properties"
         },
+        "resources": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/watchlists_watchlistItems_childResource"
+              }
+            ]
+          }
+        },
         "type": {
           "type": "string",
           "enum": [
@@ -681,6 +700,49 @@
         "type"
       ],
       "description": "Microsoft.SecurityInsights/watchlists"
+    },
+    "watchlists_watchlistItems": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-01-01-preview"
+          ]
+        },
+        "etag": {
+          "type": "string",
+          "description": "Etag of the azure resource"
+        },
+        "name": {
+          "type": "string",
+          "description": "Watchlist Item Id (GUID)"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WatchlistItemProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Describes watchlist item properties"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.SecurityInsights/watchlists/watchlistItems"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.SecurityInsights/watchlists/watchlistItems"
     }
   },
   "definitions": {
@@ -1028,6 +1090,11 @@
           "type": "string",
           "description": "The display name of the bookmark"
         },
+        "eventTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The bookmark event time"
+        },
         "incidentInfo": {
           "oneOf": [
             {
@@ -1061,9 +1128,19 @@
           "type": "string",
           "description": "The query of the bookmark."
         },
+        "queryEndTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The end time for the query"
+        },
         "queryResult": {
           "type": "string",
           "description": "The query result of the bookmark."
+        },
+        "queryStartTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The start time for the query"
         },
         "updated": {
           "type": "string",
@@ -1250,7 +1327,6 @@
       },
       "required": [
         "severity",
-        "startTimeUtc",
         "status",
         "title"
       ],
@@ -1337,6 +1413,91 @@
         "type"
       ],
       "description": "Microsoft.SecurityInsights/cases/relations"
+    },
+    "Dynamics365DataConnector": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "Dynamics365"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Dynamics365DataConnectorProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Dynamics365 data connector properties."
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "description": "Represents Dynamics365 data connector."
+    },
+    "Dynamics365DataConnectorDataTypes": {
+      "type": "object",
+      "properties": {
+        "dynamics365CdsActivities": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Dynamics365DataConnectorDataTypesDynamics365CdsActivities"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Common Data Service data type connection."
+        }
+      },
+      "description": "The available data types for Dynamics365 data connector."
+    },
+    "Dynamics365DataConnectorDataTypesDynamics365CdsActivities": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Enabled",
+                "Disabled"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Describe whether this data type connection is enabled or not."
+        }
+      },
+      "description": "Common Data Service data type connection."
+    },
+    "Dynamics365DataConnectorProperties": {
+      "type": "object",
+      "properties": {
+        "dataTypes": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Dynamics365DataConnectorDataTypes"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The available data types for Dynamics365 data connector."
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "The tenant id to connect to, and get the data from."
+        }
+      },
+      "description": "Dynamics365 data connector properties."
     },
     "EntityAnalytics": {
       "type": "object",
@@ -1511,7 +1672,8 @@
                   "Account",
                   "Host",
                   "Ip",
-                  "Url"
+                  "Url",
+                  "FileHash"
                 ]
               }
             },
@@ -1624,12 +1786,6 @@
           "description": "The title of the incident"
         }
       },
-      "required": [
-        "incidentId",
-        "relationName",
-        "severity",
-        "title"
-      ],
       "description": "Describes related incident information for the bookmark"
     },
     "IncidentLabel": {
@@ -1754,6 +1910,14 @@
             }
           ],
           "description": "Information on the user an incident is assigned to"
+        },
+        "providerIncidentId": {
+          "type": "string",
+          "description": "The incident ID assigned by the incident provider"
+        },
+        "providerName": {
+          "type": "string",
+          "description": "The name of the source provider that generated the incident"
         },
         "severity": {
           "oneOf": [
@@ -2156,6 +2320,57 @@
         "productFilter"
       ],
       "description": "MicrosoftSecurityIncidentCreation rule property bag."
+    },
+    "MLBehaviorAnalyticsAlertRule": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "MLBehaviorAnalytics"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MLBehaviorAnalyticsAlertRuleProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "MLBehaviorAnalytics alert rule base property bag."
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "description": "Represents MLBehaviorAnalytics alert rule."
+    },
+    "MLBehaviorAnalyticsAlertRuleProperties": {
+      "type": "object",
+      "properties": {
+        "alertRuleTemplateName": {
+          "type": "string",
+          "description": "The Name of the alert rule template used to create this rule."
+        },
+        "enabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Determines whether this alert rule is enabled or disabled."
+        }
+      },
+      "required": [
+        "alertRuleTemplateName",
+        "enabled"
+      ],
+      "description": "MLBehaviorAnalytics alert rule base property bag."
     },
     "OfficeATPDataConnector": {
       "type": "object",
@@ -2614,6 +2829,57 @@
       ],
       "description": "Scheduled alert rule base property bag."
     },
+    "ThreatIntelligenceAlertRule": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "ThreatIntelligence"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ThreatIntelligenceAlertRuleProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Threat Intelligence alert rule base property bag."
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "description": "Represents Threat Intelligence alert rule."
+    },
+    "ThreatIntelligenceAlertRuleProperties": {
+      "type": "object",
+      "properties": {
+        "alertRuleTemplateName": {
+          "type": "string",
+          "description": "The Name of the alert rule template used to create this rule."
+        },
+        "enabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Determines whether this alert rule is enabled or disabled."
+        }
+      },
+      "required": [
+        "alertRuleTemplateName",
+        "enabled"
+      ],
+      "description": "Threat Intelligence alert rule base property bag."
+    },
     "ThreatIntelligenceGranularMarkingModel": {
       "type": "object",
       "properties": {
@@ -2678,6 +2944,22 @@
         "displayName": {
           "type": "string",
           "description": "Display name of a threat intelligence entity"
+        },
+        "extensions": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "properties": {}
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Extensions map"
         },
         "externalId": {
           "type": "string",
@@ -2753,6 +3035,10 @@
           ],
           "description": "Labels  of threat intelligence entity"
         },
+        "language": {
+          "type": "string",
+          "description": "Language of threat intelligence entity"
+        },
         "lastUpdatedTimeUtc": {
           "type": "string",
           "description": "Last updated time in UTC"
@@ -2760,6 +3046,20 @@
         "modified": {
           "type": "string",
           "description": "Modified by"
+        },
+        "parsedPattern": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ThreatIntelligenceParsedPattern"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Parsed patterns"
         },
         "pattern": {
           "type": "string",
@@ -2831,15 +3131,46 @@
           "description": "Kill chainName name"
         },
         "phaseName": {
+          "type": "string",
+          "description": "Phase name"
+        }
+      },
+      "description": "Describes threat kill chain phase entity"
+    },
+    "ThreatIntelligenceParsedPattern": {
+      "type": "object",
+      "properties": {
+        "patternTypeKey": {
+          "type": "string",
+          "description": "Pattern type key"
+        },
+        "patternTypeValues": {
           "oneOf": [
             {
-              "type": "integer"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ThreatIntelligenceParsedPatternTypeValue"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Phase name"
+          "description": "Pattern type keys"
+        }
+      },
+      "description": "Describes parsed pattern entity"
+    },
+    "ThreatIntelligenceParsedPatternTypeValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "description": "Value of parsed pattern"
+        },
+        "valueType": {
+          "type": "string",
+          "description": "Type of the value"
         }
       },
       "description": "Describes threat kill chain phase entity"
@@ -3108,6 +3439,80 @@
       },
       "description": "User information that made some action"
     },
+    "WatchlistItemProperties": {
+      "type": "object",
+      "properties": {
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The time the watchlist item was created"
+        },
+        "createdBy": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/UserInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "User information that made some action"
+        },
+        "entityMapping": {
+          "type": "object",
+          "properties": {},
+          "description": "key-value pairs for a watchlist item entity mapping"
+        },
+        "isDeleted": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A flag that indicates if the watchlist item is deleted or not"
+        },
+        "itemsKeyValue": {
+          "type": "object",
+          "properties": {},
+          "description": "key-value pairs for a watchlist item"
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "The tenantId to which the watchlist item belongs to"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The last time the watchlist item was updated"
+        },
+        "updatedBy": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/UserInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "User information that made some action"
+        },
+        "watchlistItemId": {
+          "type": "string",
+          "description": "The id (a Guid) of the watchlist item"
+        },
+        "watchlistItemType": {
+          "type": "string",
+          "description": "The type of the watchlist item"
+        }
+      },
+      "required": [
+        "itemsKeyValue"
+      ],
+      "description": "Describes watchlist item properties"
+    },
     "WatchlistProperties": {
       "type": "object",
       "properties": {
@@ -3223,6 +3628,10 @@
           ],
           "description": "User information that made some action"
         },
+        "uploadStatus": {
+          "type": "string",
+          "description": "The status of the Watchlist upload : New, InProgress or Complete. Pls note : When a Watchlist upload status is equal to InProgress, the Watchlist cannot be deleted"
+        },
         "watchlistAlias": {
           "type": "string",
           "description": "The alias of the watchlist"
@@ -3230,6 +3639,17 @@
         "watchlistId": {
           "type": "string",
           "description": "The id (a Guid) of the watchlist"
+        },
+        "watchlistItemsCount": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The number of Watchlist Items in the Watchlist"
         },
         "watchlistType": {
           "type": "string",
@@ -3242,6 +3662,49 @@
         "source"
       ],
       "description": "Describes watchlist properties"
+    },
+    "watchlists_watchlistItems_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-01-01-preview"
+          ]
+        },
+        "etag": {
+          "type": "string",
+          "description": "Etag of the azure resource"
+        },
+        "name": {
+          "type": "string",
+          "description": "Watchlist Item Id (GUID)"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WatchlistItemProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Describes watchlist item properties"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "watchlistItems"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.SecurityInsights/watchlists/watchlistItems"
     }
   }
 }

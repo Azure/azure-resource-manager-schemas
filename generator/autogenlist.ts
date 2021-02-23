@@ -394,6 +394,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.Maps',
     },
     {
+        basePath: 'mixedreality/resource-manager',
+        namespace: 'Microsoft.MixedReality',
+    },
+    {
         basePath: 'netapp/resource-manager',
         namespace: 'Microsoft.NetApp',
     },
@@ -455,6 +459,20 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.Relay',
     },
     {
+        basePath: 'recoveryservicessiterecovery/resource-manager',
+        namespace: 'Microsoft.RecoveryServices',
+        suffix: 'SiteRecovery',
+    },
+    {
+        basePath: 'recoveryservicesbackup/resource-manager',
+        namespace: 'Microsoft.RecoveryServices',
+        suffix: "Backup"
+    },
+    {
+        basePath: "recoveryservices/resource-manager",
+        namespace: "Microsoft.RecoveryServices"
+    },
+    {
         basePath: 'reservations/resource-manager',
         namespace: 'Microsoft.Capacity',
     },
@@ -499,6 +517,36 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.Synapse',
     },
     {
+        basePath: 'security/resource-manager',
+        namespace: 'Microsoft.Security',
+        resourceConfig: [
+            {
+                type: 'advancedThreatProtectionSettings',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'assessments',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'deviceSecurityGroups',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'iotSensors',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'informationProtectionPolicies',
+                scopes: ScopeType.ManagementGroup | ScopeType.Extension,
+            },
+            {
+                type: 'sqlVulnerabilityAssessments/baselineRules',
+                scopes: ScopeType.Extension,
+            },
+        ]
+    },
+    {
         basePath: 'securityinsights/resource-manager',
         namespace: 'Microsoft.SecurityInsights',
     },
@@ -507,10 +555,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.ImportExport'
     },
     {
-        basePath: 'storSimple1200Series/resource-manager',
-        namespace: 'Microsoft.StorSimple',
+        basePath: 'storSimple1200Series/resource-manager',
+        namespace: 'Microsoft.StorSimple',
         suffix: '1200'
-    },
+    },
     {
         basePath: 'storage/resource-manager',
         namespace: 'Microsoft.Storage',
@@ -578,6 +626,79 @@ const autogenlist: AutogenlistConfig[] = [
     {
         basePath: 'windowsiot/resource-manager',
         namespace: 'Microsoft.WindowsIoT',
+    },
+    {
+        basePath: 'adp/resource-manager',
+        namespace: 'Microsoft.AutonomousDevelopmentPlatform',
+    },
+    {
+        basePath: 'automanage/resource-manager',
+        namespace: 'Microsoft.Automanage',
+    },
+    {
+        basePath: 'confluent/resource-manager',
+        namespace: 'Microsoft.Confluent',
+    },
+    {
+        basePath: 'datamigration/resource-manager',
+        namespace: 'Microsoft.DataMigration',
+    },
+    {
+        basePath: 'datadog/resource-manager',
+        namespace: 'Microsoft.Datadog',
+    },
+    {
+        basePath: 'healthbot/resource-manager',
+        namespace: 'Microsoft.HealthBot',
+    },
+    {
+        basePath: 'hybridkubernetes/resource-manager',
+        namespace: 'Microsoft.Kubernetes',
+    },
+    {
+        basePath: 'hybridnetwork/resource-manager',
+        namespace: 'Microsoft.HybridNetwork',
+    },
+    {
+        basePath: 'powerplatform/resource-manager',
+        namespace: 'Microsoft.PowerPlatform',
+    },
+    {
+        basePath: 'monitor/resource-manager',
+        namespace: 'Microsoft.Insights',
+        resourceConfig: [
+            {
+                type: 'diagnosticSettings',
+                scopes: ScopeType.Subcription | ScopeType.Extension,
+            },
+            {
+                type: 'guestDiagnosticSettingsAssociation',
+                scopes: ScopeType.Extension,
+            },
+            {
+                type: 'dataCollectionRuleAssociations',
+                scopes: ScopeType.Extension,
+            },
+        ],
+    },
+    {
+        basePath: 'applicationinsights/resource-manager',
+        namespace: 'Microsoft.Insights',
+        suffix: 'Application',
+    },
+    {
+        basePath: 'quantum/resource-manager',
+        namespace: 'Microsoft.Quantum',
+    },
+    {
+        basePath: 'kubernetesconfiguration/resource-manager',
+        namespace: 'Microsoft.KubernetesConfiguration',
+        resourceConfig: [
+            {
+                type: 'sourceControlConfigurations',
+                scopes: ScopeType.Extension
+            }
+        ]
     }
 ];
 

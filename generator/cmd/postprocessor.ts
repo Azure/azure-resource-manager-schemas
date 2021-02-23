@@ -21,10 +21,10 @@ function getStatus(file: any){
 }
 
 async function getChangedSchemas(repoPath: string) {
-    var Git = require("nodegit");
+    const Git = require('nodegit');
     const repo = await Git.Repository.open(repoPath);
     const files = await repo.getStatus();
-    let status = [];
+    let status: any[] = [];
     if (files.length) {
         status = files.map(getStatus);
     }

@@ -3,10 +3,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace deploymentsSchemaTests
 {
     [TestClass]
-    public class UnitTest1
+    public class DeploymentsTests
     {
         [TestMethod]
-        public void TestMethod1()
+        public void TestSchemaLoader()
         {
         }
     }

@@ -1,0 +1,442 @@
+{
+  "id": "https://schema.management.azure.com/schemas/2019-09-01/policyDefinition.json#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Policy Definition",
+  "description": "This schema defines Azure resource policy definition, please see https://azure.microsoft.com/documentation/articles/resource-manager-policy/ for more details.",
+  "type": "object",
+  "properties": {
+    "if": {
+      "oneOf": [
+        { "$ref": "#/definitions/condition" },
+        { "$ref": "#/definitions/operatorNot" },
+        { "$ref": "#/definitions/operatorAnyOf" },
+        { "$ref": "#/definitions/operatorAllOf" }
+      ]
+    },
+    "then": {
+      "type": "object",
+      "properties": {
+        "effect": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [ "append", "audit", "auditIfNotExists", "deny", "deployIfNotExists", "modify", "disabled" ]
+            },
+            { "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression" }
+          ]
+        },
+        "details": {
+          "oneOf": [
+            { "$ref": "#/definitions/ifNotExistsDetails" },
+            { "$ref": "#/definitions/appendDetails" },
+            { "$ref": "#/definitions/modifyDetails" }
+          ]
+        }
+      },
+      "required": [ "effect" ],
+      "additionalProperties": false
+    }
+  },
+  "required": [ "if", "then" ],
+  "additionalProperties": false,
+  "definitions": {
+    "appendDetails": {
+      "type": "array",
+      "items": {
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "value": {
+          }
+        },
+        "required": [ "field", "value" ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "additionalItems": false
+    },
+    "ifNotExistsDetails": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "resourceGroupName": {
+          "type": "string"
+        },
+        "existenceScope": {
+          "type": "string",
+          "enum": [ "resourceGroup", "subscription" ]
+        },
+        "deploymentScope": {
+          "type": "string",
+          "enum": [ "resourceGroup", "subscription" ]
+        },
+        "roleDefinitionIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "existenceCondition": {
+          "oneOf": [
+            { "$ref": "#/definitions/condition" },
+            { "$ref": "#/definitions/operatorNot" },
+            { "$ref": "#/definitions/operatorAnyOf" },
+            { "$ref": "#/definitions/operatorAllOf" }
+          ]
+        },
+        "deployment": {
+          "type": "object",
+          "properties": {
+            "properties": {
+              "$ref": "https://schema.management.azure.com/schemas/2018-05-01/Microsoft.Resources.json#/definitions/DeploymentProperties"
+            }
+          }
+        }
+      },
+      "required": [ "type" ],
+      "additionalProperties": false
+    },
+    "modifyDetails": {
+      "type": "object",
+      "properties": {
+        "conflictEffect": {
+          "type": "string",
+          "enum": [ "deny", "audit" ]
+        },
+        "roleDefinitionIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "properties": {
+              "operation": {
+                "type": "string",
+                "enum": [ "add", "addOrReplace", "remove" ]
+              },
+              "field": {
+                "type": "string"
+              },
+              "value": {
+              },
+              "condition": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "operation",
+              "field"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "additionalItems": false
+        }
+      },
+      "required": [ "roleDefinitionIds", "operations" ],
+      "additionalProperties": false
+    },
+    "condition": {
+      "allOf": [
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "source": {
+                  "type": "string"
+                }
+              },
+              "required": [ "source" ]
+            },
+            {
+              "properties": {
+                "field": {
+                  "type": "string"
+                }
+              },
+              "required": [ "field" ]
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "string"
+                }
+              },
+              "required": [ "value" ]
+            },
+            {
+              "properties": {
+                "count": {
+                  "$ref": "#/definitions/countExpression"
+                }
+              },
+              "required": [ "count" ]
+            }
+          ]
+        },
+        {
+          "oneOf": [
+            {
+              "properties": {
+                "equals": {
+                  "type": [ "number", "string" ]
+                }
+              },
+              "required": [ "equals" ]
+            },
+            {
+              "properties": {
+                "notEquals": {
+                  "type": [ "number", "string" ]
+                }
+              },
+              "required": [ "notEquals" ]
+            },
+            {
+              "properties": {
+                "like": {
+                  "type": "string"
+                }
+              },
+              "required": [ "like" ]
+            },
+            {
+              "properties": {
+                "notLike": {
+                  "type": "string"
+                }
+              },
+              "required": [ "notLike" ]
+            },
+            {
+              "properties": {
+                "contains": {
+                  "type": "string"
+                }
+              },
+              "required": [ "contains" ]
+            },
+            {
+              "properties": {
+                "notContains": {
+                  "type": "string"
+                }
+              },
+              "required": [ "notContains" ]
+            },
+            {
+              "properties": {
+                "in": {
+                  "oneOf": [
+                    { "type": "array" },
+                    { "type": "string" }
+                  ]
+                }
+              },
+              "required": [ "in" ]
+            },
+            {
+              "properties": {
+                "notIn": {
+                  "oneOf": [
+                    { "type": "array" },
+                    { "type": "string" }
+                  ]
+                }
+              },
+              "required": [ "notIn" ]
+            },
+            {
+              "properties": {
+                "containsKey": {
+                  "type": "string"
+                }
+              },
+              "required": [ "containsKey" ]
+            },
+            {
+              "properties": {
+                "notContainsKey": {
+                  "type": "string"
+                }
+              },
+              "required": [ "notContainsKey" ]
+            },
+            {
+              "properties": {
+                "match": {
+                  "type": "string"
+                }
+              },
+              "required": [ "match" ]
+            },
+            {
+              "properties": {
+                "matchInsensitively": {
+                  "type": "string"
+                }
+              },
+              "required": [ "matchInsensitively" ]
+            },
+            {
+              "properties": {
+                "notMatch": {
+                  "type": "string"
+                }
+              },
+              "required": [ "notMatch" ]
+            },
+            {
+              "properties": {
+                "notMatchInsensitively": {
+                  "type": "string"
+                }
+              },
+              "required": [ "notMatchInsensitively" ]
+            },
+            {
+              "properties": {
+                "exists": {
+                  "type": [ "string", "boolean" ]
+                }
+              },
+              "required": [ "exists" ]
+            },
+            {
+              "properties": {
+                "greater": {
+                  "type": [ "number", "string" ]
+                }
+              },
+              "required": [ "greater" ]
+            },
+            {
+              "properties": {
+                "less": {
+                  "type": [ "number", "string" ]
+                }
+              },
+              "required": [ "less" ]
+            },
+            {
+              "properties": {
+                "greaterOrEquals": {
+                  "type": [ "number", "string" ]
+                }
+              },
+              "required": [ "greaterOrEquals" ]
+            },
+            {
+              "properties": {
+                "lessOrEquals": {
+                  "type": [ "number", "string" ]
+                }
+              },
+              "required": [ "lessOrEquals" ]
+            }
+          ]
+        }
+      ]
+    },
+    "countExpression": {
+      "oneOf": [
+        {
+          "properties": {
+            "field": {
+              "type": "string"
+            },
+            "where": {
+              "oneOf": [
+                { "$ref": "#/definitions/condition" },
+                { "$ref": "#/definitions/operatorNot" },
+                { "$ref": "#/definitions/operatorAnyOf" },
+                { "$ref": "#/definitions/operatorAllOf" }
+              ]
+            }
+          },
+          "required": [ "field" ],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "value": {
+              "type": [ "array", "string" ]
+            },
+            "name": {
+              "type": "string"
+            },
+            "where": {
+              "oneOf": [
+                { "$ref": "#/definitions/condition" },
+                { "$ref": "#/definitions/operatorNot" },
+                { "$ref": "#/definitions/operatorAnyOf" },
+                { "$ref": "#/definitions/operatorAllOf" }
+              ]
+            }
+          },
+          "required": [ "value" ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "operatorNot": {
+      "properties": {
+        "not": {
+          "oneOf": [
+            { "$ref": "#/definitions/condition" },
+            { "$ref": "#/definitions/operatorNot" },
+            { "$ref": "#/definitions/operatorAnyOf" },
+            { "$ref": "#/definitions/operatorAllOf" }
+          ]
+        }
+      },
+      "required": [ "not" ],
+      "additionalProperties": false
+    },
+    "operatorAnyOf": {
+      "properties": {
+        "anyOf": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              { "$ref": "#/definitions/condition" },
+              { "$ref": "#/definitions/operatorNot" },
+              { "$ref": "#/definitions/operatorAnyOf" },
+              { "$ref": "#/definitions/operatorAllOf" }
+            ]
+          }
+        }
+      },
+      "required": [ "anyOf" ],
+      "additionalProperties": false
+    },
+    "operatorAllOf": {
+      "properties": {
+        "allOf": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              { "$ref": "#/definitions/condition" },
+              { "$ref": "#/definitions/operatorNot" },
+              { "$ref": "#/definitions/operatorAnyOf" },
+              { "$ref": "#/definitions/operatorAllOf" }
+            ]
+          }
+        }
+      },
+      "required": [ "allOf" ],
+      "additionalProperties": false
+    }
+  }
+}

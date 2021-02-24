@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2016-10-01/Microsoft.KeyVault.json#",
+  "id": "https://schema.management.azure.com/schemas/2018-02-14/Microsoft.KeyVault.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.KeyVault",
   "description": "Microsoft KeyVault Resource Types",
@@ -10,7 +10,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-10-01"
+            "2018-02-14"
           ]
         },
         "location": {
@@ -46,6 +46,9 @@
             "oneOf": [
               {
                 "$ref": "#/definitions/vaults_accessPolicies_childResource"
+              },
+              {
+                "$ref": "#/definitions/vaults_privateEndpointConnections_childResource"
               },
               {
                 "$ref": "#/definitions/vaults_secrets_childResource"
@@ -90,7 +93,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-10-01"
+            "2018-02-14"
           ]
         },
         "name": {
@@ -135,13 +138,52 @@
       ],
       "description": "Microsoft.KeyVault/vaults/accessPolicies"
     },
+    "vaults_privateEndpointConnections": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-02-14"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the private endpoint connection associated with the key vault."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PrivateEndpointConnectionProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the private endpoint connection resource."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.KeyVault/vaults/privateEndpointConnections"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.KeyVault/vaults/privateEndpointConnections"
+    },
     "vaults_secrets": {
       "type": "object",
       "properties": {
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-10-01"
+            "2018-02-14"
           ]
         },
         "name": {
@@ -249,6 +291,83 @@
       ],
       "description": "An identity that have access to the key vault. All identities in the array must use the same tenant ID as the key vault's tenant ID."
     },
+    "IPRule": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "description": "An IPv4 address range in CIDR notation, such as '124.56.78.91' (simple IP address) or '124.56.78.0/24' (all addresses that start with 124.56.78)."
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "description": "A rule governing the accessibility of a vault from a specific ip address or ip range."
+    },
+    "NetworkRuleSet": {
+      "type": "object",
+      "properties": {
+        "bypass": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "AzureServices",
+                "None"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Tells what traffic can bypass network rules. This can be 'AzureServices' or 'None'.  If not specified the default is 'AzureServices'."
+        },
+        "defaultAction": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Allow",
+                "Deny"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The default action when no rule from ipRules and from virtualNetworkRules match. This is only used after the bypass property has been evaluated."
+        },
+        "ipRules": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/IPRule"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of IP address rules."
+        },
+        "virtualNetworkRules": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/VirtualNetworkRule"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of virtual network rules."
+        }
+      },
+      "description": "A set of rules governing the network accessibility of a vault."
+    },
     "Permissions": {
       "type": "object",
       "properties": {
@@ -272,7 +391,9 @@
                   "deleteissuers",
                   "manageissuers",
                   "recover",
-                  "purge"
+                  "purge",
+                  "backup",
+                  "restore"
                 ]
               }
             },
@@ -370,6 +491,89 @@
         }
       },
       "description": "Permissions the identity has for keys, secrets, certificates and storage."
+    },
+    "PrivateEndpoint": {
+      "type": "object",
+      "properties": {},
+      "description": "Private endpoint object properties."
+    },
+    "PrivateEndpointConnectionProperties": {
+      "type": "object",
+      "properties": {
+        "privateEndpoint": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PrivateEndpoint"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Private endpoint object properties."
+        },
+        "privateLinkServiceConnectionState": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PrivateLinkServiceConnectionState"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "An object that represents the approval state of the private link connection."
+        },
+        "provisioningState": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Succeeded",
+                "Creating",
+                "Updating",
+                "Deleting",
+                "Failed",
+                "Disconnected"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Provisioning state of the private endpoint connection."
+        }
+      },
+      "description": "Properties of the private endpoint connection resource."
+    },
+    "PrivateLinkServiceConnectionState": {
+      "type": "object",
+      "properties": {
+        "actionRequired": {
+          "type": "string",
+          "description": "A message indicating if changes on the service provider require any updates on the consumer."
+        },
+        "description": {
+          "type": "string",
+          "description": "The reason for approval or rejection."
+        },
+        "status": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Pending",
+                "Approved",
+                "Rejected",
+                "Disconnected"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates whether the connection has been approved, rejected or removed by the key vault owner."
+        }
+      },
+      "description": "An object that represents the approval state of the private link connection."
     },
     "SecretAttributes": {
       "type": "object",
@@ -512,7 +716,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "An array of 0 to 16 identities that have access to the key vault. All identities in the array must use the same tenant ID as the key vault's tenant ID. When `createMode` is set to `recover`, access policies are not required. Otherwise, access policies are required."
+          "description": "An array of 0 to 1024 identities that have access to the key vault. All identities in the array must use the same tenant ID as the key vault's tenant ID. When `createMode` is set to `recover`, access policies are not required. Otherwise, access policies are required."
         },
         "createMode": {
           "oneOf": [
@@ -582,7 +786,18 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Property specifying whether recoverable deletion is enabled for this key vault. Setting this property to true activates the soft delete feature, whereby vaults or vault entities can be recovered after deletion. Enabling this functionality is irreversible - that is, the property does not accept false as its value."
+          "description": "Property to specify whether the 'soft delete' functionality is enabled for this key vault. It does not accept false value."
+        },
+        "networkAcls": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/NetworkRuleSet"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A set of rules governing the network accessibility of a vault."
         },
         "sku": {
           "oneOf": [
@@ -624,7 +839,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-10-01"
+            "2018-02-14"
           ]
         },
         "name": {
@@ -669,13 +884,52 @@
       ],
       "description": "Microsoft.KeyVault/vaults/accessPolicies"
     },
+    "vaults_privateEndpointConnections_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-02-14"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the private endpoint connection associated with the key vault."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PrivateEndpointConnectionProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the private endpoint connection resource."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "privateEndpointConnections"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.KeyVault/vaults/privateEndpointConnections"
+    },
     "vaults_secrets_childResource": {
       "type": "object",
       "properties": {
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-10-01"
+            "2018-02-14"
           ]
         },
         "name": {
@@ -730,6 +984,19 @@
         "type"
       ],
       "description": "Microsoft.KeyVault/vaults/secrets"
+    },
+    "VirtualNetworkRule": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Full resource id of a vnet subnet, such as '/subscriptions/subid/resourceGroups/rg1/providers/Microsoft.Network/virtualNetworks/test-vnet/subnets/subnet1'."
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "description": "A rule governing the accessibility of a vault from a specific virtual network."
     }
   }
 }

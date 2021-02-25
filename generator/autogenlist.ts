@@ -652,6 +652,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.HealthBot',
     },
     {
+        basePath: 'keyvault/resource-manager',
+        namespace: 'Microsoft.KeyVault',
+    },
+    {
         basePath: 'hybridkubernetes/resource-manager',
         namespace: 'Microsoft.Kubernetes',
     },

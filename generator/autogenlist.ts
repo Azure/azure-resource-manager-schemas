@@ -244,7 +244,7 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.Cache',
     },
     { 
-        basePath: 'redisEnterprise/resource-manager',
+        basePath: 'redisenterprise/resource-manager',
         namespace: 'Microsoft.Cache',
         suffix: 'Enterprise'
     },

@@ -48,6 +48,9 @@
           "items": {
             "oneOf": [
               {
+                "$ref": "#/definitions/workspaces_labelingJobs_childResource"
+              },
+              {
                 "$ref": "#/definitions/workspaces_computes_childResource"
               },
               {
@@ -224,6 +227,45 @@
         "type"
       ],
       "description": "Microsoft.MachineLearningServices/workspaces/connections"
+    },
+    "workspaces_labelingJobs": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-09-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "Name and identifier for LabelingJob."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/LabelingJobProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Definition of a labeling job."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.MachineLearningServices/workspaces/labelingJobs"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.MachineLearningServices/workspaces/labelingJobs"
     },
     "workspaces_linkedServices": {
       "type": "object",
@@ -719,7 +761,7 @@
           ],
           "description": "Number of agents"
         },
-        "agentVMSize": {
+        "agentVmSize": {
           "type": "string",
           "description": "Agent virtual machine size"
         },
@@ -1257,6 +1299,27 @@
       },
       "description": "Machine Learning compute object."
     },
+    "ComputeBinding": {
+      "type": "object",
+      "properties": {
+        "computeId": {
+          "type": "string",
+          "description": "ID of the compute resource."
+        },
+        "nodeCount": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Number of nodes."
+        }
+      },
+      "description": "Compute binding definition."
+    },
     "ComputeInstance": {
       "type": "object",
       "properties": {
@@ -1325,6 +1388,17 @@
             }
           ],
           "description": "Settings for a personal compute instance."
+        },
+        "setupScripts": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SetupScripts"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Details of customized scripts to execute for setting up the cluster."
         },
         "sshSettings": {
           "oneOf": [
@@ -1941,6 +2015,263 @@
         "keyVaultArmId"
       ]
     },
+    "LabelCategory": {
+      "type": "object",
+      "properties": {
+        "allowMultiSelect": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates whether it is allowed to select multiple classes in this category."
+        },
+        "classes": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/LabelClass"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Dictionary of label classes in this category."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name of the label category."
+        }
+      },
+      "required": [
+        "classes"
+      ],
+      "description": "Represents a category of labels in a labeling job."
+    },
+    "LabelClass": {
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "Display name of the label class."
+        },
+        "subclasses": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Dictionary of subclasses of the label class."
+        }
+      },
+      "description": "Represents a label or a category of labels in a labeling job."
+    },
+    "LabelingDatasetConfiguration": {
+      "type": "object",
+      "properties": {
+        "assetName": {
+          "type": "string",
+          "description": "Name of the data asset to perform labeling."
+        },
+        "datasetVersion": {
+          "type": "string",
+          "description": "AML dataset version."
+        },
+        "enableIncrementalDatasetRefresh": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates whether to enable incremental dataset refresh."
+        }
+      },
+      "required": [
+        "assetName",
+        "datasetVersion"
+      ],
+      "description": "Represents configuration of dataset used in a labeling job."
+    },
+    "LabelingJobImageProperties": {
+      "type": "object",
+      "properties": {
+        "additionalProperties": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "properties": {}
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Unmatched properties from the message are deserialized this collection"
+        },
+        "annotationType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Classification",
+                "BoundingBox",
+                "InstanceSegmentation"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Annotation type of image labeling tasks."
+        },
+        "mediaType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Image",
+                "Text"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Media type of data asset."
+        }
+      },
+      "required": [
+        "mediaType"
+      ],
+      "description": "Properties in an labeling job of image media."
+    },
+    "LabelingJobInstructions": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "The link to a page with detailed labeling instructions for labelers."
+        }
+      },
+      "description": "Instructions for a labeling job."
+    },
+    "LabelingJobProperties": {
+      "type": "object",
+      "properties": {
+        "datasetConfiguration": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/LabelingDatasetConfiguration"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Represents configuration of dataset used in a labeling job."
+        },
+        "jobInstructions": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/LabelingJobInstructions"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Instructions for a labeling job."
+        },
+        "labelCategories": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/LabelCategory"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Label categories of the job."
+        },
+        "labelingJobMediaProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/LabelingJobImageProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties in an labeling job of image media."
+        },
+        "mlAssistConfiguration": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MLAssistConfiguration"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Represents configuration for machine learning assisted features in a labeling job."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The job property dictionary. Properties can be added, but not removed or altered."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The job tag dictionary. Tags can be added, removed, and updated."
+        }
+      },
+      "required": [
+        "datasetConfiguration",
+        "jobInstructions",
+        "labelCategories",
+        "labelingJobMediaProperties"
+      ],
+      "description": "Definition of a labeling job."
+    },
     "LinkedServiceProps": {
       "type": "object",
       "properties": {
@@ -1977,6 +2308,65 @@
         "linkedServiceResourceId"
       ],
       "description": "LinkedService specific properties."
+    },
+    "MLAssistConfiguration": {
+      "type": "object",
+      "properties": {
+        "inferencingComputeBinding": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ComputeBinding"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Compute binding definition."
+        },
+        "mlAssistEnabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates whether MLAssist feature is enabled."
+        },
+        "modelNamePrefix": {
+          "type": "string",
+          "description": "Name prefix to use for machine learning model. For each iteration modelName will be appended with iteration e.g.{modelName}_{i}."
+        },
+        "prelabelAccuracyThreshold": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Prelabel accuracy threshold used in MLAssist feature."
+        },
+        "trainingComputeBinding": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ComputeBinding"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Compute binding definition."
+        }
+      },
+      "required": [
+        "inferencingComputeBinding",
+        "modelNamePrefix",
+        "trainingComputeBinding"
+      ],
+      "description": "Represents configuration for machine learning assisted features in a labeling job."
     },
     "Model": {
       "type": "object",
@@ -2515,6 +2905,73 @@
       ],
       "description": "scale settings for AML Compute"
     },
+    "ScriptReference": {
+      "type": "object",
+      "properties": {
+        "scriptArguments": {
+          "type": "string",
+          "description": "Optional command line arguments passed to the script to run."
+        },
+        "scriptData": {
+          "type": "string",
+          "description": "The location of scripts in the mounted volume."
+        },
+        "scriptSource": {
+          "type": "string",
+          "description": "The storage source of the script: inline, workspace."
+        },
+        "timeout": {
+          "type": "string",
+          "description": "Optional time period passed to timeout command."
+        }
+      },
+      "description": "Script reference"
+    },
+    "ScriptsToExecute": {
+      "type": "object",
+      "properties": {
+        "creationScript": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ScriptReference"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Script reference"
+        },
+        "startupScript": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ScriptReference"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Script reference"
+        }
+      },
+      "description": "Customized setup scripts"
+    },
+    "SetupScripts": {
+      "type": "object",
+      "properties": {
+        "scripts": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ScriptsToExecute"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Customized setup scripts"
+        }
+      },
+      "description": "Details of customized scripts to execute for setting up the cluster."
+    },
     "SharedPrivateLinkResource": {
       "type": "object",
       "properties": {
@@ -2620,7 +3077,8 @@
               "type": "string",
               "enum": [
                 "Disabled",
-                "Enabled"
+                "Enabled",
+                "Auto"
               ]
             },
             {
@@ -2979,6 +3437,45 @@
         "type"
       ],
       "description": "Microsoft.MachineLearningServices/workspaces/connections"
+    },
+    "workspaces_labelingJobs_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-09-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "Name and identifier for LabelingJob."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/LabelingJobProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Definition of a labeling job."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "labelingJobs"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.MachineLearningServices/workspaces/labelingJobs"
     },
     "workspaces_linkedServices_childResource": {
       "type": "object",

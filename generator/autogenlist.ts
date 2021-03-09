@@ -510,6 +510,10 @@ const autogenlist: AutogenlistConfig[] = [
         namespace: 'Microsoft.StorageCache',
     },
     {
+        basePath: 'storagepool/resource-manager',
+        namespace: 'Microsoft.StoragePool',
+    },
+    {
         basePath: 'streamanalytics/resource-manager',
         namespace: 'Microsoft.StreamAnalytics',
     },

@@ -1197,38 +1197,6 @@
       },
       "description": "Properties of an Azure Resource Manager template parameter."
     },
-    "ArtifactDeploymentStatusProperties": {
-      "type": "object",
-      "properties": {
-        "artifactsApplied": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The total count of the artifacts that were successfully applied."
-        },
-        "deploymentStatus": {
-          "type": "string",
-          "description": "The deployment status of the artifact."
-        },
-        "totalArtifacts": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The total count of the artifacts that were tentatively applied."
-        }
-      },
-      "description": "Properties of an artifact deployment."
-    },
     "ArtifactInstallProperties": {
       "type": "object",
       "properties": {
@@ -1317,7 +1285,8 @@
               "type": "string",
               "enum": [
                 "VsoGit",
-                "GitHub"
+                "GitHub",
+                "StorageAccount"
               ]
             },
             {
@@ -1364,7 +1333,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Size of the disk to be attached in GibiBytes."
+          "description": "Size of the disk to be attached in Gibibytes."
         },
         "diskType": {
           "oneOf": [
@@ -1716,7 +1685,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The size of the disk in GibiBytes."
+          "description": "The size of the disk in Gibibytes."
         },
         "diskType": {
           "oneOf": [
@@ -1749,6 +1718,10 @@
         "managedDiskId": {
           "type": "string",
           "description": "When backed by managed disk, this is the ID of the compute disk resource."
+        },
+        "storageAccountId": {
+          "type": "string",
+          "description": "When backed by a blob, the storage account where the blob is."
         }
       },
       "description": "Properties of a disk."
@@ -1822,10 +1795,6 @@
     "FormulaProperties": {
       "type": "object",
       "properties": {
-        "author": {
-          "type": "string",
-          "description": "The author of the formula."
-        },
         "description": {
           "type": "string",
           "description": "The description of the formula."
@@ -1928,7 +1897,20 @@
           "description": "The tenant identifier of resource."
         },
         "type": {
-          "type": "string",
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "None",
+                "SystemAssigned",
+                "UserAssigned",
+                "SystemAssigned,UserAssigned"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
           "description": "Managed identity."
         }
       },
@@ -3173,24 +3155,14 @@
         "allowClaim": {
           "oneOf": [
             {
-              "type": "boolean"
+              "type": "boolean",
+              "default": false
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Indicates whether another user can take ownership of the virtual machine"
-        },
-        "artifactDeploymentStatus": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ArtifactDeploymentStatusProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Properties of an artifact deployment."
         },
         "artifacts": {
           "oneOf": [
@@ -3217,18 +3189,6 @@
           ],
           "description": "Parameters for creating multiple virtual machines as a single action."
         },
-        "computeId": {
-          "type": "string",
-          "description": "The resource identifier (Microsoft.Compute) of the virtual machine."
-        },
-        "createdByUser": {
-          "type": "string",
-          "description": "The email address of creator of the virtual machine."
-        },
-        "createdByUserId": {
-          "type": "string",
-          "description": "The object identifier of the creator of the virtual machine."
-        },
         "createdDate": {
           "type": "string",
           "format": "date-time",
@@ -3255,7 +3215,8 @@
         "disallowPublicIpAddress": {
           "oneOf": [
             {
-              "type": "boolean"
+              "type": "boolean",
+              "default": false
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -3271,10 +3232,6 @@
           "type": "string",
           "format": "date-time",
           "description": "The expiration date for VM."
-        },
-        "fqdn": {
-          "type": "string",
-          "description": "The fully-qualified domain name of the virtual machine."
         },
         "galleryImageReference": {
           "oneOf": [
@@ -3306,10 +3263,6 @@
           "type": "string",
           "description": "The lab virtual network identifier of the virtual machine."
         },
-        "lastKnownPowerState": {
-          "type": "string",
-          "description": "Last known compute power state captured in DTL"
-        },
         "networkInterface": {
           "oneOf": [
             {
@@ -3325,12 +3278,9 @@
           "type": "string",
           "description": "The notes of the virtual machine."
         },
-        "osType": {
-          "type": "string",
-          "description": "The OS type of the virtual machine."
-        },
         "ownerObjectId": {
           "type": "string",
+          "default": "dynamicValue",
           "description": "The object identifier of the owner of the virtual machine."
         },
         "ownerUserPrincipalName": {
@@ -3374,22 +3324,6 @@
         "userName": {
           "type": "string",
           "description": "The user name of the virtual machine."
-        },
-        "virtualMachineCreationSource": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "FromCustomImage",
-                "FromGalleryImage",
-                "FromSharedGalleryImage"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Tells source of creation of lab virtual machine. Output property only."
         }
       },
       "description": "Properties for virtual machine creation."
@@ -3400,24 +3334,14 @@
         "allowClaim": {
           "oneOf": [
             {
-              "type": "boolean"
+              "type": "boolean",
+              "default": false
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Indicates whether another user can take ownership of the virtual machine"
-        },
-        "artifactDeploymentStatus": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ArtifactDeploymentStatusProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Properties of an artifact deployment."
         },
         "artifacts": {
           "oneOf": [
@@ -3433,18 +3357,6 @@
           ],
           "description": "The artifacts to be installed on the virtual machine."
         },
-        "computeId": {
-          "type": "string",
-          "description": "The resource identifier (Microsoft.Compute) of the virtual machine."
-        },
-        "createdByUser": {
-          "type": "string",
-          "description": "The email address of creator of the virtual machine."
-        },
-        "createdByUserId": {
-          "type": "string",
-          "description": "The object identifier of the creator of the virtual machine."
-        },
         "createdDate": {
           "type": "string",
           "format": "date-time",
@@ -3471,7 +3383,8 @@
         "disallowPublicIpAddress": {
           "oneOf": [
             {
-              "type": "boolean"
+              "type": "boolean",
+              "default": false
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -3487,10 +3400,6 @@
           "type": "string",
           "format": "date-time",
           "description": "The expiration date for VM."
-        },
-        "fqdn": {
-          "type": "string",
-          "description": "The fully-qualified domain name of the virtual machine."
         },
         "galleryImageReference": {
           "oneOf": [
@@ -3522,10 +3431,6 @@
           "type": "string",
           "description": "The lab virtual network identifier of the virtual machine."
         },
-        "lastKnownPowerState": {
-          "type": "string",
-          "description": "Last known compute power state captured in DTL"
-        },
         "networkInterface": {
           "oneOf": [
             {
@@ -3541,12 +3446,9 @@
           "type": "string",
           "description": "The notes of the virtual machine."
         },
-        "osType": {
-          "type": "string",
-          "description": "The OS type of the virtual machine."
-        },
         "ownerObjectId": {
           "type": "string",
+          "default": "dynamicValue",
           "description": "The object identifier of the owner of the virtual machine."
         },
         "ownerUserPrincipalName": {
@@ -3590,22 +3492,6 @@
         "userName": {
           "type": "string",
           "description": "The user name of the virtual machine."
-        },
-        "virtualMachineCreationSource": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "FromCustomImage",
-                "FromGalleryImage",
-                "FromSharedGalleryImage"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Tells source of creation of lab virtual machine. Output property only."
         }
       },
       "description": "Properties of a virtual machine."

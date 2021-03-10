@@ -464,6 +464,32 @@ const autogenlist: AutogenlistConfig[] = [
         postProcessor: resourcesPostProcessor,
     },
     {
+        basePath: 'resources/resource-manager',
+        namespace: 'Microsoft.Authorization',
+        resourceConfig: [
+            {
+                type: 'policyDefinitions',
+                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subcription,
+            },
+            {
+                type: 'policySetDefinitions',
+                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subcription,
+            },
+            {
+                type: 'policyAssignments',
+                scopes: ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'policyExemptions',
+                scopes: ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'locks',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+        ],
+    },
+    {
         basePath: 'relay/resource-manager',
         namespace: 'Microsoft.Relay',
     },

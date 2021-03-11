@@ -39,6 +39,7 @@ This table specifies what GitHub handle our bot is currently configured to notif
 | RP:ServiceFabric           | QingChenmsft, vaishnavk, juhacket |
 | RP:SQL                     | azureSQLGitHub                    |
 | RP:Storage                 | xgithubtriage                     |
+| RP:StoragePool             | chrboum, dalbe, rurangne          |
 | RP:Web                     | antcp                             |
 | CreateUIDefinition         | QuinnMcHugh                       |
 

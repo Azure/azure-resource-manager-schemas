@@ -8,11 +8,15 @@ import { executeSynchronous } from '../utils';
 
 executeSynchronous(async () => {
     const basePath = process.argv[2];
-    await cloneAndGenerateBasePaths(constants.specsRepoPath, constants.specsRepoUri, constants.specsRepoCommitHash);
+    let localPath = process.argv[3];
+    if (!localPath) {
+        localPath = constants.specsRepoPath;
+        await cloneAndGenerateBasePaths(localPath, constants.specsRepoUri, constants.specsRepoCommitHash);
+    }
 
     let readme = '';
     try {
-        readme = await validateAndReturnReadmePath(basePath);
+        readme = await validateAndReturnReadmePath(localPath, basePath);
     } catch {
         throw new Error(`Unable to find a readme under '${basePath}'. Please try running 'npm run list-basepaths' to find the list of valid paths.`);
     }

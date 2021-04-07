@@ -35,7 +35,7 @@ executeSynchronous(async () => {
     const errors = [];
     for (const autogenlistConfig of filteredAutogenlist) {
         try {
-            const readme = await validateAndReturnReadmePath(autogenlistConfig.basePath);
+            const readme = await validateAndReturnReadmePath(constants.specsRepoPath, autogenlistConfig.basePath);
 
             const newConfigs = await generateSchemas(readme, autogenlistConfig);
             schemaConfigs.push(...newConfigs);

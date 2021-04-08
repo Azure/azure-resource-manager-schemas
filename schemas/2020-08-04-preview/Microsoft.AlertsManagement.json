@@ -4,7 +4,7 @@
   "title": "Microsoft.AlertsManagement",
   "description": "Microsoft AlertsManagement Resource Types",
   "resourceDefinitions": {
-    "resourceHealthAlerts": {
+    "resourceHealthAlertRules": {
       "type": "object",
       "properties": {
         "apiVersion": {
@@ -50,7 +50,7 @@
         "type": {
           "type": "string",
           "enum": [
-            "Microsoft.AlertsManagement/resourceHealthAlerts"
+            "Microsoft.AlertsManagement/resourceHealthAlertRules"
           ]
         }
       },
@@ -61,7 +61,7 @@
         "properties",
         "type"
       ],
-      "description": "Microsoft.AlertsManagement/resourceHealthAlerts"
+      "description": "Microsoft.AlertsManagement/resourceHealthAlertRules"
     }
   },
   "definitions": {
@@ -206,11 +206,29 @@
       "type": "object",
       "properties": {
         "healthStateName": {
-          "type": "string",
-          "description": "Health state"
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Warning",
+                "Critical"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Health state name."
         },
         "severity": {
-          "type": "string",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
           "description": "Severity of alert fired"
         }
       },
@@ -223,10 +241,6 @@
     "VmGuestHealthAlertCriterion": {
       "type": "object",
       "properties": {
-        "healthMonitorName": {
-          "type": "string",
-          "description": "Name of health monitor on which to define alert"
-        },
         "healthStates": {
           "oneOf": [
             {
@@ -241,15 +255,43 @@
           ],
           "description": "Health states to alert on"
         },
+        "monitorNames": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Names of health monitor on which to define alert"
+        },
+        "monitorTypes": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Names of health monitor type on which to define alert"
+        },
         "namespace": {
           "type": "string",
           "enum": [
-            "VmGuestHealth"
+            "GuestVmHealth"
           ]
         }
       },
       "required": [
-        "healthMonitorName",
+        "healthStates",
         "namespace"
       ],
       "description": "Specifies the health alert criteria to alert on."

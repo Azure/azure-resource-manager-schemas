@@ -9,6 +9,11 @@
       "type": "string",
       "description": "JSON schema reference"
     },
+    "metadata": {
+      "type": "object",
+      "description": "Additional unstructured metadata to include with the template deployment.",
+      "additionalProperties": true
+    },
     "apiProfile": {
       "type": "string",
       "enum": [
@@ -125,6 +130,9 @@
                 "$ref": "https://schema.management.azure.com/schemas/2018-11-01-preview/Microsoft.Blueprint.json#/unknown_resourceDefinitions/blueprints_versions"
               },
               {
+                "$ref": "https://schema.management.azure.com/schemas/2020-01-01-preview/Microsoft.Insights.json#/managementGroup_resourceDefinitions/diagnosticSettings"
+              },
+              {
                 "$ref": "https://schema.management.azure.com/schemas/2018-07-01-preview/Microsoft.PolicyInsights.json#/unknown_resourceDefinitions/remediations"
               },
               {
@@ -153,6 +161,21 @@
               },
               {
                 "$ref": "https://schema.management.azure.com/schemas/2020-06-01/Microsoft.Resources.json#/unknown_resourceDefinitions/tags"
+              },
+              {
+                "$ref": "https://schema.management.azure.com/schemas/2020-08-01/Microsoft.Resources.json#/managementGroup_resourceDefinitions/deployments"
+              },
+              {
+                "$ref": "https://schema.management.azure.com/schemas/2020-08-01/Microsoft.Resources.json#/unknown_resourceDefinitions/tags"
+              },
+              {
+                "$ref": "https://schema.management.azure.com/schemas/2020-10-01/Microsoft.Resources.json#/managementGroup_resourceDefinitions/deployments"
+              },
+              {
+                "$ref": "https://schema.management.azure.com/schemas/2020-10-01/Microsoft.Resources.json#/unknown_resourceDefinitions/tags"
+              },
+              {
+                "$ref": "https://schema.management.azure.com/schemas/2017-08-01-preview/Microsoft.Security.json#/unknown_resourceDefinitions/informationProtectionPolicies"
               }
             ]
           }
@@ -245,6 +268,10 @@
             },
             "copy": {
               "$ref": "#/definitions/resourceCopy"
+            },
+            "scope": {
+              "type": "string",
+              "description": "Scope property to be used to provide scope for a resource or to be used to specify a scope for Management Group or Tenant level deployments."
             },
             "comments": {
               "type": "string"
@@ -468,6 +495,17 @@
     "output": {
       "type": "object",
       "properties": {
+        "condition": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Condition of the output"
+        },
         "type": {
           "$ref": "#/definitions/parameterTypes",
           "description": "Type of output value"
@@ -475,11 +513,14 @@
         "value": {
           "$ref": "#/definitions/parameterValueTypes",
           "description": "Value assigned for output"
+        },
+        "copy": {
+          "$ref": "#/definitions/outputCopy",
+          "description": "Output copy"
         }
       },
       "required": [
-        "type",
-        "value"
+        "type"
       ],
       "description": "Set of output parameters"
     },
@@ -535,6 +576,45 @@
         "secretName"
       ],
       "additionalProperties": false
+    },
+    "outputCopy": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "oneOf": [
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "description": "Count of the copy"
+        },
+        "input": {
+          "anyOf": [
+            {
+              "type": [
+                "string",
+                "boolean",
+                "integer",
+                "array",
+                "object",
+                "null"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Input of the copy"
+        }
+      },
+      "required": [
+        "count",
+        "input"
+      ],
+      "description": "Output copy"
     }
   }
 }

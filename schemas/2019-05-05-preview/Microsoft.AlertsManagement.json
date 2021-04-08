@@ -65,9 +65,35 @@
     }
   },
   "definitions": {
+    "ActionGroup": {
+      "type": "object",
+      "properties": {
+        "actionGroupId": {
+          "type": "string",
+          "description": "Action group to trigger if action rule matches"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "ActionGroup"
+          ]
+        }
+      },
+      "required": [
+        "actionGroupId",
+        "type"
+      ],
+      "description": "Action rule with action group configuration"
+    },
     "ActionRuleProperties": {
       "type": "object",
       "oneOf": [
+        {
+          "$ref": "#/definitions/Suppression"
+        },
+        {
+          "$ref": "#/definitions/ActionGroup"
+        },
         {
           "$ref": "#/definitions/Diagnostics"
         }
@@ -287,6 +313,107 @@
         }
       },
       "description": "Target scope for a given action rule. By default scope will be the subscription. User can also provide list of resource groups or list of resources from the scope subscription as well."
+    },
+    "Suppression": {
+      "type": "object",
+      "properties": {
+        "suppressionConfig": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SuppressionConfig"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Suppression logic for a given action rule"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Suppression"
+          ]
+        }
+      },
+      "required": [
+        "suppressionConfig",
+        "type"
+      ],
+      "description": "Action rule with suppression configuration"
+    },
+    "SuppressionConfig": {
+      "type": "object",
+      "properties": {
+        "recurrenceType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Always",
+                "Once",
+                "Daily",
+                "Weekly",
+                "Monthly"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies when the suppression should be applied."
+        },
+        "schedule": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SuppressionSchedule"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Schedule for a given suppression configuration."
+        }
+      },
+      "required": [
+        "recurrenceType"
+      ],
+      "description": "Suppression logic for a given action rule"
+    },
+    "SuppressionSchedule": {
+      "type": "object",
+      "properties": {
+        "endDate": {
+          "type": "string",
+          "description": "End date for suppression"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "End date for suppression"
+        },
+        "recurrenceValues": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies the values for recurrence pattern"
+        },
+        "startDate": {
+          "type": "string",
+          "description": "Start date for suppression"
+        },
+        "startTime": {
+          "type": "string",
+          "description": "Start time for suppression"
+        }
+      },
+      "description": "Schedule for a given suppression configuration."
     }
   }
 }

@@ -5,7 +5,7 @@ This table specifies what GitHub handle our bot is currently configured to notif
 
 | RP Label                   | GitHub Handle(s)                  |
 | -------------------------- | --------------------------------- |
-| RP:AAD                     | adamedx                           |
+| RP:AAD                     | jihochang                         |
 | RP:Advisor                 | mojayara, prasanna-padmanabhan    |
 | RP:AlertsManagement        | liadtal, yairgil                  |
 | RP:AnalysisServices        | athipp, taiwu, minghan            |
@@ -16,6 +16,9 @@ This table specifies what GitHub handle our bot is currently configured to notif
 | RP:Batch                   | mksuni, bgklein, mscurrell        |
 | RP:Blueprint               | alex-frankel, filizt              |
 | RP:BotService              | sgellock                          |
+| RP:Cache                   | TimLovellSmith, MECHANDR, greenms |
+| RP:ClusterConfiguration    | nanthi, nizlati, safeerm          |
+| RP:Communication           | bviglietta, usvoyager             |
 | RP:Compute                 | viabhav-agar, avirishuv, amjads1  |
 | RP:ContainerInstances      | dkkapur                           |
 | RP:ContainerRegistry       | toddysm, yugangw-MSFT             |
@@ -36,6 +39,7 @@ This table specifies what GitHub handle our bot is currently configured to notif
 | RP:ServiceFabric           | QingChenmsft, vaishnavk, juhacket |
 | RP:SQL                     | azureSQLGitHub                    |
 | RP:Storage                 | xgithubtriage                     |
+| RP:StoragePool             | chrboum, dalbe, rurangne          |
 | RP:Web                     | antcp                             |
 | CreateUIDefinition         | QuinnMcHugh                       |
 

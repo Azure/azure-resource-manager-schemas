@@ -13,8 +13,8 @@ export async function resolveReadmePath(localPath: string, basePath: string) {
     return path.resolve(readmePath);
 }
 
-export async function validateAndReturnReadmePath(basePath: string) {
-    const readme = await resolveReadmePath(constants.specsRepoPath, basePath);
+export async function validateAndReturnReadmePath(localPath: string, basePath: string) {
+    const readme = await resolveReadmePath(localPath, basePath);
 
     if (!await exists(readme)) {
         throw new Error(`Unable to find readme '${readme}' in specs repo`);

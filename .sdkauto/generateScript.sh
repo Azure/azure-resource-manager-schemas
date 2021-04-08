@@ -2,12 +2,7 @@
 
 set -ex
 
-if [ ! -f $PWD/generateInput.json ]; then
-  echo "$PWD/generateInput.json not found!"
-  exit 1
-fi
-
-PARAMS=$(cat $PWD/generateInput.json | jq '{localPath: .specFolder, readmeFiles: .relatedReadmeMdFiles}' -c)
+PARAMS=$(cat $1 | jq '{localPath: .specFolder, readmeFiles: .relatedReadmeMdFiles}' -c)
 
 pushd generator
 

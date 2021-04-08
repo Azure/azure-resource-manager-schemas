@@ -7,21 +7,20 @@ import * as constants from './constants'
 
 const exists = promisify(fs.exists);
 
-export async function resolveLocalPath(localPath: string) {
+export async function resolveAbsolutePath(localPath: string) {
     if (path.isAbsolute(localPath)) {
         return path.resolve(localPath);
     }
     return path.resolve(constants.generatorRoot, localPath);
 }
 
-export async function resolveReadmePath(localPath: string, basePath: string) {
-    const readmePath = path.join(localPath, 'specification', basePath, 'readme.md');
-
-    return path.resolve(readmePath);
-}
-
 export async function validateAndReturnReadmePath(localPath: string, basePath: string) {
-    const readme = await resolveReadmePath(localPath, basePath);
+    let readme = '';
+    if (basePath.toLowerCase().endsWith('readme.md')) {
+        readme = path.resolve(localPath, basePath);
+    } else {
+        readme = path.resolve(localPath, 'specification', basePath, 'readme.md')
+    }
 
     if (!await exists(readme)) {
         throw new Error(`Unable to find readme '${readme}' in specs repo`);
@@ -56,6 +55,12 @@ export function getBasePathString(localPath: string, basePath: string) {
         .relative(path.join(localPath, 'specification'), basePath)
         .split(path.sep)
         .join('/');
+}
+
+export function getPackageString(readme: string) {
+    return readme
+        .split(path.sep)
+        .find((_, index, obj) => index > 0 && obj[index - 1] === 'specification');
 }
 
 function isBlocklisted(basePath: string) {

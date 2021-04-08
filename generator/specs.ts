@@ -7,6 +7,13 @@ import * as constants from './constants'
 
 const exists = promisify(fs.exists);
 
+export async function resolveLocalPath(localPath: string) {
+    if (path.isAbsolute(localPath)) {
+        return path.resolve(localPath);
+    }
+    return path.resolve(constants.generatorRoot, localPath);
+}
+
 export async function resolveReadmePath(localPath: string, basePath: string) {
     const readmePath = path.join(localPath, 'specification', basePath, 'readme.md');
 

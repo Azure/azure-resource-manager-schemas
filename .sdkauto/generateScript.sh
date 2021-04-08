@@ -2,7 +2,7 @@
 
 set -ex
 
-PARAMS=$(cat $1 | jq '{localPath: .specFolder, readmeFiles: .relatedReadmeMdFiles}' -c)
+PARAMS=$(cat $1 | jq '{localPath: .specFolder, readmeFiles: .relatedReadmeMdFiles, $outputPath}' -c --arg outputPath $2)
 
 pushd generator
 

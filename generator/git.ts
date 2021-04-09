@@ -31,7 +31,3 @@ export async function cloneGitRepo(localPath: string, remoteUri: string, commitH
     await executeCmd(localPath, 'git', ['fetch', '-q']);
     await executeCmd(localPath, 'git', ['checkout', '-q', commitHash]);
 }
-
-export async function resetFile(localPath: string, fileName: string) {
-    await executeCmd(localPath, 'git', ['checkout', '-q', '--', fileName]);
-}

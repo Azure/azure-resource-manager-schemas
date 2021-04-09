@@ -3,7 +3,10 @@ import fs from 'fs';
 import { promisify } from 'util';
 import { cloneGitRepo } from './git';
 import { findRecursive } from './utils';
+import { ApiVersionFile, CodeBlock } from './models';
 import * as constants from './constants'
+import * as cm from '@ts-common/commonmark-to-markdown'
+import * as yaml from 'js-yaml'
 
 const exists = promisify(fs.exists);
 
@@ -65,4 +68,28 @@ export function getPackageString(readme: string) {
 
 function isBlocklisted(basePath: string) {
     return constants.blocklist.includes(basePath);
+}
+
+export async function getApiVersionFileList(readme: string): Promise<ApiVersionFile> {
+    const content = fs.readFileSync(readme).toString();
+    const markdownEx = cm.parse(content);
+    const fileSet = new Set<string>();
+    for (const codeBlock of cm.iterate(markdownEx.markDown)) {
+        if (codeBlock.type === 'code_block' && codeBlock?.info?.startsWith('yaml') && codeBlock.literal !== null) {
+            const DOC = (yaml.load(codeBlock.literal) as CodeBlock);
+            if (DOC) {
+                const inputFile = DOC['input-file'];
+                if (typeof inputFile === 'string') {
+                    fileSet.add(inputFile);
+                } else if (inputFile instanceof Array) {
+                    for (const i of inputFile) {
+                        fileSet.add(i);
+                    }
+                }
+            }
+        }
+    }
+    const result = {} as ApiVersionFile;
+
+    return result;
 }

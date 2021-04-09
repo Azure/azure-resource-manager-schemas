@@ -8,16 +8,25 @@ export enum ScopeType {
   Extension = 1 << 5,
 }
 
-export interface AutogenlistConfig {
+export interface AutogenConfig {
   basePath: string,
   namespace: string,
   readmeFile?: string,
+  overrideApiVersion?: ApiVersionFile,
   suffix?: string,
-  resourceConfig?: AutogenlistResourceConfig[],
+  resourceConfig?: AutogenResourceConfig[],
   postProcessor?: SchemaPostProcessor,
 }
 
-export interface AutogenlistResourceConfig {
+export interface ApiVersionFile {
+  [apiVersion: string]: string[]
+}
+
+export interface CodeBlock {
+  readonly "input-file"?: ReadonlyArray<string>|string
+}
+
+export interface AutogenResourceConfig {
   type: string,
   scopes?: ScopeType,
 }

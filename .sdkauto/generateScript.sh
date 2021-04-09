@@ -1,8 +1,10 @@
 #!/bin/bash
 
-set -ex
+set -e
 
 PARAMS=$(cat $1 | jq '{localPath: .specFolder, readmeFiles: .relatedReadmeMdFiles, $outputPath}' -c --arg outputPath $2)
+
+echo $PARAMS
 
 pushd generator
 

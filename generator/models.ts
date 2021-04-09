@@ -28,5 +28,6 @@ export interface SchemaPostProcessor {
 
 export interface Package {
   packageName?: string,
+  path: string[],
   result: 'succeeded' | 'failed' | 'warning'
 }

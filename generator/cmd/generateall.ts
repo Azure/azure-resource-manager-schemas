@@ -57,7 +57,9 @@ executeSynchronous(async () => {
     const errors = [];
     const packages: Package[] = [];
     for (const autogenlistConfig of filteredAutogenlist) {
-        let pkg = {} as Package;
+        let pkg = {
+            path: ['schemas']
+        } as Package;
         try {
             const readme = await validateAndReturnReadmePath(localPath, autogenlistConfig.readmeFile || autogenlistConfig.basePath);
             pkg.packageName = getPackageString(readme);

@@ -4,8 +4,7 @@ import { findRecursive, findDirRecursive, executeCmd, rmdirRecursive, lowerCaseC
 import * as constants from './constants';
 import chalk from 'chalk';
 import { ScopeType, AutogenlistConfig } from './models';
-import { resetFile } from './git';
-import { get, set, flatten, uniq, concat, Dictionary, groupBy, keys, difference, pickBy, flatMap, values, uniqBy } from 'lodash';
+import { get, set, flatten, uniq, concat, Dictionary, groupBy, keys, difference, pickBy } from 'lodash';
 
 const autorestBinary = os.platform() === 'win32' ? 'autorest.cmd' : 'autorest';
 const apiVersionRegex = /^\d{4}-\d{2}-\d{2}(|-preview)$/;
@@ -74,31 +73,6 @@ export async function generateSchemas(readme: string, autogenlistConfig?: Autoge
     }
 
     return schemaConfigs;
-}
-
-export async function schemaPostProcess(schemaPath: string, isNew: boolean, autogenlistConfig?: AutogenlistConfig) {
-    const namespace = path.basename(schemaPath.substring(0, schemaPath.lastIndexOf(path.extname(schemaPath))));
-    const apiVersion = path.basename(path.resolve(`${schemaPath}/..`));
-    const schemaConfig = await generateSchemaConfig(schemaPath, namespace, apiVersion, autogenlistConfig);
-    const unknownScopeResources = schemaConfig.references.filter(x => x.scope & ScopeType.Unknown);
-    if (autogenlistConfig && unknownScopeResources.length > 0) {
-        throw new Error(`Unable to determine scope for resource types ${unknownScopeResources.map(x => x.type).join(', ')} for file ${schemaPath}`);
-    }
-
-    await saveSchemaFile(schemaPath, schemaConfig);
-    const schemaPathNew = path.join(constants.schemasBasePath, schemaConfig.relativePath);
-
-    if (schemaPathNew !== schemaPath) {
-        if (isNew) {
-            console.log('Delete file: ' + chalk.red(schemaPath));
-            safeUnlink(schemaPath);
-        } else {
-            console.log('Reset file: ' + chalk.green(schemaPath));
-            resetFile(path.dirname(schemaPath), path.basename(schemaPath));
-        }
-    }
-
-    return schemaConfig;
 }
 
 async function handleGeneratedSchema(readme: string, schemaPath: string, autogenlistConfig?: AutogenlistConfig) {

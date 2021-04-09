@@ -11,6 +11,7 @@ export enum ScopeType {
 export interface AutogenlistConfig {
   basePath: string,
   namespace: string,
+  readmeFile?: string,
   suffix?: string,
   resourceConfig?: AutogenlistResourceConfig[],
   postProcessor?: SchemaPostProcessor,
@@ -23,4 +24,10 @@ export interface AutogenlistResourceConfig {
 
 export interface SchemaPostProcessor {
   (namespace: string, apiVersion: string, schema: any): void,
+}
+
+export interface Package {
+  packageName?: string,
+  path: string[],
+  result: 'succeeded' | 'failed' | 'warning'
 }

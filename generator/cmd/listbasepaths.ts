@@ -10,7 +10,7 @@ executeSynchronous(async () => {
     const basePaths = await cloneAndGenerateBasePaths(constants.specsRepoPath, constants.specsRepoUri, constants.specsRepoCommitHash);
 
     for (const basePath of basePaths) {
-        const readme = await validateAndReturnReadmePath(basePath);
+        const readme = await validateAndReturnReadmePath(constants.specsRepoPath, basePath);
         const namespaces = keys(await getApiVersionsByNamespace(readme));
         const autogenlistEntries = findAutogenEntries(basePath);
 

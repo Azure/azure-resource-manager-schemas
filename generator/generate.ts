@@ -2,6 +2,7 @@ import path from 'path';
 import os from 'os';
 import { findRecursive, findDirRecursive, executeCmd, rmdirRecursive, lowerCaseCompare, lowerCaseCompareLists, lowerCaseStartsWith, readJsonFile, writeJsonFile, safeMkdir, safeUnlink, fileExists, lowerCaseEquals, lowerCaseContains } from './utils';
 import * as constants from './constants';
+import { getApiVersionFileList } from './specs';
 import chalk from 'chalk';
 import { ScopeType, AutogenConfig } from './models';
 import { get, set, flatten, uniq, concat, Dictionary, groupBy, keys, difference, pickBy } from 'lodash';
@@ -45,6 +46,7 @@ export async function getApiVersionsByNamespace(readme: string): Promise<Diction
 }
 
 export async function generateSchemas(readme: string, autogenConfig?: AutogenConfig): Promise<SchemaConfiguration[]> {
+    const fileList = await getApiVersionFileList(readme, autogenConfig?.namespace);
     const apiVersionsByNamespace = pickBy(
         await getApiVersionsByNamespace(readme),
         (_, key) => !autogenConfig || lowerCaseEquals(key, autogenConfig.namespace));
@@ -105,16 +107,16 @@ async function execAutoRest(tmpFolder: string, params: string[]) {
     return await findRecursive(tmpFolder, p => path.extname(p) === '.json');
 }
 
-async function generateSchema(inputFiles: string[], tmpFolder: string) {
+async function generateSchema(readme: string, tmpFolder: string) {
     const autoRestParams = [
         `--version=${constants.autorestCoreVersion}`,
         `--use=@autorest/azureresourceschema@${constants.azureresourceschemaVersion}`,
         '--azureresourceschema',
         `--output-folder=${tmpFolder}`,
+        '--multiapi',
         '--pass-thru:subset-reducer',
+        readme,
     ];
-
-    inputFiles.forEach(inputFile => autoRestParams.push(`--inputFile=${inputFile}`));
 
     if (constants.autoRestVerboseOutput) {
         autoRestParams.push('--verbose');

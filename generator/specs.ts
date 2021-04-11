@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import { promisify } from 'util';
 import { cloneGitRepo } from './git';
-import { findRecursive } from './utils';
+import { findRecursive, lowerCaseEquals } from './utils';
 import { ApiVersionFile, CodeBlock } from './models';
 import * as constants from './constants'
 import * as cm from '@ts-common/commonmark-to-markdown'
@@ -70,7 +70,7 @@ function isBlocklisted(basePath: string) {
     return constants.blocklist.includes(basePath);
 }
 
-export async function getApiVersionFileList(readme: string): Promise<ApiVersionFile> {
+export async function getApiVersionFileList(readme: string, namespace?: string): Promise<ApiVersionFile> {
     const content = fs.readFileSync(readme).toString();
     const markdownEx = cm.parse(content);
     const fileSet = new Set<string>();
@@ -89,7 +89,21 @@ export async function getApiVersionFileList(readme: string): Promise<ApiVersionF
             }
         }
     }
+
     const result = {} as ApiVersionFile;
+    fileSet.forEach(inputFile => {
+        const match = constants.pathRegex.exec(inputFile);
+        if (!!match) {
+            const mNamespace = match[1];
+            const mApiVersion = match[2];
+            if (!!namespace && lowerCaseEquals(mNamespace, namespace)) {
+                if (!result[mApiVersion]) {
+                    result[mApiVersion] = [];
+                }
+                result[mApiVersion].push(inputFile);
+            }
+        }
+    });
 
     return result;
 }

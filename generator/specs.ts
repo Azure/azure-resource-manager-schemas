@@ -3,7 +3,7 @@ import fs from 'fs';
 import { promisify } from 'util';
 import { cloneGitRepo } from './git';
 import { findRecursive, lowerCaseEquals } from './utils';
-import { ApiVersionFile, CodeBlock } from './models';
+import { ApiVersionFile, AutoGenConfig, CodeBlock } from './models';
 import * as constants from './constants'
 import * as cm from '@ts-common/commonmark-to-markdown'
 import * as yaml from 'js-yaml'
@@ -70,7 +70,7 @@ function isBlocklisted(basePath: string) {
     return constants.blocklist.includes(basePath);
 }
 
-export async function getApiVersionFileList(readme: string, namespace?: string): Promise<ApiVersionFile> {
+export async function prepareReadme(readme: string, autoGenConfig?: AutoGenConfig) {
     const content = fs.readFileSync(readme).toString();
     const markdownEx = cm.parse(content);
     const fileSet = new Set<string>();
@@ -96,7 +96,7 @@ export async function getApiVersionFileList(readme: string, namespace?: string):
         if (!!match) {
             const mNamespace = match[1];
             const mApiVersion = match[2];
-            if (!!namespace && lowerCaseEquals(mNamespace, namespace)) {
+            if (!autoGenConfig || lowerCaseEquals(mNamespace, autoGenConfig.namespace)) {
                 if (!result[mApiVersion]) {
                     result[mApiVersion] = [];
                 }
@@ -105,5 +105,4 @@ export async function getApiVersionFileList(readme: string, namespace?: string):
         }
     });
 
-    return result;
 }

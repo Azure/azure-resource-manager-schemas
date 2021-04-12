@@ -47,6 +47,7 @@ export async function getApiVersionsByNamespace(readme: string): Promise<Diction
 
 export async function generateSchemas(readme: string, autoGenConfig?: AutoGenConfig): Promise<SchemaConfiguration[]> {
     await prepareReadme(readme, autoGenConfig);
+
     const apiVersionsByNamespace = pickBy(
         await getApiVersionsByNamespace(readme),
         (_, key) => !autoGenConfig || lowerCaseEquals(key, autoGenConfig.namespace));

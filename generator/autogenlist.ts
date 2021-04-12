@@ -671,7 +671,7 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'keyvault/resource-manager',
         namespace: 'Microsoft.KeyVault',
-        overrideApiVersion: {
+        readmeTag: {
             '2016-10-01': [
                 'Microsoft.KeyVault/stable/2016-10-01/keyvault.json',
                 'Microsoft.KeyVault/stable/2016-10-01/providers.json',

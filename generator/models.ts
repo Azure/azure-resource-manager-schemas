@@ -12,13 +12,13 @@ export interface AutoGenConfig {
   basePath: string,
   namespace: string,
   readmeFile?: string,
-  overrideApiVersion?: ApiVersionFile,
+  readmeTag?: ReadmeTag,
   suffix?: string,
   resourceConfig?: AutoGenResourceConfig[],
   postProcessor?: SchemaPostProcessor,
 }
 
-export interface ApiVersionFile {
+export interface ReadmeTag {
   [apiVersion: string]: string[]
 }
 

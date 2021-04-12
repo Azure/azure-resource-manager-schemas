@@ -3,7 +3,7 @@ import fs from 'fs';
 import { promisify } from 'util';
 import { cloneGitRepo } from './git';
 import { findRecursive, lowerCaseEquals } from './utils';
-import { ApiVersionFile, AutoGenConfig, CodeBlock } from './models';
+import { ReadmeTag, AutoGenConfig, CodeBlock } from './models';
 import * as constants from './constants'
 import * as cm from '@ts-common/commonmark-to-markdown'
 import * as yaml from 'js-yaml'
@@ -90,19 +90,52 @@ export async function prepareReadme(readme: string, autoGenConfig?: AutoGenConfi
         }
     }
 
-    const result = {} as ApiVersionFile;
+    let readmeTag = {} as ReadmeTag;
     fileSet.forEach(inputFile => {
         const match = constants.pathRegex.exec(inputFile);
         if (!!match) {
             const mNamespace = match[1];
             const mApiVersion = match[2];
             if (!autoGenConfig || lowerCaseEquals(mNamespace, autoGenConfig.namespace)) {
-                if (!result[mApiVersion]) {
-                    result[mApiVersion] = [];
+                if (!readmeTag[mApiVersion]) {
+                    readmeTag[mApiVersion] = [];
                 }
-                result[mApiVersion].push(inputFile);
+                readmeTag[mApiVersion].push(inputFile);
             }
         }
     });
 
+    if (!!autoGenConfig?.readmeTag) {
+        readmeTag = {...readmeTag, ...autoGenConfig.readmeTag };
+    }
+
+    const schemaReadmeContent = compositeSchemaReadme(readmeTag);
+
+    const schemaReadme = readme.replace(/\.md$/i, '.azureresourceschema.md');
+
+    fs.writeFileSync(schemaReadme, schemaReadmeContent);
+}
+
+function compositeSchemaReadme(readmeTag: ReadmeTag): string {
+    let content =
+`## AzureResourceSchema
+
+### AzureResourceSchema multi-api
+
+\`\`\` yaml $(azureresourceschema) && $(multiapi)
+${yaml.dump({ 'batch': Object.keys(readmeTag).map(apiVersion => ({ 'tag': `schema-${apiVersion}`})) }, { lineWidth: 1000 })}
+\`\`\`
+
+`
+    for (const apiVersion of Object.keys(readmeTag)) {
+        content +=
+`
+### Tag: schema-${apiVersion} and azureresourceschema
+
+\`\`\` yaml $(tag) == 'schema-${apiVersion}' && $(azureresourceschema)
+${yaml.dump({ 'input-file': readmeTag[apiVersion] }, { lineWidth: 1000})}
+\`\`\`
+`
+    }
+    return content;
 }

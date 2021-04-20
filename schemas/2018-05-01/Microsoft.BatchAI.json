@@ -39,6 +39,9 @@
                 "$ref": "#/definitions/workspaces_experiments_childResource"
               },
               {
+                "$ref": "#/definitions/workspaces_fileServers_childResource"
+              },
+              {
                 "$ref": "#/definitions/workspaces_clusters_childResource"
               }
             ]
@@ -218,6 +221,55 @@
         "type"
       ],
       "description": "Microsoft.BatchAI/workspaces/experiments/jobs"
+    },
+    "workspaces_fileServers": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-05-01"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[-\\w_]+$",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the file server within the specified resource group. File server names can only contain a combination of alphanumeric characters along with dash (-) and underscore (_). The name must be from 1 through 64 characters long."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/FileServerBaseProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties of a file server."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.BatchAI/workspaces/fileServers"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.BatchAI/workspaces/fileServers"
     }
   },
   "definitions": {
@@ -670,6 +722,70 @@
       },
       "description": "Custom tool kit job settings."
     },
+    "DataDisks": {
+      "type": "object",
+      "properties": {
+        "cachingType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "none",
+                "readonly",
+                "readwrite"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Caching type for the disks. Available values are none (default), readonly, readwrite. Caching type can be set only for VM sizes supporting premium storage."
+        },
+        "diskCount": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Number of data disks attached to the File Server. If multiple disks attached, they will be configured in RAID level 0."
+        },
+        "diskSizeInGB": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Disk size in GB for the blank data disks."
+        },
+        "storageAccountType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Standard_LRS",
+                "Premium_LRS"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Type of storage account to be used on the disk. Possible values are: Standard_LRS or Premium_LRS. Premium storage account type can only be used with VM sizes supporting premium storage."
+        }
+      },
+      "required": [
+        "diskCount",
+        "diskSizeInGB",
+        "storageAccountType"
+      ],
+      "description": "Data disks settings."
+    },
     "EnvironmentVariable": {
       "type": "object",
       "properties": {
@@ -715,6 +831,54 @@
         "name"
       ],
       "description": "An environment variable with secret value definition."
+    },
+    "FileServerBaseProperties": {
+      "type": "object",
+      "properties": {
+        "dataDisks": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DataDisks"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Data disks settings."
+        },
+        "sshConfiguration": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SshConfiguration"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "SSH configuration."
+        },
+        "subnet": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ResourceId"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Represents a resource ID. For example, for a subnet, it is the resource URL for the subnet."
+        },
+        "vmSize": {
+          "type": "string",
+          "description": "The size of the virtual machine for the File Server. For information about available VM sizes from the Virtual Machines Marketplace, see Sizes for Virtual Machines (Linux)."
+        }
+      },
+      "required": [
+        "dataDisks",
+        "sshConfiguration",
+        "vmSize"
+      ],
+      "description": "The properties of a file server."
     },
     "FileServerReference": {
       "type": "object",
@@ -1491,6 +1655,40 @@
       ],
       "description": "Specifies a setup task which can be used to customize the compute nodes of the cluster."
     },
+    "SshConfiguration": {
+      "type": "object",
+      "properties": {
+        "publicIPsToAllow": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of source IP ranges to allow SSH connection from. The default value is '*' (all source IPs are allowed). Maximum number of IP ranges that can be specified is 400."
+        },
+        "userAccountSettings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/UserAccountSettings"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Settings for user account that gets created on each on the nodes of a cluster."
+        }
+      },
+      "required": [
+        "userAccountSettings"
+      ],
+      "description": "SSH configuration."
+    },
     "TensorFlowSettings": {
       "type": "object",
       "properties": {
@@ -1732,6 +1930,55 @@
         "type"
       ],
       "description": "Microsoft.BatchAI/workspaces/experiments/jobs"
+    },
+    "workspaces_fileServers_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-05-01"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[-\\w_]+$",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the file server within the specified resource group. File server names can only contain a combination of alphanumeric characters along with dash (-) and underscore (_). The name must be from 1 through 64 characters long."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/FileServerBaseProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties of a file server."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "fileServers"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.BatchAI/workspaces/fileServers"
     }
   }
 }

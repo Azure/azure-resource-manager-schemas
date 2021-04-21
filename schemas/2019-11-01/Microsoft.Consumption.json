@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2019-05-01/Microsoft.Consumption.json#",
+  "id": "https://schema.management.azure.com/schemas/2019-11-01/Microsoft.Consumption.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.Consumption",
   "description": "Microsoft Consumption Resource Types",
@@ -11,7 +11,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2019-05-01"
+            "2019-11-01"
           ]
         },
         "eTag": {
@@ -50,6 +50,130 @@
     }
   },
   "definitions": {
+    "BudgetComparisonExpression": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the column to use in comparison."
+        },
+        "operator": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "In"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The operator to use for comparison."
+        },
+        "values": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Array of values to use for comparison"
+        }
+      },
+      "required": [
+        "name",
+        "operator",
+        "values"
+      ],
+      "description": "The comparison expression to be used in the budgets."
+    },
+    "BudgetFilter": {
+      "type": "object",
+      "properties": {
+        "and": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/BudgetFilterProperties"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The logical \"AND\" expression. Must have at least 2 items."
+        },
+        "dimensions": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BudgetComparisonExpression"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The comparison expression to be used in the budgets."
+        },
+        "not": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BudgetFilterProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Dimensions or Tags to filter a budget by."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BudgetComparisonExpression"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The comparison expression to be used in the budgets."
+        }
+      },
+      "description": "May be used to filter budgets by resource group, resource, or meter."
+    },
+    "BudgetFilterProperties": {
+      "type": "object",
+      "properties": {
+        "dimensions": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BudgetComparisonExpression"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The comparison expression to be used in the budgets."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BudgetComparisonExpression"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The comparison expression to be used in the budgets."
+        }
+      },
+      "description": "The Dimensions or Tags to filter a budget by."
+    },
     "BudgetProperties": {
       "type": "object",
       "properties": {
@@ -69,8 +193,7 @@
             {
               "type": "string",
               "enum": [
-                "Cost",
-                "Usage"
+                "Cost"
               ]
             },
             {
@@ -82,13 +205,13 @@
         "filter": {
           "oneOf": [
             {
-              "$ref": "#/definitions/Filter"
+              "$ref": "#/definitions/BudgetFilter"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "May be used to filter budgets by user-specified dimensions and/or tags."
+          "description": "May be used to filter budgets by resource group, resource, or meter."
         },
         "notifications": {
           "oneOf": [
@@ -122,7 +245,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The time covered by a budget. Tracking of the amount will be reset based on the time grain."
+          "description": "The time covered by a budget. Tracking of the amount will be reset based on the time grain. BillingMonth, BillingQuarter, and BillingAnnual are only supported by WD customers."
         },
         "timePeriod": {
           "oneOf": [
@@ -162,66 +285,6 @@
         "startDate"
       ],
       "description": "The start and end date for a budget."
-    },
-    "Filter": {
-      "type": "object",
-      "properties": {
-        "meters": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The list of filters on meters (GUID), mandatory for budgets of usage category. "
-        },
-        "resourceGroups": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The list of filters on resource groups, allowed at subscription level only."
-        },
-        "resources": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "The list of filters on resources."
-        },
-        "tags": {
-          "oneOf": [
-            {
-              "type": "object",
-              "additionalProperties": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "properties": {}
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The dictionary of filters on tags."
-        }
-      },
-      "description": "May be used to filter budgets by user-specified dimensions and/or tags."
     },
     "Notification": {
       "type": "object",

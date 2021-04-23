@@ -1,4 +1,5 @@
 import { ScopeType, AutogenlistConfig } from './models';
+import { postProcessor as insightsApplicationPostProcessor } from './processors/Microsoft.Insights.Application';
 import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
 import { postProcessor as machineLearningPostProcessor } from './processors/Microsoft.MachineLearning';
 import { postProcessor as machineLearningServicesPostProcessor } from './processors/Microsoft.MachineLearningServices';
@@ -708,6 +709,7 @@ const autogenlist: AutogenlistConfig[] = [
         basePath: 'applicationinsights/resource-manager',
         namespace: 'Microsoft.Insights',
         suffix: 'Application',
+        postProcessor: insightsApplicationPostProcessor,
     },
     {
         basePath: 'quantum/resource-manager',

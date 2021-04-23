@@ -1,6 +1,7 @@
 import { ScopeType, AutogenlistConfig } from './models';
 import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
 import { postProcessor as machineLearningPostProcessor } from './processors/Microsoft.MachineLearning';
+import { postProcessor as machineLearningServicesPostProcessor } from './processors/Microsoft.MachineLearningServices';
 import { postProcessor as storageProcessor } from './processors/Microsoft.Storage';
 import { lowerCaseEquals } from './utils';
 
@@ -333,6 +334,11 @@ const autogenlist: AutogenlistConfig[] = [
         postProcessor: machineLearningPostProcessor,
     },
     {
+        basePath: 'machinelearningservices/resource-manager',
+        namespace: 'Microsoft.MachineLearningServices',
+        postProcessor: machineLearningServicesPostProcessor,
+    },
+    {
         basePath: 'machinelearningcompute/resource-manager',
         namespace: 'Microsoft.MachineLearningCompute',
     },
@@ -377,10 +383,6 @@ const autogenlist: AutogenlistConfig[] = [
     {
         basePath: 'marketplace/resource-manager',
         namespace: 'Microsoft.Marketplace',
-    },
-    {
-        basePath: 'machinelearningservices/resource-manager',
-        namespace: 'Microsoft.MachineLearningServices',
     },
     {
         basePath: 'mysql/resource-manager',

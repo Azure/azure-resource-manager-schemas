@@ -1,6 +1,8 @@
 import { ScopeType, AutoGenConfig } from './models';
+import { postProcessor as insightsApplicationPostProcessor } from './processors/Microsoft.Insights.Application';
 import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
 import { postProcessor as machineLearningPostProcessor } from './processors/Microsoft.MachineLearning';
+import { postProcessor as machineLearningServicesPostProcessor } from './processors/Microsoft.MachineLearningServices';
 import { postProcessor as storageProcessor } from './processors/Microsoft.Storage';
 import { lowerCaseEquals } from './utils';
 
@@ -333,6 +335,11 @@ const autoGenList: AutoGenConfig[] = [
         postProcessor: machineLearningPostProcessor,
     },
     {
+        basePath: 'machinelearningservices/resource-manager',
+        namespace: 'Microsoft.MachineLearningServices',
+        postProcessor: machineLearningServicesPostProcessor,
+    },
+    {
         basePath: 'machinelearningcompute/resource-manager',
         namespace: 'Microsoft.MachineLearningCompute',
     },
@@ -377,10 +384,6 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'marketplace/resource-manager',
         namespace: 'Microsoft.Marketplace',
-    },
-    {
-        basePath: 'machinelearningservices/resource-manager',
-        namespace: 'Microsoft.MachineLearningServices',
     },
     {
         basePath: 'mysql/resource-manager',
@@ -723,6 +726,7 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'applicationinsights/resource-manager',
         namespace: 'Microsoft.Insights',
         suffix: 'Application',
+        postProcessor: insightsApplicationPostProcessor,
     },
     {
         basePath: 'quantum/resource-manager',

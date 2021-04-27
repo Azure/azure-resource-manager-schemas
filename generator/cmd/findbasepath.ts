@@ -15,9 +15,9 @@ executeSynchronous(async () => {
     // format basePath.
     basePath = `${basePath}/resource-manager`;
 
-    const autogenEntries = findAutogenEntries(basePath);
+    const autoGenEntries = findAutogenEntries(basePath);
 
-    if (autogenEntries.length === 0) {
+    if (autoGenEntries.length === 0) {
         // not onboarded in autogeneration
         console.log("false");
         return;

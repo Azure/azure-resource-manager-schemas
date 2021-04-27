@@ -2,8 +2,9 @@ import path from 'path';
 import os from 'os';
 import { findRecursive, findDirRecursive, executeCmd, rmdirRecursive, lowerCaseCompare, lowerCaseCompareLists, lowerCaseStartsWith, readJsonFile, writeJsonFile, safeMkdir, safeUnlink, fileExists, lowerCaseEquals, lowerCaseContains } from './utils';
 import * as constants from './constants';
+import { prepareReadme } from './specs';
 import chalk from 'chalk';
-import { ScopeType, AutogenlistConfig } from './models';
+import { ScopeType, AutoGenConfig } from './models';
 import { get, set, flatten, uniq, concat, Dictionary, groupBy, keys, difference, pickBy } from 'lodash';
 
 const autorestBinary = os.platform() === 'win32' ? 'autorest.cmd' : 'autorest';
@@ -44,10 +45,12 @@ export async function getApiVersionsByNamespace(readme: string): Promise<Diction
     return output;
 }
 
-export async function generateSchemas(readme: string, autogenlistConfig?: AutogenlistConfig): Promise<SchemaConfiguration[]> {
+export async function generateSchemas(readme: string, autoGenConfig?: AutoGenConfig): Promise<SchemaConfiguration[]> {
+    await prepareReadme(readme, autoGenConfig);
+
     const apiVersionsByNamespace = pickBy(
         await getApiVersionsByNamespace(readme),
-        (_, key) => !autogenlistConfig || lowerCaseEquals(key, autogenlistConfig.namespace));
+        (_, key) => !autoGenConfig || lowerCaseEquals(key, autoGenConfig.namespace));
 
     const namespaces = keys(apiVersionsByNamespace);
 
@@ -63,7 +66,7 @@ export async function generateSchemas(readme: string, autogenlistConfig?: Autoge
                 continue;
             }
 
-            const generatedSchemaConfig = await handleGeneratedSchema(readme, schemaPath, autogenlistConfig);
+            const generatedSchemaConfig = await handleGeneratedSchema(readme, schemaPath, autoGenConfig);
 
             schemaConfigs.push(generatedSchemaConfig);
         }
@@ -75,19 +78,19 @@ export async function generateSchemas(readme: string, autogenlistConfig?: Autoge
     return schemaConfigs;
 }
 
-async function handleGeneratedSchema(readme: string, schemaPath: string, autogenlistConfig?: AutogenlistConfig) {
+async function handleGeneratedSchema(readme: string, schemaPath: string, autoGenConfig?: AutoGenConfig) {
     const namespace = path.basename(schemaPath.substring(0, schemaPath.lastIndexOf(path.extname(schemaPath))));
 
-    if (autogenlistConfig && autogenlistConfig.namespace.toLowerCase() !== namespace.toLowerCase()) {
+    if (autoGenConfig && autoGenConfig.namespace.toLowerCase() !== namespace.toLowerCase()) {
         throw new Error(`Encountered unexpected namespace ${namespace} in readme ${readme}`);
     }
 
     const apiVersion = path.basename(path.resolve(`${schemaPath}/..`));
 
-    const schemaConfig = await generateSchemaConfig(schemaPath, namespace, apiVersion, autogenlistConfig);
+    const schemaConfig = await generateSchemaConfig(schemaPath, namespace, apiVersion, autoGenConfig);
 
     const unknownScopeResources = schemaConfig.references.filter(x => x.scope & ScopeType.Unknown);
-    if (autogenlistConfig && unknownScopeResources.length > 0) {
+    if (autoGenConfig && unknownScopeResources.length > 0) {
         throw new Error(`Unable to determine scope for resource types ${unknownScopeResources.map(x => x.type).join(', ')} in readme ${readme}`);
     }
 
@@ -111,8 +114,7 @@ async function generateSchema(readme: string, tmpFolder: string) {
         `--use=@autorest/azureresourceschema@${constants.azureresourceschemaVersion}`,
         '--azureresourceschema',
         `--output-folder=${tmpFolder}`,
-        `--multiapi`,
-        '--title=none',
+        '--multiapi',
         '--pass-thru:subset-reducer',
         readme,
     ];
@@ -144,8 +146,8 @@ function getFilePathFromRef(schemaRef: string) {
     return path.resolve(path.join(constants.schemasBasePath, schemaUri.substring(constants.schemasBaseUri.length + 1)));
 }
 
-function assignScopesToUnknownReferences(knownReferences: SchemaReference[], unknownReferences: SchemaReference[], autogenlistConfig?: AutogenlistConfig) {
-    const resourceConfig = (autogenlistConfig || {}).resourceConfig || [];
+function assignScopesToUnknownReferences(knownReferences: SchemaReference[], unknownReferences: SchemaReference[], autoGenConfig?: AutoGenConfig) {
+    const resourceConfig = (autoGenConfig || {}).resourceConfig || [];
 
     for (const schemaRef of unknownReferences) {
         const config = resourceConfig.find(c => lowerCaseCompare(c.type, schemaRef.type) === 0);
@@ -169,14 +171,14 @@ function getSchemaFileName(namespace: string, suffix: string | undefined) {
     return `${namespace}.${suffix}.json`;
 }
 
-async function generateSchemaConfig(outputFile: string, namespace: string, apiVersion: string, autogenlistConfig?: AutogenlistConfig): Promise<SchemaConfiguration> {
-    namespace = autogenlistConfig?.namespace ?? namespace;
-    const suffix = autogenlistConfig?.suffix;
+async function generateSchemaConfig(outputFile: string, namespace: string, apiVersion: string, autoGenConfig?: AutoGenConfig): Promise<SchemaConfiguration> {
+    namespace = autoGenConfig?.namespace ?? namespace;
+    const suffix = autoGenConfig?.suffix;
     const relativePath = `${apiVersion}/${getSchemaFileName(namespace, suffix)}`;
 
     let output = await readJsonFile(outputFile);
-    if (autogenlistConfig?.postProcessor) {
-        autogenlistConfig?.postProcessor(namespace, apiVersion, output);
+    if (autoGenConfig?.postProcessor) {
+        autoGenConfig?.postProcessor(namespace, apiVersion, output);
 
         await writeJsonFile(outputFile, output);
     }
@@ -190,7 +192,7 @@ async function generateSchemaConfig(outputFile: string, namespace: string, apiVe
     ];
 
     const unknownReferences = getSchemaRefs(output, ScopeType.Unknown, 'unknown_resourceDefinitions');
-    assignScopesToUnknownReferences(knownReferences, unknownReferences, autogenlistConfig);
+    assignScopesToUnknownReferences(knownReferences, unknownReferences, autoGenConfig);
 
     const references = [
         ...knownReferences,
@@ -290,10 +292,10 @@ async function getCurrentTemplateRefs(scopeType: ScopeType, rootSchemaConfig: Ro
     return currentRefsOneOf.map(v => v['$ref']);
 }
 
-export async function clearAutogeneratedSchemaRefs(autogenlist: AutogenlistConfig[]) {
+export async function clearAutoGeneratedSchemaRefs(autoGenList: AutoGenConfig[]) {
     RootSchemaConfigs.forEach(async (rootSchemaConfig, scopeType) => {
         const currentRefs = await getCurrentTemplateRefs(scopeType, rootSchemaConfig);
-        const autogenlistedFiles = new Set(autogenlist.map(x => getSchemaFileName(x.namespace, x.suffix).toLowerCase()));
+        const autogenlistedFiles = new Set(autoGenList.map(x => getSchemaFileName(x.namespace, x.suffix).toLowerCase()));
         const schemasToRemove = [];
         const schemasByFilePath = groupBy(currentRefs, getFilePathFromRef);
         // clean up existing schemas to detect deletions
@@ -311,7 +313,7 @@ export async function clearAutogeneratedSchemaRefs(autogenlist: AutogenlistConfi
     });
 }
 
-export async function saveAutogeneratedSchemaRefs(schemaConfigs: SchemaConfiguration[]) {
+export async function saveAutoGeneratedSchemaRefs(schemaConfigs: SchemaConfiguration[]) {
     RootSchemaConfigs.forEach(async (rootSchemaConfig, scopeType) => {
         const refs = flatten(schemaConfigs
             .map(c => c.references

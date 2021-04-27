@@ -6,6 +6,7 @@ export const generatorRoot = path.resolve(__dirname, '../');
 export const specsRepoPath = path.join(os.tmpdir(), 'schm_azspc');
 export const specsRepoUri = 'https://github.com/azure/azure-rest-api-specs';
 export const specsRepoCommitHash = 'origin/master';
+export const pathRegex = /(microsoft\.\w+)[\\\/]\S*[\\\/](\d{4}-\d{2}-\d{2}(|-preview))[\\\/]/i;
 
 export const autoRestVerboseOutput = false;
 

@@ -2,8 +2,11 @@ import path from 'path';
 import fs from 'fs';
 import { promisify } from 'util';
 import { cloneGitRepo } from './git';
-import { findRecursive } from './utils';
+import { findRecursive, lowerCaseEquals } from './utils';
+import { ReadmeTag, AutoGenConfig, CodeBlock } from './models';
 import * as constants from './constants'
+import * as cm from '@ts-common/commonmark-to-markdown'
+import * as yaml from 'js-yaml'
 
 const exists = promisify(fs.exists);
 
@@ -65,4 +68,74 @@ export function getPackageString(readme: string) {
 
 function isBlocklisted(basePath: string) {
     return constants.blocklist.includes(basePath);
+}
+
+export async function prepareReadme(readme: string, autoGenConfig?: AutoGenConfig) {
+    const content = fs.readFileSync(readme).toString();
+    const markdownEx = cm.parse(content);
+    const fileSet = new Set<string>();
+    for (const codeBlock of cm.iterate(markdownEx.markDown)) {
+        if (codeBlock.type === 'code_block' && codeBlock?.info?.startsWith('yaml') && codeBlock.literal !== null) {
+            const DOC = (yaml.load(codeBlock.literal) as CodeBlock);
+            if (DOC) {
+                const inputFile = DOC['input-file'];
+                if (typeof inputFile === 'string') {
+                    fileSet.add(inputFile);
+                } else if (inputFile instanceof Array) {
+                    for (const i of inputFile) {
+                        fileSet.add(i);
+                    }
+                }
+            }
+        }
+    }
+
+    let readmeTag = {} as ReadmeTag;
+    fileSet.forEach(inputFile => {
+        const match = constants.pathRegex.exec(inputFile);
+        if (!!match) {
+            const mNamespace = match[1];
+            const mApiVersion = match[2];
+            if (!autoGenConfig || lowerCaseEquals(mNamespace, autoGenConfig.namespace)) {
+                if (!readmeTag[mApiVersion]) {
+                    readmeTag[mApiVersion] = [];
+                }
+                readmeTag[mApiVersion].push(inputFile);
+            }
+        }
+    });
+
+    if (!!autoGenConfig?.readmeTag) {
+        readmeTag = {...readmeTag, ...autoGenConfig.readmeTag };
+    }
+
+    const schemaReadmeContent = compositeSchemaReadme(readmeTag);
+
+    const schemaReadme = readme.replace(/\.md$/i, '.azureresourceschema.md');
+
+    fs.writeFileSync(schemaReadme, schemaReadmeContent);
+}
+
+function compositeSchemaReadme(readmeTag: ReadmeTag): string {
+    let content =
+`## AzureResourceSchema
+
+### AzureResourceSchema multi-api
+
+\`\`\` yaml $(azureresourceschema) && $(multiapi)
+${yaml.dump({ 'batch': Object.keys(readmeTag).map(apiVersion => ({ 'tag': `schema-${apiVersion}`})) }, { lineWidth: 1000 })}
+\`\`\`
+
+`
+    for (const apiVersion of Object.keys(readmeTag)) {
+        content +=
+`
+### Tag: schema-${apiVersion} and azureresourceschema
+
+\`\`\` yaml $(tag) == 'schema-${apiVersion}' && $(azureresourceschema)
+${yaml.dump({ 'input-file': readmeTag[apiVersion] }, { lineWidth: 1000})}
+\`\`\`
+`
+    }
+    return content;
 }

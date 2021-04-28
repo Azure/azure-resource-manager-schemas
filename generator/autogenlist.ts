@@ -686,9 +686,9 @@ const autoGenList: AutoGenConfig[] = [
                 'Microsoft.KeyVault/stable/2018-02-14/secrets.json',
             ],
             '2018-02-14-preview': [
-                'Microsoft.KeyVault/stable/2018-02-14-preview/keyvault.json',
-                'Microsoft.KeyVault/stable/2018-02-14-preview/providers.json',
-                'Microsoft.KeyVault/stable/2018-02-14-preview/secrets.json',
+                'Microsoft.KeyVault/preview/2018-02-14-preview/keyvault.json',
+                'Microsoft.KeyVault/preview/2018-02-14-preview/providers.json',
+                'Microsoft.KeyVault/preview/2018-02-14-preview/secrets.json',
             ],
         }
     },

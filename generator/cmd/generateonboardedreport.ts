@@ -29,14 +29,14 @@ executeSynchronous(async () => {
                 'basePath': basePath,
                 'onboardedToAutogen': 'no',
                 'missing': unautogened,
-                'included': []
+                'onboarded': []
             });
 
             allBasePaths.push({
                 'basePath': basePath,
                 'onboardedToAutogen': 'yes',
                 'missing': [],
-                'included': autogened
+                'onboarded': autogened
             });
         }
         else {

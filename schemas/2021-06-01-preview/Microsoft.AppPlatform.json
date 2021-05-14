@@ -687,6 +687,59 @@
       },
       "description": "The settings of config server."
     },
+    "CustomContainer": {
+      "type": "object",
+      "properties": {
+        "args": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Arguments to the entrypoint. The docker image's CMD is used if this is not provided."
+        },
+        "command": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Entrypoint array. Not executed within a shell. The docker image's ENTRYPOINT is used if this is not provided."
+        },
+        "containerImage": {
+          "type": "string",
+          "description": "Container image of the custom container. This should be in the form of <repository>:<tag> without the server name of the registry"
+        },
+        "imageRegistryCredential": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ImageRegistryCredential"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Credential of the image registry"
+        },
+        "server": {
+          "type": "string",
+          "description": "The name of the registry that contains the container image"
+        }
+      },
+      "description": "Custom container payload"
+    },
     "CustomDomainProperties": {
       "type": "object",
       "properties": {
@@ -903,6 +956,20 @@
         "uri"
       ],
       "description": "Git repository property payload"
+    },
+    "ImageRegistryCredential": {
+      "type": "object",
+      "properties": {
+        "password": {
+          "type": "string",
+          "description": "The password of the image registry credential"
+        },
+        "username": {
+          "type": "string",
+          "description": "The username of the image registry credential"
+        }
+      },
+      "description": "Credential of the image registry"
     },
     "ManagedIdentityProperties": {
       "type": "object",
@@ -1414,6 +1481,17 @@
           "type": "string",
           "description": "Selector for the artifact to be used for the deployment for multi-module projects. This should be\r\nthe relative path to the target module/project."
         },
+        "customContainer": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CustomContainer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Custom container payload"
+        },
         "relativePath": {
           "type": "string",
           "description": "Relative path of the storage which stores the source"
@@ -1425,7 +1503,8 @@
               "enum": [
                 "Jar",
                 "NetCoreZip",
-                "Source"
+                "Source",
+                "Container"
               ]
             },
             {

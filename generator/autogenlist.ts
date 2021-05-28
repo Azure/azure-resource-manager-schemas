@@ -266,10 +266,10 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',
         namespace: 'Microsoft.EnterpriseKnowledgeGraph',
     },
-    { 
+    /*{ NOTE(jcotillo): Temporally removing this RP - latest swagger contains an unsupported type by the schema generator tool
         basePath: 'domainservices/resource-manager',
         namespace: 'Microsoft.AAD',
-    },
+    },*/
     {
         basePath: 'eventhub/resource-manager',
         namespace: 'Microsoft.EventHub',

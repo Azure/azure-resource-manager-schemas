@@ -1,0 +1,90 @@
+{
+  "tests": [
+    {
+      "name": "virtual network gateway",
+      "definition": "https://schema.management.azure.com/schemas/2018-06-01/Microsoft.Network.json#/resourceDefinitions/virtualNetworkGateways",
+      "json": {
+        "apiVersion": "2018-06-01",
+        "type": "Microsoft.Network/virtualNetworkGateways",
+        "name": "[variables('virtualNetworkGatewayName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "gwipconfig1",
+              "properties": {
+                "privateIPAllocationMethod": "Dynamic",
+                "subnet": {
+                  "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('subnetName'))]"
+                },
+                "publicIPAddress": {
+                  "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('pipName'))]"
+                }
+              }
+            }
+          ],
+          "gatewayType": "Vpn",
+          "vpnType": "RouteBased",
+          "enableBgp": false,
+          "activeActive": false,
+          "sku": {
+            "name": "VpnGw1",
+            "tier": "VpnGw1"
+          },
+          "bgpSettings": {
+            "asn": 65515,
+            "bgpPeeringAddress": "[parameters('peeringAddress')]",
+            "peerWeight": 0
+          },
+          "customRoutes": {
+            "addressPrefixes": [
+              "[parameters('addressPrefix')]"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "virtual network gateway connection",
+      "definition": "https://schema.management.azure.com/schemas/2018-06-01/Microsoft.Network.json#/resourceDefinitions/connections",
+      "json": {
+        "apiVersion": "2018-06-01",
+        "type": "Microsoft.Network/connections",
+        "name": "[variables('virtualNetworkGatewayConnectionName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "virtualNetworkGateway1": {
+            "id": "[resourceId('Microsoft.Network/virtualNetworkGateways', parameters('vpnGatewayName'))]"
+          },
+          "localNetworkGateway2": {
+            "id": "[resourceId('Microsoft.Network/localNetworkGateways', parameters('localGatewayName'))]"
+          },
+          "connectionType": "IPsec",
+          "connectionProtocol": "IKEv2",
+          "routingWeight": 0,
+          "sharedKey": "[parameters('sharedKey')]",
+          "enableBgp": false,
+          "usePolicyBasedTrafficSelectors": false
+        }
+      }
+    },
+    {
+      "name": "local network gateway",
+      "definition": "https://schema.management.azure.com/schemas/2018-06-01/Microsoft.Network.json#/resourceDefinitions/localNetworkGateways",
+      "json": {
+        "apiVersion": "2018-06-01",
+        "type": "Microsoft.Network/localNetworkGateways",
+        "name": "[variables('localNetworkGatewayName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "localNetworkAddressSpace": {
+            "addressPrefixes": [
+              "[parameters('addressPrefix')]"
+            ]
+          },
+          "gatewayIpAddress": "[parameters('gatewayIpAddress')]"
+        }
+      }
+    }
+  ]
+}

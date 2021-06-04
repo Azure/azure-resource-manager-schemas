@@ -1,0 +1,283 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-03-01-hybrid/deploymentTemplate.json#",
+  "metadata": {
+    "comments": "This template was developed for schema validation purposes.",
+    "author": "Azure Deployments"
+  },
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "keyvaultSettings": {
+      "type": "string"
+    },
+    "keyvaultSecrets": {
+      "type": "string"
+    },
+    "keyvaultAP":{
+      "type":"string"
+    }
+  },
+  "variables": {
+    "loadBalancerName": {
+      "type": "string",
+      "metadata": {
+        "description": "This is the name of the load balancer"
+      }
+    },
+    "publicIPAddressID1": "123"
+  },
+  "outputs": {
+    "out1": {
+      "type": "secureObject",
+      "value": {
+        "abc": "val1"
+      }
+    }
+  },
+  "apiProfile": "2019-03-01-hybrid",
+  "resources": [
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "name": "[parameters('keyvaultSettings').keyVaultName]",
+      "apiVersion": "2016-10-01",
+      "location": "[parameters('keyvaultSettings').location]",
+      "properties": {
+        "enabledForDeployment": true,
+        "enabledForTemplateDeployment": true,
+        "enabledForVolumeEncryption": false,
+        "tenantId": "[parameters('keyvaultSettings').tenantId]",
+        "accessPolicies": [
+          {
+            "tenantId": "[parameters('keyvaultSettings').tenantId]",
+            "objectId": "[parameters('keyvaultSettings').objectId]",
+            "permissions": {
+              "keys": [
+                "get"
+              ],
+              "secrets": [
+                "get"
+              ]
+            }
+          }
+        ],
+        "sku": {
+          "name": "[parameters('keyvaultSettings').vaultSku]",
+          "family": "A"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[parameters('keyvaultSecrets').keyVaultName]",
+      "apiVersion": "2016-10-01",
+      "location": "[parameters('keyvaultSecrets').location]",
+      "properties": {
+        "enabledForDeployment": true,
+        "enabledForTemplateDeployment": true,
+        "enabledForVolumeEncryption": false,
+        "tenantId": "[parameters('keyvaultSecrets').tenantId]",
+        "accessPolicies": [
+          {
+            "tenantId": "[parameters('keyvaultSecrets').tenantId]",
+            "objectId": "[parameters('keyvaultSecrets').objectId]",
+            "permissions": {
+              "keys": [
+                "get"
+              ],
+              "secrets": [
+                "get"
+              ]
+            }
+          }
+        ],
+        "sku": {
+          "name": "[parameters('keyvaultSecrets').vaultSku]",
+          "family": "A"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/accessPolicies",
+      "apiVersion": "2016-10-01",
+      "name": "add",
+      "properties": {
+        "accessPolicies": [
+          {
+            "applicationId": "[parameters('keyvaultAP').applicationId]",
+            "objectId": "",
+            "permissions": {},
+            "tenantId": "[parameters('keyvaultAP').tenantId]"
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2017-10-01",
+      "location": "West Us",
+      "name": "sto725",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "Standard_GRS"
+      },
+      "properties": {
+        "supportsHttpsTrafficOnly": true
+      }
+    },
+    {
+      "type": "Microsoft.Network/connections",
+      "apiVersion": "2017-10-01",
+      "name": "something",
+      "properties": {
+        "virtualNetworkGateway1": {
+          "activeActive": true,
+          "bgpSettings": {},
+          "enableBgp": true,
+          "gatewayDefaultSite": {},
+          "gatewayType": "Vpn",
+          "ipConfigurations": [],
+          "resourceGuid": "",
+          "sku": {
+            "capacity": 123,
+            "name": "Basic",
+            "tier": "Basic"
+          },
+          "vpnClientConfiguration": {},
+          "vpnType": "PolicyBased"
+        },
+        "connectionType": "IPsec"
+      }
+    },
+    {
+      "apiVersion": "2017-10-01",
+      "name": "[variables('loadBalancerName')]",
+      "type": "Microsoft.Network/loadBalancers",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "frontendIPConfigurations": [
+          {
+            "name": "loadBalancerFrontEnd1",
+            "properties": {
+              "publicIPAddress": {
+                "id": "[variables('publicIPAddressID1')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/localNetworkGateways",
+      "apiVersion": "2017-10-01",
+      "name": "",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2017-10-01",
+      "name": "",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "apiVersion": "2017-10-01",
+      "name": "",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2017-10-01",
+      "name": "",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Network/routeTables",
+      "apiVersion": "2017-10-01",
+      "name": "",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworkGateways",
+      "apiVersion": "2017-10-01",
+      "name": "",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2017-10-01",
+      "name": "",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Network/dnszones",
+      "apiVersion": "2016-04-01",
+      "name": "",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Compute/images",
+      "apiVersion": "2017-12-01",
+      "name": "",
+      "location": "",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Compute/availabilitySets",
+      "apiVersion": "2017-12-01",
+      "name": "",
+      "location": "",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2017-12-01",
+      "name": "",
+      "location": "",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachineScaleSets",
+      "apiVersion": "2017-12-01",
+      "name": "",
+      "location": "",
+      "properties": {}
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachineScaleSets/extensions",
+      "apiVersion": "2017-12-01",
+      "name": "",
+      "location": "",
+      "properties": {
+        "publisher": "abc",
+        "typeHandlerVersion": "123",
+        "type": "extensions",
+        "settings": {}
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "2017-12-01",
+      "name": "",
+      "location": "",
+      "properties": {
+        "publisher": "abc",
+        "type": "extensions",
+        "typeHandlerVersion": "123",
+        "settings": {}
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2018-05-01",
+      "name": "nested",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://localhost/",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {}
+      }
+    }
+  ]
+}

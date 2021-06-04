@@ -1,0 +1,592 @@
+{
+  "tests": [
+    {
+      "name": "PolicyDefinition tests - valid minimal rule",
+      "definition": "https://schema.management.azure.com/schemas/2019-01-01/policyDefinition.json#",
+      "json": {
+        "if": {
+          "field": "location",
+          "equals": "westus"
+        },
+        "then": {
+          "effect": "deny"
+        }
+      }
+    },
+    {
+      "name": "PolicyDefinition tests - valid complex rule",
+      "definition": "https://schema.management.azure.com/schemas/2019-01-01/policyDefinition.json#",
+      "json": {
+        "if": {
+          "not": {
+            "anyOf": [
+              {
+                "field": "type",
+                "equals": "Microsoft.SQL/servers"
+              },
+              {
+                "source": "action",
+                "equals": "asdkfjkladsf"
+              },
+              {
+                "not": {
+                  "allOf": [
+                    {
+                      "field": "foo",
+                      "notIn": [ "foo12", "asdf", "asdf" ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        "then": {
+          "effect": "audit"
+        }
+      }
+    },
+    {
+      "name": "PolicyDefinition tests - valid append details",
+      "definition": "https://schema.management.azure.com/schemas/2019-01-01/policyDefinition.json#",
+      "json": {
+        "if": {
+          "field": "tags",
+          "containsKey": "westus"
+        },
+        "then": {
+          "effect": "append",
+          "details": [
+            {
+              "field": "tags.location",
+              "value": "westus"
+            },
+            {
+              "field": "tags.foo",
+              "value": "bar"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "PolicyDefinition tests - minmal ifNotExists details",
+      "definition": "https://schema.management.azure.com/schemas/2019-01-01/policyDefinition.json#",
+      "json": {
+        "if": {
+          "field": "tags",
+          "containsKey": "westus"
+        },
+        "then": {
+          "effect": "auditIfNotExists",
+          "details": {
+            "type": "Microsoft.Compute/virtualMachines/extensions"
+          }
+        }
+      }
+    },
+    {
+      "name": "PolicyDefinition tests - complex ifNotExists details",
+      "definition": "https://schema.management.azure.com/schemas/2019-01-01/policyDefinition.json#",
+      "json": {
+        "if": {
+          "field": "tags",
+          "containsKey": "westus"
+        },
+        "then": {
+          "effect": "auditIfNotExists",
+          "details": {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "resourceGroupName": "myRG",
+            "name": "myResource",
+            "existenceCondition": {
+              "not": {
+                "field": "location",
+                "in": [ "eastus", "westeurope" ]
+              }
+            },
+            "existenceScope": "subscription",
+            "roleDefinitionIds": [ "/providers/microsoft.authorization/roleDefinitions/d0610b27-9663-4c05-89f8-5b4be01e86a5" ],
+            "deployment": {
+              "properties": {
+                "mode": "Incremental",
+                "template": {
+                  "resources": [
+                    {
+                      "type": "Microsoft.Compute/virtualMachines",
+                      "name": "MyVirtualMachine",
+                      "apiVersion": "2018-06-01"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "PolicyDefinition tests - invalid deployIfNotExists deployment template",
+      "definition": "https://schema.management.azure.com/schemas/2019-01-01/policyDefinition.json#",
+      "expectedErrors": [
+        {
+          "message": "Data does not match any schemas from \"oneOf\"",
+          "dataPath": "/then/details"
+        }
+      ],
+      "json": {
+        "if": {
+          "field": "type",
+          "equals": "Microsoft.Compute/virtualMachines"
+        },
+        "then": {
+          "effect": "deployIfNotExists",
+          "details": {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "existenceCondition": {
+              "field": "Microsoft.Compute/virtualMachines/extensions/type",
+              "equals": "OmsAgentForLinux"
+            },
+            "roleDefinitionIds": [
+              "/providers/microsoft.authorization/roleDefinitions/d0610b27-9663-4c05-89f8-5b4be01e86a5"
+            ],
+            "deployment": {
+              "properties": {
+                "template": {
+                  "resources": [
+                    {
+                      "type": "Microsoft.Compute/virtualMachines",
+                      "name": "MyVirtualMachine",
+                      "apiVersion": "2018-06-01"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "PolicyDefinition tests - complex deployIfNotExists deployment",
+      "definition": "https://schema.management.azure.com/schemas/2019-01-01/policyDefinition.json#",
+      "json": {
+        "if": {
+          "allOf": [
+            {
+              "field": "type",
+              "equals": "Microsoft.Compute/virtualMachines"
+            },
+            {
+              "anyOf": [
+                {
+                  "allOf": [
+                    {
+                      "field": "Microsoft.Compute/imagePublisher",
+                      "equals": "RedHat"
+                    },
+                    {
+                      "field": "Microsoft.Compute/imageOffer",
+                      "in": [
+                        "RHEL",
+                        "RHEL-SAP-HANA"
+                      ]
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "field": "Microsoft.Compute/imageSKU",
+                          "like": "6.*"
+                        },
+                        {
+                          "field": "Microsoft.Compute/imageSKU",
+                          "like": "7*"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "allOf": [
+                    {
+                      "field": "Microsoft.Compute/imagePublisher",
+                      "equals": "SUSE"
+                    },
+                    {
+                      "field": "Microsoft.Compute/imageOffer",
+                      "in": [
+                        "SLES",
+                        "SLES-SAP",
+                        "SLES-SAP-BYOS",
+                        "SLES-Priority",
+                        "SLES-BYOS",
+                        "SLES-SAPCAL",
+                        "sles-byos"
+                      ]
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "field": "Microsoft.Compute/imageSKU",
+                          "like": "12*"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "allOf": [
+                    {
+                      "field": "Microsoft.Compute/imagePublisher",
+                      "equals": "Canonical"
+                    },
+                    {
+                      "field": "Microsoft.Compute/imageOffer",
+                      "equals": "UbuntuServer"
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "field": "Microsoft.Compute/imageSKU",
+                          "like": "14.04*LTS"
+                        },
+                        {
+                          "field": "Microsoft.Compute/imageSKU",
+                          "like": "16.04*LTS"
+                        },
+                        {
+                          "field": "Microsoft.Compute/imageSKU",
+                          "like": "18.04*LTS"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "allOf": [
+                    {
+                      "field": "Microsoft.Compute/imagePublisher",
+                      "equals": "Oracle"
+                    },
+                    {
+                      "field": "Microsoft.Compute/imageOffer",
+                      "equals": "Oracle-Linux"
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "field": "Microsoft.Compute/imageSKU",
+                          "like": "6.*"
+                        },
+                        {
+                          "field": "Microsoft.Compute/imageSKU",
+                          "like": "7.*"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "allOf": [
+                    {
+                      "field": "Microsoft.Compute/imagePublisher",
+                      "equals": "OpenLogic"
+                    },
+                    {
+                      "field": "Microsoft.Compute/imageOffer",
+                      "in": [
+                        "CentOS",
+                        "Centos-LVM"
+                      ]
+                    },
+                    {
+                      "anyOf": [
+                        {
+                          "field": "Microsoft.Compute/imageSKU",
+                          "like": "6.*"
+                        },
+                        {
+                          "field": "Microsoft.Compute/imageSKU",
+                          "like": "7*"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "then": {
+          "effect": "deployIfNotExists",
+          "details": {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "roleDefinitionIds": [
+              "/providers/microsoft.authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293"
+            ],
+            "existenceCondition": {
+              "allOf": [
+                {
+                  "field": "Microsoft.Compute/virtualMachines/extensions/type",
+                  "equals": "OmsAgentForLinux"
+                },
+                {
+                  "field": "Microsoft.Compute/virtualMachines/extensions/publisher",
+                  "equals": "Microsoft.EnterpriseCloud.Monitoring"
+                },
+                {
+                  "field": "Microsoft.Compute/virtualMachines/extensions/provisioningState",
+                  "equals": "Succeeded"
+                }
+              ]
+            },
+            "deploymentScope": "subscription",
+            "deployment": {
+              "properties": {
+                "mode": "Incremental",
+                "template": {
+                  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "parameters": {
+                    "vmName": {
+                      "type": "string"
+                    },
+                    "location": {
+                      "type": "string"
+                    },
+                    "logAnalytics": {
+                      "type": "string"
+                    }
+                  },
+                  "variables": {
+                    "vmExtensionName": "MMAExtension",
+                    "vmExtensionPublisher": "Microsoft.EnterpriseCloud.Monitoring",
+                    "vmExtensionType": "OmsAgentForLinux",
+                    "vmExtensionTypeHandlerVersion": "1.7"
+                  },
+                  "resources": [
+                    {
+                      "name": "[concat(parameters('vmName'), '/', variables('vmExtensionName'))]",
+                      "type": "Microsoft.Compute/virtualMachines/extensions",
+                      "location": "[parameters('location')]",
+                      "apiVersion": "2018-06-01",
+                      "properties": {
+                        "publisher": "[variables('vmExtensionPublisher')]",
+                        "type": "[variables('vmExtensionType')]",
+                        "typeHandlerVersion": "[variables('vmExtensionTypeHandlerVersion')]",
+                        "autoUpgradeMinorVersion": true,
+                        "settings": {
+                          "workspaceId": "[reference(parameters('logAnalytics'), '2015-03-20').customerId]",
+                          "stopOnMultipleConnections": "true"
+                        },
+                        "protectedSettings": {
+                          "workspaceKey": "[listKeys(parameters('logAnalytics'), '2015-03-20').primarySharedKey]"
+                        }
+                      }
+                    }
+                  ],
+                  "outputs": {
+                    "policy": {
+                      "type": "string",
+                      "value": "[concat('Enabled extension for VM', ': ', parameters('vmName'))]"
+                    }
+                  }
+                },
+                "parameters": {
+                  "vmName": {
+                    "value": "[field('name')]"
+                  },
+                  "location": {
+                    "value": "[field('location')]"
+                  },
+                  "logAnalytics": {
+                    "value": "[parameters('logAnalytics')]"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "PolicyDefinition tests - invalid ifNotExists existenceCondition",
+      "definition": "https://schema.management.azure.com/schemas/2019-01-01/policyDefinition.json#",
+      "expectedErrors": [
+        {
+          "message": "Data does not match any schemas from \"oneOf\"",
+          "dataPath": "/then/details"
+        }
+      ],
+      "json": {
+        "if": {
+          "field": "tags",
+          "containsKey": "westus"
+        },
+        "then": {
+          "effect": "auditIfNotExists",
+          "details": {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "existenceCondition": {
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "PolicyDefinition tests - invalid ifNotExists existenceScope",
+      "definition": "https://schema.management.azure.com/schemas/2019-01-01/policyDefinition.json#",
+      "expectedErrors": [
+        {
+          "message": "Data does not match any schemas from \"oneOf\"",
+          "dataPath": "/then/details"
+        }
+      ],
+      "json": {
+        "if": {
+          "field": "tags",
+          "containsKey": "westus"
+        },
+        "then": {
+          "effect": "auditIfNotExists",
+          "details": {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "existenceScope": "foo"
+          }
+        }
+      }
+    },
+    {
+      "name": "PolicyDefinition tests - invalid ifNotExists deploymentScope",
+      "definition": "https://schema.management.azure.com/schemas/2019-01-01/policyDefinition.json#",
+      "expectedErrors": [
+        {
+          "message": "Data does not match any schemas from \"oneOf\"",
+          "dataPath": "/then/details"
+        }
+      ],
+      "json": {
+        "if": {
+          "field": "tags",
+          "containsKey": "westus"
+        },
+        "then": {
+          "effect": "auditIfNotExists",
+          "details": {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "deploymentScope": "foo"
+          }
+        }
+      }
+    },
+    {
+      "name": "PolicyDefinition tests - missing append details",
+      "definition": "https://schema.management.azure.com/schemas/2019-01-01/policyDefinition.json#",
+      "expectedErrors": [
+        {
+          "message": "Data does not match any schemas from \"oneOf\"",
+          "dataPath": "/then/details"
+        }
+      ],
+      "json": {
+        "if": {
+          "field": "tags",
+          "containsKey": "westus"
+        },
+        "then": {
+          "effect": "append",
+          "details": []
+        }
+      }
+    },
+    {
+      "name": "PolicyDefinition tests - invalid effect",
+      "definition": "https://schema.management.azure.com/schemas/2019-01-01/policyDefinition.json#",
+      "expectedErrors": [
+        {
+          "message": "No enum match for: \"foo\"",
+          "dataPath": "/then/effect"
+        }
+      ],
+      "json": {
+        "if": {
+          "field": "location",
+          "equals": "westus"
+        },
+        "then": {
+          "effect": "foo"
+        }
+      }
+    },
+    {
+      "name": "PolicyDefinition tests - invalid field property",
+      "definition": "https://schema.management.azure.com/schemas/2019-01-01/policyDefinition.json#",
+      "expectedErrors": [
+        {
+          "message": "Data does not match any schemas from \"oneOf\"",
+          "dataPath": "/if"
+        }
+      ],
+      "json": {
+        "if": {
+          "field2": "location",
+          "equals": "westus"
+        },
+        "then": {
+          "effect": "deny"
+        }
+      }
+    },
+    {
+      "name": "PolicyDefinition tests - invalid operator",
+      "definition": "https://schema.management.azure.com/schemas/2019-01-01/policyDefinition.json#",
+      "expectedErrors": [
+        {
+          "message": "Data does not match any schemas from \"oneOf\"",
+          "dataPath": "/if"
+        }
+      ],
+      "json": {
+        "if": {
+          "field": "location",
+          "notEqualTo": "westus"
+        },
+        "then": {
+          "effect": "deny"
+        }
+      }
+    },
+    {
+      "name": "PolicyDefinition tests - array for non-array operator",
+      "definition": "https://schema.management.azure.com/schemas/2019-01-01/policyDefinition.json#",
+      "expectedErrors": [
+        {
+          "message": "Data does not match any schemas from \"oneOf\"",
+          "dataPath": "/if"
+        }
+      ],
+      "json": {
+        "if": {
+          "field": "location",
+          "equals": [ "foo" ]
+        },
+        "then": {
+          "effect": "deny"
+        }
+      }
+    },
+    {
+      "name": "PolicyDefinition tests - string for array operator",
+      "definition": "https://schema.management.azure.com/schemas/2019-01-01/policyDefinition.json#",
+      "json": {
+        "if": {
+          "field": "location",
+          "notIn": "[parameters('foo')]"
+        },
+        "then": {
+          "effect": "deny"
+        }
+      }
+    }
+  ]
+}

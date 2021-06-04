@@ -1,0 +1,458 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Azure Resource Meta-schema",
+  "allOf": [
+    {
+      "$ref": "http://json-schema.org/draft-04/schema#"
+    },
+    {
+      "$ref": "#/definitions/resourceMetaSchema"
+    }
+  ],
+  "definitions": {
+    "resourceMetaSchema": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "$schema": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "$ref": "#/definitions/description"
+        },
+        "resourceDefinitions": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/resource"
+          }
+        },
+        "subscription_resourceDefinitions": {
+          "type": "object"
+        },
+        "managementGroup_resourceDefinitions": {
+          "type": "object"
+        },
+        "tenant_resourceDefinitions": {
+          "type": "object"
+        },
+        "extension_resourceDefinitions": {
+          "type": "object"
+        },
+        "unknown_resourceDefinitions": {
+          "type": "object"
+        },
+        "definitions": {
+          "$ref": "#/definitions/definitions"
+        }
+      },
+      "required": [
+        "$schema",
+        "title",
+        "description",
+        "resourceDefinitions"
+      ],
+      "additionalProperties": false
+    },
+    "resource": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "object"
+          ]
+        },
+        "description": {
+          "$ref": "#/definitions/description"
+        },
+        "required": {
+          "$ref": "#/definitions/stringArrayEmptyOkay"
+        },
+        "properties": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "$ref": "#/definitions/resourceTypesArray"
+            },
+            "apiVersion": {
+              "$ref": "#/definitions/resourceApiVersions"
+            },
+            "resources": {
+              "$ref": "#/definitions/childResources"
+            },
+            "properties": {
+              "$ref": "#/definitions/resourceSpecificProperties"
+            }
+          },
+          "required": [
+            "apiVersion",
+            "type"
+          ]
+        }
+      },
+      "required": [
+        "description"
+      ]
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stringArrayEmptyOkay": {
+      "oneOf": [
+        {
+          "$ref": "http://json-schema.org/draft-04/schema#/definitions/stringArray"
+        },
+        {
+          "enum": [
+            []
+          ]
+        }
+      ]
+    },
+    "resourceTypesArray": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "string"
+          ]
+        },
+        "enum": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "description": {
+          "$ref": "#/definitions/description"
+        }
+      },
+      "required": [
+        "enum"
+      ],
+      "additionalProperties": false
+    },
+    "resourceApiVersions": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "$ref": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "$ref"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "string"
+              ]
+            },
+            "enum": {
+              "type": "array",
+              "items": {
+                "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/apiVersion"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "enum"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "childResources": {
+      "type": "object"
+    },
+    "resourceSpecificProperties": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "oneOf": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "$ref": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "description": {
+              "$ref": "#/definitions/description"
+            }
+          },
+          "required": [
+            "oneOf"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "anyOf": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "$ref": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "description": {
+              "$ref": "#/definitions/description"
+            }
+          },
+          "required": [
+            "anyOf"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "$ref": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "$ref"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "enum": [
+                "object"
+              ]
+            },
+            "properties": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/resourceProperty"
+              }
+            },
+            "required": {
+              "$ref": "#/definitions/stringArrayEmptyOkay"
+            },
+            "additionalProperties": {
+              "$ref": "http://json-schema.org/draft-04/schema#/properties/additionalProperties"
+            },
+            "description": {
+              "$ref": "#/definitions/description"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "resourceProperty": {
+      "type": "object",
+      "properties": {
+        "$ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "items": {
+          "$ref": "http://json-schema.org/draft-04/schema#/properties/items"
+        },
+        "oneOf": {
+          "$ref": "#/definitions/resourcePropertyDefinitionOptions"
+        },
+        "anyOf": {
+          "$ref": "#/definitions/resourceStringPropertyDefinitionOptions"
+        },
+        "type": {
+          "enum": [
+            "string"
+          ]
+        },
+        "minLength": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxLength": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "description": {
+          "$ref": "#/definitions/description"
+        }
+      },
+      "required": [
+        "description"
+      ],
+      "additionalProperties": false
+    },
+    "resourcePropertyDefinitionOptions": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "allOf": [
+                  {
+                    "$ref": "http://json-schema.org/draft-04/schema#/definitions/simpleTypes"
+                  },
+                  {
+                    "not": {
+                      "enum": [
+                        "string",
+                        "number"
+                      ]
+                    }
+                  }
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "enum": [
+                  "string"
+                ]
+              },
+              "pattern": {
+                "$ref": "http://json-schema.org/draft-04/schema#/properties/pattern"
+              }
+            },
+            "required": [
+              "type",
+              "pattern"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "enum": {
+                "$ref": "http://json-schema.org/draft-04/schema#/properties/enum"
+              },
+              "default": {
+                "$ref": "http://json-schema.org/draft-04/schema#/properties/default"
+              }
+            },
+            "required": [
+              "enum"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "$ref": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "$ref"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "oneOf": {
+                "$ref": "#/definitions/resourcePropertyDefinitionOptions"
+              }
+            },
+            "required": [
+              "oneOf"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "minItems": 2
+    },
+    "resourceStringPropertyDefinitionOptions": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "enum": [
+                  "string"
+                ]
+              }
+            },
+            "required": [
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "$ref": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "$ref"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "minItems": 2
+    },
+    "definitions": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/definition"
+      }
+    },
+    "definition": {
+      "$ref": "http://json-schema.org/draft-04/schema#"
+    }
+  }
+}

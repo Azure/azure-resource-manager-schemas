@@ -1,0 +1,493 @@
+{
+  "id": "https://schema.management.azure.com/schemas/2019-10-01-preview/Microsoft.Resources.json#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Microsoft.Resources",
+  "description": "Microsoft Resources Resource Types",
+  "resourceDefinitions": {
+    "deploymentScripts": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/AzurePowerShellScript"
+        },
+        {
+          "$ref": "#/definitions/AzureCliScript"
+        }
+      ],
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-10-01-preview"
+          ]
+        },
+        "identity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ManagedServiceIdentity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Managed identity generic object."
+        },
+        "location": {
+          "type": "string",
+          "description": "The location of the ACI and the storage account for the deployment script."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 90,
+          "description": "Name of the deployment script."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Resource tags."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Resources/deploymentScripts"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "identity",
+        "location",
+        "name",
+        "type"
+      ],
+      "description": "Microsoft.Resources/deploymentScripts"
+    }
+  },
+  "definitions": {
+    "AzureCliScript": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "AzureCLI"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AzureCliScriptProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the Azure CLI script object."
+        }
+      },
+      "required": [
+        "kind",
+        "properties"
+      ],
+      "description": "Object model for the Azure CLI script."
+    },
+    "AzureCliScriptProperties": {
+      "type": "object",
+      "properties": {
+        "arguments": {
+          "type": "string",
+          "description": "Command line arguments to pass to the script. Arguments are separated by spaces. ex: -Name blue* -Location 'West US 2' "
+        },
+        "azCliVersion": {
+          "type": "string",
+          "description": "Azure CLI module version to be used."
+        },
+        "cleanupPreference": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Always",
+                "OnSuccess",
+                "OnExpiration"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The clean up preference when the script execution gets in a terminal state. Default setting is 'Always'."
+        },
+        "containerSettings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerConfiguration"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Settings to customize ACI container instance."
+        },
+        "environmentVariables": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/EnvironmentVariable"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The environment variables to pass over to the script."
+        },
+        "forceUpdateTag": {
+          "type": "string",
+          "description": "Gets or sets how the deployment script should be forced to execute even if the script resource has not changed. Can be current time stamp or a GUID."
+        },
+        "primaryScriptUri": {
+          "type": "string",
+          "description": "Uri for the script. This is the entry point for the external script."
+        },
+        "retentionInterval": {
+          "type": "string",
+          "format": "duration",
+          "description": "Interval for which the service retains the script resource after it reaches a terminal state. Resource will be deleted when this duration expires. Duration is based on ISO 8601 pattern (for example P1D means one day)."
+        },
+        "scriptContent": {
+          "type": "string",
+          "maxLength": 32000,
+          "description": "Script body."
+        },
+        "storageAccountSettings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/StorageAccountConfiguration"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Settings to use an existing storage account. Valid storage account kinds are: Storage, StorageV2 and FileStorage"
+        },
+        "supportingScriptUris": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Supporting files for the external script."
+        },
+        "timeout": {
+          "type": "string",
+          "default": "P1D",
+          "format": "duration",
+          "description": "Maximum allowed script execution time specified in ISO 8601 format. Default value is P1D"
+        }
+      },
+      "required": [
+        "azCliVersion",
+        "retentionInterval"
+      ],
+      "description": "Properties of the Azure CLI script object."
+    },
+    "AzurePowerShellScript": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "AzurePowerShell"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AzurePowerShellScriptProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the Azure PowerShell script object."
+        }
+      },
+      "required": [
+        "kind",
+        "properties"
+      ],
+      "description": "Object model for the Azure PowerShell script."
+    },
+    "AzurePowerShellScriptProperties": {
+      "type": "object",
+      "properties": {
+        "arguments": {
+          "type": "string",
+          "description": "Command line arguments to pass to the script. Arguments are separated by spaces. ex: -Name blue* -Location 'West US 2' "
+        },
+        "azPowerShellVersion": {
+          "type": "string",
+          "description": "Azure PowerShell module version to be used."
+        },
+        "cleanupPreference": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Always",
+                "OnSuccess",
+                "OnExpiration"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The clean up preference when the script execution gets in a terminal state. Default setting is 'Always'."
+        },
+        "containerSettings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerConfiguration"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Settings to customize ACI container instance."
+        },
+        "environmentVariables": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/EnvironmentVariable"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The environment variables to pass over to the script."
+        },
+        "forceUpdateTag": {
+          "type": "string",
+          "description": "Gets or sets how the deployment script should be forced to execute even if the script resource has not changed. Can be current time stamp or a GUID."
+        },
+        "primaryScriptUri": {
+          "type": "string",
+          "description": "Uri for the script. This is the entry point for the external script."
+        },
+        "retentionInterval": {
+          "type": "string",
+          "format": "duration",
+          "description": "Interval for which the service retains the script resource after it reaches a terminal state. Resource will be deleted when this duration expires. Duration is based on ISO 8601 pattern (for example P1D means one day)."
+        },
+        "scriptContent": {
+          "type": "string",
+          "maxLength": 32000,
+          "description": "Script body."
+        },
+        "storageAccountSettings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/StorageAccountConfiguration"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Settings to use an existing storage account. Valid storage account kinds are: Storage, StorageV2 and FileStorage"
+        },
+        "supportingScriptUris": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Supporting files for the external script."
+        },
+        "timeout": {
+          "type": "string",
+          "default": "P1D",
+          "format": "duration",
+          "description": "Maximum allowed script execution time specified in ISO 8601 format. Default value is P1D"
+        }
+      },
+      "required": [
+        "azPowerShellVersion",
+        "retentionInterval"
+      ],
+      "description": "Properties of the Azure PowerShell script object."
+    },
+    "ContainerConfiguration": {
+      "type": "object",
+      "properties": {
+        "containerGroupName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 63,
+          "description": "Container group name, if not specified then the name will get auto-generated. Not specifying a 'containerGroupName' indicates the system to generate a unique name which might end up flagging an Azure Policy as non-compliant. Use 'containerGroupName' when you have an Azure Policy that expects a specific naming convention or when you want to fully control the name. 'containerGroupName' property must be between 1 and 63 characters long, must contain only lowercase letters, numbers, and dashes and it cannot start or end with a dash and consecutive dashes are not allowed. To specify a 'containerGroupName', add the following object to properties: { \"containerSettings\": { \"containerGroupName\": \"contoso-container\" } }. If you do not want to specify a 'containerGroupName' then do not add 'containerSettings' property."
+        }
+      },
+      "description": "Settings to customize ACI container instance."
+    },
+    "EnvironmentVariable": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the environment variable."
+        },
+        "secureValue": {
+          "type": "string",
+          "description": "The value of the secure environment variable."
+        },
+        "value": {
+          "type": "string",
+          "description": "The value of the environment variable."
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "The environment variable to pass to the script in the container instance."
+    },
+    "ManagedServiceIdentity": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "UserAssigned"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Type of the managed identity."
+        },
+        "userAssignedIdentities": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/UserAssignedIdentity"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of user-assigned managed identities associated with the resource. Key is the Azure resource Id of the managed identity."
+        }
+      },
+      "description": "Managed identity generic object."
+    },
+    "StorageAccountConfiguration": {
+      "type": "object",
+      "properties": {
+        "storageAccountKey": {
+          "type": "string",
+          "description": "The storage account access key."
+        },
+        "storageAccountName": {
+          "type": "string",
+          "description": "The storage account name."
+        }
+      },
+      "description": "Settings to use an existing storage account. Valid storage account kinds are: Storage, StorageV2 and FileStorage"
+    },
+    "UserAssignedIdentity": {
+      "type": "object",
+      "properties": {},
+      "description": "User-assigned managed identity."
+    }
+  },
+  "subscription_resourceDefinitions": {
+    "resourceGroups": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[-\\w\\._\\(\\)]+$",
+              "maxLength": 90,
+              "description": "the resource group name"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Resources/resourceGroups"
+          ]
+        },
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-10-01-preview"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "the resource group location"
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The resource group tags."
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion",
+        "location"
+      ],
+      "description": "Microsoft.Resources/resourceGroups"
+    }
+  }
+}

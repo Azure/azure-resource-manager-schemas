@@ -1,0 +1,462 @@
+{
+  "id": "https://schema.management.azure.com/schemas/2019-02-01-preview/Microsoft.VirtualMachineImages.json#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Microsoft.VirtualMachineImages",
+  "description": "Microsoft VirtualMachineImages Resource Types",
+  "resourceDefinitions": {
+    "imageTemplates": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2019-02-01-preview"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Resource location"
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9-_]{1,64}$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the image Template"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ImageTemplateProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Resource tags"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.VirtualMachineImages/imageTemplates"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "location",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.VirtualMachineImages/imageTemplates"
+    }
+  },
+  "definitions": {
+    "ImageTemplateCustomizer": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/ImageTemplateShellCustomizer"
+        },
+        {
+          "$ref": "#/definitions/ImageTemplateRestartCustomizer"
+        },
+        {
+          "$ref": "#/definitions/ImageTemplatePowerShellCustomizer"
+        }
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Friendly Name to provide context on what this customization step does"
+        }
+      }
+    },
+    "ImageTemplateDistributor": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/ImageTemplateManagedImageDistributor"
+        },
+        {
+          "$ref": "#/definitions/ImageTemplateSharedImageDistributor"
+        },
+        {
+          "$ref": "#/definitions/ImageTemplateVhdDistributor"
+        }
+      ],
+      "properties": {
+        "artifactTags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Tags that will be applied to the artifact once it has been created/updated by the distributor."
+        },
+        "runOutputName": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9-_]{1,64}$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name to be used for the associated RunOutput."
+        }
+      },
+      "required": [
+        "runOutputName"
+      ],
+      "description": "Generic distribution object"
+    },
+    "ImageTemplateIsoSource": {
+      "type": "object",
+      "properties": {
+        "sha256Checksum": {
+          "type": "string",
+          "description": "SHA256 Checksum of the ISO image."
+        },
+        "sourceURI": {
+          "type": "string",
+          "description": "URI to get the ISO image. This URI has to be accessible to the resource provider at the time of the image template creation."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "ISO"
+          ]
+        }
+      },
+      "required": [
+        "sha256Checksum",
+        "sourceURI",
+        "type"
+      ],
+      "description": "Describes an image source that is an installation ISO. Currently only supports Red Hat Enterprise Linux 7.2-7.5 ISO's."
+    },
+    "ImageTemplateManagedImageDistributor": {
+      "type": "object",
+      "properties": {
+        "imageId": {
+          "type": "string",
+          "description": "Resource Id of the Managed Disk Image"
+        },
+        "location": {
+          "type": "string",
+          "description": "Azure location for the image, should match if image already exists"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "ManagedImage"
+          ]
+        }
+      },
+      "required": [
+        "imageId",
+        "location",
+        "type"
+      ],
+      "description": "Distribute as a Managed Disk Image."
+    },
+    "ImageTemplateManagedImageSource": {
+      "type": "object",
+      "properties": {
+        "imageId": {
+          "type": "string",
+          "description": "ARM resource id of the managed image in customer subscription"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "ManagedImage"
+          ]
+        }
+      },
+      "required": [
+        "imageId",
+        "type"
+      ],
+      "description": "Describes an image source that is a managed image in customer subscription."
+    },
+    "ImageTemplatePlatformImageSource": {
+      "type": "object",
+      "properties": {
+        "offer": {
+          "type": "string",
+          "description": "Image offer from the [Azure Gallery Images](https://docs.microsoft.com/en-us/rest/api/compute/virtualmachineimages)."
+        },
+        "publisher": {
+          "type": "string",
+          "description": "Image Publisher in [Azure Gallery Images](https://docs.microsoft.com/en-us/rest/api/compute/virtualmachineimages)."
+        },
+        "sku": {
+          "type": "string",
+          "description": "Image sku from the [Azure Gallery Images](https://docs.microsoft.com/en-us/rest/api/compute/virtualmachineimages)."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "PlatformImage"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "description": "Image version from the [Azure Gallery Images](https://docs.microsoft.com/en-us/rest/api/compute/virtualmachineimages)."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Describes an image source from [Azure Gallery Images](https://docs.microsoft.com/en-us/rest/api/compute/virtualmachineimages)."
+    },
+    "ImageTemplatePowerShellCustomizer": {
+      "type": "object",
+      "properties": {
+        "inline": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Array of PowerShell commands to execute"
+        },
+        "script": {
+          "type": "string",
+          "description": "The PowerShell script to be run for customizing. It can be a github link, SAS URI for Azure Storage, etc"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "PowerShell"
+          ]
+        },
+        "validExitCodes": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Valid exit codes for the PowerShell script. [Default: 0]"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Runs the specified PowerShell on the VM (Windows). Corresponds to Packer powershell provisioner. Exactly one of 'script' or 'inline' can be specified."
+    },
+    "ImageTemplateProperties": {
+      "type": "object",
+      "properties": {
+        "customize": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ImageTemplateCustomizer"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies the properties used to describe the customization steps of the image, like Image source etc"
+        },
+        "distribute": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ImageTemplateDistributor"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The distribution targets where the image output needs to go to."
+        },
+        "source": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ImageTemplateSource"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "distribute",
+        "source"
+      ]
+    },
+    "ImageTemplateRestartCustomizer": {
+      "type": "object",
+      "properties": {
+        "restartCheckCommand": {
+          "type": "string",
+          "description": "Command to check if restart succeeded [Default: '']"
+        },
+        "restartCommand": {
+          "type": "string",
+          "description": "Command to execute the restart [Default: 'shutdown /r /f /t 0 /c \"packer restart\"']"
+        },
+        "restartTimeout": {
+          "type": "string",
+          "description": "Restart timeout specified as a string of magnitude and unit, e.g. '5m' (5 minutes) or '2h' (2 hours) [Default: '5m']"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "WindowsRestart"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Reboots a VM and waits for it to come back online (Windows). Corresponds to Packer windows-restart provisioner"
+    },
+    "ImageTemplateSharedImageDistributor": {
+      "type": "object",
+      "properties": {
+        "galleryImageId": {
+          "type": "string",
+          "description": "Resource Id of the Shared Image Gallery image"
+        },
+        "replicationRegions": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "SharedImage"
+          ]
+        }
+      },
+      "required": [
+        "galleryImageId",
+        "replicationRegions",
+        "type"
+      ],
+      "description": "Distribute via Shared Image Gallery."
+    },
+    "ImageTemplateShellCustomizer": {
+      "type": "object",
+      "properties": {
+        "inline": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Array of shell commands to execute"
+        },
+        "script": {
+          "type": "string",
+          "description": "The shell script to be run for customizing. It can be a github link, SAS URI for Azure Storage, etc"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Shell"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Runs a shell script during the customization phase (Linux). Corresponds to Packer shell provisioner. Exactly one of 'script' or 'inline' can be specified."
+    },
+    "ImageTemplateSource": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/ImageTemplateIsoSource"
+        },
+        {
+          "$ref": "#/definitions/ImageTemplatePlatformImageSource"
+        },
+        {
+          "$ref": "#/definitions/ImageTemplateManagedImageSource"
+        }
+      ],
+      "properties": {}
+    },
+    "ImageTemplateVhdDistributor": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "VHD"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Distribute via VHD in a storage account."
+    }
+  }
+}

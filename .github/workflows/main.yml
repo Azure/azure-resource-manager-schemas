@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ master ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2.1.2
+        with:
+          node-version: 14.x
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1.7.2
+
+      - name: Install NPM modules
+        run: npm ci
+        working-directory: ./tools
+
+      - name: Run CI tests
+        run: npm test
+        working-directory: ./tools
+
+      - name: Deployments Schema tests
+        run: dotnet test DeploymentsSchemaTests/DeploymentsSchemaTests.csproj
+        working-directory: ./tools
+
+  automerge:
+    runs-on: ubuntu-latest
+    needs: build
+    env:
+      PR_PREFIX: sdkAuto/
+    if: ${{ github.event.pull_request.user.login == 'openapi-sdkautomation[bot]' }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2.1.2
+        with:
+          node-version: 14.x
+
+      - name: Install NPM modules
+        run: npm ci
+        working-directory: ./generator
+
+      - name: Check RP in Autogenlist
+        run: |
+          check_result='';
+          exec=$(npm run find-basepath ${{ github.head_ref }} $PR_PREFIX); 
+          while read line; 
+          do
+            # overriding check_result until the last line is read, last line contains
+            # the result to whether or not the basepath was found in autogenlist.
+            check_result=$line; 
+            echo $check_result;
+          done <<< "$exec";
+          
+          if [ $check_result == 'false' ] ; then
+            exit 1
+          fi
+        working-directory: ./generator

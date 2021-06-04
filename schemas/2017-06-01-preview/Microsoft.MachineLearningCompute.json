@@ -7,24 +7,6 @@
     "operationalizationClusters": {
       "type": "object",
       "properties": {
-        "name": {
-          "oneOf": [
-            {
-              "type": "string",
-              "pattern": "^[a-zA-Z][-\\w\\._\\(\\)]+[a-zA-Z0-9]$"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "The name of the cluster."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.MachineLearningCompute/operationalizationClusters"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
@@ -35,19 +17,19 @@
           "type": "string",
           "description": "Specifies the location of the resource."
         },
-        "tags": {
+        "name": {
           "oneOf": [
             {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
+              "type": "string",
+              "pattern": "^[a-zA-Z][-\\w\\._\\(\\)]+[a-zA-Z0-9]$",
+              "minLength": 1,
+              "maxLength": 90
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Contains resource tags defined as key/value pairs."
+          "description": "The name of the cluster."
         },
         "properties": {
           "oneOf": [
@@ -55,18 +37,39 @@
               "$ref": "#/definitions/OperationalizationClusterProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Properties of an operationalization cluster"
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Contains resource tags defined as key/value pairs."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.MachineLearningCompute/operationalizationClusters"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
         "location",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.MachineLearningCompute/operationalizationClusters"
     }
@@ -75,49 +78,6 @@
     "AcsClusterProperties": {
       "type": "object",
       "properties": {
-        "orchestratorType": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Kubernetes"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Type of orchestrator. It cannot be changed once the cluster is created."
-        },
-        "orchestratorProperties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/KubernetesClusterProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Kubernetes cluster specific properties"
-        },
-        "systemServices": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "enum": [
-                  "Scoring",
-                  "Batch"
-                ]
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "The system services deployed to the cluster"
-        },
         "agentCount": {
           "oneOf": [
             {
@@ -127,7 +87,7 @@
               "default": "2"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The number of agent nodes in the Container Service. This can be changed to scale the cluster."
@@ -187,28 +147,71 @@
               ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The Azure VM size of the agent VM nodes. This cannot be changed once the cluster is created."
+        },
+        "orchestratorProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/KubernetesClusterProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Kubernetes cluster specific properties"
+        },
+        "orchestratorType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Kubernetes"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Type of orchestrator. It cannot be changed once the cluster is created."
+        },
+        "systemServices": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Scoring",
+                  "Batch"
+                ]
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The system services deployed to the cluster"
         }
       },
       "required": [
-        "orchestratorType",
-        "orchestratorProperties"
+        "orchestratorProperties",
+        "orchestratorType"
       ],
       "description": "Information about the container service backing the cluster"
     },
     "AppInsightsCredentials": {
       "type": "object",
       "properties": {
-        "appId": {
-          "type": "string",
-          "description": "The AppInsights application ID."
-        },
         "apiKey": {
           "type": "string",
           "description": "The AppInsights API key. This is not returned in response of GET/PUT on the resource.. To see this please call listKeys API."
+        },
+        "appId": {
+          "type": "string",
+          "description": "The AppInsights application ID."
         }
       },
       "description": "AppInsights credentials."
@@ -216,6 +219,43 @@
     "AutoScaleConfiguration": {
       "type": "object",
       "properties": {
+        "maxReplicas": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "default": "100"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The maximum number of replicas for each service."
+        },
+        "minReplicas": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "default": "1"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The minimum number of replicas for each service."
+        },
+        "refreshPeriodInSeconds": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Refresh period in seconds."
+        },
         "status": {
           "oneOf": [
             {
@@ -226,36 +266,10 @@
               ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "If auto-scale is enabled for all services. Each service can turn it off individually."
-        },
-        "minReplicas": {
-          "oneOf": [
-            {
-              "type": "integer",
-              "minimum": 1,
-              "default": "1"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "The minimum number of replicas for each service."
-        },
-        "maxReplicas": {
-          "oneOf": [
-            {
-              "type": "integer",
-              "minimum": 1,
-              "default": "100"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "The maximum number of replicas for each service."
         },
         "targetUtilization": {
           "oneOf": [
@@ -263,21 +277,10 @@
               "type": "number"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The target utilization."
-        },
-        "refreshPeriodInSeconds": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Refresh period in seconds."
         }
       },
       "description": "AutoScale configuration properties."
@@ -301,39 +304,14 @@
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              }
+              },
+              "properties": {}
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Unmatched properties from the message are deserialized this collection"
-        },
-        "etag": {
-          "type": "string",
-          "description": "The configuration ETag for updates."
-        },
-        "ssl": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/SslConfiguration"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "SSL configuration. If configured data-plane calls to user services will be exposed over SSL only."
-        },
-        "serviceAuth": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ServiceAuthConfiguration"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Global service auth configuration properties. These are the data-plane authorization keys and are used if a service doesn't define it's own."
         },
         "autoScale": {
           "oneOf": [
@@ -341,10 +319,36 @@
               "$ref": "#/definitions/AutoScaleConfiguration"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "AutoScale configuration properties."
+        },
+        "etag": {
+          "type": "string",
+          "description": "The configuration ETag for updates."
+        },
+        "serviceAuth": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ServiceAuthConfiguration"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Global service auth configuration properties. These are the data-plane authorization keys and are used if a service doesn't define it's own."
+        },
+        "ssl": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SslConfiguration"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "SSL configuration. If configured data-plane calls to user services will be exposed over SSL only."
         }
       },
       "description": "Global configuration for services in the cluster."
@@ -358,7 +362,7 @@
               "$ref": "#/definitions/ServicePrincipalProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The Azure service principal used by Kubernetes for configuring load balancers"
@@ -372,9 +376,16 @@
     "OperationalizationClusterProperties": {
       "type": "object",
       "properties": {
-        "description": {
-          "type": "string",
-          "description": "The description of the cluster."
+        "appInsights": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AppInsightsCredentials"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "AppInsights credentials."
         },
         "clusterType": {
           "oneOf": [
@@ -385,21 +396,10 @@
               ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The cluster type."
-        },
-        "storageAccount": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/StorageAccountProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Properties of Storage Account."
         },
         "containerRegistry": {
           "oneOf": [
@@ -407,7 +407,7 @@
               "$ref": "#/definitions/ContainerRegistryProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Properties of Azure Container Registry."
@@ -418,21 +418,14 @@
               "$ref": "#/definitions/AcsClusterProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Information about the container service backing the cluster"
         },
-        "appInsights": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/AppInsightsCredentials"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "AppInsights credentials."
+        "description": {
+          "type": "string",
+          "description": "The description of the cluster."
         },
         "globalServiceConfiguration": {
           "oneOf": [
@@ -440,10 +433,21 @@
               "$ref": "#/definitions/GlobalServiceConfiguration"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "Global configuration for services in the cluster."
+        },
+        "storageAccount": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/StorageAccountProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of Storage Account."
         }
       },
       "required": [
@@ -491,6 +495,14 @@
     "SslConfiguration": {
       "type": "object",
       "properties": {
+        "cert": {
+          "type": "string",
+          "description": "The SSL cert data in PEM format encoded as base64 string"
+        },
+        "key": {
+          "type": "string",
+          "description": "The SSL key data in PEM format encoded as base64 string. This is not returned in response of GET/PUT on the resource.. To see this please call listKeys API."
+        },
         "status": {
           "oneOf": [
             {
@@ -501,18 +513,10 @@
               ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "SSL status. Allowed values are Enabled and Disabled."
-        },
-        "cert": {
-          "type": "string",
-          "description": "The SSL cert data in PEM format encoded as base64 string"
-        },
-        "key": {
-          "type": "string",
-          "description": "The SSL key data in PEM format encoded as base64 string. This is not returned in response of GET/PUT on the resource.. To see this please call listKeys API."
         }
       },
       "description": "SSL configuration. If configured data-plane calls to user services will be exposed over SSL only."

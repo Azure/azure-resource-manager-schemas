@@ -1,1 +1,0 @@
-rmdir /S /Q js-coverage

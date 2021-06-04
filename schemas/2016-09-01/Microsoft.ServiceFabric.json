@@ -7,17 +7,19 @@
     "clusters": {
       "type": "object",
       "properties": {
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.ServiceFabric/clusters"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
             "2016-09-01"
           ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Resource location."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the cluster resource"
         },
         "properties": {
           "oneOf": [
@@ -25,30 +27,72 @@
               "$ref": "#/definitions/ClusterProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Gets or sets the cluster properties."
+          "description": "The cluster resource properties"
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Resource tags."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ServiceFabric/clusters"
+          ]
         }
       },
       "required": [
-        "type",
         "apiVersion",
-        "properties"
+        "location",
+        "name",
+        "properties",
+        "type"
       ],
-      "description": "Microsoft.ServiceFabric/clusters: ServiceFabric cluster resource."
+      "description": "Microsoft.ServiceFabric/clusters"
     }
   },
   "definitions": {
+    "AzureActiveDirectory": {
+      "type": "object",
+      "properties": {
+        "clientApplication": {
+          "type": "string",
+          "description": "Azure active directory client application id"
+        },
+        "clusterApplication": {
+          "type": "string",
+          "description": "Azure active directory cluster application id"
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Azure active directory tenant id"
+        }
+      },
+      "description": "The settings to enable AAD authentication on the cluster"
+    },
     "CertificateDescription": {
       "type": "object",
       "properties": {
         "thumbprint": {
           "type": "string",
-          "minLength": 1
+          "description": "Thumbprint of the primary certificate"
         },
         "thumbprintSecondary": {
-          "type": "string"
+          "type": "string",
+          "description": "Thumbprint of the secondary certificate"
         },
         "x509StoreName": {
           "oneOf": [
@@ -66,353 +110,242 @@
               ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "required": [
-        "thumbprint",
-        "x509StoreName"
-      ]
-    },
-    "AzureActiveDirectory": {
-      "type": "object",
-      "properties": {
-        "tenantId": {
-          "type": "string",
-          "minLength": 1
-        },
-        "clusterApplication": {
-          "type": "string",
-          "minLength": 1
-        },
-        "clientApplication": {
-          "type": "string",
-          "minLength": 1
-        }
-      },
-      "required": [
-        "tenantId",
-        "clusterApplication",
-        "clientApplication"
-      ]
-    },
-    "NodeTypes": {
-      "type": "object",
-      "properties": {
-        "reverseProxyEndpointPort": {
-          "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/numberOrExpression"
-        },
-        "durabilityLevel": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/Level"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "This level is used to set the durability of nodes of this type."
-        },
-        "vmInstanceCount": {
-          "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/numberOrExpression",
-          "minimum": 1,
-          "maximum": 2147483647
-        },
-        "name": {
-          "type": "string",
-          "minLength": 1
-        },
-        "placementProperties": {
-          "oneOf": [
-            {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ]
-        },
-        "capacities": {
-          "oneOf": [
-            {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ]
-        },
-        "clientConnectionEndpointPort": {
-          "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/numberOrExpression"
-        },
-        "httpGatewayEndpointPort": {
-          "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/numberOrExpression"
-        },
-        "applicationPorts": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/Ports"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ]
-        },
-        "ephemeralPorts": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/Ports"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ]
-        },
-        "isPrimary": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ]
+          "description": "The local certificate store location."
         }
       },
       "required": [
-        "vmInstanceCount",
-        "name",
-        "clientConnectionEndpointPort",
-        "httpGatewayEndpointPort",
-        "isPrimary"
-      ]
-    },
-    "Ports": {
-      "type": "object",
-      "properties": {
-        "startPort": {
-          "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/numberOrExpression"
-        },
-        "endPort": {
-          "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/numberOrExpression"
-        }
-      },
-      "required": [
-        "startPort",
-        "endPort"
-      ]
-    },
-    "Level": {
-      "type": "string",
-      "enum": [
-        "Bronze",
-        "Silver",
-        "Gold",
-        "Platinum"
-      ]
-    },
-    "ClientCertificateThumbprint": {
-      "type": "object",
-      "properties": {
-        "isAdmin": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ]
-        },
-        "certificateThumbprint": {
-          "type": "string",
-          "minLength": 1
-        }
-      },
-      "required": [
-        "isAdmin",
-        "certificateThumbprint"
-      ]
+        "thumbprint"
+      ],
+      "description": "Certificate details"
     },
     "ClientCertificateCommonName": {
       "type": "object",
       "properties": {
+        "certificateCommonName": {
+          "type": "string",
+          "description": "Certificate common name to be granted access; be careful using wild card common names"
+        },
+        "certificateIssuerThumbprint": {
+          "type": "string",
+          "description": "Certificate issuer thumbprint"
+        },
         "isAdmin": {
           "oneOf": [
             {
               "type": "boolean"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
-        },
-        "certificateCommonName": {
-          "type": "string",
-          "minLength": 1
-        },
-        "certificateIssuerThumbprint": {
-          "type": "string",
-          "minLength": 1
+          ],
+          "description": "Is this certificate used for admin access from the client, if false , it is used or query only access"
         }
       },
       "required": [
-        "isAdmin",
         "certificateCommonName",
-        "certificateIssuerThumbprint"
-      ]
+        "certificateIssuerThumbprint",
+        "isAdmin"
+      ],
+      "description": "Client certificate details using common name"
     },
-    "SettingsSectionDescription": {
+    "ClientCertificateThumbprint": {
       "type": "object",
       "properties": {
-        "name": {
+        "certificateThumbprint": {
           "type": "string",
-          "minLength": 1
+          "description": "Certificate thumbprint"
         },
-        "parameters": {
-          "type": "array",
-          "items": {
-            "oneOf": [
-              {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string",
-                    "minLength": 1
-                  },
-                  "value": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "name",
-                  "value"
-                ]
-              },
-              {
-                "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-              }
-            ]
-          }
+        "isAdmin": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Is this certificate used for admin access from the client, if false, it is used or query only access"
         }
       },
       "required": [
-        "name",
-        "parameters"
-      ]
+        "certificateThumbprint",
+        "isAdmin"
+      ],
+      "description": "Client certificate details using thumbprint"
     },
-    "PaasClusterUpgradePolicy": {
+    "ClusterHealthPolicy": {
       "type": "object",
       "properties": {
-        "upgradeReplicaSetCheckTimeout": {
-          "type": "string"
-        },
-        "healthCheckWaitDuration": {
-          "type": "string"
-        },
-        "healthCheckStableDuration": {
-          "type": "string"
-        },
-        "healthCheckRetryTimeout": {
-          "type": "string"
-        },
-        "upgradeTimeout": {
-          "type": "string"
-        },
-        "upgradeDomainTimeout": {
-          "type": "string"
-        },
-        "healthPolicy": {
-          "type": "object",
-          "properties": {
-            "maxPercentUnhealthyNodes": {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/numberOrExpression"
+        "maxPercentUnhealthyApplications": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
             },
-            "maxPercentUnhealthyApplications": {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/numberOrExpression"
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "maxPercentUnhealthyNodes",
-            "maxPercentUnhealthyApplications"
-          ]
+          ],
+          "description": "The maximum allowed percentage of unhealthy applications before reporting an error. For example, to allow 10% of applications to be unhealthy, this value would be 10. "
         },
-        "deltaHealthPolicy": {
-          "type": "object",
-          "properties": {
-            "maxPercentDeltaUnhealthyNodes": {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/numberOrExpression"
+        "maxPercentUnhealthyNodes": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
             },
-            "maxPercentUpgradeDomainDeltaUnhealthyNodes": {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/numberOrExpression"
-            },
-            "maxPercentDeltaUnhealthyApplications": {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/numberOrExpression"
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "maxPercentDeltaUnhealthyNodes",
-            "maxPercentUpgradeDomainDeltaUnhealthyNodes",
-            "maxPercentDeltaUnhealthyApplications"
-          ]
+          ],
+          "description": "The maximum allowed percentage of unhealthy nodes before reporting an error. For example, to allow 10% of nodes to be unhealthy, this value would be 10. "
         }
       },
-      "required": [
-        "upgradeReplicaSetCheckTimeout",
-        "healthCheckWaitDuration",
-        "healthCheckStableDuration",
-        "healthCheckRetryTimeout",
-        "upgradeTimeout",
-        "upgradeDomainTimeout",
-        "healthPolicy"
-      ]
-    },
-    "DiagnosticsStorageAccountConfig": {
-      "type": "object",
-      "properties": {
-        "storageAccountName": {
-          "type": "string",
-          "minLength": 1
-        },
-        "protectedAccountKeyName": {
-          "type": "string"
-        },
-        "blobEndpoint": {
-          "type": "string"
-        },
-        "queueEndpoint": {
-          "type": "string"
-        },
-        "tableEndpoint": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "storageAccountName",
-        "protectedAccountKeyName",
-        "blobEndpoint",
-        "queueEndpoint",
-        "tableEndpoint"
-      ]
+      "description": "Defines a health policy used to evaluate the health of the cluster or of a cluster node."
     },
     "ClusterProperties": {
       "type": "object",
       "properties": {
-        "vmImage": {
-          "type": "string",
-          "description": "Microsoft.ServiceFabric/clusters: The name of VM image VMSS has been configured with. Generic names such as Windows or Linux can be used."
+        "azureActiveDirectory": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AzureActiveDirectory"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The settings to enable AAD authentication on the cluster"
+        },
+        "certificate": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CertificateDescription"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Certificate details"
+        },
+        "clientCertificateCommonNames": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ClientCertificateCommonName"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": " List of client certificates to whitelist based on common names"
+        },
+        "clientCertificateThumbprints": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ClientCertificateThumbprint"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The client thumbprint details ,it is used for client access for cluster operation"
         },
         "clusterCodeVersion": {
           "type": "string",
-          "description": "Microsoft.ServiceFabric/clusters: The ServiceFabric runtime version of the cluster."
+          "description": "The ServiceFabric code version running in your cluster"
+        },
+        "diagnosticsStorageAccountConfig": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DiagnosticsStorageAccountConfig"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Diagnostics storage account config"
+        },
+        "fabricSettings": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SettingsSectionDescription"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of custom fabric settings to configure the cluster."
+        },
+        "managementEndpoint": {
+          "type": "string",
+          "description": "The http management endpoint of the cluster"
+        },
+        "nodeTypes": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/NodeTypeDescription"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of node types that make up the cluster"
+        },
+        "reliabilityLevel": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Bronze",
+                "Silver",
+                "Gold",
+                "Platinum"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Cluster reliability level indicates replica set size of system service."
+        },
+        "reverseProxyCertificate": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CertificateDescription"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Certificate details"
+        },
+        "upgradeDescription": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ClusterUpgradePolicy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Cluster upgrade policy"
         },
         "upgradeMode": {
           "oneOf": [
@@ -424,144 +357,407 @@
               ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Microsoft.ServiceFabric/clusters: The ServiceFabric runtime version of the cluster."
+          "description": "Cluster upgrade mode indicates if fabric upgrade is initiated automatically by the system or not."
         },
-        "reverseProxyCertificate": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/CertificateDescription"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Microsoft.ServiceFabric/clusters: The server certificate used by reverse proxy."
-        },
-        "azureActiveDirectory": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/AzureActiveDirectory"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Microsoft.ServiceFabric/clusters: The settings to enable AAD authentication on the cluster."
-        },
-        "reliabilityLevel": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/Level"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Microsoft.ServiceFabric/clusters: This level is used to set the number of replicas of the system services. Details: http://azure.microsoft.com/en-us/documentation/articles/service-fabric-cluster-capacity/#the-reliability-characteristics-of-the-cluster"
-        },
-        "nodeTypes": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/NodeTypes"
-              },
-              "minItems": 1
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Microsoft.ServiceFabric/clusters: The node types of the cluster. Details: http://azure.microsoft.com/en-us/documentation/articles/service-fabric-cluster-capacity"
-        },
-        "managementEndpoint": {
+        "vmImage": {
           "type": "string",
-          "minLength": 1,
-          "description": "Microsoft.ServiceFabric/clusters: The http management endpoint of the cluster."
-        },
-        "certificate": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/CertificateDescription"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Microsoft.ServiceFabric/clusters: The certificate to use for node to node communication within cluster, the server certificate of the cluster and the default admin client."
-        },
-        "clientCertificateThumbprints": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/ClientCertificateThumbprint"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Microsoft.ServiceFabric/clusters: List of client certificates to whitelist based on thumbprints."
-        },
-        "clientCertificateCommonNames": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/ClientCertificateCommonName"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Microsoft.ServiceFabric/clusters: List of client certificates to whitelist based on common names."
-        },
-        "fabricSettings": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/SettingsSectionDescription"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Microsoft.ServiceFabric/clusters: List of custom fabric settings to configure the cluster."
-        },
-        "upgradeDescription": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/PaasClusterUpgradePolicy"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Microsoft.ServiceFabric/clusters: The policy to use when upgrading the cluster."
-        },
-        "diagnosticsStorageAccountConfig": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DiagnosticsStorageAccountConfig"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Microsoft.ServiceFabric/clusters: The azure storage account information for uploading cluster logs."
+          "description": "The name of VM image VMSS has been configured with. Generic names such as Windows or Linux can be used."
         }
       },
       "required": [
-        "nodeTypes",
-        "managementEndpoint"
-      ]
+        "managementEndpoint",
+        "nodeTypes"
+      ],
+      "description": "The cluster resource properties"
+    },
+    "ClusterUpgradeDeltaHealthPolicy": {
+      "type": "object",
+      "properties": {
+        "maxPercentDeltaUnhealthyApplications": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Additional unhealthy applications percentage"
+        },
+        "maxPercentDeltaUnhealthyNodes": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Additional unhealthy nodes percentage"
+        },
+        "maxPercentUpgradeDomainDeltaUnhealthyNodes": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Additional unhealthy nodes percentage per upgrade domain "
+        }
+      },
+      "required": [
+        "maxPercentDeltaUnhealthyApplications",
+        "maxPercentDeltaUnhealthyNodes",
+        "maxPercentUpgradeDomainDeltaUnhealthyNodes"
+      ],
+      "description": "Delta health policy for the cluster"
+    },
+    "ClusterUpgradePolicy": {
+      "type": "object",
+      "properties": {
+        "deltaHealthPolicy": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ClusterUpgradeDeltaHealthPolicy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Delta health policy for the cluster"
+        },
+        "forceRestart": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Force node to restart or not"
+        },
+        "healthCheckRetryTimeout": {
+          "type": "string",
+          "description": "The length of time that health checks can fail continuously,it represents .Net TimeSpan"
+        },
+        "healthCheckStableDuration": {
+          "type": "string",
+          "description": "The length of time that health checks must pass continuously,it represents .Net TimeSpan"
+        },
+        "healthCheckWaitDuration": {
+          "type": "string",
+          "description": "The length of time to wait after completing an upgrade domain before performing health checks, it represents .Net TimeSpan"
+        },
+        "healthPolicy": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ClusterHealthPolicy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Defines a health policy used to evaluate the health of the cluster or of a cluster node."
+        },
+        "overrideUserUpgradePolicy": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Use the user defined upgrade policy or not"
+        },
+        "upgradeDomainTimeout": {
+          "type": "string",
+          "description": "The timeout for any upgrade domain,it represents .Net TimeSpan"
+        },
+        "upgradeReplicaSetCheckTimeout": {
+          "type": "string",
+          "description": "Timeout for replica set upgrade to complete,it represents .Net TimeSpan"
+        },
+        "upgradeTimeout": {
+          "type": "string",
+          "description": "The upgrade timeout,it represents .Net TimeSpan"
+        }
+      },
+      "required": [
+        "healthCheckRetryTimeout",
+        "healthCheckStableDuration",
+        "healthCheckWaitDuration",
+        "healthPolicy",
+        "upgradeDomainTimeout",
+        "upgradeReplicaSetCheckTimeout",
+        "upgradeTimeout"
+      ],
+      "description": "Cluster upgrade policy"
+    },
+    "DiagnosticsStorageAccountConfig": {
+      "type": "object",
+      "properties": {
+        "blobEndpoint": {
+          "type": "string",
+          "description": "Diagnostics storage account blob endpoint"
+        },
+        "protectedAccountKeyName": {
+          "type": "string",
+          "description": "Protected Diagnostics storage key name"
+        },
+        "queueEndpoint": {
+          "type": "string",
+          "description": "Diagnostics storage account queue endpoint"
+        },
+        "storageAccountName": {
+          "type": "string",
+          "description": "Diagnostics storage account name"
+        },
+        "tableEndpoint": {
+          "type": "string",
+          "description": "Diagnostics storage account table endpoint"
+        }
+      },
+      "required": [
+        "blobEndpoint",
+        "protectedAccountKeyName",
+        "queueEndpoint",
+        "storageAccountName",
+        "tableEndpoint"
+      ],
+      "description": "Diagnostics storage account config"
+    },
+    "EndpointRangeDescription": {
+      "type": "object",
+      "properties": {
+        "endPort": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "End port of a range of ports"
+        },
+        "startPort": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Starting port of a range of ports"
+        }
+      },
+      "required": [
+        "endPort",
+        "startPort"
+      ],
+      "description": "Port range details"
+    },
+    "NodeTypeDescription": {
+      "type": "object",
+      "properties": {
+        "applicationPorts": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EndpointRangeDescription"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Port range details"
+        },
+        "capacities": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The capacity tags applied to the nodes in the node type, the cluster resource manager uses these tags to understand how much of a resource a node has"
+        },
+        "clientConnectionEndpointPort": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The TCP cluster management endpoint port"
+        },
+        "durabilityLevel": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Bronze",
+                "Silver",
+                "Gold"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Node type durability Level."
+        },
+        "ephemeralPorts": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EndpointRangeDescription"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Port range details"
+        },
+        "httpGatewayEndpointPort": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The HTTP cluster management endpoint port"
+        },
+        "isPrimary": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Mark this as the primary node type"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the node type"
+        },
+        "placementProperties": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The placement tags applied to nodes in the node type, which can be used to indicate where certain services (workload) should run"
+        },
+        "reverseProxyEndpointPort": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Endpoint used by reverse proxy"
+        },
+        "vmInstanceCount": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2147483647
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The number of node instances in the node type"
+        }
+      },
+      "required": [
+        "clientConnectionEndpointPort",
+        "httpGatewayEndpointPort",
+        "isPrimary",
+        "name",
+        "vmInstanceCount"
+      ],
+      "description": "Describes a node type in the cluster, each node type represents sub set of nodes in the cluster"
+    },
+    "SettingsParameterDescription": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of settings property"
+        },
+        "value": {
+          "type": "string",
+          "description": "The value of the property"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "description": "ServiceFabric settings under sections"
+    },
+    "SettingsSectionDescription": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of settings section"
+        },
+        "parameters": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SettingsParameterDescription"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Collection of settings in the section, each setting is a tuple consisting of setting name and value"
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "description": "ServiceFabric section settings"
     }
   }
 }

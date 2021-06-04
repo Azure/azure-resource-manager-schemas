@@ -7,41 +7,21 @@
     "workspaces": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "minLength": 3,
-          "maxLength": 64,
-          "description": "The name of the workspace."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.Databricks/workspaces"
-          ]
-        },
         "apiVersion": {
           "type": "string",
           "enum": [
             "2018-04-01"
           ]
         },
-        "tags": {
-          "oneOf": [
-            {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
-            }
-          ],
-          "description": "Resource tags."
-        },
         "location": {
           "type": "string",
           "description": "The geo-location where the resource lives"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 64,
+          "description": "The name of the workspace."
         },
         "properties": {
           "oneOf": [
@@ -49,10 +29,20 @@
               "$ref": "#/definitions/WorkspaceProperties"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The workspace properties."
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/workspaces_virtualNetworkPeerings_childResource"
+              }
+            ]
+          }
         },
         "sku": {
           "oneOf": [
@@ -60,23 +50,146 @@
               "$ref": "#/definitions/Sku"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "SKU for the resource."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Resource tags."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Databricks/workspaces"
+          ]
         }
       },
       "required": [
-        "name",
-        "type",
         "apiVersion",
         "location",
-        "properties"
+        "name",
+        "properties",
+        "type"
       ],
       "description": "Microsoft.Databricks/workspaces"
+    },
+    "workspaces_virtualNetworkPeerings": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-04-01"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the workspace vNet peering."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/VirtualNetworkPeeringPropertiesFormat"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the virtual network peering."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Databricks/workspaces/virtualNetworkPeerings"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.Databricks/workspaces/virtualNetworkPeerings"
     }
   },
   "definitions": {
+    "AddressSpace": {
+      "type": "object",
+      "properties": {
+        "addressPrefixes": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A list of address blocks reserved for this virtual network in CIDR notation."
+        }
+      },
+      "description": "AddressSpace contains an array of IP address ranges that can be used by subnets of the virtual network."
+    },
+    "CreatedBy": {
+      "type": "object",
+      "properties": {},
+      "description": "Provides details of the entity that created/updated the workspace."
+    },
+    "Encryption": {
+      "type": "object",
+      "properties": {
+        "KeyName": {
+          "type": "string",
+          "description": "The name of KeyVault key."
+        },
+        "keySource": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Default",
+                "Microsoft.Keyvault"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The encryption keySource (provider). Possible values (case-insensitive):  Default, Microsoft.Keyvault."
+        },
+        "keyvaulturi": {
+          "type": "string",
+          "description": "The Uri of KeyVault."
+        },
+        "keyversion": {
+          "type": "string",
+          "description": "The version of KeyVault key."
+        }
+      },
+      "description": "The object that contains details of encryption used on the workspace."
+    },
+    "ManagedIdentityConfiguration": {
+      "type": "object",
+      "properties": {},
+      "description": "The Managed Identity details for storage account."
+    },
     "Sku": {
       "type": "object",
       "properties": {
@@ -94,20 +207,395 @@
       ],
       "description": "SKU for the resource."
     },
+    "VirtualNetworkPeeringPropertiesFormat": {
+      "type": "object",
+      "properties": {
+        "allowForwardedTraffic": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether the forwarded traffic from the VMs in the local virtual network will be allowed/disallowed in remote virtual network."
+        },
+        "allowGatewayTransit": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "If gateway links can be used in remote virtual networking to link to this virtual network."
+        },
+        "allowVirtualNetworkAccess": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether the VMs in the local virtual network space would be able to access the VMs in remote virtual network space."
+        },
+        "databricksAddressSpace": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AddressSpace"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "AddressSpace contains an array of IP address ranges that can be used by subnets of the virtual network."
+        },
+        "databricksVirtualNetwork": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/VirtualNetworkPeeringPropertiesFormatDatabricksVirtualNetwork"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": " The remote virtual network should be in the same region. See here to learn more (https://docs.microsoft.com/en-us/azure/databricks/administration-guide/cloud-configurations/azure/vnet-peering)."
+        },
+        "remoteAddressSpace": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AddressSpace"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "AddressSpace contains an array of IP address ranges that can be used by subnets of the virtual network."
+        },
+        "remoteVirtualNetwork": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/VirtualNetworkPeeringPropertiesFormatRemoteVirtualNetwork"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": " The remote virtual network should be in the same region. See here to learn more (https://docs.microsoft.com/en-us/azure/databricks/administration-guide/cloud-configurations/azure/vnet-peering)."
+        },
+        "useRemoteGateways": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "If remote gateways can be used on this virtual network. If the flag is set to true, and allowGatewayTransit on remote peering is also true, virtual network will use gateways of remote virtual network for transit. Only one peering can have this flag set to true. This flag cannot be set if virtual network already has a gateway."
+        }
+      },
+      "required": [
+        "remoteVirtualNetwork"
+      ],
+      "description": "Properties of the virtual network peering."
+    },
+    "VirtualNetworkPeeringPropertiesFormatDatabricksVirtualNetwork": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The Id of the databricks virtual network."
+        }
+      },
+      "description": " The remote virtual network should be in the same region. See here to learn more (https://docs.microsoft.com/en-us/azure/databricks/administration-guide/cloud-configurations/azure/vnet-peering)."
+    },
+    "VirtualNetworkPeeringPropertiesFormatRemoteVirtualNetwork": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The Id of the remote virtual network."
+        }
+      },
+      "description": " The remote virtual network should be in the same region. See here to learn more (https://docs.microsoft.com/en-us/azure/databricks/administration-guide/cloud-configurations/azure/vnet-peering)."
+    },
+    "WorkspaceCustomBooleanParameter": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Bool",
+                "Object",
+                "String"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The type of variable that this is."
+        },
+        "value": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The value which should be used for this field."
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "description": "The value which should be used for this field."
+    },
+    "WorkspaceCustomParameters": {
+      "type": "object",
+      "properties": {
+        "amlWorkspaceId": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WorkspaceCustomStringParameter"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Value."
+        },
+        "customPrivateSubnetName": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WorkspaceCustomStringParameter"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Value."
+        },
+        "customPublicSubnetName": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WorkspaceCustomStringParameter"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Value."
+        },
+        "customVirtualNetworkId": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WorkspaceCustomStringParameter"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Value."
+        },
+        "enableNoPublicIp": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WorkspaceCustomBooleanParameter"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The value which should be used for this field."
+        },
+        "encryption": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WorkspaceEncryptionParameter"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The object that contains details of encryption used on the workspace."
+        },
+        "loadBalancerBackendPoolName": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WorkspaceCustomStringParameter"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Value."
+        },
+        "loadBalancerId": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WorkspaceCustomStringParameter"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Value."
+        },
+        "natGatewayName": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WorkspaceCustomStringParameter"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Value."
+        },
+        "prepareEncryption": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WorkspaceCustomBooleanParameter"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The value which should be used for this field."
+        },
+        "publicIpName": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WorkspaceCustomStringParameter"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Value."
+        },
+        "requireInfrastructureEncryption": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WorkspaceCustomBooleanParameter"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The value which should be used for this field."
+        },
+        "storageAccountName": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WorkspaceCustomStringParameter"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Value."
+        },
+        "storageAccountSkuName": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WorkspaceCustomStringParameter"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Value."
+        },
+        "vnetAddressPrefix": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WorkspaceCustomStringParameter"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Value."
+        }
+      },
+      "description": "Custom Parameters used for Cluster Creation."
+    },
+    "WorkspaceCustomStringParameter": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Bool",
+                "Object",
+                "String"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The type of variable that this is."
+        },
+        "value": {
+          "type": "string",
+          "description": "The value which should be used for this field."
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "description": "The Value."
+    },
+    "WorkspaceEncryptionParameter": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Bool",
+                "Object",
+                "String"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The type of variable that this is."
+        },
+        "value": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Encryption"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The object that contains details of encryption used on the workspace."
+        }
+      },
+      "description": "The object that contains details of encryption used on the workspace."
+    },
     "WorkspaceProperties": {
       "type": "object",
       "properties": {
-        "managedResourceGroupId": {
-          "type": "string",
-          "description": "The managed resource group Id."
-        },
-        "parameters": {
-          "description": "Name and value pairs that define the workspace parameters."
-        },
-        "uiDefinitionUri": {
-          "type": "string",
-          "description": "The blob URI where the UI definition file is located."
-        },
         "authorizations": {
           "oneOf": [
             {
@@ -117,10 +605,67 @@
               }
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The workspace provider authorizations."
+        },
+        "createdBy": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CreatedBy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Provides details of the entity that created/updated the workspace."
+        },
+        "createdDateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time stamp when the workspace was created."
+        },
+        "managedResourceGroupId": {
+          "type": "string",
+          "description": "The managed resource group Id."
+        },
+        "parameters": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WorkspaceCustomParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Custom Parameters used for Cluster Creation."
+        },
+        "storageAccountIdentity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ManagedIdentityConfiguration"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Managed Identity details for storage account."
+        },
+        "uiDefinitionUri": {
+          "type": "string",
+          "description": "The blob URI where the UI definition file is located."
+        },
+        "updatedBy": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CreatedBy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Provides details of the entity that created/updated the workspace."
         }
       },
       "required": [
@@ -138,7 +683,7 @@
               "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The provider's principal identifier. This is the identity that the provider will use to call ARM to manage the workspace resources."
@@ -150,7 +695,7 @@
               "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$"
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#/definitions/expression"
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
           "description": "The provider's role definition identifier. This role will define all the permissions that the provider must have on the workspace's container resource group. This role definition cannot have permission to delete the resource group."
@@ -161,6 +706,45 @@
         "roleDefinitionId"
       ],
       "description": "The workspace provider authorization."
+    },
+    "workspaces_virtualNetworkPeerings_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-04-01"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the workspace vNet peering."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/VirtualNetworkPeeringPropertiesFormat"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of the virtual network peering."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "virtualNetworkPeerings"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.Databricks/workspaces/virtualNetworkPeerings"
     }
   }
 }

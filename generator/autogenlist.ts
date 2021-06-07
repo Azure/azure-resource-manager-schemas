@@ -1,11 +1,13 @@
-import { ScopeType, AutogenlistConfig } from './models';
+import { ScopeType, AutoGenConfig } from './models';
+import { postProcessor as insightsApplicationPostProcessor } from './processors/Microsoft.Insights.Application';
 import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
 import { postProcessor as machineLearningPostProcessor } from './processors/Microsoft.MachineLearning';
+import { postProcessor as machineLearningServicesPostProcessor } from './processors/Microsoft.MachineLearningServices';
 import { postProcessor as storageProcessor } from './processors/Microsoft.Storage';
 import { lowerCaseEquals } from './utils';
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
-const autogenlist: AutogenlistConfig[] = [
+const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'addons/resource-manager',
         namespace: 'Microsoft.Addons',
@@ -264,10 +266,10 @@ const autogenlist: AutogenlistConfig[] = [
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',
         namespace: 'Microsoft.EnterpriseKnowledgeGraph',
     },
-    { 
+    /*{ NOTE(jcotillo): Temporally removing this RP - latest swagger contains an unsupported type by the schema generator tool
         basePath: 'domainservices/resource-manager',
         namespace: 'Microsoft.AAD',
-    },
+    },*/
     {
         basePath: 'eventhub/resource-manager',
         namespace: 'Microsoft.EventHub',
@@ -333,6 +335,11 @@ const autogenlist: AutogenlistConfig[] = [
         postProcessor: machineLearningPostProcessor,
     },
     {
+        basePath: 'machinelearningservices/resource-manager',
+        namespace: 'Microsoft.MachineLearningServices',
+        postProcessor: machineLearningServicesPostProcessor,
+    },
+    {
         basePath: 'machinelearningcompute/resource-manager',
         namespace: 'Microsoft.MachineLearningCompute',
     },
@@ -377,10 +384,6 @@ const autogenlist: AutogenlistConfig[] = [
     {
         basePath: 'marketplace/resource-manager',
         namespace: 'Microsoft.Marketplace',
-    },
-    {
-        basePath: 'machinelearningservices/resource-manager',
-        namespace: 'Microsoft.MachineLearningServices',
     },
     {
         basePath: 'mysql/resource-manager',
@@ -697,6 +700,23 @@ const autogenlist: AutogenlistConfig[] = [
     {
         basePath: 'keyvault/resource-manager',
         namespace: 'Microsoft.KeyVault',
+        readmeTag: {
+            '2016-10-01': [
+                'Microsoft.KeyVault/stable/2016-10-01/keyvault.json',
+                'Microsoft.KeyVault/stable/2016-10-01/providers.json',
+                'Microsoft.KeyVault/stable/2016-10-01/secrets.json',
+            ],
+            '2018-02-14': [
+                'Microsoft.KeyVault/stable/2018-02-14/keyvault.json',
+                'Microsoft.KeyVault/stable/2018-02-14/providers.json',
+                'Microsoft.KeyVault/stable/2018-02-14/secrets.json',
+            ],
+            '2018-02-14-preview': [
+                'Microsoft.KeyVault/preview/2018-02-14-preview/keyvault.json',
+                'Microsoft.KeyVault/preview/2018-02-14-preview/providers.json',
+                'Microsoft.KeyVault/preview/2018-02-14-preview/secrets.json',
+            ],
+        }
     },
     {
         basePath: 'hybridkubernetes/resource-manager',
@@ -732,6 +752,7 @@ const autogenlist: AutogenlistConfig[] = [
         basePath: 'applicationinsights/resource-manager',
         namespace: 'Microsoft.Insights',
         suffix: 'Application',
+        postProcessor: insightsApplicationPostProcessor,
     },
     {
         basePath: 'quantum/resource-manager',
@@ -749,10 +770,10 @@ const autogenlist: AutogenlistConfig[] = [
     }
 ];
 
-export function getAutogenlist(): AutogenlistConfig[] {
-    return autogenlist;
+export function getAutoGenList(): AutoGenConfig[] {
+    return autoGenList;
 }
 
-export function findAutogenEntries(basePath: string): AutogenlistConfig[] {
-    return autogenlist.filter(w => lowerCaseEquals(w.basePath, basePath));
+export function findAutogenEntries(basePath: string): AutoGenConfig[] {
+    return autoGenList.filter(w => lowerCaseEquals(w.basePath, basePath));
 }

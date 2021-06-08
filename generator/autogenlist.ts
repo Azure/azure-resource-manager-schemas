@@ -4,6 +4,7 @@ import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.
 import { postProcessor as machineLearningPostProcessor } from './processors/Microsoft.MachineLearning';
 import { postProcessor as machineLearningServicesPostProcessor } from './processors/Microsoft.MachineLearningServices';
 import { postProcessor as storageProcessor } from './processors/Microsoft.Storage';
+import { postProcessor as policyProcessor } from './processors/Microsoft.Authorization';
 import { lowerCaseEquals } from './utils';
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
@@ -465,6 +466,33 @@ const autoGenList: AutoGenConfig[] = [
             },
         ],
         postProcessor: resourcesPostProcessor,
+    },
+    {
+        basePath: 'resources/resource-manager',
+        namespace: 'Microsoft.Authorization',
+        resourceConfig: [
+            {
+                type: 'policyDefinitions',
+                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subcription,
+            },
+            {
+                type: 'policySetDefinitions',
+                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subcription,
+            },
+            {
+                type: 'policyAssignments',
+                scopes: ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'policyExemptions',
+                scopes: ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'locks',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+        ],
+        postProcessor: policyProcessor
     },
     {
         basePath: 'relay/resource-manager',

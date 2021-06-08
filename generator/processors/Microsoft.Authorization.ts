@@ -16,9 +16,11 @@ export const postProcessor: SchemaPostProcessor = (_namespace: string, _apiVersi
 
     const definitionParameter = schema.definitions?.PolicyDefinitionProperties?.properties?.parameters;
     removeObjectType(definitionParameter);
+    removeDataplaneParameterRestriction(definitionParameter);
 
     const definitionReferenceParameter = schema.definitions?.PolicyDefinitionReference?.properties?.parameters;
     removeObjectType(definitionReferenceParameter);
+    removeDataplaneParameterRestriction(definitionReferenceParameter);
 
     const setDefinitionParameter = schema.definitions?.PolicySetDefinitionProperties?.properties?.parameters;
     removeObjectType(setDefinitionParameter);

@@ -2,7 +2,7 @@ import { SchemaPostProcessor } from '../models';
 
 export const postProcessor: SchemaPostProcessor = (_namespace: string, _apiVersion: string, schema: any) => {
     const allowedValues = schema.definitions?.ParameterDefinitionsValue?.properties?.allowedValues;
-    if (allowedValues) {
+    if (allowedValues && allowedValues.oneOf) {
         const allowedValuesItems = allowedValues.oneOf[0]?.items
         removeObjectType(allowedValuesItems);
     }
@@ -12,6 +12,7 @@ export const postProcessor: SchemaPostProcessor = (_namespace: string, _apiVersi
   
     const assignmentParameter = schema.definitions?.PolicyAssignmentProperties?.properties?.parameters;
     removeObjectType(assignmentParameter);
+    removeDataplaneParameterRestriction(assignmentParameter);
 
     const definitionParameter = schema.definitions?.PolicyDefinitionProperties?.properties?.parameters;
     removeObjectType(definitionParameter);
@@ -21,6 +22,7 @@ export const postProcessor: SchemaPostProcessor = (_namespace: string, _apiVersi
 
     const setDefinitionParameter = schema.definitions?.PolicySetDefinitionProperties?.properties?.parameters;
     removeObjectType(setDefinitionParameter);
+    removeDataplaneParameterRestriction(setDefinitionParameter);
 }
 
 function removeObjectType(property: any) {
@@ -30,3 +32,8 @@ function removeObjectType(property: any) {
     }    
 }
 
+function removeDataplaneParameterRestriction(property: any) {
+    if (property?.oneOf && property.oneOf[0]?.additionalProperties && property.oneOf[0]['type'] === 'object') {
+        delete property['oneOf'];
+    }    
+}

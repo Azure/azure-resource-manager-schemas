@@ -4,6 +4,7 @@ import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.
 import { postProcessor as machineLearningPostProcessor } from './processors/Microsoft.MachineLearning';
 import { postProcessor as machineLearningServicesPostProcessor } from './processors/Microsoft.MachineLearningServices';
 import { postProcessor as storageProcessor } from './processors/Microsoft.Storage';
+import { postProcessor as policyProcessor } from './processors/Microsoft.Authorization';
 import { lowerCaseEquals } from './utils';
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
@@ -491,6 +492,7 @@ const autoGenList: AutoGenConfig[] = [
                 scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
         ],
+        postProcessor: policyProcessor
     },
     {
         basePath: 'relay/resource-manager',

@@ -492,6 +492,7 @@ const autoGenList: AutoGenConfig[] = [
                 scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
         ],
+        suffix: 'Resources',
         postProcessor: policyProcessor
     },
     {

@@ -74,17 +74,21 @@ export async function prepareReadme(readme: string, autoGenConfig?: AutoGenConfi
     const content = fs.readFileSync(readme).toString();
     const markdownEx = cm.parse(content);
     const fileSet = new Set<string>();
-    for (const codeBlock of cm.iterate(markdownEx.markDown)) {
-        if (codeBlock.type === 'code_block' && codeBlock?.info?.startsWith('yaml') && codeBlock.literal !== null) {
-            const DOC = (yaml.load(codeBlock.literal) as CodeBlock);
-            if (DOC) {
-                const inputFile = DOC['input-file'];
-                if (typeof inputFile === 'string') {
-                    fileSet.add(inputFile);
-                } else if (inputFile instanceof Array) {
-                    for (const i of inputFile) {
-                        fileSet.add(i);
-                    }
+    for (const node of cm.iterate(markdownEx.markDown)) {
+        // We're only interested in yaml code blocks
+        if (node.type !== 'code_block' || !node.info || !node.literal ||
+            !node.info.trim().startsWith('yaml')) {
+            continue;
+        }
+        
+        const DOC = (yaml.load(node.literal) as CodeBlock);
+        if (DOC) {
+            const inputFile = DOC['input-file'];
+            if (typeof inputFile === 'string') {
+                fileSet.add(inputFile);
+            } else if (inputFile instanceof Array) {
+                for (const i of inputFile) {
+                    fileSet.add(i);
                 }
             }
         }

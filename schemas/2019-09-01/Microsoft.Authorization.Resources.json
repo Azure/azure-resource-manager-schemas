@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2018-05-01/Microsoft.Authorization.json#",
+  "id": "https://schema.management.azure.com/schemas/2019-09-01/Microsoft.Authorization.Resources.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.Authorization",
   "description": "Microsoft Authorization Resource Types",
@@ -11,7 +11,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-05-01"
+            "2019-09-01"
           ]
         },
         "name": {
@@ -50,7 +50,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-05-01"
+            "2019-09-01"
           ]
         },
         "name": {
@@ -91,7 +91,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-05-01"
+            "2019-09-01"
           ]
         },
         "name": {
@@ -130,7 +130,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-05-01"
+            "2019-09-01"
           ]
         },
         "name": {
@@ -171,7 +171,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2018-05-01"
+            "2019-09-01"
           ]
         },
         "identity": {
@@ -248,10 +248,103 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The identity type."
+          "description": "The identity type. This is the only required field when adding a system assigned identity to a resource."
         }
       },
       "description": "Identity for the resource."
+    },
+    "ParameterDefinitionsValue": {
+      "type": "object",
+      "properties": {
+        "allowedValues": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The allowed values for the parameter."
+        },
+        "defaultValue": {
+          "description": "The default value for the parameter if no value is provided."
+        },
+        "metadata": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ParameterDefinitionsValueMetadata"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "General metadata for the parameter."
+        },
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "String",
+                "Array",
+                "Object",
+                "Boolean",
+                "Integer",
+                "Float",
+                "DateTime"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The data type of the parameter."
+        }
+      },
+      "description": "The definition of a parameter that can be provided to the policy."
+    },
+    "ParameterDefinitionsValueMetadata": {
+      "type": "object",
+      "properties": {
+        "additionalProperties": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "properties": {}
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Unmatched properties from the message are deserialized this collection"
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the parameter."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The display name for the parameter."
+        }
+      },
+      "description": "General metadata for the parameter."
+    },
+    "ParameterValuesValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "object",
+          "properties": {},
+          "description": "The value of the parameter."
+        }
+      },
+      "description": "The value of a parameter."
     },
     "PolicyAssignmentProperties": {
       "type": "object",
@@ -264,10 +357,25 @@
           "type": "string",
           "description": "The display name of the policy assignment."
         },
+        "enforcementMode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Default",
+                "DoNotEnforce"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The policy assignment enforcement mode. Possible values are Default and DoNotEnforce."
+        },
         "metadata": {
           "type": "object",
           "properties": {},
-          "description": "The policy assignment metadata."
+          "description": "The policy assignment metadata. Metadata is an open ended object and is typically a collection of key value pairs."
         },
         "notScopes": {
           "oneOf": [
@@ -284,7 +392,7 @@
           "description": "The policy's excluded scopes."
         },
         "parameters": {
-          "description": "Required if a parameter is used in policy rule."
+          "description": "The parameter values for the policy rule. The keys are the parameter names."
         },
         "policyDefinitionId": {
           "type": "string",
@@ -296,6 +404,35 @@
         }
       },
       "description": "The policy assignment properties."
+    },
+    "PolicyDefinitionGroup": {
+      "type": "object",
+      "properties": {
+        "additionalMetadataId": {
+          "type": "string",
+          "description": "A resource ID of a resource that contains additional metadata about the group."
+        },
+        "category": {
+          "type": "string",
+          "description": "The group's category."
+        },
+        "description": {
+          "type": "string",
+          "description": "The group's description."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The group's display name."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the group."
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "The policy definition group."
     },
     "PolicyDefinitionProperties": {
       "type": "object",
@@ -311,26 +448,14 @@
         "metadata": {
           "type": "object",
           "properties": {},
-          "description": "The policy definition metadata."
+          "description": "The policy definition metadata.  Metadata is an open ended object and is typically a collection of key value pairs."
         },
         "mode": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "NotSpecified",
-                "Indexed",
-                "All"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The policy definition mode. Possible values are NotSpecified, Indexed, and All."
+          "type": "string",
+          "description": "The policy definition mode. Some examples are All, Indexed, Microsoft.KeyVault.Data."
         },
         "parameters": {
-          "description": "Required if a parameter is used in policy rule."
+          "description": "The parameter definitions for parameters used in the policy. The keys are the parameter names."
         },
         "policyRule": {
           "type": "object",
@@ -344,14 +469,15 @@
               "enum": [
                 "NotSpecified",
                 "BuiltIn",
-                "Custom"
+                "Custom",
+                "Static"
               ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The type of policy definition. Possible values are NotSpecified, BuiltIn, and Custom."
+          "description": "The type of policy definition. Possible values are NotSpecified, BuiltIn, Custom, and Static."
         }
       },
       "description": "The policy definition properties."
@@ -359,14 +485,35 @@
     "PolicyDefinitionReference": {
       "type": "object",
       "properties": {
+        "groupNames": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the groups that this policy definition reference belongs to."
+        },
         "parameters": {
-          "description": "Required if a parameter is used in policy rule."
+          "description": "The parameter values for the policy rule. The keys are the parameter names."
         },
         "policyDefinitionId": {
           "type": "string",
           "description": "The ID of the policy definition or policy set definition."
+        },
+        "policyDefinitionReferenceId": {
+          "type": "string",
+          "description": "A unique id (within the policy set definition) for this policy definition reference."
         }
       },
+      "required": [
+        "policyDefinitionId"
+      ],
       "description": "The policy definition reference."
     },
     "PolicySetDefinitionProperties": {
@@ -383,10 +530,24 @@
         "metadata": {
           "type": "object",
           "properties": {},
-          "description": "The policy set definition metadata."
+          "description": "The policy set definition metadata.  Metadata is an open ended object and is typically a collection of key value pairs."
         },
         "parameters": {
-          "description": "The policy set definition parameters that can be used in policy definition references."
+          "description": "The parameter definitions for parameters used in the policy. The keys are the parameter names."
+        },
+        "policyDefinitionGroups": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PolicyDefinitionGroup"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The metadata describing groups of policy definition references within the policy set definition."
         },
         "policyDefinitions": {
           "oneOf": [
@@ -409,14 +570,15 @@
               "enum": [
                 "NotSpecified",
                 "BuiltIn",
-                "Custom"
+                "Custom",
+                "Static"
               ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The type of policy definition. Possible values are NotSpecified, BuiltIn, and Custom."
+          "description": "The type of policy definition. Possible values are NotSpecified, BuiltIn, Custom, and Static."
         }
       },
       "required": [

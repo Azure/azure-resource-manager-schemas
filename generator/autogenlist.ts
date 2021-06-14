@@ -58,6 +58,10 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.Automation',
     },
     {
+        basePath: 'azurearcdata/resource-manager',
+        namespace: 'Microsoft.AzureArcData',
+    },
+    {
         basePath: 'azuredata/resource-manager',
         namespace: 'Microsoft.AzureData',
     },

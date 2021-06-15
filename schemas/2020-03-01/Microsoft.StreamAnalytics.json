@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2016-03-01/Microsoft.StreamAnalytics.json#",
+  "id": "https://schema.management.azure.com/schemas/2020-03-01/Microsoft.StreamAnalytics.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.StreamAnalytics",
   "description": "Microsoft StreamAnalytics Resource Types",
@@ -10,8 +10,19 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-03-01"
+            "2020-03-01"
           ]
+        },
+        "identity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Identity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Describes how identity is verified"
         },
         "location": {
           "type": "string",
@@ -87,7 +98,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-03-01"
+            "2020-03-01"
           ]
         },
         "name": {
@@ -126,7 +137,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-03-01"
+            "2020-03-01"
           ]
         },
         "name": {
@@ -165,7 +176,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-03-01"
+            "2020-03-01"
           ]
         },
         "name": {
@@ -204,7 +215,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-03-01"
+            "2020-03-01"
           ]
         },
         "name": {
@@ -291,6 +302,22 @@
         "accountName": {
           "type": "string",
           "description": "The name of the Azure Data Lake Store account. Required on PUT (CreateOrReplace) requests."
+        },
+        "authenticationMode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Msi",
+                "UserToken",
+                "ConnectionString"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Authentication Mode."
         },
         "dateFormat": {
           "type": "string",
@@ -491,6 +518,176 @@
     "AzureSqlDatabaseOutputDataSourceProperties": {
       "type": "object",
       "properties": {
+        "authenticationMode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Msi",
+                "UserToken",
+                "ConnectionString"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Authentication Mode."
+        },
+        "database": {
+          "type": "string",
+          "description": "The name of the Azure SQL database. Required on PUT (CreateOrReplace) requests."
+        },
+        "maxBatchCount": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Max Batch count for write to Sql database, the default value is 10,000. Optional on PUT requests."
+        },
+        "maxWriterCount": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Max Writer count, currently only 1(single writer) and 0(based on query partition) are available. Optional on PUT requests."
+        },
+        "password": {
+          "type": "string",
+          "description": "The password that will be used to connect to the Azure SQL database. Required on PUT (CreateOrReplace) requests."
+        },
+        "server": {
+          "type": "string",
+          "description": "The name of the SQL server containing the Azure SQL database. Required on PUT (CreateOrReplace) requests."
+        },
+        "table": {
+          "type": "string",
+          "description": "The name of the table in the Azure SQL database. Required on PUT (CreateOrReplace) requests."
+        },
+        "user": {
+          "type": "string",
+          "description": "The user name that will be used to connect to the Azure SQL database. Required on PUT (CreateOrReplace) requests."
+        }
+      },
+      "description": "The properties that are associated with an Azure SQL database output."
+    },
+    "AzureSqlReferenceInputDataSource": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AzureSqlReferenceInputDataSourceProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties that are associated with SQL DB input containing reference data. Required on PUT (CreateOrReplace) requests."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Sql/Server/Database"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Describes an Azure SQL database reference input data source."
+    },
+    "AzureSqlReferenceInputDataSourceProperties": {
+      "type": "object",
+      "properties": {
+        "database": {
+          "type": "string",
+          "description": "This element is associated with the datasource element. This is the name of the database that output will be written to."
+        },
+        "deltaSnapshotQuery": {
+          "type": "string",
+          "description": "This element is associated with the datasource element. This query is used to fetch incremental changes from the SQL database. To use this option, we recommend using temporal tables in Azure SQL Database."
+        },
+        "fullSnapshotQuery": {
+          "type": "string",
+          "description": "This element is associated with the datasource element. This query is used to fetch data from the sql database."
+        },
+        "password": {
+          "type": "string",
+          "description": "This element is associated with the datasource element. This is the password that will be used to connect to the SQL Database instance."
+        },
+        "refreshRate": {
+          "type": "string",
+          "description": "This element is associated with the datasource element. This indicates how frequently the data will be fetched from the database. It is of DateTime format."
+        },
+        "refreshType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Static",
+                "RefreshPeriodicallyWithFull",
+                "RefreshPeriodicallyWithDelta"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates the type of data refresh option."
+        },
+        "server": {
+          "type": "string",
+          "description": "This element is associated with the datasource element. This is the name of the server that contains the database that will be written to."
+        },
+        "table": {
+          "type": "string",
+          "description": "This element is associated with the datasource element. The name of the table in the Azure SQL database.."
+        },
+        "user": {
+          "type": "string",
+          "description": "This element is associated with the datasource element. This is the user name that will be used to connect to the SQL Database instance."
+        }
+      },
+      "description": "The properties that are associated with SQL DB input containing reference data. Required on PUT (CreateOrReplace) requests."
+    },
+    "AzureSynapseOutputDataSource": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AzureSynapseOutputDataSourceProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties that are associated with an Azure Synapse output."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Sql/Server/DataWarehouse"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Describes an Azure Synapse output data source."
+    },
+    "AzureSynapseOutputDataSourceProperties": {
+      "type": "object",
+      "properties": {
         "database": {
           "type": "string",
           "description": "The name of the Azure SQL database. Required on PUT (CreateOrReplace) requests."
@@ -512,7 +709,7 @@
           "description": "The user name that will be used to connect to the Azure SQL database. Required on PUT (CreateOrReplace) requests."
         }
       },
-      "description": "The properties that are associated with an Azure SQL database output."
+      "description": "The properties that are associated with an Azure Synapse output."
     },
     "AzureTableOutputDataSource": {
       "type": "object",
@@ -620,6 +817,22 @@
     "BlobOutputDataSourceProperties": {
       "type": "object",
       "properties": {
+        "authenticationMode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Msi",
+                "UserToken",
+                "ConnectionString"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Authentication Mode."
+        },
         "container": {
           "type": "string",
           "description": "The name of a container within the associated Storage account. This container contains either the blob(s) to be read from or written to. Required on PUT (CreateOrReplace) requests."
@@ -788,6 +1001,41 @@
       },
       "description": "The properties that are associated with a blob input containing stream data."
     },
+    "ClusterInfo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The resource id of cluster."
+        }
+      },
+      "description": "The properties associated with a Stream Analytics cluster."
+    },
+    "Compression": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "None",
+                "GZip",
+                "Deflate"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates the type of compression that the input uses. Required on PUT (CreateOrReplace) requests."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Describes how input data is compressed"
+    },
     "CsvSerialization": {
       "type": "object",
       "properties": {
@@ -923,6 +1171,22 @@
     "EventHubOutputDataSourceProperties": {
       "type": "object",
       "properties": {
+        "authenticationMode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Msi",
+                "UserToken",
+                "ConnectionString"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Authentication Mode."
+        },
         "eventHubName": {
           "type": "string",
           "description": "The name of the Event Hub. Required on PUT (CreateOrReplace) requests."
@@ -930,6 +1194,20 @@
         "partitionKey": {
           "type": "string",
           "description": "The key/column that is used to determine to which partition to send event data."
+        },
+        "propertyColumns": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties associated with this Event Hub output."
         },
         "serviceBusNamespace": {
           "type": "string",
@@ -975,6 +1253,22 @@
     "EventHubStreamInputDataSourceProperties": {
       "type": "object",
       "properties": {
+        "authenticationMode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Msi",
+                "UserToken",
+                "ConnectionString"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Authentication Mode."
+        },
         "consumerGroupName": {
           "type": "string",
           "description": "The name of an Event Hub Consumer Group that should be used to read events from the Event Hub. Specifying distinct consumer group names for multiple inputs allows each of those inputs to receive the same events from the Event Hub. If not specified, the input uses the Event Hub’s default consumer group."
@@ -997,6 +1291,58 @@
         }
       },
       "description": "The properties that are associated with a Event Hub input containing stream data."
+    },
+    "EventHubV2OutputDataSource": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EventHubOutputDataSourceProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties that are associated with an Event Hub output."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.EventHub/EventHub"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Describes an Event Hub output data source."
+    },
+    "EventHubV2StreamInputDataSource": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EventHubStreamInputDataSourceProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties that are associated with a Event Hub input containing stream data."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.EventHub/EventHub"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Describes an Event Hub input data source that contains stream data."
     },
     "Function": {
       "type": "object",
@@ -1073,6 +1419,24 @@
       "properties": {},
       "description": "The properties that are associated with a function."
     },
+    "Identity": {
+      "type": "object",
+      "properties": {
+        "principalId": {
+          "type": "string",
+          "description": "The identity principal ID"
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "The identity tenantId"
+        },
+        "type": {
+          "type": "string",
+          "description": "The identity type"
+        }
+      },
+      "description": "Describes how identity is verified"
+    },
     "Input": {
       "type": "object",
       "properties": {
@@ -1105,6 +1469,21 @@
         }
       ],
       "properties": {
+        "compression": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Compression"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Describes how input data is compressed"
+        },
+        "partitionKey": {
+          "type": "string",
+          "description": "partitionKey Describes a key in the input data which is used for partitioning the input data"
+        },
         "serialization": {
           "oneOf": [
             {
@@ -1207,6 +1586,36 @@
       },
       "description": "The binding properties associated with a JavaScript function."
     },
+    "JobStorageAccount": {
+      "type": "object",
+      "properties": {
+        "accountKey": {
+          "type": "string",
+          "description": "The account key for the Azure Storage account. Required on PUT (CreateOrReplace) requests."
+        },
+        "accountName": {
+          "type": "string",
+          "description": "The name of the Azure Storage account. Required on PUT (CreateOrReplace) requests."
+        },
+        "authenticationMode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Msi",
+                "UserToken",
+                "ConnectionString"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Authentication Mode."
+        }
+      },
+      "description": "The properties that are associated with an Azure Storage account with MSI"
+    },
     "JsonSerialization": {
       "type": "object",
       "properties": {
@@ -1302,7 +1711,13 @@
           "$ref": "#/definitions/EventHubOutputDataSource"
         },
         {
+          "$ref": "#/definitions/EventHubV2OutputDataSource"
+        },
+        {
           "$ref": "#/definitions/AzureSqlDatabaseOutputDataSource"
+        },
+        {
+          "$ref": "#/definitions/AzureSynapseOutputDataSource"
         },
         {
           "$ref": "#/definitions/DocumentDbOutputDataSource"
@@ -1347,9 +1762,44 @@
             }
           ],
           "description": "Describes how data from an input is serialized or how data is serialized when written to an output."
+        },
+        "sizeWindow": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The size window to constrain a Stream Analytics output to."
+        },
+        "timeWindow": {
+          "type": "string",
+          "description": "The time frame for filtering Stream Analytics job outputs."
         }
       },
       "description": "The properties that are associated with an output."
+    },
+    "ParquetSerialization": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "type": "object",
+          "properties": {},
+          "description": "The properties that are associated with the Parquet serialization type."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Parquet"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Describes how data from an input is serialized or how data is serialized when written to an output in Parquet format."
     },
     "PowerBIOutputDataSource": {
       "type": "object",
@@ -1380,6 +1830,22 @@
     "PowerBIOutputDataSourceProperties": {
       "type": "object",
       "properties": {
+        "authenticationMode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Msi",
+                "UserToken",
+                "ConnectionString"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Authentication Mode."
+        },
         "dataset": {
           "type": "string",
           "description": "The name of the Power BI dataset. Required on PUT (CreateOrReplace) requests."
@@ -1416,6 +1882,9 @@
       "oneOf": [
         {
           "$ref": "#/definitions/BlobReferenceInputDataSource"
+        },
+        {
+          "$ref": "#/definitions/AzureSqlReferenceInputDataSource"
         }
       ],
       "properties": {},
@@ -1519,6 +1988,9 @@
       "type": "object",
       "oneOf": [
         {
+          "$ref": "#/definitions/ParquetSerialization"
+        },
+        {
           "$ref": "#/definitions/CsvSerialization"
         },
         {
@@ -1560,6 +2032,22 @@
     "ServiceBusQueueOutputDataSourceProperties": {
       "type": "object",
       "properties": {
+        "authenticationMode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Msi",
+                "UserToken",
+                "ConnectionString"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Authentication Mode."
+        },
         "propertyColumns": {
           "oneOf": [
             {
@@ -1589,6 +2077,11 @@
         "sharedAccessPolicyName": {
           "type": "string",
           "description": "The shared access policy name for the Event Hub, Service Bus Queue, Service Bus Topic, etc. Required on PUT (CreateOrReplace) requests."
+        },
+        "systemPropertyColumns": {
+          "type": "object",
+          "properties": {},
+          "description": "The system properties associated with the Service Bus Queue. The following system properties are supported: ReplyToSessionId, ContentType, To, Subject, CorrelationId, TimeToLive, PartitionKey, SessionId, ScheduledEnqueueTime, MessageId, ReplyTo, Label, ScheduledEnqueueTimeUtc."
         }
       },
       "description": "The properties that are associated with a Service Bus Queue output."
@@ -1622,6 +2115,22 @@
     "ServiceBusTopicOutputDataSourceProperties": {
       "type": "object",
       "properties": {
+        "authenticationMode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Msi",
+                "UserToken",
+                "ConnectionString"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Authentication Mode."
+        },
         "propertyColumns": {
           "oneOf": [
             {
@@ -1647,6 +2156,21 @@
         "sharedAccessPolicyName": {
           "type": "string",
           "description": "The shared access policy name for the Event Hub, Service Bus Queue, Service Bus Topic, etc. Required on PUT (CreateOrReplace) requests."
+        },
+        "systemPropertyColumns": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The system properties associated with the Service Bus Topic Output. The following system properties are supported: ReplyToSessionId, ContentType, To, Subject, CorrelationId, TimeToLive, PartitionKey, SessionId, ScheduledEnqueueTime, MessageId, ReplyTo, Label, ScheduledEnqueueTimeUtc."
         },
         "topicName": {
           "type": "string",
@@ -1692,12 +2216,24 @@
     "StreamingJobProperties": {
       "type": "object",
       "properties": {
+        "cluster": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ClusterInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties associated with a Stream Analytics cluster."
+        },
         "compatibilityLevel": {
           "oneOf": [
             {
               "type": "string",
               "enum": [
-                "1.0"
+                "1.0",
+                "1.2"
               ]
             },
             {
@@ -1705,6 +2241,21 @@
             }
           ],
           "description": "Controls certain runtime behaviors of the streaming job."
+        },
+        "contentStoragePolicy": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "SystemAccount",
+                "JobStorageAccount"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Valid values are JobStorageAccount and SystemAccount. If set to JobStorageAccount, this requires the user to also specify jobStorageAccount property."
         },
         "dataLocale": {
           "type": "string",
@@ -1774,6 +2325,32 @@
             }
           ],
           "description": "A list of one or more inputs to the streaming job. The name property for each input is required when specifying this property in a PUT request. This property cannot be modify via a PATCH operation. You must use the PATCH API available for the individual input."
+        },
+        "jobStorageAccount": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/JobStorageAccount"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties that are associated with an Azure Storage account with MSI"
+        },
+        "jobType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Cloud",
+                "Edge"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Describes the type of the job. Valid modes are `Cloud` and 'Edge'."
         },
         "outputErrorPolicy": {
           "oneOf": [
@@ -1856,7 +2433,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-03-01"
+            "2020-03-01"
           ]
         },
         "name": {
@@ -1895,7 +2472,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-03-01"
+            "2020-03-01"
           ]
         },
         "name": {
@@ -1934,7 +2511,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-03-01"
+            "2020-03-01"
           ]
         },
         "name": {
@@ -1973,7 +2550,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2016-03-01"
+            "2020-03-01"
           ]
         },
         "name": {
@@ -2014,6 +2591,9 @@
         },
         {
           "$ref": "#/definitions/EventHubStreamInputDataSource"
+        },
+        {
+          "$ref": "#/definitions/EventHubV2StreamInputDataSource"
         },
         {
           "$ref": "#/definitions/IoTHubStreamInputDataSource"
@@ -2086,6 +2666,17 @@
             }
           ],
           "description": "Specifies the number of streaming units that the streaming job uses."
+        },
+        "validStreamingUnits": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies the valid streaming units a streaming job can scale to."
         }
       },
       "description": "The properties that are associated with a transformation."

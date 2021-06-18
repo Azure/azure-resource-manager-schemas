@@ -1,4 +1,4 @@
-# azure-resource-manager-schemas 
+test# azure-resource-manager-schemas 
 
 This is the repo for template deployment schemas hosted under `https://schema.management.azure.com/schemas`. Please see below for information on contributing and publishing updated schemas.
 

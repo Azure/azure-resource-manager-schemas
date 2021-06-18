@@ -786,6 +786,10 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'web/resource-manager',
         namespace: 'Microsoft.Web'
+    },
+    {
+        basePath: 'deviceupdate/resource-manager',
+        namespace: 'Microsoft.DeviceUpdate',
     }
 ];
 

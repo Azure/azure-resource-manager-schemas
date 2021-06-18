@@ -774,6 +774,10 @@ const autoGenList: AutoGenConfig[] = [
                 scopes: ScopeType.Extension
             }
         ]
+    },
+    {
+        basePath: 'deviceupdate/resource-manager',
+        namespace: 'Microsoft.DeviceUpdate',
     }
 ];
 

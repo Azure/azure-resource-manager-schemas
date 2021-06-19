@@ -774,6 +774,22 @@ const autoGenList: AutoGenConfig[] = [
                 scopes: ScopeType.Extension
             }
         ]
+    },
+    {
+        basePath: 'web/resource-manager',
+        namespace: 'Microsoft.CertificateRegistration'
+    },
+    {
+        basePath: 'web/resource-manager',
+        namespace: 'Microsoft.DomainRegistration'
+    },
+    {
+        basePath: 'web/resource-manager',
+        namespace: 'Microsoft.Web'
+    },
+    {
+        basePath: 'deviceupdate/resource-manager',
+        namespace: 'Microsoft.DeviceUpdate',
     }
 ];
 

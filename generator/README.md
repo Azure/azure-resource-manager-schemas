@@ -10,7 +10,7 @@
 * `npm run list-basepaths` - Lists all the valid base paths from the specs repo for generation.
 * `npm run list-resources` - Lists all the schema-declared types and API versions referenced in [schemas/2019-04-01/deploymentTemplate.json](/schemas/2019-04-01/deploymentTemplate.json).
 * `npm run generate-all` - Re-generates all schemas for providers which have been added to [autogenlist.ts](./autogenlist.ts).
-* `npm run generate-single {basePath}` - Re-generates schemas for all resource types and API versions found under a given base path.
+* `npm run generate-single {basePath} [{localPath}]` - Re-generates schemas for all resource types and API versions found under a given base path. Use optional `{localPath}` to generate from local specs repo.
 * See [package.json](./package.json) for the full set of commands.
 
 ### Daily autogeneration

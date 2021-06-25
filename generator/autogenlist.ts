@@ -4,6 +4,7 @@ import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.
 import { postProcessor as machineLearningPostProcessor } from './processors/Microsoft.MachineLearning';
 import { postProcessor as machineLearningServicesPostProcessor } from './processors/Microsoft.MachineLearningServices';
 import { postProcessor as storageProcessor } from './processors/Microsoft.Storage';
+import { postProcessor as policyProcessor } from './processors/Microsoft.Authorization';
 import { lowerCaseEquals } from './utils';
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
@@ -55,6 +56,10 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'automation/resource-manager',
         namespace: 'Microsoft.Automation',
+    },
+    {
+        basePath: 'azurearcdata/resource-manager',
+        namespace: 'Microsoft.AzureArcData',
     },
     {
         basePath: 'azuredata/resource-manager',
@@ -266,10 +271,10 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',
         namespace: 'Microsoft.EnterpriseKnowledgeGraph',
     },
-    { 
+    /*{ NOTE(jcotillo): Temporally removing this RP - latest swagger contains an unsupported type by the schema generator tool
         basePath: 'domainservices/resource-manager',
         namespace: 'Microsoft.AAD',
-    },
+    },*/
     {
         basePath: 'eventhub/resource-manager',
         namespace: 'Microsoft.EventHub',
@@ -465,6 +470,34 @@ const autoGenList: AutoGenConfig[] = [
             },
         ],
         postProcessor: resourcesPostProcessor,
+    },
+    {
+        basePath: 'resources/resource-manager',
+        namespace: 'Microsoft.Authorization',
+        resourceConfig: [
+            {
+                type: 'policyDefinitions',
+                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subcription,
+            },
+            {
+                type: 'policySetDefinitions',
+                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subcription,
+            },
+            {
+                type: 'policyAssignments',
+                scopes: ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'policyExemptions',
+                scopes: ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'locks',
+                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+        ],
+        suffix: 'Resources',
+        postProcessor: policyProcessor
     },
     {
         basePath: 'relay/resource-manager',
@@ -741,6 +774,22 @@ const autoGenList: AutoGenConfig[] = [
                 scopes: ScopeType.Extension
             }
         ]
+    },
+    {
+        basePath: 'web/resource-manager',
+        namespace: 'Microsoft.CertificateRegistration'
+    },
+    {
+        basePath: 'web/resource-manager',
+        namespace: 'Microsoft.DomainRegistration'
+    },
+    {
+        basePath: 'web/resource-manager',
+        namespace: 'Microsoft.Web'
+    },
+    {
+        basePath: 'deviceupdate/resource-manager',
+        namespace: 'Microsoft.DeviceUpdate',
     }
 ];
 

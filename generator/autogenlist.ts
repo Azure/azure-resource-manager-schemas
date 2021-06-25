@@ -73,10 +73,6 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'batch/resource-manager',
         namespace: 'Microsoft.Batch',
     },
-    { 
-        basePath: 'batchai/resource-manager',
-        namespace: 'Microsoft.BatchAI',
-    },
     {
         basePath: 'blockchain/resource-manager',
         namespace: 'Microsoft.Blockchain',

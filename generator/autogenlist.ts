@@ -698,10 +698,6 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'datadog/resource-manager',
         namespace: 'Microsoft.Datadog',
     },
-	{
-        basePath: 'elastic/resource-manager',
-        namespace: 'Microsoft.Elastic',
-    },
     {
         basePath: 'healthbot/resource-manager',
         namespace: 'Microsoft.HealthBot',

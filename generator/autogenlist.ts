@@ -497,6 +497,37 @@ const autoGenList: AutoGenConfig[] = [
         postProcessor: policyProcessor
     },
     {
+        basePath: 'authorization/resource-manager',
+        namespace: 'Microsoft.Authorization',
+        resourceConfig: [
+            {
+                type: 'roleAssignments',
+                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subcription | ScopeType.Tenant
+            },
+            {
+                type: 'roleDefinitions',
+                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subcription | ScopeType.Tenant
+            },
+            {
+                type: 'roleAssignmentScheduleRequests',
+                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subcription | ScopeType.Tenant
+            },
+            {
+                type: 'roleEligibilityScheduleRequests',
+                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subcription | ScopeType.Tenant
+            },
+            {
+                type: 'roleManagementPolicyAssignments',
+                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subcription | ScopeType.Tenant
+            },
+            {
+                type: 'roleAssignmentApprovals/stages',
+                scopes: ScopeType.Tenant
+            }
+        ],
+        suffix: 'Authz'
+    },
+    {
         basePath: 'relay/resource-manager',
         namespace: 'Microsoft.Relay',
     },

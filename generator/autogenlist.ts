@@ -5,6 +5,7 @@ import { postProcessor as machineLearningPostProcessor } from './processors/Micr
 import { postProcessor as machineLearningServicesPostProcessor } from './processors/Microsoft.MachineLearningServices';
 import { postProcessor as storageProcessor } from './processors/Microsoft.Storage';
 import { postProcessor as policyProcessor } from './processors/Microsoft.Authorization';
+import { postProcessor as securityInsightsPostProcessor } from './processors/Microsoft.SecurityInsights';
 import { lowerCaseEquals } from './utils';
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
@@ -72,10 +73,6 @@ const autoGenList: AutoGenConfig[] = [
     { 
         basePath: 'batch/resource-manager',
         namespace: 'Microsoft.Batch',
-    },
-    { 
-        basePath: 'batchai/resource-manager',
-        namespace: 'Microsoft.BatchAI',
     },
     {
         basePath: 'blockchain/resource-manager',
@@ -500,6 +497,37 @@ const autoGenList: AutoGenConfig[] = [
         postProcessor: policyProcessor
     },
     {
+        basePath: 'authorization/resource-manager',
+        namespace: 'Microsoft.Authorization',
+        resourceConfig: [
+            {
+                type: 'roleAssignments',
+                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subcription | ScopeType.Tenant
+            },
+            {
+                type: 'roleDefinitions',
+                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subcription | ScopeType.Tenant
+            },
+            {
+                type: 'roleAssignmentScheduleRequests',
+                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subcription | ScopeType.Tenant
+            },
+            {
+                type: 'roleEligibilityScheduleRequests',
+                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subcription | ScopeType.Tenant
+            },
+            {
+                type: 'roleManagementPolicyAssignments',
+                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subcription | ScopeType.Tenant
+            },
+            {
+                type: 'roleAssignmentApprovals/stages',
+                scopes: ScopeType.Tenant
+            }
+        ],
+        suffix: 'Authz'
+    },
+    {
         basePath: 'relay/resource-manager',
         namespace: 'Microsoft.Relay',
     },
@@ -602,6 +630,7 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'securityinsights/resource-manager',
         namespace: 'Microsoft.SecurityInsights',
+        postProcessor: securityInsightsPostProcessor,
     },
     {
         basePath: 'storageimportexport/resource-manager',
@@ -699,6 +728,10 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'datadog/resource-manager',
         namespace: 'Microsoft.Datadog',
+    },
+    {
+        basePath: 'elastic/resource-manager',
+        namespace: 'Microsoft.Elastic',
     },
     {
         basePath: 'healthbot/resource-manager',

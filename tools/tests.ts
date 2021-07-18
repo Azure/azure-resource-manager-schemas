@@ -122,6 +122,7 @@ const schemasToSkip = [
   '2019-06-01/policyDefinition.json',
   '2019-09-01/policyDefinition.json',
   '2020-09-01/policyDefinition.json',
+  '2020-10-01/policyDefinition.json',
   '2018-05-01/subscriptionDeploymentParameters.json',
   '2018-05-01/subscriptionDeploymentTemplate.json',
   '2019-04-01/deploymentParameters.json',

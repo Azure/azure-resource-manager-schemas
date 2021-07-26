@@ -5,6 +5,45 @@
   "description": "Microsoft Security Resource Types",
   "resourceDefinitions": {},
   "subscription_resourceDefinitions": {
+    "assessmentMetadata": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2021-06-01"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The Assessment Key - Unique key for the assessment type"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecurityAssessmentMetadataProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Describes properties of an assessment metadata."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Security/assessmentMetadata"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.Security/assessmentMetadata"
+    },
     "settings": {
       "type": "object",
       "oneOf": [
@@ -51,6 +90,47 @@
         "type"
       ],
       "description": "Microsoft.Security/settings"
+    }
+  },
+  "unknown_resourceDefinitions": {
+    "assessments": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2021-06-01"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The Assessment Key - Unique key for the assessment type"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecurityAssessmentProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Describes properties of an assessment."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Security/assessments"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.Security/assessments"
     }
   },
   "definitions": {
@@ -100,6 +180,59 @@
       ],
       "description": "Represents an alert sync setting"
     },
+    "AssessmentLinks": {
+      "type": "object",
+      "properties": {},
+      "description": "Links relevant to the assessment"
+    },
+    "AssessmentStatus": {
+      "type": "object",
+      "properties": {
+        "cause": {
+          "type": "string",
+          "description": "Programmatic code for the cause of the assessment status"
+        },
+        "code": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Healthy",
+                "Unhealthy",
+                "NotApplicable"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Programmatic code for the status of the assessment."
+        },
+        "description": {
+          "type": "string",
+          "description": "Human readable description of the assessment status"
+        }
+      },
+      "required": [
+        "code"
+      ],
+      "description": "The result of the assessment"
+    },
+    "AzureResourceDetails": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": [
+            "Azure"
+          ]
+        }
+      },
+      "required": [
+        "source"
+      ],
+      "description": "Details of the Azure resource that was assessed"
+    },
     "DataExportSettingProperties": {
       "type": "object",
       "properties": {
@@ -145,6 +278,357 @@
         "kind"
       ],
       "description": "Represents a data export setting"
+    },
+    "OnPremiseResourceDetails": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/OnPremiseSqlResourceDetails"
+        }
+      ],
+      "properties": {
+        "machineName": {
+          "type": "string",
+          "description": "The name of the machine"
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "OnPremise"
+          ]
+        },
+        "sourceComputerId": {
+          "type": "string",
+          "description": "The oms agent Id installed on the machine"
+        },
+        "vmuuid": {
+          "type": "string",
+          "description": "The unique Id of the machine"
+        },
+        "workspaceId": {
+          "type": "string",
+          "description": "Azure resource Id of the workspace the machine is attached to"
+        }
+      },
+      "required": [
+        "machineName",
+        "source",
+        "sourceComputerId",
+        "vmuuid",
+        "workspaceId"
+      ],
+      "description": "Details of the On Premise resource that was assessed"
+    },
+    "OnPremiseSqlResourceDetails": {
+      "type": "object",
+      "properties": {
+        "databaseName": {
+          "type": "string",
+          "description": "The Sql database name installed on the machine"
+        },
+        "serverName": {
+          "type": "string",
+          "description": "The Sql server name installed on the machine"
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "OnPremiseSql"
+          ]
+        }
+      },
+      "required": [
+        "databaseName",
+        "serverName",
+        "source"
+      ],
+      "description": "Details of the On Premise Sql resource that was assessed"
+    },
+    "ResourceDetails": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/AzureResourceDetails"
+        },
+        {
+          "$ref": "#/definitions/OnPremiseResourceDetails"
+        }
+      ],
+      "properties": {},
+      "description": "Details of the resource that was assessed"
+    },
+    "SecurityAssessmentMetadataPartnerData": {
+      "type": "object",
+      "properties": {
+        "partnerName": {
+          "type": "string",
+          "description": "Name of the company of the partner"
+        },
+        "productName": {
+          "type": "string",
+          "description": "Name of the product of the partner that created the assessment"
+        },
+        "secret": {
+          "type": "string",
+          "description": "Secret to authenticate the partner and verify it created the assessment - write only"
+        }
+      },
+      "required": [
+        "partnerName",
+        "secret"
+      ],
+      "description": "Describes the partner that created the assessment"
+    },
+    "SecurityAssessmentMetadataProperties": {
+      "type": "object",
+      "properties": {
+        "assessmentType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "BuiltIn",
+                "CustomPolicy",
+                "CustomerManaged",
+                "VerifiedPartner"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "BuiltIn if the assessment based on built-in Azure Policy definition, Custom if the assessment based on custom Azure Policy definition."
+        },
+        "categories": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Compute",
+                  "Networking",
+                  "Data",
+                  "IdentityAndAccess",
+                  "IoT"
+                ]
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "Human readable description of the assessment"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User friendly display name of the assessment"
+        },
+        "implementationEffort": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Low",
+                "Moderate",
+                "High"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The implementation effort required to remediate this assessment."
+        },
+        "partnerData": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecurityAssessmentMetadataPartnerData"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Describes the partner that created the assessment"
+        },
+        "preview": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "True if this assessment is in preview release status"
+        },
+        "remediationDescription": {
+          "type": "string",
+          "description": "Human readable description of what you should do to mitigate this security issue"
+        },
+        "severity": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Low",
+                "Medium",
+                "High"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The severity level of the assessment."
+        },
+        "threats": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "accountBreach",
+                  "dataExfiltration",
+                  "dataSpillage",
+                  "maliciousInsider",
+                  "elevationOfPrivilege",
+                  "threatResistance",
+                  "missingCoverage",
+                  "denialOfService"
+                ]
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "userImpact": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Low",
+                "Moderate",
+                "High"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The user impact of the assessment."
+        }
+      },
+      "required": [
+        "assessmentType",
+        "displayName",
+        "severity"
+      ],
+      "description": "Describes properties of an assessment metadata."
+    },
+    "SecurityAssessmentPartnerData": {
+      "type": "object",
+      "properties": {
+        "partnerName": {
+          "type": "string",
+          "description": "Name of the company of the partner"
+        },
+        "secret": {
+          "type": "string",
+          "description": "secret to authenticate the partner - write only"
+        }
+      },
+      "required": [
+        "partnerName",
+        "secret"
+      ],
+      "description": "Data regarding 3rd party partner integration"
+    },
+    "SecurityAssessmentProperties": {
+      "type": "object",
+      "properties": {
+        "additionalData": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Additional data regarding the assessment"
+        },
+        "links": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AssessmentLinks"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Links relevant to the assessment"
+        },
+        "metadata": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecurityAssessmentMetadataProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Describes properties of an assessment metadata."
+        },
+        "partnersData": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecurityAssessmentPartnerData"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Data regarding 3rd party partner integration"
+        },
+        "resourceDetails": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ResourceDetails"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Details of the resource that was assessed"
+        },
+        "status": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AssessmentStatus"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The result of the assessment"
+        }
+      },
+      "required": [
+        "resourceDetails",
+        "status"
+      ],
+      "description": "Describes properties of an assessment."
     }
   }
 }

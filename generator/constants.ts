@@ -41,6 +41,7 @@ export const blocklist = [
     'azsadmin/resource-manager/backup',
     'azsadmin/resource-manager/commerce',
     'azsadmin/resource-manager/compute',
+    'azsadmin/resource-manager/containerregistry',
     'azsadmin/resource-manager/deployment',
     'azsadmin/resource-manager/fabric',
     'azsadmin/resource-manager/gallery',

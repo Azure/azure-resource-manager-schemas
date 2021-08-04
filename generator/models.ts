@@ -9,6 +9,7 @@ export enum ScopeType {
 }
 
 export interface AutoGenConfig {
+  disabledForAutogen?: true,
   basePath: string,
   namespace: string,
   readmeFile?: string,

@@ -35,6 +35,10 @@ export async function validateAndReturnReadmePath(localPath: string, basePath: s
 export async function cloneAndGenerateBasePaths(localPath: string, remoteUri: string, commitHash: string) {
     await cloneGitRepo(localPath, remoteUri, commitHash);
 
+    return await generateBasePaths(localPath);
+}
+
+export async function generateBasePaths(localPath: string) {
     const specsPath = path.join(localPath, 'specification');
 
     const filePaths = await findRecursive(specsPath, filePath => {

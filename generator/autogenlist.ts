@@ -8,8 +8,224 @@ import { postProcessor as policyProcessor } from './processors/Microsoft.Authori
 import { postProcessor as securityInsightsPostProcessor } from './processors/Microsoft.SecurityInsights';
 import { lowerCaseEquals } from './utils';
 
+// Going forwards, providers are onboarded by default.
+// The providers listed here are the only ones **not** onboarded.
+const disabledProviders: AutoGenConfig[] = [
+    {
+        basePath: 'advisor/resource-manager',
+        namespace: 'Microsoft.Advisor',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'agrifood/resource-manager',
+        namespace: 'Microsoft.AgFoodPlatform',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'azure-kusto/resource-manager',
+        namespace: 'Microsoft.Kusto',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'azurestackhci/resource-manager',
+        namespace: 'Microsoft.AzureStackHCI',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'baremetalinfrastructure/resource-manager',
+        namespace: 'Microsoft.BareMetalInfrastructure',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'cloudshell/resource-manager',
+        namespace: 'Microsoft.Portal',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'compute/resource-manager',
+        namespace: 'Microsoft.Compute',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'compute/resource-manager',
+        namespace: 'Microsoft.ContainerService',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'confidentialledger/resource-manager',
+        namespace: 'Microsoft.ConfidentialLedger',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'cost-management/resource-manager',
+        namespace: 'Microsoft.CostManagement',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'cpim/resource-manager',
+        namespace: 'Microsoft.AzureActiveDirectory',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'dataprotection/resource-manager',
+        namespace: 'Microsoft.DataProtection',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'dfp/resource-manager',
+        namespace: 'Microsoft.Dynamics365Fraudprotection',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'dnc/resource-manager',
+        namespace: 'Microsoft.DelegatedNetwork',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'dns/resource-manager',
+        namespace: 'Microsoft.Network',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'edgeorder/resource-manager',
+        namespace: 'Microsoft.EdgeOrder',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'edgeorderpartner/resource-manager',
+        namespace: 'Microsoft.EdgeOrderPartner',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'extendedlocation/resource-manager',
+        namespace: 'Microsoft.ExtendedLocation',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'fluidrelay/resource-manager',
+        namespace: 'Microsoft.FluidRelay',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'iotsecurity/resource-manager',
+        namespace: 'Microsoft.IoTSecurity',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'logic/resource-manager',
+        namespace: 'Microsoft.Logic',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'm365securityandcompliance/resource-manager',
+        namespace: 'Microsoft.M365SecurityAndCompliance',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'managedservices/resource-manager',
+        namespace: 'Microsoft.ManagedServices',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'marketplacenotifications/resource-manager',
+        namespace: 'Microsoft.MarketplaceNotifications',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'marketplaceordering/resource-manager',
+        namespace: 'Microsoft.MarketplaceOrdering',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'mediaservices/resource-manager',
+        namespace: 'Microsoft.Media',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'msi/resource-manager',
+        namespace: 'Microsoft.ManagedIdentity',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'network/resource-manager',
+        namespace: 'Microsoft.Network',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'operationsmanagement/resource-manager',
+        namespace: 'Microsoft.OperationsManagement',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'privatedns/resource-manager',
+        namespace: 'Microsoft.Network',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'providerhub/resource-manager',
+        namespace: 'Microsoft.ProviderHub',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'purview/resource-manager',
+        namespace: 'Microsoft.Purview',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'quota/resource-manager',
+        namespace: 'Microsoft.Quota',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'resources/resource-manager',
+        namespace: 'Microsoft.Features',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'resources/resource-manager',
+        namespace: 'Microsoft.Solutions',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'securityandcompliance/resource-manager',
+        namespace: 'Microsoft.SecurityAndCompliance',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'service-map/resource-manager',
+        namespace: 'Microsoft.OperationalInsights',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'servicefabricmanagedclusters/resource-manager',
+        namespace: 'Microsoft.ServiceFabricManagedClusters',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'testbase/resource-manager',
+        namespace: 'Microsoft.TestBase',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'trafficmanager/resource-manager',
+        namespace: 'Microsoft.Network',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'videoanalyzer/resource-manager',
+        namespace: 'Microsoft.Media',
+        disabledForAutogen: true,
+    },
+    {
+        basePath: 'webpubsub/resource-manager',
+        namespace: 'Microsoft.SignalRService',
+        disabledForAutogen: true,
+    },
+];
+
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
 const autoGenList: AutoGenConfig[] = [
+    ...disabledProviders,
     {
         basePath: 'addons/resource-manager',
         namespace: 'Microsoft.Addons',
@@ -268,10 +484,10 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',
         namespace: 'Microsoft.EnterpriseKnowledgeGraph',
     },
-    /*{ NOTE(jcotillo): Temporally removing this RP - latest swagger contains an unsupported type by the schema generator tool
+    {
         basePath: 'domainservices/resource-manager',
         namespace: 'Microsoft.AAD',
-    },*/
+    },
     {
         basePath: 'eventhub/resource-manager',
         namespace: 'Microsoft.EventHub',
@@ -827,7 +1043,7 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'deviceupdate/resource-manager',
         namespace: 'Microsoft.DeviceUpdate',
-    }
+    },
 ];
 
 export function getAutoGenList(): AutoGenConfig[] {

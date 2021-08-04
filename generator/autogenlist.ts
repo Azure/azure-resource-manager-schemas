@@ -734,6 +734,10 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.Elastic',
     },
     {
+        basePath: 'logz/resource-manager',
+        namespace: 'Microsoft.Logz',
+    },
+    {
         basePath: 'healthbot/resource-manager',
         namespace: 'Microsoft.HealthBot',
     },

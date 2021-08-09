@@ -8,8 +8,7 @@ import { postProcessor as policyProcessor } from './processors/Microsoft.Authori
 import { postProcessor as securityInsightsPostProcessor } from './processors/Microsoft.SecurityInsights';
 import { lowerCaseEquals } from './utils';
 
-// Going forwards, providers are onboarded by default.
-// The providers listed here are the only ones **not** onboarded.
+// New providers are onboarded by default. The providers listed here are the only ones **not** onboarded.
 const disabledProviders: AutoGenConfig[] = [
     {
         basePath: 'advisor/resource-manager',
@@ -69,6 +68,12 @@ const disabledProviders: AutoGenConfig[] = [
     {
         basePath: 'dataprotection/resource-manager',
         namespace: 'Microsoft.DataProtection',
+        disabledForAutogen: true,
+    },
+    {
+        // Disabled as the swagger spec contains a type ("DateTimeRfc1123") which autorest is unable to parse: https://github.com/Azure/autorest.azureresourceschema/issues/71
+        basePath: 'domainservices/resource-manager',
+        namespace: 'Microsoft.AAD',
         disabledForAutogen: true,
     },
     {
@@ -483,10 +488,6 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',
         namespace: 'Microsoft.EnterpriseKnowledgeGraph',
-    },
-    {
-        basePath: 'domainservices/resource-manager',
-        namespace: 'Microsoft.AAD',
     },
     {
         basePath: 'eventhub/resource-manager',

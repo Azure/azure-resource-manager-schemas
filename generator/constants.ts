@@ -34,24 +34,12 @@ export const generatedSchemasTemplatePath = path.join(__dirname, 'resources/auto
 export const autorestCoreVersion = '3.0.6374';
 export const azureresourceschemaVersion = '3.0.92';
 
-// paths in this list won't even appear in list-basepaths
-export const blocklist = [
+// paths in this list won't even appear in list-basepaths. 
+// This list should only contain spec paths that should DEFINITELY be excluded from generation.
+// For now - that should just be Azure Stack providers, and deprecated providers.
+export const excludedBasePathPrefixes = [
     /* Azure Stack resource providers */
-    'azsadmin/resource-manager/azurebridge',
-    'azsadmin/resource-manager/backup',
-    'azsadmin/resource-manager/commerce',
-    'azsadmin/resource-manager/compute',
-    'azsadmin/resource-manager/containerregistry',
-    'azsadmin/resource-manager/deployment',
-    'azsadmin/resource-manager/fabric',
-    'azsadmin/resource-manager/gallery',
-    'azsadmin/resource-manager/infrastructureinsights',
-    'azsadmin/resource-manager/keyvault',
-    'azsadmin/resource-manager/network',
-    'azsadmin/resource-manager/storage',
-    'azsadmin/resource-manager/subscriptions',
-    'azsadmin/resource-manager/update',
-    'azsadmin/resource-manager/user-subscriptions',
+    'azsadmin/',
     /* Microsoft.CustomerInsights is deprecated */
-    'customer-insights/resource-manager',
+    'customer-insights/',
 ];

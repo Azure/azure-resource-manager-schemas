@@ -54,7 +54,7 @@ export async function generateBasePaths(localPath: string) {
     return filePaths
         .map(p => p.substring(0, p.lastIndexOf(path.sep)))
         .map(getBasePathString.bind(null, localPath))
-        .filter(p => !isBlocklisted(p));
+        .filter(p => !isExcludedBasePath(p));
 }
 
 export function getBasePathString(localPath: string, basePath: string) {
@@ -70,8 +70,10 @@ export function getPackageString(readme: string) {
         .find((_, index, obj) => index > 0 && obj[index - 1] === 'specification');
 }
 
-function isBlocklisted(basePath: string) {
-    return constants.blocklist.includes(basePath);
+function isExcludedBasePath(basePath: string) {
+    return constants.excludedBasePathPrefixes
+        .map(prefix => prefix.toLowerCase())
+        .some(prefix => basePath.toLowerCase().startsWith(prefix));
 }
 
 export async function prepareReadme(readme: string, autoGenConfig?: AutoGenConfig) {

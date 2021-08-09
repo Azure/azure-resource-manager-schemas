@@ -17,7 +17,7 @@ executeSynchronous(async () => {
 
     const autoGenEntries = findAutogenEntries(basePath);
 
-    if (autoGenEntries.length === 0) {
+    if (autoGenEntries[0]?.disabledForAutogen === true) {
         // not onboarded in autogeneration
         console.log("false");
         return;

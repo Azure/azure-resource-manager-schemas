@@ -17,9 +17,9 @@ executeSynchronous(async () => {
         const namespaces = keys(await getApiVersionsByNamespace(readme));
         const autogenlistEntries = findAutogenEntries(basePath);
 
-        const [autogened, unautogened] = partition(
+        const [unautogened, autogened] = partition(
             namespaces,
-            n => autogenlistEntries.findIndex(w => lowerCaseEquals(w.namespace, n)) > -1);
+            n => autogenlistEntries.filter(w => lowerCaseEquals(w.namespace, n))[0]?.disabledForAutogen === true);
         
         if (unautogened.length > 0 && autogened.length > 0) {
             // For partial autogeneration only, add two items

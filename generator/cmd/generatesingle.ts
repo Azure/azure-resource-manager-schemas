@@ -31,6 +31,12 @@ executeSynchronous(async () => {
         schemaConfigs.push(...localSchemaConfigs);
     } else {
         for (const autoGenConfig of autoGenEntries) {
+            if (autoGenConfig.disabledForAutogen === true) {
+                console.log(`Path ${autoGenConfig.basePath} has been disabled for generation:`)
+                console.log(chalk.red(JSON.stringify(autoGenConfig, null, 2)));
+                continue;
+            }
+
             console.log(`Using autogenlist config:`)
             console.log(chalk.green(JSON.stringify(autoGenConfig, null, 2)));
 

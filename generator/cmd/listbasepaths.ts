@@ -14,16 +14,16 @@ executeSynchronous(async () => {
         const namespaces = keys(await getApiVersionsByNamespace(readme));
         const autogenlistEntries = findAutogenEntries(basePath);
 
-        const [autogened, unautogened] = partition(
+        const [unautogened, autogened] = partition(
             namespaces,
-            n => autogenlistEntries.findIndex(w => lowerCaseEquals(w.namespace, n)) > -1);
+            n => autogenlistEntries.filter(w => lowerCaseEquals(w.namespace, n))[0]?.disabledForAutogen === true);
 
         if (unautogened.length === 0) {
-            console.log(`Discovered '${chalk.green(basePath)}'. autogened for auto-generation: ${chalk.green('yes')}.`);
+            console.log(`Discovered '${chalk.green(basePath)}'. enabled for auto-generation: ${chalk.green('yes')}.`);
         } else if (autogened.length > 0) {
-            console.log(`Discovered '${chalk.green(basePath)}'. autogened for auto-generation: ${chalk.yellow('partial')}. Missing: ${unautogened.map(p => chalk.yellow(p)).join(', ')}.`);
+            console.log(`Discovered '${chalk.green(basePath)}'. enabled for auto-generation: ${chalk.yellow('partial')}. Missing: ${unautogened.map(p => chalk.yellow(p)).join(', ')}.`);
         } else {
-            console.log(`Discovered '${chalk.green(basePath)}'. autogened for auto-generation: ${chalk.red('no')}. Missing: ${unautogened.map(p => chalk.yellow(p)).join(', ')}.`);
+            console.log(`Discovered '${chalk.green(basePath)}'. enabled for auto-generation: ${chalk.red('no')}. Missing: ${unautogened.map(p => chalk.yellow(p)).join(', ')}.`);
         }
     }
 });

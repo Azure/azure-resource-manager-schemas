@@ -45,7 +45,7 @@ executeSynchronous(async () => {
     const packages: Package[] = [];
 
     for (const basePath of basePaths) {
-        const readme = await validateAndReturnReadmePath(constants.specsRepoPath, basePath);
+        const readme = await validateAndReturnReadmePath(localPath, basePath);
         const namespaces = keys(await getApiVersionsByNamespace(readme));
         const autogenlistEntries = findAutogenEntries(basePath);
 

@@ -1,7 +1,7 @@
 import * as constants from '../constants';
 import { cloneAndGenerateBasePaths, validateAndReturnReadmePath } from '../specs';
 import chalk from 'chalk';
-import { findAutogenEntries } from '../autogenlist';
+import { findOrGenerateAutogenEntries } from '../autogenlist';
 import { executeSynchronous, lowerCaseEquals, writeJsonFile, safeMkdir } from '../utils';
 import { getApiVersionsByNamespace } from '../generate';
 import { keys, partition } from 'lodash';
@@ -15,11 +15,11 @@ executeSynchronous(async () => {
     for (const basePath of basePaths) {
         const readme = await validateAndReturnReadmePath(constants.specsRepoPath, basePath);
         const namespaces = keys(await getApiVersionsByNamespace(readme));
-        const autogenlistEntries = findAutogenEntries(basePath);
+        const autogenlistEntries = findOrGenerateAutogenEntries(basePath, namespaces);
 
         const [unautogened, autogened] = partition(
-            namespaces,
-            n => autogenlistEntries.filter(w => lowerCaseEquals(w.namespace, n))[0]?.disabledForAutogen === true);
+            autogenlistEntries,
+            e => e.disabledForAutogen === true);
         
         if (unautogened.length > 0 && autogened.length > 0) {
             // For partial autogeneration only, add two items
@@ -28,7 +28,7 @@ executeSynchronous(async () => {
             allBasePaths.push({
                 'basePath': basePath,
                 'onboardedToAutogen': 'no',
-                'missing': unautogened,
+                'missing': unautogened.map(x => x.namespace),
                 'onboarded': []
             });
 
@@ -36,7 +36,7 @@ executeSynchronous(async () => {
                 'basePath': basePath,
                 'onboardedToAutogen': 'yes',
                 'missing': [],
-                'onboarded': autogened
+                'onboarded': autogened.map(x => x.namespace)
             });
         }
         else {
@@ -44,7 +44,7 @@ executeSynchronous(async () => {
             allBasePaths.push({
                 'basePath': basePath,
                 'onboardedToAutogen': unautogened.length === 0 ? 'yes' : 'no',
-                'missing': unautogened,
+                'missing': unautogened.map(x => x.namespace),
                 'onboarded': []
             });
         }

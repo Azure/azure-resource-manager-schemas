@@ -1047,10 +1047,22 @@ const autoGenList: AutoGenConfig[] = [
     },
 ];
 
-export function getAutoGenList(): AutoGenConfig[] {
-    return autoGenList;
-}
-
 export function findAutogenEntries(basePath: string): AutoGenConfig[] {
     return autoGenList.filter(w => lowerCaseEquals(w.basePath, basePath));
+}
+
+export function findOrGenerateAutogenEntries(basePath: string, namespaces: string[]): AutoGenConfig[] {
+    const entries = findAutogenEntries(basePath).filter(e => namespaces.some(ns => lowerCaseEquals(e.namespace, ns)));
+
+    for (const namespace of namespaces) {
+        if (!entries.some(e => lowerCaseEquals(e.namespace, namespace))) {
+            // Generate configuration for any RPs not explicitly declared in the autogen list
+            entries.push({
+                basePath,
+                namespace,
+            });
+        }
+    }
+
+    return entries;
 }

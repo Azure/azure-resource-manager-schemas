@@ -172,11 +172,6 @@ const disabledProviders: AutoGenConfig[] = [
         disabledForAutogen: true,
     },
     {
-        basePath: 'purview/resource-manager',
-        namespace: 'Microsoft.Purview',
-        disabledForAutogen: true,
-    },
-    {
         basePath: 'quota/resource-manager',
         namespace: 'Microsoft.Quota',
         disabledForAutogen: true,

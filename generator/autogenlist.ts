@@ -563,6 +563,7 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'migrate/resource-manager',
         namespace: 'Microsoft.Migrate',
+        suffix: 'Migrate'
     },
     {
         basePath: 'migrate/resource-manager',
@@ -581,10 +582,12 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'migrateprojects/resource-manager',
         namespace: 'Microsoft.Migrate',
+        suffix: 'MigrateProjects',
     },
     {
         basePath: 'resourcemover/resource-manager',
         namespace: 'Microsoft.Migrate',
+        suffix: 'ResourceMover',
     },
     {
         basePath: 'mariadb/resource-manager',

@@ -102,11 +102,6 @@ const disabledProviders: AutoGenConfig[] = [
         disabledForAutogen: true,
     },
     {
-        basePath: 'extendedlocation/resource-manager',
-        namespace: 'Microsoft.ExtendedLocation',
-        disabledForAutogen: true,
-    },
-    {
         basePath: 'fluidrelay/resource-manager',
         namespace: 'Microsoft.FluidRelay',
         disabledForAutogen: true,

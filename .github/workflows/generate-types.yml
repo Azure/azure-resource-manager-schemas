@@ -1,0 +1,71 @@
+name: Generate Types
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_specs_ref:
+        description: 'Git ref or full SHA for https://github.com/Azure/azure-rest-api-specs.'
+        required: true
+        default: 'main'
+      single_path:
+        description: 'The path to generate types for (e.g. "compute", or "keyvault"). Leave blank to generate all types.'
+        required: false
+
+jobs:
+  update-types:
+    name: Update Types
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2.3.4
+
+      - name: Clone azure-rest-api-specs
+        uses: actions/checkout@v2.3.4
+        with:
+          repository: Azure/azure-rest-api-specs
+          path: workflow-temp/azure-rest-api-specs
+          ref: ${{ github.event.inputs.api_specs_ref }}
+      
+      - name: Install generator npm packages
+        run: npm ci
+        working-directory: generator
+      
+      - id: generate
+        name: Run generator
+        run: |
+          if [ -z "${{ github.event.inputs.single_path }}" ]
+          then
+            npm run generate-all -- '{"localPath": "$GITHUB_WORKSPACE/workflow-temp/azure-rest-api-specs"}'
+          else
+            npm run generate-single -- '${{ github.event.inputs.single_path }}/resource-manager' '$GITHUB_WORKSPACE/workflow-temp/azure-rest-api-specs'
+          fi
+        working-directory: generator
+
+      - id: get_swagger_gh_uri
+        name: Get GitHub URI for azure-rest-api-specs
+        run: |
+          git_sha=`git rev-parse HEAD`
+          echo "::set-output name=gh_uri::https://github.com/Azure/azure-rest-api-specs/tree/$git_sha"
+        working-directory: workflow-temp/azure-rest-api-specs
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3.10.1
+        with:
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          signoff: false
+          branch: autogenerate
+          branch-suffix: short-commit-hash
+          delete-branch: true
+          title: |
+            Update Generated Types ${{ github.event.inputs.single_path && format('(single path: {0})', github.event.inputs.single_path) || '' }}
+          body:  |
+            Update Generated Types ${{ github.event.inputs.single_path && format('(single path: {0})', github.event.inputs.single_path) || '' }}
+
+            Generate types for ${{ steps.get_swagger_gh_uri.outputs.gh_uri }}
+          commit-message: |
+            Update Generated Types ${{ github.event.inputs.single_path && format('(single path: {0})', github.event.inputs.single_path) || '' }}
+
+            Generate types for ${{ steps.get_swagger_gh_uri.outputs.gh_uri }}
+          labels: autogenerate
+          draft: false

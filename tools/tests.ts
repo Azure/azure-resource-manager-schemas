@@ -7,6 +7,7 @@ import { promisify } from 'util';
 import { getLanguageService } from 'vscode-json-languageservice';
 import { TextDocument } from 'vscode-languageserver-types';
 import draft4MetaSchema from 'ajv/lib/refs/json-schema-draft-04.json';
+import draft7MetaSchema from 'ajv/lib/refs/json-schema-draft-07.json';
 import * as schemaTestsRunner from './schemaTestsRunner';
 import 'mocha';
 import { findCycle } from './cycleCheck';
@@ -19,6 +20,7 @@ const testSchemasFolder = __dirname + '/schemas/';
 const templateTestsFolder = __dirname + '/templateTests/';
 const armSchemasPrefix = /^https?:\/\/schema\.management\.azure\.com\/schemas\//
 const jsonSchemaDraft4Prefix = /^https?:\/\/json-schema\.org\/draft-04\/schema/
+const jsonSchemaDraft7Prefix = /^https?:\/\/json-schema\.org\/draft-07\/schema/
 
 const ajvInstance = new Ajv({
   loadSchema: loadSchema,
@@ -26,6 +28,7 @@ const ajvInstance = new Ajv({
   schemaId: 'id',
   meta: false
   }).addMetaSchema(draft4MetaSchema)
+    .addMetaSchema(draft7MetaSchema)
   .addFormat('int32',  /.*/)
   .addFormat('duration',  /.*/)
   .addFormat('password',  /.*/);
@@ -42,6 +45,9 @@ async function loadRawSchema(uri: string) : Promise<string> {
   }
   else if (uri.match(jsonSchemaDraft4Prefix)) {
     return JSON.stringify(draft4MetaSchema);
+  }
+  else if (uri.match(jsonSchemaDraft7Prefix)) {
+      return JSON.stringify(draft7MetaSchema);
   }
   else {
     jsonPath = uri;

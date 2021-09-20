@@ -91,6 +91,7 @@ function listSchemaPaths(basePath: string): string[] {
 
 const metaSchemaPaths = [
   'http://json-schema.org/draft-04/schema',
+  'http://json-schema.org/draft-07/schema',
   testSchemasFolder + 'ResourceMetaSchema.json',
 ];
 

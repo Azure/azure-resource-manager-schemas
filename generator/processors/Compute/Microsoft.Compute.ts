@@ -1,6 +1,10 @@
 import { SchemaPostProcessor, ScopeType } from '../../models';
 
 export const postProcessor: SchemaPostProcessor = (namespace: string, apiVersion: string, schema: any) => {
+    if (schema.title != "Microsoft.Compute") {
+        return;
+    }
+
     const extensionsDefinitions = require("./ExtensionsDefinitionsTemplate.json");
     const extensionsProperties = require("./ExtensionsPropertiesTemplate.json");
 
@@ -40,7 +44,7 @@ export const postProcessor: SchemaPostProcessor = (namespace: string, apiVersion
 
     // save schema as Microsoft.Compute.json
     // save extensionsDefinitions as Microsoft.ComputeExtensions.json
-    var extensionFile = "../../../schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json";
+    var extensionFile = "..\\..\\..\\schemas\\" + apiVersion + "\\Microsoft.Compute.Extensions.json";
     var fs = require('fs');
     const data = JSON.stringify(extensionsDefinitions, null, 2);
     fs.writeFileSync(extensionFile, data);

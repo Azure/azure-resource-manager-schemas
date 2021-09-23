@@ -4,7 +4,7 @@ import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.
 import { postProcessor as machineLearningPostProcessor } from './processors/Microsoft.MachineLearning';
 import { postProcessor as machineLearningServicesPostProcessor } from './processors/Microsoft.MachineLearningServices';
 import { postProcessor as storageProcessor } from './processors/Microsoft.Storage';
-import { postProcessor as computeProcessor } from './processors/Compute/Microsoft.Compute';
+import { postProcessor as computeProcessor } from './processors/Microsoft.Compute';
 import { postProcessor as policyProcessor } from './processors/Microsoft.Authorization';
 import { postProcessor as securityInsightsPostProcessor } from './processors/Microsoft.SecurityInsights';
 import { lowerCaseEquals } from './utils';

@@ -34,6 +34,10 @@ export const postProcessor: SchemaPostProcessor = (namespace: string, apiVersion
 
     // save extensionsDefinitions as Microsoft.ComputeExtensions.json
     const extensionFile = path.normalize(path.join(__dirname, `../../schemas/${apiVersion}/Microsoft.Compute.Extensions.json`));
+    const extensionDir = path.dirname(extensionFile);
+    if (!fs.existsSync(extensionDir) {
+        fs.mkdirSync(extensionDir, { recursive: true });
+    }
 
     const data = JSON.stringify(extensionsDefinitions, null, 2);
     fs.writeFileSync(extensionFile, data);

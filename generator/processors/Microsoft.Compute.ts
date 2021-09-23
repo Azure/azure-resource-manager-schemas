@@ -1,49 +1,47 @@
-import { SchemaPostProcessor, ScopeType } from '../models';
+import path from 'path';
+import fs from 'fs'
+import { SchemaPostProcessor } from '../models';
 
 export const postProcessor: SchemaPostProcessor = (namespace: string, apiVersion: string, schema: any) => {
+    const extensionsDefinitions = extensionsDefinition(apiVersion);
 
-    if (schema.title == "Microsoft.Compute") {
-
-        var extensionsDefinitions = extensionsDefinition(apiVersion);
-
-        // Set schema.resourceDefinitions.virtualMachines_extensions.properties.properties = $extensionsProperties
-        if (schema.resourceDefinitions?.virtualMachines_extensions?.properties?.properties) {
-            schema.resourceDefinitions.virtualMachines_extensions.properties.properties = extensionsProperties(apiVersion);
-        }
-        // Set schema.resourceDefinitions.virtualMachineScaleSets_extensions.properties.properties = $extensionsProperties
-        if (schema.resourceDefinitions?.virtualMachineScaleSets_extensions?.properties?.properties) {
-            schema.resourceDefinitions.virtualMachineScaleSets_extensions.properties.properties = extensionsProperties(apiVersion);
-        }
-        // Set schema.definitions.virtualMachines_extensions_childResource.properties.properties = $extensionsProperties
-        if (schema.definitions.virtualMachines_extensions_childResource?.properties?.properties) {
-            schema.definitions.virtualMachines_extensions_childResource.properties.properties = extensionsProperties(apiVersion);
-        }
-        // Set schema.definitions.VirtualMachineScaleSetExtension.properties.properties = $extensionsProperties
-        if (schema.definitions.VirtualMachineScaleSetExtension?.properties?.properties) {
-            schema.definitions.VirtualMachineScaleSetExtension.properties.properties = extensionsProperties(apiVersion);
-        }
-
-        // set extensionsDefinitions.resourceDefinitions.virtualMachines_extensions = schema.resourceDefinitions.virtualMachines_extensions
-        extensionsDefinitions.resourceDefinitions.virtualMachines_extensions = schema.resourceDefinitions.virtualMachines_extensions
-        // set extensionsDefinitions.resourceDefinitions.virtualMachineScaleSets_extensions = schema.resourceDefinitions.virtualMachineScaleSets_extensions
-        extensionsDefinitions.resourceDefinitions.virtualMachineScaleSets_extensions = schema.resourceDefinitions.virtualMachineScaleSets_extensions
-
-        // remove schema.resourceDefinitions.virtualMachines_extensions
-        delete schema.resourceDefinitions.virtualMachines_extensions
-        // remove schema.resourceDefinitions.virtualMachineScaleSets_extensions
-        delete schema.resourceDefinitions.virtualMachineScaleSets_extensions
-
-        // save extensionsDefinitions as Microsoft.ComputeExtensions.json
-        var extensionFile = __dirname + "\\..\\..\\schemas\\" + apiVersion + "\\Microsoft.Compute.Extensions.json";
-        var fs = require('fs');
-        const data = JSON.stringify(extensionsDefinitions, null, 2);
-        fs.writeFileSync(extensionFile, data);
+    // Set schema.resourceDefinitions.virtualMachines_extensions.properties.properties = $extensionsProperties
+    if (schema.resourceDefinitions?.virtualMachines_extensions?.properties?.properties) {
+        schema.resourceDefinitions.virtualMachines_extensions.properties.properties = extensionsProperties(apiVersion);
     }
+    // Set schema.resourceDefinitions.virtualMachineScaleSets_extensions.properties.properties = $extensionsProperties
+    if (schema.resourceDefinitions?.virtualMachineScaleSets_extensions?.properties?.properties) {
+        schema.resourceDefinitions.virtualMachineScaleSets_extensions.properties.properties = extensionsProperties(apiVersion);
+    }
+    // Set schema.definitions.virtualMachines_extensions_childResource.properties.properties = $extensionsProperties
+    if (schema.definitions.virtualMachines_extensions_childResource?.properties?.properties) {
+        schema.definitions.virtualMachines_extensions_childResource.properties.properties = extensionsProperties(apiVersion);
+    }
+    // Set schema.definitions.VirtualMachineScaleSetExtension.properties.properties = $extensionsProperties
+    if (schema.definitions.VirtualMachineScaleSetExtension?.properties?.properties) {
+        schema.definitions.VirtualMachineScaleSetExtension.properties.properties = extensionsProperties(apiVersion);
+    }
+
+    // set extensionsDefinitions.resourceDefinitions.virtualMachines_extensions = schema.resourceDefinitions.virtualMachines_extensions
+    extensionsDefinitions.resourceDefinitions.virtualMachines_extensions = schema.resourceDefinitions.virtualMachines_extensions
+    // set extensionsDefinitions.resourceDefinitions.virtualMachineScaleSets_extensions = schema.resourceDefinitions.virtualMachineScaleSets_extensions
+    extensionsDefinitions.resourceDefinitions.virtualMachineScaleSets_extensions = schema.resourceDefinitions.virtualMachineScaleSets_extensions
+
+    // remove schema.resourceDefinitions.virtualMachines_extensions
+    delete schema.resourceDefinitions.virtualMachines_extensions
+    // remove schema.resourceDefinitions.virtualMachineScaleSets_extensions
+    delete schema.resourceDefinitions.virtualMachineScaleSets_extensions
+
+    // save extensionsDefinitions as Microsoft.ComputeExtensions.json
+    const extensionFile = path.normalize(path.join(__dirname, `../../schemas/${apiVersion}/Microsoft.Compute.Extensions.json`));
+
+    const data = JSON.stringify(extensionsDefinitions, null, 2);
+    fs.writeFileSync(extensionFile, data);
 }
 
 const extensionsDefinition = (apiVersion: string) => (
     {
-        "id": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#",
+        "id": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#`,
         "$schema": "http://json-schema.org/draft-04/schema#",
         "title": "Microsoft.Compute.Extensions",
         "description": "Microsoft Compute Extensions Resource Types",
@@ -2072,40 +2070,40 @@ const extensionsDefinition = (apiVersion: string) => (
 const extensionsProperties = (apiVersion: string) => (
     {
         "anyOf": [
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/genericExtension" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/iaaSDiagnostics" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/iaaSAntimalware" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/customScriptExtension" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/customScriptForLinux" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/linuxDiagnostic" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/vmAccessForLinux" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/bgInfo" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/vmAccessAgent" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/dscExtension" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/acronisBackupLinux" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/acronisBackup" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/linuxChefClient" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/chefClient" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/datadogLinuxAgent" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/datadogWindowsAgent" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/dockerExtension" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/dynatraceLinux" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/dynatraceWindows" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/eset" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/hpeSecurityApplicationDefender" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/puppetAgent" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/site24x7LinuxServerExtn" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/site24x7WindowsServerExtn" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/site24x7ApmInsightExtn" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/trendMicroDSALinux" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/trendMicroDSA" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/bmcCtmAgentLinux" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/bmcCtmAgentWindows" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/OSPatchingForLinux" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/VMSnapshot" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/VMSnapshotLinux" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/customScript" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/networkWatcherAgentWindows" },
-            { "$ref": "https://schema.management.azure.com/schemas/" + apiVersion + "/Microsoft.Compute.Extensions.json#/definitions/networkWatcherAgentLinux" }
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/genericExtension` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/iaaSDiagnostics` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/iaaSAntimalware` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/customScriptExtension` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/customScriptForLinux` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/linuxDiagnostic` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/vmAccessForLinux` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/bgInfo` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/vmAccessAgent` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/dscExtension` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/acronisBackupLinux` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/acronisBackup` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/linuxChefClient` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/chefClient` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/datadogLinuxAgent` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/datadogWindowsAgent` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/dockerExtension` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/dynatraceLinux` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/dynatraceWindows` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/eset` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/hpeSecurityApplicationDefender` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/puppetAgent` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/site24x7LinuxServerExtn` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/site24x7WindowsServerExtn` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/site24x7ApmInsightExtn` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/trendMicroDSALinux` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/trendMicroDSA` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/bmcCtmAgentLinux` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/bmcCtmAgentWindows` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/OSPatchingForLinux` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/VMSnapshot` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/VMSnapshotLinux` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/customScript` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/networkWatcherAgentWindows` },
+            { "$ref": `https://schema.management.azure.com/schemas/${apiVersion}/Microsoft.Compute.Extensions.json#/definitions/networkWatcherAgentLinux` }
         ]
     });

@@ -772,6 +772,16 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.ServiceFabricMesh',
     },
     {
+        basePath: 'servicelinker/resource-manager',
+        namespace: 'Microsoft.ServiceLinker',
+        resourceConfig: [
+            {
+                type: 'linkers',
+                scopes: ScopeType.Extension,
+            },
+        ],
+    },
+    {
         basePath: 'signalr/resource-manager',
         namespace: 'Microsoft.SignalRService',
     },

@@ -946,7 +946,7 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.DataMigration',
          resourceConfig: [
              {
-                 type: 'sourceControlConfigurations',
+                 type: 'databaseMigrations',
                  scopes: ScopeType.Extension
              }
         ]

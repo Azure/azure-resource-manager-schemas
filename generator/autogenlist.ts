@@ -944,11 +944,11 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'datamigration/resource-manager',
         namespace: 'Microsoft.DataMigration',
-         resourceConfig: [
-             {
-                 type: 'databaseMigrations',
-                 scopes: ScopeType.Extension
-             }
+        resourceConfig: [
+            {
+                type: 'databaseMigrations',
+                scopes: ScopeType.Extension
+            }
         ]
     },
     {

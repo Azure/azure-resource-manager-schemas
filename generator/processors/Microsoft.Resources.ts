@@ -81,7 +81,7 @@ function appendProps(definition: any, props: any[]) {
   }
 }
 
-export const postProcessor: SchemaPostProcessor = (namespace: string, apiVersion: string, schema: any) => {
+export const postProcessor: SchemaPostProcessor = async (namespace: string, apiVersion: string, schema: any) => {
   appendProps(schema.tenant_resourceDefinitions?.deployments, [subscriptionProps]);
   appendProps(schema.managementGroup_resourceDefinitions?.deployments, [subscriptionProps]);
   appendProps(schema.subscription_resourceDefinitions?.deployments, [resourceGroupProps]);

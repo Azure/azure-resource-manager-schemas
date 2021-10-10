@@ -33,7 +33,7 @@ export interface AutoGenResourceConfig {
 }
 
 export interface SchemaPostProcessor {
-  (namespace: string, apiVersion: string, schema: any): void,
+  (namespace: string, apiVersion: string, schema: any): Promise<void>,
 }
 
 export interface Package {

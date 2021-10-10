@@ -4,6 +4,7 @@ import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.
 import { postProcessor as machineLearningPostProcessor } from './processors/Microsoft.MachineLearning';
 import { postProcessor as machineLearningServicesPostProcessor } from './processors/Microsoft.MachineLearningServices';
 import { postProcessor as storageProcessor } from './processors/Microsoft.Storage';
+import { postProcessor as computeProcessor } from './processors/Microsoft.Compute';
 import { postProcessor as policyProcessor } from './processors/Microsoft.Authorization';
 import { postProcessor as securityInsightsPostProcessor } from './processors/Microsoft.SecurityInsights';
 import { lowerCaseEquals } from './utils';
@@ -38,11 +39,6 @@ const disabledProviders: AutoGenConfig[] = [
     {
         basePath: 'cloudshell/resource-manager',
         namespace: 'Microsoft.Portal',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'compute/resource-manager',
-        namespace: 'Microsoft.Compute',
         disabledForAutogen: true,
     },
     {
@@ -865,6 +861,11 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'storage/resource-manager',
         namespace: 'Microsoft.Storage',
         postProcessor: storageProcessor
+    },
+    {
+        basePath: 'compute/resource-manager',
+        namespace: 'Microsoft.Compute',
+        postProcessor: computeProcessor
     },
     {
         basePath: 'vmwarecloudsimple/resource-manager',

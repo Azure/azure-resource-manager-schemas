@@ -1,6 +1,6 @@
 import { SchemaPostProcessor, ScopeType } from '../models';
 
-export const postProcessor: SchemaPostProcessor = (namespace: string, apiVersion: string, schema: any) => {
+export const postProcessor: SchemaPostProcessor = async (namespace: string, apiVersion: string, schema: any) => {
   const scopes = [
     'tenant_resourceDefinitions',
     'managementGroup_resourceDefinitions',

@@ -1,6 +1,6 @@
 import { SchemaPostProcessor } from '../models';
 
-export const postProcessor: SchemaPostProcessor = (_namespace: string, _apiVersion: string, schema: any) => {
+export const postProcessor: SchemaPostProcessor = async (_namespace: string, _apiVersion: string, schema: any) => {
     const allowedValues = schema.definitions?.ParameterDefinitionsValue?.properties?.allowedValues;
     if (allowedValues && allowedValues.oneOf) {
         const allowedValuesItems = allowedValues.oneOf[0]?.items

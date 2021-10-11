@@ -207,11 +207,6 @@ const disabledProviders: AutoGenConfig[] = [
         namespace: 'Microsoft.Media',
         disabledForAutogen: true,
     },
-    {
-        basePath: 'webpubsub/resource-manager',
-        namespace: 'Microsoft.SignalRService',
-        disabledForAutogen: true,
-    },
 ];
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
@@ -780,6 +775,11 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'signalr/resource-manager',
         namespace: 'Microsoft.SignalRService',
+    },
+    {
+        basePath: 'webpubsub/resource-manager',
+        namespace: 'Microsoft.SignalRService',
+        suffix: 'WebPubSub',
     },
     {
         basePath: 'sqlvirtualmachine/resource-manager',

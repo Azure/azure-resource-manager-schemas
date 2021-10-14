@@ -2,6 +2,7 @@ import { ScopeType, AutoGenConfig } from './models';
 import { postProcessor as insightsApplicationPostProcessor } from './processors/Microsoft.Insights.Application';
 import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
 import { postProcessor as machineLearningPostProcessor } from './processors/Microsoft.MachineLearning';
+import { postProcessor as kustoPostProcessor } from './processors/Microsoft.Kusto';
 import { postProcessor as machineLearningServicesPostProcessor } from './processors/Microsoft.MachineLearningServices';
 import { postProcessor as storageProcessor } from './processors/Microsoft.Storage';
 import { postProcessor as policyProcessor } from './processors/Microsoft.Authorization';
@@ -338,6 +339,11 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'machinelearning/resource-manager',
         namespace: 'Microsoft.MachineLearning',
         postProcessor: machineLearningPostProcessor,
+    },
+    {
+        basePath: 'azure-kusto/resource-manager',
+        namespace: 'Microsoft.Kusto',
+        postProcessor: kustoPostProcessor,
     },
     {
         basePath: 'machinelearningservices/resource-manager',

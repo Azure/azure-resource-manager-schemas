@@ -25,6 +25,7 @@ executeSynchronous(async () => {
 
     const schemaConfigs = [];
     const autoGenEntries = findAutogenEntries(basePath);
+    console.log(autoGenEntries);
 
     if (autoGenEntries.length === 0) {
         const localSchemaConfigs = await generateSchemas(readme);

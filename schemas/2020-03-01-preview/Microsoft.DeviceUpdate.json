@@ -16,13 +16,13 @@
         "identity": {
           "oneOf": [
             {
-              "$ref": "#/definitions/Identity"
+              "$ref": "#/definitions/ManagedServiceIdentity"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Identity for the resource."
+          "description": "Managed service identity (system assigned and/or user assigned identities)"
         },
         "location": {
           "type": "string",
@@ -336,30 +336,52 @@
       ],
       "description": "Microsoft.DeviceUpdate/accounts/privateEndpointConnections"
     },
-    "Identity": {
+    "DiagnosticStorageProperties": {
       "type": "object",
       "properties": {
-        "type": {
+        "authenticationType": {
           "oneOf": [
             {
               "type": "string",
               "enum": [
-                "SystemAssigned",
-                "None"
+                "KeyBased"
               ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The identity type."
+          "description": "Authentication Type"
+        },
+        "connectionString": {
+          "type": "string",
+          "description": "ConnectionString of the diagnostic storage account"
+        },
+        "resourceId": {
+          "type": "string",
+          "description": "ResourceId of the diagnostic storage account"
         }
       },
-      "description": "Identity for the resource."
+      "required": [
+        "authenticationType",
+        "resourceId"
+      ],
+      "description": "Customer-initiated diagnostic log collection storage properties"
     },
     "InstanceProperties": {
       "type": "object",
       "properties": {
+        "diagnosticStorageProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DiagnosticStorageProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Customer-initiated diagnostic log collection storage properties"
+        },
         "enableDiagnostics": {
           "oneOf": [
             {
@@ -410,6 +432,46 @@
         "resourceId"
       ],
       "description": "Device Update account integration with IoT Hub settings."
+    },
+    "ManagedServiceIdentity": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "None",
+                "SystemAssigned",
+                "UserAssigned",
+                "SystemAssigned,UserAssigned"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "userAssignedIdentities": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/UserAssignedIdentity"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Managed service identity (system assigned and/or user assigned identities)"
     },
     "PrivateEndpoint": {
       "type": "object",
@@ -493,6 +555,11 @@
         }
       },
       "description": "A collection of information about the state of the connection between service consumer and provider."
+    },
+    "UserAssignedIdentity": {
+      "type": "object",
+      "properties": {},
+      "description": "User assigned identity properties"
     }
   }
 }

@@ -129,7 +129,7 @@ const genevaLegacyDataConnection = () => ({
 });
 
 const clusterDataConnections_childResource = () => ({
-    $ref: '#/definitions/clusters_dataconnections_childResource'
+    $ref: '#/definitions/clusters_dataConnections_childResource'
 });
 
 export const postProcessor: SchemaPostProcessor = async (namespace: string, apiVersion: string, schema: any) => {
@@ -139,9 +139,9 @@ export const postProcessor: SchemaPostProcessor = async (namespace: string, apiV
         clusterSubResources.push(clusterDataConnections_childResource());
         schema.resourceDefinitions.clusters.properties.resources.items.oneOf = clusterSubResources;
         const clusterDataConnectionObject = clusterDataConnections(apiVersion);
-        schema['resourceDefinitions']['clusters_dataconnections'] = clusterDataConnectionObject;
+        schema['resourceDefinitions']['clusters_dataConnections'] = clusterDataConnectionObject;
         clusterDataConnectionObject.properties.type.enum = ["Microsoft.Kusto/clusters/dataconnections"];
-        schema.definitions.clusters_dataconnections_childResource = clusterDataConnectionObject;
+        schema.definitions.clusters_dataConnections_childResource = clusterDataConnectionObject;
         schema.definitions.GenevaDataConnectionProperties = genevaDataConnectionProperties();
         schema.definitions.GenevaDataConnection = genevaDataConnection();
         schema.definitions.GenevaLegacyDataConnectionProperties = genevaLegacyDataConnectionProperties();

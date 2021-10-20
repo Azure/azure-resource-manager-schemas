@@ -9,6 +9,7 @@ export enum ScopeType {
 }
 
 export interface AutoGenConfig {
+  disabledForAutogen?: true,
   basePath: string,
   namespace: string,
   readmeFile?: string,
@@ -32,7 +33,7 @@ export interface AutoGenResourceConfig {
 }
 
 export interface SchemaPostProcessor {
-  (namespace: string, apiVersion: string, schema: any): void,
+  (namespace: string, apiVersion: string, schema: any): Promise<void>,
 }
 
 export interface Package {

@@ -15,7 +15,7 @@ export interface SchemaConfiguration {
     relativePath: string;
 }
 
-interface SchemaReference {
+export interface SchemaReference {
     scope: ScopeType;
     type: string;
     reference: string;
@@ -178,7 +178,7 @@ async function generateSchemaConfig(outputFile: string, namespace: string, apiVe
 
     let output = await readJsonFile(outputFile);
     if (autoGenConfig?.postProcessor) {
-        autoGenConfig?.postProcessor(namespace, apiVersion, output);
+        await autoGenConfig?.postProcessor(namespace, apiVersion, output);
 
         await writeJsonFile(outputFile, output);
     }

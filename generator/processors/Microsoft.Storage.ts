@@ -9,6 +9,7 @@ export const postProcessor: SchemaPostProcessor = async (namespace: string, apiV
     'extension_resourceDefinitions'
   ].filter(scope => schema[scope])
   
+  // TODO: Remove this workaround once https://github.com/Azure/autorest.azureresourceschema/pull/74 is merged
   scopes.forEach(scope => {
     for (let key in schema[scope]) {
       const requiredArray = schema[scope][key].required

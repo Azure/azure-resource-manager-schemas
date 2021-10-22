@@ -7,6 +7,8 @@ import { postProcessor as storageProcessor } from './processors/Microsoft.Storag
 import { postProcessor as computeProcessor } from './processors/Microsoft.Compute';
 import { postProcessor as policyProcessor } from './processors/Microsoft.Authorization';
 import { postProcessor as securityInsightsPostProcessor } from './processors/Microsoft.SecurityInsights';
+import { postProcessor as costManagementPostProcessor } from './processors/Microsoft.CostManagement';
+import { postProcessor as providerHubPostProcessor } from './processors/Microsoft.ProviderHub';
 import { lowerCaseEquals } from './utils';
 
 // New providers are onboarded by default. The providers listed here are the only ones **not** onboarded.
@@ -270,6 +272,7 @@ const autoGenList: AutoGenConfig[] = [
                 scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
         ],
+        postProcessor: costManagementPostProcessor,
     },
     {
         basePath: 'customerlockbox/resource-manager',
@@ -572,6 +575,11 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'powerbiembedded/resource-manager',
         namespace: 'Microsoft.PowerBI',
+    },
+    {
+        basePath: 'providerhub/resource-manager',
+        namespace: 'Microsoft.ProviderHub',
+        postProcessor: providerHubPostProcessor
     },
     {
         basePath: 'quota/resource-manager',

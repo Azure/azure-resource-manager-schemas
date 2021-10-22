@@ -408,6 +408,16 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.HybridCompute',
     },
     {
+        basePath: 'hybridconnectivity/resource-manager',
+        namespace: 'Microsoft.HybridConnectivity',
+        resourceConfig: [
+            {
+                type: 'endpoints',
+                scopes: ScopeType.Extension,
+            }
+        ]
+    },
+    {
         basePath: 'hybriddatamanager/resource-manager',
         namespace: 'Microsoft.HybridData',
     },

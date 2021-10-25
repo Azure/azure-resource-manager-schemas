@@ -8,6 +8,8 @@ import { postProcessor as storageProcessor } from './processors/Microsoft.Storag
 import { postProcessor as computeProcessor } from './processors/Microsoft.Compute';
 import { postProcessor as policyProcessor } from './processors/Microsoft.Authorization';
 import { postProcessor as securityInsightsPostProcessor } from './processors/Microsoft.SecurityInsights';
+import { postProcessor as costManagementPostProcessor } from './processors/Microsoft.CostManagement';
+import { postProcessor as providerHubPostProcessor } from './processors/Microsoft.ProviderHub';
 import { lowerCaseEquals } from './utils';
 
 // New providers are onboarded by default. The providers listed here are the only ones **not** onboarded.
@@ -15,21 +17,6 @@ const disabledProviders: AutoGenConfig[] = [
     {
         basePath: 'advisor/resource-manager',
         namespace: 'Microsoft.Advisor',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'agrifood/resource-manager',
-        namespace: 'Microsoft.AgFoodPlatform',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'azurestackhci/resource-manager',
-        namespace: 'Microsoft.AzureStackHCI',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'baremetalinfrastructure/resource-manager',
-        namespace: 'Microsoft.BareMetalInfrastructure',
         disabledForAutogen: true,
     },
     {
@@ -43,39 +30,9 @@ const disabledProviders: AutoGenConfig[] = [
         disabledForAutogen: true,
     },
     {
-        basePath: 'confidentialledger/resource-manager',
-        namespace: 'Microsoft.ConfidentialLedger',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'cost-management/resource-manager',
-        namespace: 'Microsoft.CostManagement',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'cpim/resource-manager',
-        namespace: 'Microsoft.AzureActiveDirectory',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'dataprotection/resource-manager',
-        namespace: 'Microsoft.DataProtection',
-        disabledForAutogen: true,
-    },
-    {
         // Disabled as the swagger spec contains a type ("DateTimeRfc1123") which autorest is unable to parse: https://github.com/Azure/autorest.azureresourceschema/issues/71
         basePath: 'domainservices/resource-manager',
         namespace: 'Microsoft.AAD',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'dfp/resource-manager',
-        namespace: 'Microsoft.Dynamics365Fraudprotection',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'dnc/resource-manager',
-        namespace: 'Microsoft.DelegatedNetwork',
         disabledForAutogen: true,
     },
     {
@@ -84,23 +41,9 @@ const disabledProviders: AutoGenConfig[] = [
         disabledForAutogen: true,
     },
     {
-        basePath: 'edgeorder/resource-manager',
-        namespace: 'Microsoft.EdgeOrder',
-        disabledForAutogen: true,
-    },
-    {
+        // Disabled as the swagger spec contains a bug (enum mismatch)
         basePath: 'edgeorderpartner/resource-manager',
         namespace: 'Microsoft.EdgeOrderPartner',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'fluidrelay/resource-manager',
-        namespace: 'Microsoft.FluidRelay',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'iotsecurity/resource-manager',
-        namespace: 'Microsoft.IoTSecurity',
         disabledForAutogen: true,
     },
     {
@@ -109,23 +52,8 @@ const disabledProviders: AutoGenConfig[] = [
         disabledForAutogen: true,
     },
     {
-        basePath: 'm365securityandcompliance/resource-manager',
-        namespace: 'Microsoft.M365SecurityAndCompliance',
-        disabledForAutogen: true,
-    },
-    {
         basePath: 'managedservices/resource-manager',
         namespace: 'Microsoft.ManagedServices',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'marketplacenotifications/resource-manager',
-        namespace: 'Microsoft.MarketplaceNotifications',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'marketplaceordering/resource-manager',
-        namespace: 'Microsoft.MarketplaceOrdering',
         disabledForAutogen: true,
     },
     {
@@ -154,43 +82,8 @@ const disabledProviders: AutoGenConfig[] = [
         disabledForAutogen: true,
     },
     {
-        basePath: 'providerhub/resource-manager',
-        namespace: 'Microsoft.ProviderHub',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'quota/resource-manager',
-        namespace: 'Microsoft.Quota',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'resources/resource-manager',
-        namespace: 'Microsoft.Features',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'resources/resource-manager',
-        namespace: 'Microsoft.Solutions',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'securityandcompliance/resource-manager',
-        namespace: 'Microsoft.SecurityAndCompliance',
-        disabledForAutogen: true,
-    },
-    {
         basePath: 'service-map/resource-manager',
         namespace: 'Microsoft.OperationalInsights',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'servicefabricmanagedclusters/resource-manager',
-        namespace: 'Microsoft.ServiceFabricManagedClusters',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'testbase/resource-manager',
-        namespace: 'Microsoft.TestBase',
         disabledForAutogen: true,
     },
     {
@@ -359,6 +252,25 @@ const autoGenList: AutoGenConfig[] = [
         ],
     },
     {
+        basePath: 'cost-management/resource-manager',
+        namespace: 'Microsoft.CostManagement',
+        resourceConfig: [
+            {
+                type: 'exports',
+                scopes: ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup,
+            },
+            {
+                type: 'budgets',
+                scopes: ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'views',
+                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+        ],
+        postProcessor: costManagementPostProcessor,
+    },
+    {
         basePath: 'customerlockbox/resource-manager',
         namespace: 'Microsoft.CustomerLockbox',
     },
@@ -492,6 +404,16 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.HybridCompute',
     },
     {
+        basePath: 'hybridconnectivity/resource-manager',
+        namespace: 'Microsoft.HybridConnectivity',
+        resourceConfig: [
+            {
+                type: 'endpoints',
+                scopes: ScopeType.Extension,
+            }
+        ]
+    },
+    {
         basePath: 'hybriddatamanager/resource-manager',
         namespace: 'Microsoft.HybridData',
     },
@@ -506,6 +428,20 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'iotspaces/resource-manager',
         namespace: 'Microsoft.IoTSpaces',
+    },
+    {
+        basePath: 'iotsecurity/resource-manager',
+        namespace: 'Microsoft.IoTSecurity',
+        resourceConfig: [
+            {
+                type: 'sensors',
+                scopes: ScopeType.Extension,
+            },
+            {
+                type: 'sites',
+                scopes: ScopeType.Extension,
+            }
+        ]
     },
     {
         basePath: 'intune/resource-manager',
@@ -652,6 +588,25 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.PowerBI',
     },
     {
+        basePath: 'providerhub/resource-manager',
+        namespace: 'Microsoft.ProviderHub',
+        postProcessor: providerHubPostProcessor
+    },
+    {
+        basePath: 'quota/resource-manager',
+        namespace: 'Microsoft.Quota',
+        resourceConfig: [
+            {
+                type: 'quotaLimits',
+                scopes: ScopeType.Extension,
+            },
+            {
+                type: 'quotas',
+                scopes: ScopeType.Extension,
+            },
+        ],
+    },
+    {
         basePath: 'redhatopenshift/resource-manager',
         namespace: 'Microsoft.RedHatOpenShift',
     },
@@ -689,6 +644,10 @@ const autoGenList: AutoGenConfig[] = [
             {
                 type: 'policyExemptions',
                 scopes: ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'policyPricings',
+                scopes: ScopeType.ManagementGroup | ScopeType.Subcription,
             },
             {
                 type: 'locks',

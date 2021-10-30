@@ -24,7 +24,7 @@ You can use the generator in this repo to automatically generate a schema from a
 ```bash
 cd generator
 npm install
-npm run generate-single myprovider/resource-manager
+npm run generate-single -- --base-path myprovider/resource-manager
 ```
 4. Review the generator logs to ensure no errors, and review the changes generated.
 5. Ensure that you have reviewed the guidelines under [Submitting a PR](#submitting-a-pr).

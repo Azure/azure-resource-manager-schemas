@@ -1,6 +1,8 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 import { SchemaPostProcessor } from '../models';
 
-export const postProcessor: SchemaPostProcessor = async (_namespace: string, _apiVersion: string, schema: any) => {
+export const postProcessor: SchemaPostProcessor = async (namespace, apiVersion, schema) => {
     const allowedValues = schema.definitions?.ParameterDefinitionsValue?.properties?.allowedValues;
     if (allowedValues && allowedValues.oneOf) {
         const allowedValuesItems = allowedValues.oneOf[0]?.items
@@ -27,6 +29,7 @@ export const postProcessor: SchemaPostProcessor = async (_namespace: string, _ap
     removeDataplaneParameterRestriction(setDefinitionParameter);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function removeObjectType(property: any) {
     if (property && property['type'] && property['type'] === 'object') {
         delete property['type'];
@@ -34,6 +37,7 @@ function removeObjectType(property: any) {
     }    
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function removeDataplaneParameterRestriction(property: any) {
     if (property?.oneOf && property.oneOf[0]?.additionalProperties && property.oneOf[0]['type'] === 'object') {
         delete property['oneOf'];

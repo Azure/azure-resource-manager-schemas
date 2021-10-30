@@ -1,8 +1,9 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 import * as constants from '../constants';
 import { cloneAndGenerateBasePaths, validateAndReturnReadmePath } from '../specs';
-import chalk from 'chalk';
 import { findOrGenerateAutogenEntries } from '../autogenlist';
-import { executeSynchronous, lowerCaseEquals, writeJsonFile, safeMkdir } from '../utils';
+import { executeSynchronous, writeJsonFile, safeMkdir } from '../utils';
 import { getApiVersionsByNamespace } from '../generate';
 import { keys, partition } from 'lodash';
 import path from 'path';
@@ -10,7 +11,7 @@ import path from 'path';
 executeSynchronous(async () => {
     const basePaths = await cloneAndGenerateBasePaths(constants.specsRepoPath, constants.specsRepoUri, constants.specsRepoCommitHash);
 
-    let allBasePaths = [];
+    const allBasePaths = [];
 
     for (const basePath of basePaths) {
         const readme = await validateAndReturnReadmePath(constants.specsRepoPath, basePath);

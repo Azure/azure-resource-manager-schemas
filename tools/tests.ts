@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 import { expect } from 'chai';
 import Ajv from 'ajv';
 import * as url from 'url';
@@ -145,6 +147,7 @@ const schemaTestPaths = listSchemaPaths(schemaTestsFolder);
 schemaTestPaths.push(testSchemasFolder + 'ResourceMetaSchema.tests.json');
 const templateTestPaths = listSchemaPaths(templateTestsFolder);
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const schemaTestMap: {[path: string]: any} = {};
 for (const testPath of schemaTestPaths) {
   const contents = fs.readFileSync(testPath, { encoding: 'utf8' });

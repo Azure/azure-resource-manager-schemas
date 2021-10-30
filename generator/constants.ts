@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 import os from 'os';
 import path from 'path';
 
@@ -6,6 +8,7 @@ export const generatorRoot = path.resolve(__dirname, '../');
 export const specsRepoPath = path.join(os.tmpdir(), 'schm_azspc');
 export const specsRepoUri = 'https://github.com/azure/azure-rest-api-specs';
 export const specsRepoCommitHash = 'origin/main';
+// eslint-disable-next-line no-useless-escape
 export const pathRegex = /(microsoft\.\w+)[\\\/]\S*[\\\/](\d{4}-\d{2}-\d{2}(|-preview))[\\\/]/i;
 
 export const autoRestVerboseOutput = false;

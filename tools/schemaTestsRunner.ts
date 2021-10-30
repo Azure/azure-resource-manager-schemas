@@ -1,3 +1,7 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { expect, assert } from 'chai';
 import tv4 from 'tv4';
 
@@ -181,7 +185,7 @@ function cleanValidationErrorProperties(error: tv4.ValidationError): ValidationE
 
 async function addMissingSchemas(missingUris: string[], loadSchema: (uri: string) => Promise<any>) {
     while (missingUris && missingUris.length > 0) {
-        var missingUri = missingUris.pop();
+        const missingUri = missingUris.pop();
         if (missingUri && missingUri.length > 0) {
             const schema = await loadSchema(missingUri);
             tv4.addSchema(missingUri, schema);

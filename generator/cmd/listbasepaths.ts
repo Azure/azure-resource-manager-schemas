@@ -1,8 +1,10 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 import * as constants from '../constants';
 import { cloneAndGenerateBasePaths, validateAndReturnReadmePath } from '../specs';
 import chalk from 'chalk';
 import { findOrGenerateAutogenEntries } from '../autogenlist';
-import { executeSynchronous, lowerCaseEquals } from '../utils';
+import { executeSynchronous } from '../utils';
 import { getApiVersionsByNamespace } from '../generate';
 import { keys, partition } from 'lodash';
 

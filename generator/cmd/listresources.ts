@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 import path from 'path';
 import fs from 'fs';
 import { promisify } from 'util';
@@ -42,8 +44,9 @@ async function readSchema(schemaUri: string) {
     }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function findAllReferences(input: any) {
-    let refs: any[] = [];
+    let refs: string[] = [];
 
     for (const key of Object.keys(input)) {
         if (Array.isArray(input[key])) {
@@ -86,7 +89,7 @@ async function getResourceInfo(schemaRef: string) {
 }
 
 async function findAllResourceReferences() {
-    let allRefs: any[] = [];
+    let allRefs: string[] = [];
     for (const rootSchemaPath of rootSchemaPaths) {
         const rootSchema = await readSchema(rootSchemaPath);
         const schemaRefs = findAllReferences(rootSchema)

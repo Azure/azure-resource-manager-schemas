@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 import path from 'path';
 import fs from 'fs';
 import { promisify } from 'util';
@@ -103,7 +105,7 @@ export async function prepareReadme(readme: string, autoGenConfig?: AutoGenConfi
     let readmeTag = {} as ReadmeTag;
     fileSet.forEach(inputFile => {
         const match = constants.pathRegex.exec(inputFile);
-        if (!!match) {
+        if (match) {
             const mNamespace = match[1];
             const mApiVersion = match[2];
             if (!autoGenConfig || lowerCaseEquals(mNamespace, autoGenConfig.namespace)) {
@@ -115,7 +117,7 @@ export async function prepareReadme(readme: string, autoGenConfig?: AutoGenConfi
         }
     });
 
-    if (!!autoGenConfig?.readmeTag) {
+    if (autoGenConfig?.readmeTag) {
         readmeTag = {...readmeTag, ...autoGenConfig.readmeTag };
     }
 

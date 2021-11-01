@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 import { ScopeType, AutoGenConfig } from './models';
 import { postProcessor as insightsApplicationPostProcessor } from './processors/Microsoft.Insights.Application';
 import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
@@ -371,9 +373,9 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.HDInsight',
     },
     {
-        basePath: 'resourcehealth/resource-manager',
-        namespace: 'Microsoft.ResourceHealth',
-    }, 
+        basePath: 'resourcehealth/resource-manager',
+        namespace: 'Microsoft.ResourceHealth',
+    },
     {
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',
         namespace: 'Microsoft.EnterpriseKnowledgeGraph',

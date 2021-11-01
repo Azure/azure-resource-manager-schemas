@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 import { executeSynchronous } from '../utils';
 import { findAutogenEntries } from '../autogenlist';
 

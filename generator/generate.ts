@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 import path from 'path';
 import os from 'os';
 import { findRecursive, findDirRecursive, executeCmd, rmdirRecursive, lowerCaseCompare, lowerCaseCompareLists, lowerCaseStartsWith, readJsonFile, writeJsonFile, safeMkdir, safeUnlink, fileExists, lowerCaseEquals, lowerCaseContains } from './utils';
@@ -38,7 +40,7 @@ export async function getApiVersionsByNamespace(readme: string): Promise<Diction
     const apiVersionPaths = await findDirRecursive(searchPath, p => path.basename(p).match(apiVersionRegex) !== null);
 
     const output: Dictionary<string[]> = {};
-    for (const [namespace, _, apiVersion] of apiVersionPaths.map(p => path.relative(searchPath, p).split(path.sep))) {
+    for (const [namespace, , apiVersion] of apiVersionPaths.map(p => path.relative(searchPath, p).split(path.sep))) {
         output[namespace] = [...(output[namespace] ?? []), apiVersion];
     }
 
@@ -126,6 +128,7 @@ async function generateSchema(readme: string, tmpFolder: string) {
     return await execAutoRest(tmpFolder, autoRestParams);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getSchemaRefs(output: any, scopeType: ScopeType, resourceDefinitionsPath: string): SchemaReference[] {
     const resourceDefs = output[resourceDefinitionsPath] || {};
     const resourceKeys = Object.keys(resourceDefs);
@@ -176,7 +179,7 @@ async function generateSchemaConfig(outputFile: string, namespace: string, apiVe
     const suffix = autoGenConfig?.suffix;
     const relativePath = `${apiVersion}/${getSchemaFileName(namespace, suffix)}`;
 
-    let output = await readJsonFile(outputFile);
+    const output = await readJsonFile(outputFile);
     if (autoGenConfig?.postProcessor) {
         await autoGenConfig?.postProcessor(namespace, apiVersion, output);
 

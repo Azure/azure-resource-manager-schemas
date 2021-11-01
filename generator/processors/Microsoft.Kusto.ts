@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 import { SchemaPostProcessor } from '../models';
 import { apiVersionCompare } from '../utils';
 
@@ -132,7 +134,7 @@ const clusterDataConnections_childResource = () => ({
   $ref: '#/definitions/clusters_dataConnections_childResource'
 });
 
-export const postProcessor: SchemaPostProcessor = async (namespace: string, apiVersion: string, schema: any) => {
+export const postProcessor: SchemaPostProcessor = async (namespace, apiVersion, schema) => {
   // Handle cluster data connection
   if (apiVersionCompare(apiVersion, '2019-11-09') > -1) {
     const clusterSubResources = schema.resourceDefinitions.clusters.properties.resources.items.oneOf;

@@ -1,6 +1,8 @@
-import { SchemaPostProcessor, ScopeType } from '../models';
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+import { SchemaPostProcessor } from '../models';
 
-export const postProcessor: SchemaPostProcessor = async (namespace: string, apiVersion: string, schema: any) => {
+export const postProcessor: SchemaPostProcessor = async (namespace, apiVersion, schema) => {
   const scopes = [
     'tenant_resourceDefinitions',
     'managementGroup_resourceDefinitions',
@@ -11,7 +13,7 @@ export const postProcessor: SchemaPostProcessor = async (namespace: string, apiV
   
   // TODO: Remove this workaround once https://github.com/Azure/autorest.azureresourceschema/pull/74 is merged
   scopes.forEach(scope => {
-    for (let key in schema[scope]) {
+    for (const key in schema[scope]) {
       const requiredArray = schema[scope][key].required
       if (requiredArray && Array.isArray(requiredArray)) {
         const index = requiredArray.indexOf('properties')

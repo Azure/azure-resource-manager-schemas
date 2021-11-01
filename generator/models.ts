@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 export enum ScopeType {
   None = 0,
   Unknown = 1 << 0,
@@ -33,6 +35,7 @@ export interface AutoGenResourceConfig {
 }
 
 export interface SchemaPostProcessor {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (namespace: string, apiVersion: string, schema: any): Promise<void>,
 }
 

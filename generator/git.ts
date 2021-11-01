@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 import { executeCmd, rmdirRecursive } from './utils';
 import fs from 'fs';
 import { promisify } from 'util';

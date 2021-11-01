@@ -1,7 +1,10 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 class SchemaRefNode {
   children: {[key: string]: SchemaRefNode} = {};
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function findByRef(schema: any, ref: string) {
   const pathArray = ref.substr(2).split('/');
   for (const path of pathArray) {
@@ -11,6 +14,7 @@ function findByRef(schema: any, ref: string) {
   return schema;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function findRefs(schema: any, root: SchemaRefNode) {
   if (Array.isArray(schema)) {
     for (const entry of schema) {
@@ -48,6 +52,8 @@ export function findCycle(schema: object) {
       return [schemaRef, ...cycle];
     }
   }
+
+  return;
 }
 
 function findDependencyCycle(identifier: string, root: SchemaRefNode) {
@@ -71,4 +77,6 @@ function findDependencyCycleRecursive(originalIdentifier: string, identifier: st
       return [dependency, ...result];
     }
   }
+
+  return;
 }

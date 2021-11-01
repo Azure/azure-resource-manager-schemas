@@ -9,8 +9,8 @@
 * `npm run clean` - Resets the local schemas directory to a clean state.
 * `npm run list-basepaths` - Lists all the valid base paths from the specs repo for generation.
 * `npm run list-resources` - Lists all the schema-declared types and API versions referenced in [schemas/2019-04-01/deploymentTemplate.json](/schemas/2019-04-01/deploymentTemplate.json).
-* `npm run generate-all` - Re-generates all schemas for providers which have been added to [autogenlist.ts](./autogenlist.ts).
-* `npm run generate-single {basePath} [{localPath}]` - Re-generates schemas for all resource types and API versions found under a given base path. Use optional `{localPath}` to generate from local specs repo.
+* `npm run generate-all` - Re-generates all schemas for providers which have been added to [autogenlist.ts](./autogenlist.ts). Run `npm run generate-all -- --help` to see available options.
+* `npm run generate-single` - Re-generates schemas for all resource types and API versions found under a given base path. Run `npm run generate-single -- --help` to see available options.
 * See [package.json](./package.json) for the full set of commands.
 
 ### Daily autogeneration
@@ -39,7 +39,7 @@ If your team has been opted out, and you would like to opt in, please raise an i
 > The following steps are no longer necessary for onboarding, but listed here for reference:
 > 1. Follow the steps listed under [Getting Started](#getting-started). The following commands assume you are running in the > `generator` directory.
 > 3. Run `npm run list-basepaths` to discover the specs repo path containing the swagger definitions.
-> 4. Run `npm run generate-single {basePath}` to generate schemas for them. Save the console output to file.
+> 4. Run `npm run generate-single -- --base-path {basePath}` to generate schemas for them. Save the console output to file.
 > 5. Manually remove any existing references to your provider namespace (if any) from [schemas/2019-04-01/deploymentTemplate.> json](/schemas/2019-04-01/deploymentTemplate.json).
 > 6. Add the {basePath} to the autogenlist array in [autogenlist.ts](./autogenlist.ts).
 > 7. Commit all the changed files, and submit a PR to this repo with title "Onboarding {provider} for autogeneration". Include > the full output saved in step 2 as a comment.

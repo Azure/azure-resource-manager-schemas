@@ -1,4 +1,6 @@
-import { SchemaPostProcessor, ScopeType } from '../models';
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
+import { SchemaPostProcessor } from '../models';
 import { merge } from 'lodash';
 import { schemasBaseUri } from '../constants';
 import { apiVersionCompare } from '../utils';
@@ -75,13 +77,14 @@ const resourceGroupProps = {
   },
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function appendProps(definition: any, props: any[]) {
   if (definition?.properties) {
     definition.properties = merge(definition.properties, ...props);
   }
 }
 
-export const postProcessor: SchemaPostProcessor = async (namespace: string, apiVersion: string, schema: any) => {
+export const postProcessor: SchemaPostProcessor = async (namespace, apiVersion, schema) => {
   appendProps(schema.tenant_resourceDefinitions?.deployments, [subscriptionProps]);
   appendProps(schema.managementGroup_resourceDefinitions?.deployments, [subscriptionProps]);
   appendProps(schema.subscription_resourceDefinitions?.deployments, [resourceGroupProps]);

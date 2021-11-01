@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT License.
 import { spawn } from 'child_process';
 import path from 'path';
 import fs from 'fs';
@@ -174,6 +176,7 @@ export async function readJsonFile(filePath: string) {
     return JSON.parse(rawContents);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function writeJsonFile(filePath: string, json: any) {
     const rawContents = JSON.stringify(json, null, 2);
 
@@ -199,7 +202,7 @@ export async function fileExists(filePath: string) {
 export function executeSynchronous<T>(asyncFunc: () => Promise<T>) {
     series(
         [asyncFunc],
-        (error, _) => {
+        (error) => {
             if (error) {
                 throw error;
             }

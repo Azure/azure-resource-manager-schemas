@@ -4,7 +4,8 @@ on:
   pull_request:
     branches: [ main ]
 jobs:
-  build:
+  schema-tests:
+    name: Schema Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -21,6 +22,10 @@ jobs:
       - name: Install NPM modules
         run: npm ci
         working-directory: ./tools
+      
+      - name: Lint
+        run: npm run lint
+        working-directory: ./tools
 
       - name: Run CI tests
         run: npm test
@@ -30,9 +35,33 @@ jobs:
         run: dotnet test DeploymentsSchemaTests/DeploymentsSchemaTests.csproj
         working-directory: ./tools
 
+  build-generator:
+    name: Build Generator
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2.3.5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2.4.1
+        with:
+          node-version: 14.x
+      
+      - name: Install
+        run: npm ci
+        working-directory: ./generator
+      
+      - name: Lint
+        run: npm run lint
+        working-directory: ./generator
+
+      - name: Build
+        run: npm run build
+        working-directory: ./generator
+
   automerge:
     runs-on: ubuntu-latest
-    needs: build
+    needs: schema-tests
     env:
       PR_PREFIX: sdkAuto/
     if: ${{ github.event.pull_request.user.login == 'openapi-sdkautomation[bot]' }}

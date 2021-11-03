@@ -6,6 +6,6 @@ npm install -g npm
 
 pushd generator
 
-npm install
+npm ci
 
 popd

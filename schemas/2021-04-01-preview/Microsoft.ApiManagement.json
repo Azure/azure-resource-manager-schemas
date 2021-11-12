@@ -124,6 +124,9 @@
                 "$ref": "#/definitions/service_products_childResource"
               },
               {
+                "$ref": "#/definitions/service_schemas_childResource"
+              },
+              {
                 "$ref": "#/definitions/service_subscriptions_childResource"
               },
               {
@@ -717,23 +720,15 @@
           ]
         },
         "name": {
-          "oneOf": [
-            {
-              "type": "string",
-              "pattern": "^[^*#&+:<>?]+$",
-              "minLength": 1,
-              "maxLength": 80
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Schema identifier within an API. Must be unique in the current API Management service instance."
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "Schema id identifier. Must be unique in the current API Management service instance."
         },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/SchemaContractProperties"
+              "$ref": "#/definitions/ApiSchemaContractProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -2226,6 +2221,47 @@
       ],
       "description": "Microsoft.ApiManagement/service/products/tags"
     },
+    "service_schemas": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2021-04-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "Schema id identifier. Must be unique in the current API Management service instance."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SchemaContractProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Schema create or update contract Properties."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ApiManagement/service/schemas"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.ApiManagement/service/schemas"
+    },
     "service_subscriptions": {
       "type": "object",
       "properties": {
@@ -3136,6 +3172,50 @@
         }
       },
       "description": "API Release details"
+    },
+    "ApiSchemaContractProperties": {
+      "type": "object",
+      "properties": {
+        "contentType": {
+          "type": "string",
+          "description": "Must be a valid a media type used in a Content-Type header as defined in the RFC 2616. Media type of the schema document (e.g. application/json, application/xml). </br> - `Swagger` Schema use `application/vnd.ms-azure-apim.swagger.definitions+json` </br> - `WSDL` Schema use `application/vnd.ms-azure-apim.xsd+xml` </br> - `OpenApi` Schema use `application/vnd.oai.openapi.components+json` </br> - `WADL Schema` use `application/vnd.ms-azure-apim.wadl.grammars+xml`."
+        },
+        "document": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ApiSchemaDocumentProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Api Schema Document Properties."
+        }
+      },
+      "required": [
+        "contentType"
+      ],
+      "description": "API Schema create or update contract Properties."
+    },
+    "ApiSchemaDocumentProperties": {
+      "type": "object",
+      "properties": {
+        "components": {
+          "type": "object",
+          "properties": {},
+          "description": "Types definitions. Used for Swagger/OpenAPI v2/v3 schemas only, null otherwise."
+        },
+        "definitions": {
+          "type": "object",
+          "properties": {},
+          "description": "Types definitions. Used for Swagger/OpenAPI v1 schemas only, null otherwise."
+        },
+        "value": {
+          "type": "string",
+          "description": "Json escaped string defining the document representing the Schema. Used for schemas other than Swagger/OpenAPI."
+        }
+      },
+      "description": "Api Schema Document Properties."
     },
     "ApiVersionConstraint": {
       "type": "object",
@@ -5610,46 +5690,39 @@
     "SchemaContractProperties": {
       "type": "object",
       "properties": {
-        "contentType": {
+        "description": {
           "type": "string",
-          "description": "Must be a valid a media type used in a Content-Type header as defined in the RFC 2616. Media type of the schema document (e.g. application/json, application/xml). </br> - `Swagger` Schema use `application/vnd.ms-azure-apim.swagger.definitions+json` </br> - `WSDL` Schema use `application/vnd.ms-azure-apim.xsd+xml` </br> - `OpenApi` Schema use `application/vnd.oai.openapi.components+json` </br> - `WADL Schema` use `application/vnd.ms-azure-apim.wadl.grammars+xml`."
+          "description": "Free-form schema entity description."
         },
         "document": {
+          "type": "object",
+          "properties": {},
+          "description": "Schema Document Properties."
+        },
+        "schemaType": {
           "oneOf": [
             {
-              "$ref": "#/definitions/SchemaDocumentProperties"
+              "type": "string",
+              "enum": [
+                "xml",
+                "json"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Schema Document Properties."
-        }
-      },
-      "required": [
-        "contentType"
-      ],
-      "description": "API Schema create or update contract Properties."
-    },
-    "SchemaDocumentProperties": {
-      "type": "object",
-      "properties": {
-        "components": {
-          "type": "object",
-          "properties": {},
-          "description": "Types definitions. Used for OpenAPI v3 schemas only, null otherwise."
-        },
-        "definitions": {
-          "type": "object",
-          "properties": {},
-          "description": "Types definitions. Used for OpenAPI v2 (Swagger) schemas only, null otherwise."
+          "description": "Schema Type. Immutable."
         },
         "value": {
           "type": "string",
-          "description": "Json escaped string defining the document representing the Schema. Used for schemas other than Swagger/OpenAPI."
+          "description": "Json-encoded string for non json-based schema."
         }
       },
-      "description": "Schema Document Properties."
+      "required": [
+        "schemaType"
+      ],
+      "description": "Schema create or update contract Properties."
     },
     "service_apis_childResource": {
       "type": "object",
@@ -6109,23 +6182,15 @@
           ]
         },
         "name": {
-          "oneOf": [
-            {
-              "type": "string",
-              "pattern": "^[^*#&+:<>?]+$",
-              "minLength": 1,
-              "maxLength": 80
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Schema identifier within an API. Must be unique in the current API Management service instance."
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "Schema id identifier. Must be unique in the current API Management service instance."
         },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/SchemaContractProperties"
+              "$ref": "#/definitions/ApiSchemaContractProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -7524,6 +7589,47 @@
         "type"
       ],
       "description": "Microsoft.ApiManagement/service/products/tags"
+    },
+    "service_schemas_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2021-04-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "Schema id identifier. Must be unique in the current API Management service instance."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SchemaContractProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Schema create or update contract Properties."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "schemas"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.ApiManagement/service/schemas"
     },
     "service_subscriptions_childResource": {
       "type": "object",

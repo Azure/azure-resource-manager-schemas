@@ -820,6 +820,16 @@ const autoGenList: AutoGenConfig[] = [
         suffix: '1200'
     },
     {
+        basePath: 'resources/resource-manager',
+        namespace: 'Microsoft.Solutions',
+        suffix: 'resourcesolutions'
+    },
+    {
+        basePath: 'solutions/resource-manager',
+        namespace: 'Microsoft.Solutions',
+        suffix: 'solutions'
+    },
+    {
         basePath: 'storage/resource-manager',
         namespace: 'Microsoft.Storage',
         postProcessor: storageProcessor

@@ -11,8 +11,7 @@ import { Package } from '../models';
 import yargs from 'yargs';
 import path from 'path/posix';
 
-import { createWriteStream, existsSync } from 'fs';
-import { readdir, stat, rmdir, mkdir, rm, writeFile, readFile, copyFile } from 'fs/promises';
+import { createWriteStream } from 'fs';
 import stripAnsi from 'strip-ansi';
 
 const argsConfig = yargs

@@ -9,7 +9,7 @@ import { flatten, keys } from 'lodash';
 import { executeSynchronous, chunker, writeJsonFile } from '../utils';
 import { Package } from '../models';
 import yargs from 'yargs';
-import path from 'path/posix';
+import path from 'path';
 
 import { createWriteStream } from 'fs';
 import stripAnsi from 'strip-ansi';
@@ -55,7 +55,6 @@ executeSynchronous(async () => {
     }
 
     const schemaConfigs: SchemaConfiguration[] = [];
-    const errors = [];
     const packages: Package[] = [];
 
     const summaryLogger = await getLogger(summaryPath);

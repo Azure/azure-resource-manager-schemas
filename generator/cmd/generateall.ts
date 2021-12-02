@@ -9,6 +9,10 @@ import { flatten, keys } from 'lodash';
 import { executeSynchronous, chunker, writeJsonFile } from '../utils';
 import { Package } from '../models';
 import yargs from 'yargs';
+import path from 'path';
+
+import { createWriteStream } from 'fs';
+import stripAnsi from 'strip-ansi';
 
 const argsConfig = yargs
   .strict()
@@ -16,13 +20,20 @@ const argsConfig = yargs
   .option('batch-index', { type: 'number', desc: 'If running in batch mode, the index of this batch job' })
   .option('local-path', { type: 'string', desc: 'The local path to the azure-rest-api-specs repo' })
   .option('readme-files', { type: 'array', desc: 'The list of readme.md files to generate schemas for' })
-  .option('output-path', { type: 'string', desc: 'The base path to save schema output' });
+  .option('output-path', { type: 'string', desc: 'The base path to save schema output' })
+  .option('summary-log-path', { type: 'string', desc: 'The path to store generation summary information. File will be saved in md format.' });
+
+interface ILogger {
+    out: (data: string) => void;
+}
 
 executeSynchronous(async () => {
     const args = await argsConfig.parseAsync();
 
     let basePaths;
     let localPath = args['local-path'];
+    let summaryPath = args['summary-log-path'];
+
     if (!localPath) {
         localPath = constants.specsRepoPath;
         basePaths = await cloneAndGenerateBasePaths(localPath, constants.specsRepoUri, constants.specsRepoCommitHash);
@@ -31,13 +42,22 @@ executeSynchronous(async () => {
         basePaths = await generateBasePaths(localPath);
     }
 
+    if (!summaryPath) {
+        // generate default full path
+        summaryPath = path.join(constants.specsRepoPath, 'summary.log');
+    }
+
+    // resolve absolute path
+    summaryPath = await resolveAbsolutePath(summaryPath);
+
     if (args['batch-count'] !== undefined && args['batch-index'] !== undefined) {
         basePaths = chunker(basePaths, args['batch-count'])[args['batch-index']];
     }
 
     const schemaConfigs: SchemaConfiguration[] = [];
-    const errors = [];
     const packages: Package[] = [];
+
+    const summaryLogger = await getLogger(summaryPath);
 
     for (const basePath of basePaths) {
         const readme = await validateAndReturnReadmePath(localPath, basePath);
@@ -76,7 +96,15 @@ executeSynchronous(async () => {
                 console.log(chalk.red(`Caught exception processing autogenlist entry ${autoGenConfig.basePath}.`));
                 console.log(chalk.red(error));
         
-                errors.push(error);
+                // Use markdown formatting as this summary will be included in the PR description
+                logOut(summaryLogger, 
+                    `<details>
+                    <summary>Failed to generate types for path '${basePath}'</summary>
+                    \`\`\`
+                    ${error}
+                    \`\`\`
+                    </details>
+                    `);
             }
             packages.push(pkg);
         }
@@ -87,10 +115,20 @@ executeSynchronous(async () => {
     if (args['output-path']) {
         const outputPath = await resolveAbsolutePath(args['output-path']);
         await writeJsonFile(outputPath, { packages });
-    } else {
-        if (errors.length > 0) {
-            throw new Error(`Autogeneration failed with ${errors.length} errors. See logs for detailed information.`);
-        }
     }
-
 });
+
+function logOut(logger: ILogger, line: string) {
+    logger.out(`${line}\n`);
+}
+  
+async function getLogger(logFilePath: string): Promise<ILogger> {
+    const logFileStream = createWriteStream(logFilePath, { flags: 'a' });
+
+    return {
+        out: (data: string) => {
+            process.stdout.write(data);
+            logFileStream.write(stripAnsi(data));
+        }
+    };
+}

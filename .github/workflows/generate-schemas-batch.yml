@@ -1,0 +1,207 @@
+name: Generate Schemas batch
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_specs_ref:
+        description: 'Git ref or full SHA for https://github.com/Azure/azure-rest-api-specs.'
+        required: true
+        default: 'main'
+
+env:
+  SUMMARY_LOG_DIR: /tmp/summary
+  SUMMARY_LOG_PATH: /tmp/summary/summary.log
+  SUMMARY_LOG_ARTIFACT_NAME: summary-log
+  AUTOGENERATE_BRANCH_NAME: autogenerate
+  MAIN_BRANCH_NAME: main
+jobs:
+  batch-0:
+    name: Update Schemas Batch 0
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.3.5
+
+      - name: Clone azure-rest-api-specs
+        uses: actions/checkout@v2.3.5
+        with:
+          repository: Azure/azure-rest-api-specs
+          path: workflow-temp/azure-rest-api-specs
+          ref: ${{ github.event.inputs.api_specs_ref }}
+      
+      - name: Install generator npm packages
+        run: npm ci
+        working-directory: generator
+
+      - name: Create initial log description
+        run: mkdir -p /tmp/summary
+      
+      - id: generate
+        name: Run generator
+        run: |
+          npm run generate-all -- --local-path "$GITHUB_WORKSPACE/workflow-temp/azure-rest-api-specs" --summary-log-path $SUMMARY_LOG_PATH --batch-count 4 --batch-index 0
+        working-directory: generator
+
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v7
+        with:
+          author_name: github-actions
+          author_email: github-actions@github.com
+          message: 'Autogenerate schemas batch 0'
+          add: '*.*'
+
+      - name: Upload summary log
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.SUMMARY_LOG_ARTIFACT_NAME }}
+          path: ${{ env.SUMMARY_LOG_PATH }}
+  batch-1:
+    needs: batch-0
+    name: Update Schemas Batch 1
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.3.5
+
+      - name: Clone azure-rest-api-specs
+        uses: actions/checkout@v2.3.5
+        with:
+          repository: Azure/azure-rest-api-specs
+          path: workflow-temp/azure-rest-api-specs
+          ref: ${{ github.event.inputs.api_specs_ref }}
+      
+      - name: Install generator npm packages
+        run: npm ci
+        working-directory: generator
+
+      - name: Download summary log artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.SUMMARY_LOG_ARTIFACT_NAME }}
+          path: ${{ env.SUMMARY_LOG_DIR }}
+      
+      - id: generate
+        name: Run generator
+        run: |
+          npm run generate-all -- --local-path "$GITHUB_WORKSPACE/workflow-temp/azure-rest-api-specs" --summary-log-path $SUMMARY_LOG_PATH --batch-count 4 --batch-index 1
+        working-directory: generator
+
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v7
+        with:
+          author_name: github-actions
+          author_email: github-actions@github.com
+          message: 'Autogenerate schemas batch 1'
+          add: '*.*'
+
+      - name: Upload summary log
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.SUMMARY_LOG_ARTIFACT_NAME }}
+          path: ${{ env.SUMMARY_LOG_PATH }}
+  batch-2:
+    needs: batch-1
+    name: Update Schemas Batch 2
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.3.5
+
+      - name: Clone azure-rest-api-specs
+        uses: actions/checkout@v2.3.5
+        with:
+          repository: Azure/azure-rest-api-specs
+          path: workflow-temp/azure-rest-api-specs
+          ref: ${{ github.event.inputs.api_specs_ref }}
+      
+      - name: Install generator npm packages
+        run: npm ci
+        working-directory: generator
+
+      - name: Download summary log artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.SUMMARY_LOG_ARTIFACT_NAME }}
+          path: ${{ env.SUMMARY_LOG_DIR }}
+      
+      - id: generate
+        name: Run generator
+        run: |
+          npm run generate-all -- --local-path "$GITHUB_WORKSPACE/workflow-temp/azure-rest-api-specs" --summary-log-path $SUMMARY_LOG_PATH --batch-count 4 --batch-index 2
+        working-directory: generator
+
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v7
+        with:
+          author_name: github-actions
+          author_email: github-actions@github.com
+          message: 'Autogenerate schemas batch 2'
+          add: '*.*'
+
+      - name: Upload summary log
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.SUMMARY_LOG_ARTIFACT_NAME }}
+          path: ${{ env.SUMMARY_LOG_PATH }}
+  batch-3:
+    needs: batch-2
+    name: Update Schemas Batch 3
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.3.5
+
+      - name: Clone azure-rest-api-specs
+        uses: actions/checkout@v2.3.5
+        with:
+          repository: Azure/azure-rest-api-specs
+          path: workflow-temp/azure-rest-api-specs
+          ref: ${{ github.event.inputs.api_specs_ref }}
+      
+      - name: Install generator npm packages
+        run: npm ci
+        working-directory: generator
+
+      - name: Download summary log artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.SUMMARY_LOG_ARTIFACT_NAME }}
+          path: ${{ env.SUMMARY_LOG_DIR }}
+      
+      - id: generate
+        name: Run generator
+        run: |
+          npm run generate-all -- --local-path "$GITHUB_WORKSPACE/workflow-temp/azure-rest-api-specs" --summary-log-path $SUMMARY_LOG_PATH --batch-count 4 --batch-index 3
+
+          summary="$(<$SUMMARY_LOG_PATH)"
+          summary="${summary//'%'/'%25'}"
+          summary="${summary//$'\n'/'%0A'}"
+          summary="${summary//$'\r'/'%0D'}"
+          echo "::set-output name=summary::$summary"
+        working-directory: generator
+
+      - id: get_swagger_gh_uri
+        name: Get GitHub URI for azure-rest-api-specs
+        run: |
+          git_sha=`git rev-parse HEAD`
+          echo "::set-output name=gh_uri::https://github.com/Azure/azure-rest-api-specs/tree/$git_sha"
+        working-directory: workflow-temp/azure-rest-api-specs
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3.10.1
+        with:
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          signoff: false
+          branch: ${{ env.MAIN_BRANCH_NAME }}
+          title: |
+            Update Generated Schemas ${{ github.event.inputs.single_path && format('(single path: {0})', github.event.inputs.single_path) || '' }}
+          body:  |
+            Update Generated Schemas ${{ github.event.inputs.single_path && format('(single path: {0})', github.event.inputs.single_path) || '' }}
+
+            Generate schemas for ${{ steps.get_swagger_gh_uri.outputs.gh_uri }}
+
+            Summary
+            ${{ steps.generate.outputs.summary }}
+          commit-message: |
+            Update Generated Schemas ${{ github.event.inputs.single_path && format('(single path: {0})', github.event.inputs.single_path) || '' }}
+
+            Generate schemas for ${{ steps.get_swagger_gh_uri.outputs.gh_uri }}
+          labels: ${{ env.AUTOGENERATE_BRANCH_NAME }}
+          draft: false

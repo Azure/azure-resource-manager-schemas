@@ -101,7 +101,7 @@ executeSynchronous(async () => {
                     // Use markdown formatting as this summary will be included in the PR description
                     logOut(summaryLogger, 
                         `<details>
-                        <summary>Failed to generate types for path '${basePath}'</summary>
+                        <summary>Failed to generate types for path '${autoGenConfig.basePath}' and namespace '${autoGenConfig.namespace}'</summary>
                         \`\`\`
                         ${error}
                         \`\`\`
@@ -112,9 +112,10 @@ executeSynchronous(async () => {
             }
         } catch (error) {
             // Use markdown formatting as this summary will be included in the PR description
+            // This error usually indicates that a file has not been found (readme)
             logOut(summaryLogger, 
                 `<details>
-                <summary>Failed to generate types for path '${basePath}'</summary>
+                <summary>Failed to generate types for path '${basePath}' probably due to readme not found or due to any other file not found exception.</summary>
                 \`\`\`
                 ${error}
                 \`\`\`

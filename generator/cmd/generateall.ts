@@ -34,6 +34,7 @@ executeSynchronous(async () => {
     let localPath = args['local-path'];
     let summaryPath = args['summary-log-path'];
 
+    // localPath refers to the specs repo (azure-rest-api-specs)
     if (!localPath) {
         localPath = constants.specsRepoPath;
         basePaths = await cloneAndGenerateBasePaths(localPath, constants.specsRepoUri, constants.specsRepoCommitHash);
@@ -43,8 +44,9 @@ executeSynchronous(async () => {
     }
 
     if (!summaryPath) {
-        // generate default full path
-        summaryPath = path.join(constants.specsRepoPath, 'summary.log');
+        // using 'localPath' here because at this point it is guaranteed that the folder got created (when cloneAndGenerateBasePaths function is invoked)
+        // or is an existing path
+        summaryPath = path.join(localPath, 'summary.log');
         console.log(`Summary path not passed, using default value: ${summaryPath}`);
     }
 

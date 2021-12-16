@@ -191,14 +191,7 @@ export async function safeMkdir(filePath: string) {
 
 export async function safeUnlink(filePath: string) {
     if (await exists(filePath)) {
-        try {
-            await unlink(filePath);
-        } catch (error) {
-            // Noticed that after 'unlink' is invoked, it gets
-            // invoked again - internally, failing to catch the exception results
-            // in node to terminate the process with a non-zero code
-            console.log(error);
-        }
+        await unlink(filePath);
     }
 }
 

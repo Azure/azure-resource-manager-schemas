@@ -64,7 +64,7 @@ executeSynchronous(async () => {
 
     for (const basePath of basePaths) {
         try {
-            const readme = await validateAndReturnReadmePath(localPath, basePath);
+            const readme = validateAndReturnReadmePath(localPath, basePath);
             const namespaces = keys(await getApiVersionsByNamespace(readme));
             let filteredAutoGenList = findOrGenerateAutogenEntries(basePath, namespaces)
                 .filter(x => x.disabledForAutogen !== true);
@@ -88,7 +88,7 @@ executeSynchronous(async () => {
                     path: ['schemas']
                 } as Package;
                 try {
-                    const readme = await validateAndReturnReadmePath(localPath, autoGenConfig.readmeFile || autoGenConfig.basePath);
+                    const readme = validateAndReturnReadmePath(localPath, autoGenConfig.readmeFile || autoGenConfig.basePath);
                     pkg.packageName = getPackageString(readme);
 
                     const newConfigs = await generateSchemas(readme, autoGenConfig);

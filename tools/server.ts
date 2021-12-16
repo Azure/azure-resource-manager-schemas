@@ -2,11 +2,8 @@
 // Licensed under the MIT License.
 import express = require('express');
 
-import { promisify } from 'util';
 import { hostname } from 'os';
-import fs from 'fs';
-
-const readFile = promisify(fs.readFile);
+import { readFile } from 'fs/promises';
 
 const app = express();
 const port = 3000;

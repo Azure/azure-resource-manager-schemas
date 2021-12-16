@@ -5,15 +5,13 @@ import Ajv from 'ajv';
 import * as url from 'url';
 import path from 'path';
 import fs from 'fs';
-import { promisify } from 'util';
+import { readFile } from 'fs/promises';
 import { getLanguageService } from 'vscode-json-languageservice';
 import { TextDocument } from 'vscode-languageserver-types';
 import draft4MetaSchema from 'ajv/lib/refs/json-schema-draft-04.json';
 import * as schemaTestsRunner from './schemaTestsRunner';
 import 'mocha';
 import { findCycle } from './cycleCheck';
-
-const readFile = promisify(fs.readFile);
 
 const schemasFolder = __dirname + '/../schemas/';
 const schemaTestsFolder = __dirname + '/../tests/';

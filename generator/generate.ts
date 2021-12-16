@@ -103,7 +103,7 @@ async function handleGeneratedSchema(readme: string, schemaPath: string, autoGen
 
 async function execAutoRest(tmpFolder: string, params: string[]) {
     await executeCmd(__dirname, `${__dirname}/node_modules/.bin/${autorestBinary}`, params);
-    if (!await fileExists(tmpFolder)) {
+    if (!fileExists(tmpFolder)) {
         return [];
     }
 

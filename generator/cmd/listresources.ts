@@ -1,8 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import path from 'path';
-import fs from 'fs';
-import { promisify } from 'util';
+import { readFile, writeFile } from 'fs/promises';
 import * as constants from '../constants';
 import { lowerCaseCompare, executeSynchronous } from '../utils';
 
@@ -25,9 +24,6 @@ const rootSchemaPaths = [
     'https://schema.management.azure.com/schemas/2019-08-01/tenantDeploymentTemplate.json',
     'https://schema.management.azure.com/schemas/2019-08-01/managementGroupDeploymentTemplate.json',
 ];
-
-const readFile = promisify(fs.readFile);
-const writeFile = promisify(fs.writeFile);
 
 async function readSchema(schemaUri: string) {
     if (!schemaUri.toLowerCase().startsWith(constants.schemasBaseUri.toLowerCase() + '/')) {

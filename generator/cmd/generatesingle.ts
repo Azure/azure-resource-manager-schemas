@@ -28,7 +28,7 @@ executeSynchronous(async () => {
 
     let readme = '';
     try {
-        readme = await validateAndReturnReadmePath(localPath, basePath);
+        readme = validateAndReturnReadmePath(localPath, basePath);
     } catch {
         throw new Error(`Unable to find a readme under '${basePath}'. Please try running 'npm run list-basepaths' to find the list of valid paths.`);
     }

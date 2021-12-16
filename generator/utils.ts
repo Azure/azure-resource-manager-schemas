@@ -2,20 +2,10 @@
 // Licensed under the MIT License.
 import { spawn } from 'child_process';
 import path from 'path';
-import fs from 'fs';
-import { promisify } from 'util';
 import chalk from 'chalk';
 import { series } from 'async';
-
-const readdir = promisify(fs.readdir);
-const stat = promisify(fs.stat);
-const unlink = promisify(fs.unlink);
-const rmdir = promisify(fs.rmdir);
-const exists = promisify(fs.exists);
-const readFile = promisify(fs.readFile);
-const writeFile = promisify(fs.writeFile);
-const mkdir = promisify(fs.mkdir);
-
+import { existsSync } from 'fs';
+import { readdir, stat, unlink, rmdir, readFile, writeFile, mkdir } from 'fs/promises';
 
 export function executeCmd(cwd: string, cmd: string, args: string[]) : Promise<number> {
     return new Promise((resolve, reject) => {
@@ -90,7 +80,7 @@ export async function findRecursive(basePath: string, filter: (name: string) => 
 }
 
 export async function rmdirRecursive(basePath: string) {
-    if (!await exists(basePath)) {
+    if (!existsSync(basePath)) {
         return;
     }
 
@@ -184,19 +174,19 @@ export async function writeJsonFile(filePath: string, json: any) {
 }
 
 export async function safeMkdir(filePath: string) {
-    if (!await exists(filePath)) {
+    if (!existsSync(filePath)) {
         await mkdir(filePath, { recursive: true });
     }
 }
 
 export async function safeUnlink(filePath: string) {
-    if (await exists(filePath)) {
+    if (existsSync(filePath)) {
         await unlink(filePath);
     }
 }
 
-export async function fileExists(filePath: string) {
-    return await exists(filePath);
+export function fileExists(filePath: string) {
+    return existsSync(filePath);
 }
 
 export function executeSynchronous<T>(asyncFunc: () => Promise<T>) {

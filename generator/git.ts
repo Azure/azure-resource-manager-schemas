@@ -1,14 +1,11 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import { executeCmd, rmdirRecursive } from './utils';
-import fs from 'fs';
-import { promisify } from 'util';
-
-const mkdir = promisify(fs.mkdir);
-const exists = promisify(fs.exists);
+import { existsSync } from 'fs';
+import { mkdir } from 'fs/promises';
 
 export async function resetGitDirectory(localPath: string, includeGc: boolean) {
-    if (await exists(localPath)) {
+    if (existsSync(localPath)) {
         await executeCmd(localPath, 'git', ['reset', '-q', '.']);
         await executeCmd(localPath, 'git', ['checkout', '-q', '--', '.']);
         await executeCmd(localPath, 'git', ['clean', '-q', '-fd']);

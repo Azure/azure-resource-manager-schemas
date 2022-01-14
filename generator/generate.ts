@@ -118,6 +118,7 @@ async function generateSchema(readme: string, tmpFolder: string) {
         `--output-folder=${tmpFolder}`,
         '--multiapi',
         '--pass-thru:subset-reducer',
+        '--pass-thru:schema-validator-swagger',
         readme,
     ];
 

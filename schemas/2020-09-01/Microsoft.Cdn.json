@@ -1024,9 +1024,15 @@
           "description": "Priority of origin in given origin group for load balancing. Higher priorities will not be used for load balancing if any lower priority origin is healthy.Must be between 1 and 5"
         },
         "sharedPrivateLinkResource": {
-          "type": "object",
-          "properties": {},
-          "description": "The properties of the private link resource for private origin."
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SharedPrivateLinkResourceProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Describes the properties of an existing Shared Private Link Resource to use when connecting to a private origin."
         },
         "weight": {
           "oneOf": [
@@ -1198,6 +1204,37 @@
         }
       },
       "description": "Defines CDN web application firewall policy properties."
+    },
+    "CompressionSettings": {
+      "type": "object",
+      "properties": {
+        "contentTypesToCompress": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of content types on which compression applies. The value should be a valid MIME type."
+        },
+        "isCompressionEnabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates whether content compression is enabled on AzureFrontDoor. Default value is false. If compression is enabled, content will be served as compressed if user requests for a compressed version. Content won't be compressed on AzureFrontDoor when requested content is smaller than 1 byte or larger than 1 MB."
+        }
+      },
+      "description": "settings for compression."
     },
     "CookiesMatchConditionParameters": {
       "type": "object",
@@ -4890,9 +4927,15 @@
       "type": "object",
       "properties": {
         "compressionSettings": {
-          "type": "object",
-          "properties": {},
-          "description": "compression settings."
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CompressionSettings"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "settings for compression."
         },
         "customDomains": {
           "oneOf": [
@@ -5249,6 +5292,53 @@
         "type"
       ],
       "description": "The json object containing security policy waf parameters"
+    },
+    "SharedPrivateLinkResourceProperties": {
+      "type": "object",
+      "properties": {
+        "groupId": {
+          "type": "string",
+          "description": "The group id from the provider of resource the shared private link resource is for."
+        },
+        "privateLink": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ResourceReference"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Reference to another resource."
+        },
+        "privateLinkLocation": {
+          "type": "string",
+          "description": "The location of the shared private link resource"
+        },
+        "requestMessage": {
+          "type": "string",
+          "description": "The request message for requesting approval of the shared private link resource."
+        },
+        "status": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Pending",
+                "Approved",
+                "Rejected",
+                "Disconnected",
+                "Timeout"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Status of the shared private link resource. Can be Pending, Approved, Rejected, Disconnected, or Timeout."
+        }
+      },
+      "description": "Describes the properties of an existing Shared Private Link Resource to use when connecting to a private origin."
     },
     "Sku": {
       "type": "object",

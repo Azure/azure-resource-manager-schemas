@@ -91,13 +91,13 @@
         "identity": {
           "oneOf": [
             {
-              "$ref": "#/definitions/ManagedServiceIdentity"
+              "$ref": "#/definitions/Identity"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Managed service identity (system assigned and/or user assigned identities)"
+          "description": "Identity for the resource."
         },
         "kind": {
           "oneOf": [
@@ -616,6 +616,20 @@
             }
           ],
           "description": "The deny assignment excluded actions."
+        },
+        "allowedDataActions": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The deny assignment excluded data actions."
         }
       },
       "description": "Managed application locking policy."
@@ -667,6 +681,44 @@
         }
       },
       "description": "The managed application properties."
+    },
+    "Identity": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "SystemAssigned",
+                "UserAssigned",
+                "SystemAssigned, UserAssigned",
+                "None"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The identity type."
+        },
+        "userAssignedIdentities": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/UserAssignedResourceIdentity"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of user identities associated with the resource. The user identity dictionary key references will be resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}'."
+        }
+      },
+      "description": "Identity for the resource."
     },
     "JitApproverDefinition": {
       "type": "object",
@@ -794,46 +846,6 @@
       ],
       "description": "The JIT scheduling policies."
     },
-    "ManagedServiceIdentity": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "None",
-                "SystemAssigned",
-                "UserAssigned",
-                "SystemAssigned,UserAssigned"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "userAssignedIdentities": {
-          "oneOf": [
-            {
-              "type": "object",
-              "additionalProperties": {
-                "$ref": "#/definitions/UserAssignedIdentity"
-              },
-              "properties": {}
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests."
-        }
-      },
-      "required": [
-        "type"
-      ],
-      "description": "Managed service identity (system assigned and/or user assigned identities)"
-    },
     "Plan": {
       "type": "object",
       "properties": {
@@ -906,10 +918,10 @@
       ],
       "description": "SKU for the resource."
     },
-    "UserAssignedIdentity": {
+    "UserAssignedResourceIdentity": {
       "type": "object",
       "properties": {},
-      "description": "User assigned identity properties"
+      "description": "Represents the user assigned identity that is contained within the UserAssignedIdentities dictionary on ResourceIdentity"
     }
   }
 }

@@ -94,6 +94,11 @@ executeSynchronous(async () => {
                     const newConfigs = await generateSchemas(readme, autoGenConfig);
                     schemaConfigs.push(...newConfigs);
                     pkg.result = 'succeeded';
+                    logOut(summaryLogger, 
+                        `<details>
+                        <summary>Successfully generated types for base path '${basePath}'.</summary>
+                        </details>
+                        `);
                 } catch(error) {
                     pkg.packageName = autoGenConfig.basePath;
                     pkg.result = 'failed';
@@ -103,7 +108,7 @@ executeSynchronous(async () => {
                     // Use markdown formatting as this summary will be included in the PR description
                     logOut(summaryLogger, 
                         `<details>
-                        <summary>Failed to generate types for path '${autoGenConfig.basePath}' and namespace '${autoGenConfig.namespace}'</summary>
+                        <summary>Failed to generate types for base path '${autoGenConfig.basePath}' and namespace '${autoGenConfig.namespace}'</summary>
                         \`\`\`
                         ${error}
                         \`\`\`
@@ -117,7 +122,7 @@ executeSynchronous(async () => {
             // This error usually indicates that a file has not been found (readme)
             logOut(summaryLogger, 
                 `<details>
-                <summary>Failed to generate types for path '${basePath}' probably due to readme not found or due to any other file not found exception.</summary>
+                <summary>Failed to generate types for base path '${basePath}' probably due to readme not found or due to any other file not found exception.</summary>
                 \`\`\`
                 ${error}
                 \`\`\`

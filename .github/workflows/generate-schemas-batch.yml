@@ -13,14 +13,23 @@ env:
   SUMMARY_LOG_PATH: /tmp/summary/summary.log
   SUMMARY_LOG_ARTIFACT_NAME: summary-log
   AUTOGENERATE_BRANCH_NAME: autogenerate
+  TEMP_AUTOGENERATE_BRANCH_NAME: autogenerate_tmp
   AUTHOR: ${{ github.actor }}
-  AUTHOR_EMAIL: <${{ github.actor }}@users.noreply.github.com>
+  AUTHOR_EMAIL: ${{ github.actor }}@users.noreply.github.com
 jobs:
   batch-0:
     name: Update Schemas Batch 0
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.3.5
+        with:
+          ref: ${{ env.AUTOGENERATE_BRANCH_NAME }}
+
+      - uses: peterjgrainger/action-create-branch@v2.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          branch: ${{ env.TEMP_AUTOGENERATE_BRANCH_NAME }}
 
       - name: Clone azure-rest-api-specs
         uses: actions/checkout@v2.3.5
@@ -43,12 +52,11 @@ jobs:
         working-directory: generator
 
       - name: Commit changes
-        uses: EndBug/add-and-commit@v7
+        uses: EndBug/add-and-commit@v8
         with:
-          author_name: ${{ env.AUTHOR }}
-          author_email: ${{ env.AUTHOR_EMAIL }}
+          default_author: github_actor
           message: 'Autogenerate schemas batch 0'
-          add: '*.*'
+          new_branch: ${{ env.TEMP_AUTOGENERATE_BRANCH_NAME }}
 
       - name: Upload summary log
         uses: actions/upload-artifact@v2
@@ -61,6 +69,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.3.5
+        with:
+          ref: ${{ env.TEMP_AUTOGENERATE_BRANCH_NAME }}
 
       - name: Clone azure-rest-api-specs
         uses: actions/checkout@v2.3.5
@@ -86,12 +96,11 @@ jobs:
         working-directory: generator
 
       - name: Commit changes
-        uses: EndBug/add-and-commit@v7
+        uses: EndBug/add-and-commit@v8
         with:
-          author_name: ${{ env.AUTHOR }}
-          author_email: ${{ env.AUTHOR_EMAIL }}
+          default_author: github_actor
           message: 'Autogenerate schemas batch 1'
-          add: '*.*'
+          new_branch: ${{ env.TEMP_AUTOGENERATE_BRANCH_NAME }}
 
       - name: Upload summary log
         uses: actions/upload-artifact@v2
@@ -104,6 +113,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.3.5
+        with:
+          ref: ${{ env.TEMP_AUTOGENERATE_BRANCH_NAME }}
 
       - name: Clone azure-rest-api-specs
         uses: actions/checkout@v2.3.5
@@ -129,12 +140,11 @@ jobs:
         working-directory: generator
 
       - name: Commit changes
-        uses: EndBug/add-and-commit@v7
+        uses: EndBug/add-and-commit@v8
         with:
-          author_name: ${{ env.AUTHOR }}
-          author_email: ${{ env.AUTHOR_EMAIL }}
+          default_author: github_actor
           message: 'Autogenerate schemas batch 2'
-          add: '*.*'
+          new_branch: ${{ env.TEMP_AUTOGENERATE_BRANCH_NAME }}
 
       - name: Upload summary log
         uses: actions/upload-artifact@v2
@@ -147,6 +157,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.3.5
+        with:
+          ref: ${{ env.TEMP_AUTOGENERATE_BRANCH_NAME }}
 
       - name: Clone azure-rest-api-specs
         uses: actions/checkout@v2.3.5
@@ -185,12 +197,12 @@ jobs:
         working-directory: workflow-temp/azure-rest-api-specs
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v3.12.1
+        uses: peter-evans/create-pull-request@v3.14.0
         with:
           committer: GitHub <noreply@github.com>
-          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          author: ${{ env.AUTHOR }} <${{ env.AUTHOR_EMAIL }}>
           signoff: false
-          branch: ${{ env.AUTOGENERATE_BRANCH_NAME }}_tmp
+          branch: ${{ env.AUTOGENERATE_BRANCH_NAME }}_ltst
           branch-suffix: short-commit-hash
           delete-branch: true
           title: |

@@ -948,10 +948,25 @@
     "AzureIaaSVMProtectedItemExtendedInfo": {
       "type": "object",
       "properties": {
+        "newestRecoveryPointInArchive": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The latest backup copy available for this backup item in archive tier"
+        },
         "oldestRecoveryPoint": {
           "type": "string",
           "format": "date-time",
-          "description": "The oldest backup copy available for this backup item."
+          "description": "The oldest backup copy available for this backup item across all tiers."
+        },
+        "oldestRecoveryPointInArchive": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The oldest backup copy available for this backup item in archive tier"
+        },
+        "oldestRecoveryPointInVault": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The oldest backup copy available for this backup item in vault tier"
         },
         "policyInconsistent": {
           "oneOf": [
@@ -1044,6 +1059,21 @@
             }
           ],
           "description": "Base class for backup schedule."
+        },
+        "tieringPolicy": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/TieringPolicy"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Tiering policy to automatically move RPs to another tier\r\nKey is Target Tier, defined in RecoveryPointTierType enum.\r\nTiering policy specifies the criteria to move RP to the target tier."
         },
         "timeZone": {
           "type": "string",
@@ -1442,10 +1472,25 @@
     "AzureVmWorkloadProtectedItemExtendedInfo": {
       "type": "object",
       "properties": {
+        "newestRecoveryPointInArchive": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The latest backup copy available for this backup item in archive tier"
+        },
         "oldestRecoveryPoint": {
           "type": "string",
           "format": "date-time",
-          "description": "The oldest backup copy available for this backup item."
+          "description": "The oldest backup copy available for this backup item across all tiers."
+        },
+        "oldestRecoveryPointInArchive": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The oldest backup copy available for this backup item in archive tier"
+        },
+        "oldestRecoveryPointInVault": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The oldest backup copy available for this backup item in vault tier"
         },
         "policyState": {
           "type": "string",
@@ -2752,7 +2797,7 @@
         "containerType": {
           "type": "string",
           "enum": [
-            "IaaSVMContainer"
+            "IaasVMContainer"
           ]
         },
         "resourceGroup": {
@@ -4136,9 +4181,76 @@
             }
           ],
           "description": "Base class for backup schedule."
+        },
+        "tieringPolicy": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/TieringPolicy"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Tiering policy to automatically move RPs to another tier.\r\nKey is Target Tier, defined in RecoveryPointTierType enum.\r\nTiering policy specifies the criteria to move RP to the target tier."
         }
       },
       "description": "Sub-protection policy which includes schedule and retention"
+    },
+    "TieringPolicy": {
+      "type": "object",
+      "properties": {
+        "duration": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Number of days/weeks/months/years to retain backups in current tier before tiering.\r\nUsed only if TieringMode is set to TierAfter"
+        },
+        "durationType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Invalid",
+                "Days",
+                "Weeks",
+                "Months",
+                "Years"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Retention duration type: days/weeks/months/years\r\nUsed only if TieringMode is set to TierAfter."
+        },
+        "tieringMode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Invalid",
+                "TierRecommended",
+                "TierAfter",
+                "DoNotTier"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Tiering Mode to control automatic tiering of recovery points. Supported values are:\r\n1. TierRecommended: Tier all recovery points recommended to be tiered\r\n2. TierAfter: Tier all recovery points after a fixed period, as specified in duration + durationType below.\r\n3. DoNotTier: Do not tier any recovery points."
+        }
+      },
+      "description": "Tiering Policy for a target tier.\r\nIf the policy is not specified for a given target tier, service retains the existing configured tiering policy for that tier"
     },
     "vaults_backupFabrics_protectionContainers_protectedItems_childResource": {
       "type": "object",

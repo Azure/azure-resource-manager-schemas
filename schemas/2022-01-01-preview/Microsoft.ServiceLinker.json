@@ -172,6 +172,48 @@
       ],
       "description": "The service properties when target service type is ConfluentSchemaRegistry"
     },
+    "KeyVaultSecretReferenceSecretInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the Key Vault secret."
+        },
+        "secretType": {
+          "type": "string",
+          "enum": [
+            "keyVaultSecretReference"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "description": "Version of the Key Vault secret."
+        }
+      },
+      "required": [
+        "secretType"
+      ],
+      "description": "The secret info when type is keyVaultSecretReference. It's for scenario that user provides a secret stored in user's keyvault and source is Azure Kubernetes. The key Vault's resource id is linked to secretStore.keyVaultId."
+    },
+    "KeyVaultSecretUriSecretInfo": {
+      "type": "object",
+      "properties": {
+        "secretType": {
+          "type": "string",
+          "enum": [
+            "keyVaultSecretUri"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "description": "URI to the keyvault secret"
+        }
+      },
+      "required": [
+        "secretType"
+      ],
+      "description": "The secret info when type is keyVaultSecretUri. It's for scenario that user provides a secret stored in user's keyvault and source is Web App, Spring Cloud or Container App."
+    },
     "LinkerProperties": {
       "type": "object",
       "properties": {
@@ -263,14 +305,37 @@
           "description": "Username or account name for secret auth."
         },
         "secret": {
-          "type": "string",
-          "description": "Password or account key for secret auth."
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretInfoBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The secret info"
         }
       },
       "required": [
         "authType"
       ],
       "description": "The authentication info when authType is secret"
+    },
+    "SecretInfoBase": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/ValueSecretInfo"
+        },
+        {
+          "$ref": "#/definitions/KeyVaultSecretReferenceSecretInfo"
+        },
+        {
+          "$ref": "#/definitions/KeyVaultSecretUriSecretInfo"
+        }
+      ],
+      "properties": {},
+      "description": "The secret info"
     },
     "SecretStore": {
       "type": "object",
@@ -395,6 +460,25 @@
         "authType"
       ],
       "description": "The authentication info when authType is userAssignedIdentity"
+    },
+    "ValueSecretInfo": {
+      "type": "object",
+      "properties": {
+        "secretType": {
+          "type": "string",
+          "enum": [
+            "rawValue"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "description": "The actual value of the secret."
+        }
+      },
+      "required": [
+        "secretType"
+      ],
+      "description": "The secret info when type is rawValue. It's for scenarios that user input the secret."
     },
     "VNetSolution": {
       "type": "object",

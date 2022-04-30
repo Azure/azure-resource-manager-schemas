@@ -415,9 +415,28 @@
           "type": "string",
           "description": "NETBIOS name of the Active Directory domain."
         },
+        "ouDistinguishedName": {
+          "type": "string",
+          "description": "The distinguished name of the Active Directory Organizational Unit."
+        },
         "realm": {
           "type": "string",
           "description": "Name (uppercase) of the Active Directory domain that this AD connector will be associated with."
+        },
+        "serviceAccountProvisioning": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "automatic",
+                "manual"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The service account provisioning mode for this Active Directory connector."
         }
       },
       "required": [
@@ -429,6 +448,17 @@
     "ActiveDirectoryConnectorProperties": {
       "type": "object",
       "properties": {
+        "domainServiceAccountLoginInformation": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BasicLoginInformation"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Username and password for basic login authentication."
+        },
         "spec": {
           "oneOf": [
             {
@@ -573,6 +603,23 @@
         }
       },
       "description": "Details about the Active Directory domain controllers associated with this AD connector instance"
+    },
+    "ActiveDirectoryInformation": {
+      "type": "object",
+      "properties": {
+        "keytabInformation": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/KeytabInformation"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Keytab used for authenticate with Active Directory."
+        }
+      },
+      "description": "Active Directory information that related to the resource."
     },
     "BasicLoginInformation": {
       "type": "object",
@@ -889,6 +936,16 @@
       },
       "description": "The kubernetes scheduling options. It describes restrictions used to help Kubernetes select appropriate nodes to host the database service"
     },
+    "KeytabInformation": {
+      "type": "object",
+      "properties": {
+        "keytab": {
+          "type": "string",
+          "description": "A base64-encoded keytab."
+        }
+      },
+      "description": "Keytab used for authenticate with Active Directory."
+    },
     "LogAnalyticsWorkspaceConfig": {
       "type": "object",
       "properties": {
@@ -1114,6 +1171,17 @@
     "SqlManagedInstanceProperties": {
       "type": "object",
       "properties": {
+        "activeDirectoryInformation": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ActiveDirectoryInformation"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Active Directory information that related to the resource."
+        },
         "admin": {
           "type": "string",
           "description": "The instance admin user"
@@ -1155,10 +1223,6 @@
             }
           ],
           "description": "The raw kubernetes information."
-        },
-        "keytab": {
-          "type": "string",
-          "description": "A base64-encoded keytab."
         },
         "lastUploadedDate": {
           "type": "string",
@@ -1311,11 +1375,6 @@
             }
           ],
           "description": "SQL Server edition."
-        },
-        "esuExpirationDate": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Timestamp of ESU Expiration."
         },
         "hostType": {
           "oneOf": [

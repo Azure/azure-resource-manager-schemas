@@ -12,6 +12,7 @@ import { postProcessor as policyProcessor } from './processors/Microsoft.Authori
 import { postProcessor as securityInsightsPostProcessor } from './processors/Microsoft.SecurityInsights';
 import { postProcessor as costManagementPostProcessor } from './processors/Microsoft.CostManagement';
 import { postProcessor as providerHubPostProcessor } from './processors/Microsoft.ProviderHub';
+import { postProcessor as mediaPostProcessor } from './processors/Microsoft.Media';
 import { lowerCaseEquals } from './utils';
 
 // New providers are onboarded by default. The providers listed here are the only ones **not** onboarded.
@@ -56,11 +57,6 @@ const disabledProviders: AutoGenConfig[] = [
     {
         basePath: 'managedservices/resource-manager',
         namespace: 'Microsoft.ManagedServices',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'mediaservices/resource-manager',
-        namespace: 'Microsoft.Media',
         disabledForAutogen: true,
     },
     {
@@ -1026,6 +1022,11 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'deviceupdate/resource-manager',
         namespace: 'Microsoft.DeviceUpdate',
+    },
+    {
+        basePath: 'mediaservices/resource-manager',
+        namespace: 'Microsoft.Media',
+        postProcessor: mediaPostProcessor
     },
 ];
 

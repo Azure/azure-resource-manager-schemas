@@ -56,6 +56,14 @@ export const postProcessor: SchemaPostProcessor = async (namespace, apiVersion, 
         schema.definitions.VirtualMachineScaleSetExtension.properties.properties = extensionsProperties(apiVersion);
     }
 
+    /// Remove CloudService Update Domain
+    if (schema.resourceDefinitinos?.cloudServices_updateDomains) {
+        delete schema.resourceDefinitions.cloudServices_updateDomains;
+    }
+    if (schema.resourceDefinitions?.cloudServices?.resources) {
+        delete schema.resourceDefinitions.cloudServices.resources
+    }
+
     // save extensionsDefinitions as Microsoft.Compute.Extensions.json
     const relativePath = `${apiVersion}/Microsoft.Compute.Extensions.json`;
     const extensionFile = path.join(constants.schemasBasePath, relativePath); 

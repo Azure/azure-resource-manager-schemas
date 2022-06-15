@@ -57,7 +57,7 @@ export const postProcessor: SchemaPostProcessor = async (namespace, apiVersion, 
     }
 
     /// Remove CloudService Update Domain
-    if (schema.resourceDefinitinos?.cloudServices_updateDomains) {
+    if (schema.resourceDefinitions?.cloudServices_updateDomains) {
         delete schema.resourceDefinitions.cloudServices_updateDomains;
     }
     if (schema.resourceDefinitions?.cloudServices?.resources) {

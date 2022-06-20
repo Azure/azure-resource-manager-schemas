@@ -60,8 +60,11 @@ export const postProcessor: SchemaPostProcessor = async (namespace, apiVersion, 
     if (schema.resourceDefinitions?.cloudServices_updateDomains) {
         delete schema.resourceDefinitions.cloudServices_updateDomains;
     }
-    if (schema.resourceDefinitions?.cloudServices?.resources) {
+    if (schema.resourceDefinitions?.cloudServices?.properties?.resources) {
         delete schema.resourceDefinitions.cloudServices.resources
+    }
+    if (schema.cloudServices_updateDomains_childResource) {
+        delete schema.cloudServices_updateDomains_childResource
     }
 
     // save extensionsDefinitions as Microsoft.Compute.Extensions.json

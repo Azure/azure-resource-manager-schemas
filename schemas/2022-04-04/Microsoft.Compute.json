@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2020-10-01-preview/Microsoft.Compute.json#",
+  "id": "https://schema.management.azure.com/schemas/2022-04-04/Microsoft.Compute.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.Compute",
   "description": "Microsoft Compute Resource Types",
@@ -10,7 +10,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-10-01-preview"
+            "2022-04-04"
           ]
         },
         "location": {
@@ -31,6 +31,17 @@
             }
           ],
           "description": "Cloud service properties"
+        },
+        "systemData": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SystemData"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The system meta data relating to this resource."
         },
         "tags": {
           "oneOf": [
@@ -104,7 +115,8 @@
           "description": "Tag to force apply the provided public and protected settings.\r\nChanging the tag value allows for re-running the extension without changing any of the public or protected settings.\r\nIf forceUpdateTag is not changed, updates to public or protected settings would still be applied by the handler.\r\nIf neither forceUpdateTag nor any of public or protected settings change, extension would flow to the role instance with the same sequence-number, and\r\nit is up to handler implementation whether to re-run it or not"
         },
         "protectedSettings": {
-          "type": "string",
+          "type": "object",
+          "properties": {},
           "description": "Protected settings for the extension which are encrypted before sent to the role instance."
         },
         "protectedSettingsFromKeyVault": {
@@ -115,7 +127,8 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Protected settings for the extension, referenced using KeyVault which are encrypted before sent to the role instance."
         },
         "publisher": {
           "type": "string",
@@ -136,7 +149,8 @@
           "description": "Optional list of roles to apply this extension. If property is not specified or '*' is specified, extension is applied to all roles in the cloud service."
         },
         "settings": {
-          "type": "string",
+          "type": "object",
+          "properties": {},
           "description": "Public settings for the extension. For JSON extensions, this is the JSON settings for the extension. For XML Extension (like RDP), this is the XML setting for the extension."
         },
         "type": {
@@ -165,7 +179,21 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The list of load balancer configurations for the cloud service."
+          "description": "List of Load balancer configurations. Cloud service can have up to two load balancer configurations, corresponding to a Public Load Balancer and an Internal Load Balancer."
+        },
+        "slotType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Production",
+                "Staging"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "swappableCloudService": {
           "oneOf": [
@@ -203,6 +231,17 @@
     "CloudServiceProperties": {
       "type": "object",
       "properties": {
+        "allowModelOverride": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "(Optional) Indicates whether the role sku properties (roleProfile.roles.sku) specified in the model/template should override the role instance count and vm size specified in the .cscfg and .csdef respectively.\r\nThe default value is `false`."
+        },
         "configuration": {
           "type": "string",
           "description": "Specifies the XML service configuration (.cscfg) for the cloud service."
@@ -358,7 +397,8 @@
       "type": "object",
       "properties": {
         "secretUrl": {
-          "type": "string"
+          "type": "string",
+          "description": "Secret URL which contains the protected settings of the extension"
         },
         "sourceVault": {
           "oneOf": [
@@ -370,7 +410,8 @@
             }
           ]
         }
-      }
+      },
+      "description": "Protected settings for the extension, referenced using KeyVault which are encrypted before sent to the role instance."
     },
     "CloudServiceVaultCertificate": {
       "type": "object",
@@ -436,9 +477,13 @@
     "LoadBalancerConfiguration": {
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "Resource Id"
+        },
         "name": {
           "type": "string",
-          "description": "Resource Name"
+          "description": "The name of the Load balancer"
         },
         "properties": {
           "oneOf": [
@@ -448,9 +493,14 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Describes the properties of the load balancer configuration."
         }
       },
+      "required": [
+        "name",
+        "properties"
+      ],
       "description": "Describes the load balancer configuration."
     },
     "LoadBalancerConfigurationProperties": {
@@ -468,15 +518,20 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "List of IP"
+          "description": "Specifies the frontend IP to be used for the load balancer. Only IPv4 frontend IP address is supported. Each load balancer configuration must have exactly one frontend IP configuration."
         }
-      }
+      },
+      "required": [
+        "frontendIPConfigurations"
+      ],
+      "description": "Describes the properties of the load balancer configuration."
     },
     "LoadBalancerFrontendIPConfiguration": {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the resource that is unique within the set of frontend IP configurations used by the load balancer. This name can be used to access the resource."
         },
         "properties": {
           "oneOf": [
@@ -489,14 +544,19 @@
           ],
           "description": "Describes a cloud service IP Configuration"
         }
-      }
+      },
+      "required": [
+        "name",
+        "properties"
+      ],
+      "description": "Specifies the frontend IP to be used for the load balancer. Only IPv4 frontend IP address is supported. Each load balancer configuration must have exactly one frontend IP configuration."
     },
     "LoadBalancerFrontendIPConfigurationProperties": {
       "type": "object",
       "properties": {
         "privateIPAddress": {
           "type": "string",
-          "description": "The private IP address referenced by the cloud service."
+          "description": "The virtual network private IP address of the IP configuration."
         },
         "publicIPAddress": {
           "oneOf": [
@@ -529,6 +589,11 @@
           "description": "Resource Id"
         }
       }
+    },
+    "SystemData": {
+      "type": "object",
+      "properties": {},
+      "description": "The system meta data relating to this resource."
     }
   }
 }

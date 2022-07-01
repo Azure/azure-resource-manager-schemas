@@ -60,11 +60,6 @@ const disabledProviders: AutoGenConfig[] = [
         disabledForAutogen: true,
     },
     {
-        basePath: 'msi/resource-manager',
-        namespace: 'Microsoft.ManagedIdentity',
-        disabledForAutogen: true,
-    },
-    {
         basePath: 'network/resource-manager',
         namespace: 'Microsoft.Network',
         disabledForAutogen: true,

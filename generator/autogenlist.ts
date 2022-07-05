@@ -42,6 +42,7 @@ const disabledProviders: AutoGenConfig[] = [
         basePath: 'dns/resource-manager',
         namespace: 'Microsoft.Network',
         disabledForAutogen: true,
+        suffix: 'DNS',
     },
     {
         // Disabled as the swagger spec contains a bug (enum mismatch)
@@ -60,11 +61,6 @@ const disabledProviders: AutoGenConfig[] = [
         disabledForAutogen: true,
     },
     {
-        basePath: 'network/resource-manager',
-        namespace: 'Microsoft.Network',
-        disabledForAutogen: true,
-    },
-    {
         basePath: 'operationsmanagement/resource-manager',
         namespace: 'Microsoft.OperationsManagement',
         disabledForAutogen: true,
@@ -73,6 +69,7 @@ const disabledProviders: AutoGenConfig[] = [
         basePath: 'privatedns/resource-manager',
         namespace: 'Microsoft.Network',
         disabledForAutogen: true,
+        suffix: 'privateDns',
     },
     {
         basePath: 'service-map/resource-manager',
@@ -83,6 +80,7 @@ const disabledProviders: AutoGenConfig[] = [
         basePath: 'trafficmanager/resource-manager',
         namespace: 'Microsoft.Network',
         disabledForAutogen: true,
+        suffix: 'trafficManager',
     },
     {
         basePath: 'videoanalyzer/resource-manager',
@@ -1023,6 +1021,11 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.Media',
         postProcessor: mediaPostProcessor
     },
+    {
+        basePath: 'network/resource-manager',
+        namespace: 'Microsoft.Network',
+        suffix: 'NRP'
+    }
 ];
 
 export function findAutogenEntries(basePath: string): AutoGenConfig[] {

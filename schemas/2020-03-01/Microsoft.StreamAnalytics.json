@@ -1032,6 +1032,10 @@
           ],
           "description": "Authentication Mode."
         },
+        "blobPathPrefix": {
+          "type": "string",
+          "description": "Blob path prefix."
+        },
         "container": {
           "type": "string",
           "description": "The name of a container within the associated Storage account. This container contains either the blob(s) to be read from or written to. Required on PUT (CreateOrReplace) requests."
@@ -1272,7 +1276,7 @@
             {
               "type": "integer",
               "minimum": 36,
-              "maximum": 216
+              "maximum": 396
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -1669,6 +1673,42 @@
       ],
       "description": "Describes an Event Hub input data source that contains stream data."
     },
+    "FileReferenceInputDataSource": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/FileReferenceInputDataSourceProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties that are associated with a file input containing reference data."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "File"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Describes a file input data source that contains reference data."
+    },
+    "FileReferenceInputDataSourceProperties": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "The path of the file."
+        }
+      },
+      "description": "The properties that are associated with a file input containing reference data."
+    },
     "Function": {
       "type": "object",
       "properties": {
@@ -1798,17 +1838,81 @@
       },
       "description": "The properties that are associated with a function."
     },
+    "GatewayMessageBusOutputDataSource": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/GatewayMessageBusOutputDataSourceProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties that are associated with a Gateway Message Bus."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "GatewayMessageBus"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Describes a Gateway Message Bus output data source."
+    },
+    "GatewayMessageBusOutputDataSourceProperties": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "type": "string",
+          "description": "The name of the Service Bus topic."
+        }
+      },
+      "description": "The properties that are associated with a Gateway Message Bus."
+    },
+    "GatewayMessageBusStreamInputDataSource": {
+      "type": "object",
+      "properties": {
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/GatewayMessageBusStreamInputDataSourceProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties that are associated with a gateway message bus input containing stream data."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "GatewayMessageBus"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Describes a blob input data source that contains stream data."
+    },
+    "GatewayMessageBusStreamInputDataSourceProperties": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "type": "string",
+          "description": "The name of the Service Bus topic."
+        }
+      },
+      "description": "The properties that are associated with a gateway message bus input containing stream data."
+    },
     "Identity": {
       "type": "object",
       "properties": {
-        "principalId": {
-          "type": "string",
-          "description": "The identity principal ID"
-        },
-        "tenantId": {
-          "type": "string",
-          "description": "The identity tenantId"
-        },
         "type": {
           "type": "string",
           "description": "The identity type"
@@ -2115,6 +2219,9 @@
         },
         {
           "$ref": "#/definitions/AzureDataLakeStoreOutputDataSource"
+        },
+        {
+          "$ref": "#/definitions/GatewayMessageBusOutputDataSource"
         }
       ],
       "properties": {},
@@ -2339,6 +2446,9 @@
     "ReferenceInputDataSource": {
       "type": "object",
       "oneOf": [
+        {
+          "$ref": "#/definitions/FileReferenceInputDataSource"
+        },
         {
           "$ref": "#/definitions/BlobReferenceInputDataSource"
         },
@@ -3003,6 +3113,9 @@
         },
         {
           "$ref": "#/definitions/IoTHubStreamInputDataSource"
+        },
+        {
+          "$ref": "#/definitions/GatewayMessageBusStreamInputDataSource"
         }
       ],
       "properties": {},
@@ -3065,7 +3178,8 @@
         "streamingUnits": {
           "oneOf": [
             {
-              "type": "integer"
+              "type": "integer",
+              "default": "3"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"

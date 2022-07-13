@@ -13,6 +13,7 @@ import { postProcessor as securityInsightsPostProcessor } from './processors/Mic
 import { postProcessor as costManagementPostProcessor } from './processors/Microsoft.CostManagement';
 import { postProcessor as providerHubPostProcessor } from './processors/Microsoft.ProviderHub';
 import { postProcessor as mediaPostProcessor } from './processors/Microsoft.Media';
+import { postProcessor as networkPostProcessor } from './processors/Microsoft.Network';
 import { lowerCaseEquals } from './utils';
 
 // New providers are onboarded by default. The providers listed here are the only ones **not** onboarded.
@@ -1024,6 +1025,7 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'network/resource-manager',
         namespace: 'Microsoft.Network',
+		postProcessor: networkPostProcessor,
         suffix: 'NRP'
     }
 ];

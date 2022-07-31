@@ -928,6 +928,10 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.Logz',
     },
     {
+        basePath: 'dynatrace/resource-manager',
+        namespace: 'Dynatrace.Observability',
+    },
+    {
         basePath: 'healthbot/resource-manager',
         namespace: 'Microsoft.HealthBot',
     },

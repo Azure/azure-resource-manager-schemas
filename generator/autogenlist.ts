@@ -89,6 +89,12 @@ const disabledProviders: AutoGenConfig[] = [
         namespace: 'Microsoft.Media',
         disabledForAutogen: true,
     },
+    // Disabled because the swagger spec contains duplicate API paths and results in schema generation failures, see here for more info: https://github.com/Azure/azure-resource-manager-schemas/issues/2462
+    {
+        basePath: 'authorization/resource-manager',
+        namespace: 'Microsoft.Authorization',
+        disabledForAutogen: true,
+    }
 ];
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
@@ -651,37 +657,6 @@ const autoGenList: AutoGenConfig[] = [
         postProcessor: policyProcessor
     },
     {
-        basePath: 'authorization/resource-manager',
-        namespace: 'Microsoft.Authorization',
-        resourceConfig: [
-            {
-                type: 'roleAssignments',
-                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subcription | ScopeType.Tenant
-            },
-            {
-                type: 'roleDefinitions',
-                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subcription | ScopeType.Tenant
-            },
-            {
-                type: 'roleAssignmentScheduleRequests',
-                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subcription | ScopeType.Tenant
-            },
-            {
-                type: 'roleEligibilityScheduleRequests',
-                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subcription | ScopeType.Tenant
-            },
-            {
-                type: 'roleManagementPolicyAssignments',
-                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subcription | ScopeType.Tenant
-            },
-            {
-                type: 'roleAssignmentApprovals/stages',
-                scopes: ScopeType.Tenant
-            }
-        ],
-        suffix: 'Authz'
-    },
-    {
         basePath: 'relay/resource-manager',
         namespace: 'Microsoft.Relay',
     },
@@ -926,6 +901,10 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'logz/resource-manager',
         namespace: 'Microsoft.Logz',
+    },
+    {
+        basePath: 'dynatrace/resource-manager',
+        namespace: 'Dynatrace.Observability',
     },
     {
         basePath: 'healthbot/resource-manager',

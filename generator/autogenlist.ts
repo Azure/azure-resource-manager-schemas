@@ -89,6 +89,7 @@ const disabledProviders: AutoGenConfig[] = [
         namespace: 'Microsoft.Media',
         disabledForAutogen: true,
     },
+    // Disabled because the swagger spec contains duplicate API paths and results in schema generation failures, see here for more info: https://github.com/Azure/azure-resource-manager-schemas/issues/2462
     {
         basePath: 'authorization/resource-manager',
         namespace: 'Microsoft.Authorization',

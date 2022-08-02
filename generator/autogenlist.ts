@@ -89,6 +89,11 @@ const disabledProviders: AutoGenConfig[] = [
         namespace: 'Microsoft.Media',
         disabledForAutogen: true,
     },
+    {
+        basePath: 'authorization/resource-manager',
+        namespace: 'Microsoft.Authorization',
+        disabledForAutogen: true,
+    }
 ];
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
@@ -649,37 +654,6 @@ const autoGenList: AutoGenConfig[] = [
         ],
         suffix: 'Resources',
         postProcessor: policyProcessor
-    },
-    {
-        basePath: 'authorization/resource-manager',
-        namespace: 'Microsoft.Authorization',
-        resourceConfig: [
-            {
-                type: 'roleAssignments',
-                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subcription | ScopeType.Tenant
-            },
-            {
-                type: 'roleDefinitions',
-                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subcription | ScopeType.Tenant
-            },
-            {
-                type: 'roleAssignmentScheduleRequests',
-                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subcription | ScopeType.Tenant
-            },
-            {
-                type: 'roleEligibilityScheduleRequests',
-                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subcription | ScopeType.Tenant
-            },
-            {
-                type: 'roleManagementPolicyAssignments',
-                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subcription | ScopeType.Tenant
-            },
-            {
-                type: 'roleAssignmentApprovals/stages',
-                scopes: ScopeType.Tenant
-            }
-        ],
-        suffix: 'Authz'
     },
     {
         basePath: 'relay/resource-manager',

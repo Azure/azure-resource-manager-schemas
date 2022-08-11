@@ -30,7 +30,7 @@ interface RootSchemaConfiguration {
 
 const RootSchemaConfigs: Map<ScopeType, RootSchemaConfiguration> = new Map([
     [ScopeType.Tenant, constants.tenantRootSchema],
-    [ScopeType.Subcription, constants.subscriptionRootSchema],
+    [ScopeType.Subscription, constants.subscriptionRootSchema],
     [ScopeType.ResourceGroup, constants.resourceGroupRootSchema],
     [ScopeType.ManagementGroup, constants.managementGroupRootSchema]
 ]);
@@ -190,7 +190,7 @@ async function generateSchemaConfig(outputFile: string, namespace: string, apiVe
     const knownReferences = [
         ...getSchemaRefs(output, ScopeType.Tenant, 'tenant_resourceDefinitions'),
         ...getSchemaRefs(output, ScopeType.ManagementGroup, 'managementGroup_resourceDefinitions'),
-        ...getSchemaRefs(output, ScopeType.Subcription, 'subscription_resourceDefinitions'),
+        ...getSchemaRefs(output, ScopeType.Subscription, 'subscription_resourceDefinitions'),
         ...getSchemaRefs(output, ScopeType.ResourceGroup, 'resourceDefinitions'),
         ...getSchemaRefs(output, ScopeType.Extension, 'extension_resourceDefinitions'),
     ];
@@ -226,7 +226,7 @@ async function generateSchemaConfig(outputFile: string, namespace: string, apiVe
         }
     }
 
-    const subscriptionSchemaRefs = references.filter(x => x.scope & ScopeType.Subcription);
+    const subscriptionSchemaRefs = references.filter(x => x.scope & ScopeType.Subscription);
     if (subscriptionSchemaRefs.length > 0) {
         console.log('Resource Types (Subscription Scope):');
         for (const schemaRef of subscriptionSchemaRefs) {

@@ -88,12 +88,6 @@ const disabledProviders: AutoGenConfig[] = [
         basePath: 'videoanalyzer/resource-manager',
         namespace: 'Microsoft.Media',
         disabledForAutogen: true,
-    },
-    // Disabled because the swagger spec contains duplicate API paths and results in schema generation failures, see here for more info: https://github.com/Azure/azure-resource-manager-schemas/issues/2462
-    {
-        basePath: 'authorization/resource-manager',
-        namespace: 'Microsoft.Authorization',
-        disabledForAutogen: true,
     }
 ];
 
@@ -103,6 +97,53 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'addons/resource-manager',
         namespace: 'Microsoft.Addons',
+    },
+    {
+        basePath: 'authorization/resource-manager',
+        namespace: 'Microsoft.Authorization',
+        resourceConfig: [
+            {
+                type: 'roleAssignments',
+                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subscription | ScopeType.Tenant
+            },
+            {
+                type: 'roleDefinitions',
+                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subscription | ScopeType.Tenant
+            },
+            {
+                type: 'roleAssignmentScheduleRequests',
+                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subscription | ScopeType.Tenant
+            },
+            {
+                type: 'roleEligibilityScheduleRequests',
+                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subscription | ScopeType.Tenant
+            },
+            {
+                type: 'roleManagementPolicyAssignments',
+                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subscription | ScopeType.Tenant
+            },
+            {
+                type: 'roleAssignmentApprovals/stages',
+                scopes: ScopeType.Tenant
+            },
+            {
+                type: 'accessReviewHistoryDefinitions',
+                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subscription | ScopeType.Tenant
+            },
+            {
+                type: 'accessReviewScheduleDefinitions',
+                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subscription | ScopeType.Tenant
+            },
+            {
+                type: 'accessReviewScheduleDefinitions/instances',
+                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subscription | ScopeType.Tenant
+            },
+            {
+                type: 'accessReviewScheduleSettings',
+                scopes: ScopeType.Extension | ScopeType.ManagementGroup | ScopeType.ResourceGroup | ScopeType.Subscription | ScopeType.Tenant
+            },
+        ],
+        suffix: 'Authz'
     },
     {
         basePath: 'adhybridhealthservice/resource-manager',
@@ -174,19 +215,19 @@ const autoGenList: AutoGenConfig[] = [
         resourceConfig: [
             {
                 type: 'blueprintAssignments',
-                scopes: ScopeType.Subcription | ScopeType.ManagementGroup,
+                scopes: ScopeType.Subscription | ScopeType.ManagementGroup,
             },
             {
                 type: 'blueprints',
-                scopes: ScopeType.Subcription | ScopeType.ManagementGroup,
+                scopes: ScopeType.Subscription | ScopeType.ManagementGroup,
             },
             {
                 type: 'blueprints/artifacts',
-                scopes: ScopeType.Subcription | ScopeType.ManagementGroup,
+                scopes: ScopeType.Subscription | ScopeType.ManagementGroup,
             },
             {
                 type: 'blueprints/versions',
-                scopes: ScopeType.Subcription | ScopeType.ManagementGroup,
+                scopes: ScopeType.Subscription | ScopeType.ManagementGroup,
             },
         ]
     },
@@ -246,7 +287,7 @@ const autoGenList: AutoGenConfig[] = [
         resourceConfig: [
             {
                 type: 'budgets',
-                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+                scopes: ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
         ],
     },
@@ -256,15 +297,15 @@ const autoGenList: AutoGenConfig[] = [
         resourceConfig: [
             {
                 type: 'exports',
-                scopes: ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup,
+                scopes: ScopeType.ManagementGroup | ScopeType.Subscription | ScopeType.ResourceGroup,
             },
             {
                 type: 'budgets',
-                scopes: ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+                scopes: ScopeType.ManagementGroup | ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
             {
                 type: 'views',
-                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
         ],
         postProcessor: costManagementPostProcessor,
@@ -456,7 +497,7 @@ const autoGenList: AutoGenConfig[] = [
         resourceConfig: [
             {
                 type: 'eventSubscriptions',
-                scopes: ScopeType.Extension | ScopeType.Subcription | ScopeType.ResourceGroup,
+                scopes: ScopeType.Extension | ScopeType.Subscription | ScopeType.ResourceGroup,
             },
         ],
     },
@@ -502,7 +543,7 @@ const autoGenList: AutoGenConfig[] = [
         resourceConfig: [
             {
                 type: 'scopeAssignments',
-                scopes: ScopeType.Subcription,
+                scopes: ScopeType.Subscription,
             },
         ],
     },
@@ -558,11 +599,11 @@ const autoGenList: AutoGenConfig[] = [
         resourceConfig: [
             {
                 type: 'remediations',
-                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.ManagementGroup,
+                scopes: ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.ManagementGroup,
             },
             {
                 type: 'attestations',
-                scopes: ScopeType.Subcription | ScopeType.ResourceGroup,
+                scopes: ScopeType.Subscription | ScopeType.ResourceGroup,
             }
         ]
     },
@@ -615,11 +656,11 @@ const autoGenList: AutoGenConfig[] = [
         resourceConfig: [
             {
                 type: 'deployments',
-                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup,
+                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subscription | ScopeType.ResourceGroup,
             },
             {
                 type: 'tags',
-                scopes: ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+                scopes: ScopeType.ManagementGroup | ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
         ],
         postProcessor: resourcesPostProcessor,
@@ -630,27 +671,27 @@ const autoGenList: AutoGenConfig[] = [
         resourceConfig: [
             {
                 type: 'policyDefinitions',
-                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subcription,
+                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subscription,
             },
             {
                 type: 'policySetDefinitions',
-                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subcription,
+                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subscription,
             },
             {
                 type: 'policyAssignments',
-                scopes: ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+                scopes: ScopeType.ManagementGroup | ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
             {
                 type: 'policyExemptions',
-                scopes: ScopeType.ManagementGroup | ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+                scopes: ScopeType.ManagementGroup | ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
             {
                 type: 'policyPricings',
-                scopes: ScopeType.ManagementGroup | ScopeType.Subcription,
+                scopes: ScopeType.ManagementGroup | ScopeType.Subscription,
             },
             {
                 type: 'locks',
-                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+                scopes: ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
         ],
         suffix: 'Resources',
@@ -743,19 +784,19 @@ const autoGenList: AutoGenConfig[] = [
         resourceConfig: [
             {
                 type: 'advancedThreatProtectionSettings',
-                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+                scopes: ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
             {
                 type: 'assessments',
-                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+                scopes: ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
             {
                 type: 'deviceSecurityGroups',
-                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+                scopes: ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
             {
                 type: 'iotSensors',
-                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+                scopes: ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
             {
                 type: 'informationProtectionPolicies',
@@ -767,7 +808,7 @@ const autoGenList: AutoGenConfig[] = [
             },
             {
                 type: 'iotSites',
-                scopes: ScopeType.Subcription | ScopeType.ResourceGroup | ScopeType.Extension,
+                scopes: ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
         ]
     },
@@ -949,7 +990,7 @@ const autoGenList: AutoGenConfig[] = [
         resourceConfig: [
             {
                 type: 'diagnosticSettings',
-                scopes: ScopeType.Subcription | ScopeType.Extension,
+                scopes: ScopeType.Subscription | ScopeType.Extension,
             },
             {
                 type: 'guestDiagnosticSettingsAssociation',

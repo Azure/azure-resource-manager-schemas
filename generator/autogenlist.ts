@@ -88,6 +88,12 @@ const disabledProviders: AutoGenConfig[] = [
         basePath: 'videoanalyzer/resource-manager',
         namespace: 'Microsoft.Media',
         disabledForAutogen: true,
+    },
+    {
+        // Disabled as the swagger spec contains a bug (enum mismatch)
+        basePath: 'servicefabricmesh/resource-manager',
+        namespace: 'Microsoft.ServiceFabricMesh',
+        disabledForAutogen: true,
     }
 ];
 
@@ -726,10 +732,6 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'servicefabric/resource-manager',
         namespace: 'Microsoft.ServiceFabric',
-    },
-    {
-        basePath: 'servicefabricmesh/resource-manager',
-        namespace: 'Microsoft.ServiceFabricMesh',
     },
     {
         basePath: 'servicelinker/resource-manager',

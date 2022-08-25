@@ -1045,6 +1045,11 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.Media',
         postProcessor: mediaPostProcessor
     },
+    {
+        basePath: 'dnsresolver/resource-manager',
+        namespace: 'Microsoft.Network',
+        suffix: 'DnsResolver',
+    },
 ];
 
 export function findAutogenEntries(basePath: string): AutoGenConfig[] {

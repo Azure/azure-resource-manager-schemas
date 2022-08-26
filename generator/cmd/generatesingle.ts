@@ -30,7 +30,7 @@ executeSynchronous(async () => {
     try {
         readme = validateAndReturnReadmePath(localPath, basePath);
     } catch {
-        throw new Error(`Unable to find a readme under '${basePath}'. Please try running 'npm run list-basepaths' to find the list of valid paths.`);
+        throw new Error(`Unable to find a readme under '${localPath}' for base path '${basePath}'. Please try running 'npm run list-basepaths' to find the list of valid paths.`);
     }
 
     const schemaConfigs = [];

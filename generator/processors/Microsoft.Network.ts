@@ -16,4 +16,5 @@ export const postProcessor: SchemaPostProcessor = async (namespace, apiVersion, 
   replaceCyclicRef(schema.definitions?.NetworkInterfacePropertiesFormat?.properties?.ipConfigurations?.oneOf[0]?.items);
   replaceCyclicRef(schema.definitions?.CustomIpPrefixPropertiesFormat?.properties?.customIpPrefixParent?.oneOf[0]);
   replaceCyclicRef(schema.definitions?.NetworkInterfacePropertiesFormat?.properties?.networkSecurityGroup?.oneOf[0]);
+  replaceCyclicRef(schema.definitions?.NetworkSecurityGroupPropertiesFormat?.properties?.subnets?.oneOf[0].items);
 }

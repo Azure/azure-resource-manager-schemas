@@ -21,4 +21,5 @@ export const postProcessor: SchemaPostProcessor = async (namespace, apiVersion, 
   replaceCyclicRef(schema.definitions?.RouteTablePropertiesFormat?.properties?.subnets?.oneOf[0]?.items);
   replaceCyclicRef(schema.definitions?.SubnetPropertiesFormat?.properties?.ipConfigurations?.oneOf[0]?.items);
   replaceCyclicRef(schema.definitions?.BackendAddressPoolPropertiesFormat?.properties?.backendIPConfigurations?.oneOf[0]?.items);
+  replaceCyclicRef(schema.definitions?.InboundNatRulePropertiesFormat?.properties?.backendIPConfiguration?.oneOf[0]);
 }

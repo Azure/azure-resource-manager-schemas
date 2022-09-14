@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2022-01-01/Microsoft.NetApp.json#",
+  "id": "https://schema.management.azure.com/schemas/2022-05-01/Microsoft.NetApp.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.NetApp",
   "description": "Microsoft NetApp Resource Types",
@@ -10,8 +10,19 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-01-01"
+            "2022-05-01"
           ]
+        },
+        "identity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Identity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Identity for the resource."
         },
         "location": {
           "type": "string",
@@ -88,7 +99,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-01-01"
+            "2022-05-01"
           ]
         },
         "location": {
@@ -147,7 +158,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-01-01"
+            "2022-05-01"
           ]
         },
         "location": {
@@ -226,7 +237,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-01-01"
+            "2022-05-01"
           ]
         },
         "location": {
@@ -328,7 +339,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-01-01"
+            "2022-05-01"
           ]
         },
         "location": {
@@ -372,7 +383,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-01-01"
+            "2022-05-01"
           ]
         },
         "location": {
@@ -416,7 +427,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-01-01"
+            "2022-05-01"
           ]
         },
         "name": {
@@ -465,7 +476,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-01-01"
+            "2022-05-01"
           ]
         },
         "location": {
@@ -524,7 +535,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-01-01"
+            "2022-05-01"
           ]
         },
         "location": {
@@ -583,7 +594,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-01-01"
+            "2022-05-01"
           ]
         },
         "location": {
@@ -635,9 +646,42 @@
     "AccountEncryption": {
       "type": "object",
       "properties": {
+        "identity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EncryptionIdentity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Identity used to authenticate with key vault."
+        },
         "keySource": {
-          "type": "string",
-          "description": "Encryption Key Source. Possible values are: 'Microsoft.NetApp'."
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Microsoft.NetApp",
+                "Microsoft.KeyVault"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The encryption keySource (provider). Possible values (case-insensitive):  Microsoft.NetApp, Microsoft.KeyVault."
+        },
+        "keyVaultProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/KeyVaultProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties of key vault."
         }
       },
       "description": "Encryption settings"
@@ -974,6 +1018,16 @@
       },
       "description": "Daily Schedule properties"
     },
+    "EncryptionIdentity": {
+      "type": "object",
+      "properties": {
+        "userAssignedIdentity": {
+          "type": "string",
+          "description": "The ARM resource identifier of the user assigned identity used to authenticate with key vault. Applicable if identity.type has 'UserAssigned'. It should match key of identity.userAssignedIdentities."
+        }
+      },
+      "description": "Identity used to authenticate with key vault."
+    },
     "ExportPolicyRule": {
       "type": "object",
       "properties": {
@@ -1188,6 +1242,70 @@
       },
       "description": "Hourly Schedule properties"
     },
+    "Identity": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "None",
+                "SystemAssigned",
+                "UserAssigned",
+                "SystemAssigned,UserAssigned"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The identity type."
+        },
+        "userAssignedIdentities": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/UserAssignedIdentity"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Gets or sets a list of key value pairs that describe the set of User Assigned identities that will be used with this storage account. The key is the ARM resource identifier of the identity. Only 1 User Assigned identity is permitted here."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Identity for the resource."
+    },
+    "KeyVaultProperties": {
+      "type": "object",
+      "properties": {
+        "keyName": {
+          "type": "string",
+          "description": "The name of KeyVault key."
+        },
+        "keyVaultResourceId": {
+          "type": "string",
+          "description": "The resource ID of KeyVault."
+        },
+        "keyVaultUri": {
+          "type": "string",
+          "description": "The Uri of KeyVault."
+        }
+      },
+      "required": [
+        "keyName",
+        "keyVaultResourceId",
+        "keyVaultUri"
+      ],
+      "description": "Properties of key vault."
+    },
     "LdapSearchScopeOpt": {
       "type": "object",
       "properties": {
@@ -1269,7 +1387,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-01-01"
+            "2022-05-01"
           ]
         },
         "location": {
@@ -1328,7 +1446,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-01-01"
+            "2022-05-01"
           ]
         },
         "location": {
@@ -1397,7 +1515,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-01-01"
+            "2022-05-01"
           ]
         },
         "location": {
@@ -1441,7 +1559,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-01-01"
+            "2022-05-01"
           ]
         },
         "location": {
@@ -1524,7 +1642,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-01-01"
+            "2022-05-01"
           ]
         },
         "location": {
@@ -1568,7 +1686,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-01-01"
+            "2022-05-01"
           ]
         },
         "name": {
@@ -1617,7 +1735,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-01-01"
+            "2022-05-01"
           ]
         },
         "location": {
@@ -1676,7 +1794,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-01-01"
+            "2022-05-01"
           ]
         },
         "location": {
@@ -1735,7 +1853,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-01-01"
+            "2022-05-01"
           ]
         },
         "location": {
@@ -2023,6 +2141,11 @@
       },
       "description": "This represents path associated with the subvolume"
     },
+    "UserAssignedIdentity": {
+      "type": "object",
+      "properties": {},
+      "description": "UserAssignedIdentity for the resource."
+    },
     "VolumeBackupProperties": {
       "type": "object",
       "properties": {
@@ -2275,6 +2398,17 @@
           ],
           "description": "Default user quota for volume in KiBs. If isDefaultQuotaEnabled is set, the minimum value of 4 KiBs applies ."
         },
+        "deleteBaseSnapshot": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "If enabled (true) the snapshot the volume was created from will be automatically deleted after the volume create operation has finished.  Defaults to false"
+        },
         "enableSubvolumes": {
           "oneOf": [
             {
@@ -2295,14 +2429,15 @@
             {
               "type": "string",
               "enum": [
-                "Microsoft.NetApp"
+                "Microsoft.NetApp",
+                "Microsoft.KeyVault"
               ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Source of key used to encrypt data in volume. Possible values (case-insensitive) are: 'Microsoft.NetApp'."
+          "description": "Source of key used to encrypt data in volume. Applicable if NetApp account has encryption.keySource = 'Microsoft.KeyVault'. Possible values (case-insensitive) are: 'Microsoft.NetApp, Microsoft.KeyVault'."
         },
         "exportPolicy": {
           "oneOf": [
@@ -2349,6 +2484,10 @@
             }
           ],
           "description": "Describe if a volume is KerberosEnabled. To be use with swagger version 2020-05-01 or later"
+        },
+        "keyVaultPrivateEndpointResourceId": {
+          "type": "string",
+          "description": "The resource ID of private endpoint for KeyVault. It must reside in the same VNET as the volume. Only applicable if encryptionKeySource = 'Microsoft.KeyVault'."
         },
         "ldapEnabled": {
           "oneOf": [
@@ -2440,6 +2579,21 @@
             }
           ]
         },
+        "smbAccessBasedEnumeration": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Disabled",
+                "Enabled"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Enables access based enumeration share property for SMB Shares. Only applicable for SMB/DualProtocol volume."
+        },
         "smbContinuouslyAvailable": {
           "oneOf": [
             {
@@ -2463,6 +2617,21 @@
             }
           ],
           "description": "Enables encryption for in-flight smb3 data. Only applicable for SMB/DualProtocol volume. To be used with swagger version 2020-08-01 or later"
+        },
+        "smbNonBrowsable": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Disabled",
+                "Enabled"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Enables non browsable property for SMB Shares. Only applicable for SMB/DualProtocol volume."
         },
         "snapshotDirectoryVisible": {
           "oneOf": [

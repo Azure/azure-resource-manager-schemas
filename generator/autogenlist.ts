@@ -13,6 +13,7 @@ import { postProcessor as securityInsightsPostProcessor } from './processors/Mic
 import { postProcessor as costManagementPostProcessor } from './processors/Microsoft.CostManagement';
 import { postProcessor as providerHubPostProcessor } from './processors/Microsoft.ProviderHub';
 import { postProcessor as mediaPostProcessor } from './processors/Microsoft.Media';
+import { postProcessor as networkPostProcessor } from './processors/Microsoft.Network';
 import { lowerCaseEquals } from './utils';
 
 // New providers are onboarded by default. The providers listed here are the only ones **not** onboarded.
@@ -42,6 +43,7 @@ const disabledProviders: AutoGenConfig[] = [
         basePath: 'dns/resource-manager',
         namespace: 'Microsoft.Network',
         disabledForAutogen: true,
+        suffix: 'DNS',
     },
     {
         // Disabled as the swagger spec contains a bug (enum mismatch)
@@ -60,11 +62,6 @@ const disabledProviders: AutoGenConfig[] = [
         disabledForAutogen: true,
     },
     {
-        basePath: 'network/resource-manager',
-        namespace: 'Microsoft.Network',
-        disabledForAutogen: true,
-    },
-    {
         basePath: 'operationsmanagement/resource-manager',
         namespace: 'Microsoft.OperationsManagement',
         disabledForAutogen: true,
@@ -73,6 +70,7 @@ const disabledProviders: AutoGenConfig[] = [
         basePath: 'privatedns/resource-manager',
         namespace: 'Microsoft.Network',
         disabledForAutogen: true,
+        suffix: 'privateDns',
     },
     {
         basePath: 'service-map/resource-manager',
@@ -83,6 +81,7 @@ const disabledProviders: AutoGenConfig[] = [
         basePath: 'trafficmanager/resource-manager',
         namespace: 'Microsoft.Network',
         disabledForAutogen: true,
+        suffix: 'trafficManager',
     },
     {
         basePath: 'videoanalyzer/resource-manager',
@@ -1046,6 +1045,12 @@ const autoGenList: AutoGenConfig[] = [
         postProcessor: mediaPostProcessor
     },
     {
+        basePath: 'network/resource-manager',
+        namespace: 'Microsoft.Network',
+		postProcessor: networkPostProcessor,
+        suffix: 'NRP'
+    },
+	{
         basePath: 'dnsresolver/resource-manager',
         namespace: 'Microsoft.Network',
         suffix: 'DnsResolver',

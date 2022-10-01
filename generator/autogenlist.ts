@@ -93,6 +93,12 @@ const disabledProviders: AutoGenConfig[] = [
         basePath: 'servicefabricmesh/resource-manager',
         namespace: 'Microsoft.ServiceFabricMesh',
         disabledForAutogen: true,
+    },
+    { 
+        // Disabled as the swagger spec contains a bug (enum mismatch - missing: ProvisioningStateEnum)
+        basePath: 'operationalinsights/resource-manager',
+        namespace: 'Microsoft.OperationalInsights',
+        disabledForAutogen: true,
     }
 ];
 
@@ -281,10 +287,6 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'databox/resource-manager',
         namespace: 'Microsoft.DataBox',
-    },
-    { 
-        basePath: 'operationalinsights/resource-manager',
-        namespace: 'Microsoft.OperationalInsights',
     },
     {
         basePath: 'consumption/resource-manager',

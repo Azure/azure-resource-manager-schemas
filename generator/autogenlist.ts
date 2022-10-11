@@ -316,7 +316,7 @@ const autoGenList: AutoGenConfig[] = [
             },
 	    {
                 type: 'scheduledActions',
-                scopes: ScopeType.Tenant | ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension
+                scopes: ScopeType.Tenant | ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
             }
         ],
         postProcessor: costManagementPostProcessor,

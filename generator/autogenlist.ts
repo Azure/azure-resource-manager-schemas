@@ -314,6 +314,10 @@ const autoGenList: AutoGenConfig[] = [
                 type: 'views',
                 scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
+            {
+                type: 'scheduledActions',
+                scopes: ScopeType.Tenant | ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
+            }
         ],
         postProcessor: costManagementPostProcessor,
     },

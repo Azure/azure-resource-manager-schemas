@@ -317,6 +317,42 @@ const autoGenList: AutoGenConfig[] = [
             {
                 type: 'scheduledActions',
                 scopes: ScopeType.Tenant | ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'benefitRecommendations',
+                scopes: ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'benefitUtilizationSummaries',
+                scopes: ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'generateCostDetailsReport',
+                scopes: ScopeType.Subscription | ScopeType.Extension,
+            },
+            {
+                type: 'alerts',
+                scopes: ScopeType.ManagementGroup | ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'forecast',
+                scopes: ScopeType.ManagementGroup | ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'dimensions',
+                scopes: ScopeType.ManagementGroup | ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'query',
+                scopes: ScopeType.ManagementGroup | ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+            {
+                type: 'settings',
+                scopes: ScopeType.Subscription | ScopeType.Extension,
+            },
+            {
+                type: 'pricesheets',
+                scopes: ScopeType.Extension
             }
         ],
         postProcessor: costManagementPostProcessor,

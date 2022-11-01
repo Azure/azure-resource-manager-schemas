@@ -305,6 +305,17 @@
     "EncryptionEntitiesDefinition": {
       "type": "object",
       "properties": {
+        "managedDisk": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ManagedDiskEncryption"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The object that contains details of encryption used on the workspace."
+        },
         "managedServices": {
           "oneOf": [
             {
@@ -399,6 +410,75 @@
         "type"
       ],
       "description": "Identity for the resource."
+    },
+    "ManagedDiskEncryption": {
+      "type": "object",
+      "properties": {
+        "keySource": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Microsoft.Keyvault"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The encryption keySource (provider). Possible values (case-insensitive):  Microsoft.Keyvault"
+        },
+        "keyVaultProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ManagedDiskEncryptionKeyVaultProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Key Vault input properties for encryption."
+        },
+        "rotationToLatestKeyVersionEnabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicate whether the latest key version should be automatically used for Managed Disk Encryption."
+        }
+      },
+      "required": [
+        "keySource",
+        "keyVaultProperties"
+      ],
+      "description": "The object that contains details of encryption used on the workspace."
+    },
+    "ManagedDiskEncryptionKeyVaultProperties": {
+      "type": "object",
+      "properties": {
+        "keyName": {
+          "type": "string",
+          "description": "The name of KeyVault key."
+        },
+        "keyVaultUri": {
+          "type": "string",
+          "description": "The URI of KeyVault."
+        },
+        "keyVersion": {
+          "type": "string",
+          "description": "The version of KeyVault key."
+        }
+      },
+      "required": [
+        "keyName",
+        "keyVaultUri",
+        "keyVersion"
+      ],
+      "description": "Key Vault input properties for encryption."
     },
     "ManagedIdentityConfiguration": {
       "type": "object",
@@ -929,6 +1009,10 @@
           "format": "date-time",
           "description": "The date and time stamp when the workspace was created."
         },
+        "diskEncryptionSetId": {
+          "type": "string",
+          "description": "The resource Id of the managed disk encryption set."
+        },
         "encryption": {
           "oneOf": [
             {
@@ -939,6 +1023,17 @@
             }
           ],
           "description": "Encryption properties for databricks workspace"
+        },
+        "managedDiskIdentity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ManagedIdentityConfiguration"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Managed Identity details for storage account."
         },
         "managedResourceGroupId": {
           "type": "string",

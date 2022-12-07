@@ -782,6 +782,10 @@ const autoGenList: AutoGenConfig[] = [
                 type: 'linkers',
                 scopes: ScopeType.Extension,
             },
+            {
+                type: 'dryruns',
+                scopes: ScopeType.Extension,
+            },
         ],
     },
     {

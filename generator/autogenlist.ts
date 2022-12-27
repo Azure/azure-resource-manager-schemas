@@ -14,6 +14,7 @@ import { postProcessor as costManagementPostProcessor } from './processors/Micro
 import { postProcessor as providerHubPostProcessor } from './processors/Microsoft.ProviderHub';
 import { postProcessor as mediaPostProcessor } from './processors/Microsoft.Media';
 import { postProcessor as networkPostProcessor } from './processors/Microsoft.Network';
+import { postProcessor as azureStackHciPostProcessor } from './processors/Microsoft.AzureStackHCI';
 import { lowerCaseEquals } from './utils';
 
 // New providers are onboarded by default. The providers listed here are the only ones **not** onboarded.
@@ -1100,6 +1101,11 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'dnsresolver/resource-manager',
         namespace: 'Microsoft.Network',
         suffix: 'DnsResolver',
+    },
+    {
+        basePath: 'azurestackhci/resource-manager',
+        namespace: 'Microsoft.AzureStackHCI',
+        postProcessor: azureStackHciPostProcessor
     },
 ];
 

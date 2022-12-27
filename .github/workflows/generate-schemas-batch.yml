@@ -1,6 +1,8 @@
 name: Generate Schemas batch
 
 on:
+  schedule:
+    - cron:  '0 1 * * 3'
   workflow_dispatch:
     inputs:
       api_specs_ref:
@@ -202,9 +204,10 @@ jobs:
           committer: GitHub <noreply@github.com>
           author: ${{ env.AUTHOR }} <${{ env.AUTHOR_EMAIL }}>
           signoff: false
-          branch: ${{ env.AUTOGENERATE_BRANCH_NAME }}_ltst
+          branch: main
           branch-suffix: short-commit-hash
           delete-branch: true
+          token: ${{ secrets.GITHUB_TOKEN }}
           title: |
             Update Generated Schemas ${{ github.event.inputs.single_path && format('(single path: {0})', github.event.inputs.single_path) || '' }}
           body:  |
@@ -218,5 +221,5 @@ jobs:
             Update Generated Schemas ${{ github.event.inputs.single_path && format('(single path: {0})', github.event.inputs.single_path) || '' }}
 
             Generate schemas for ${{ steps.get_swagger_gh_uri.outputs.gh_uri }}
-          labels: ${{ env.AUTOGENERATE_BRANCH_NAME }}
+          labels: automerge
           draft: false

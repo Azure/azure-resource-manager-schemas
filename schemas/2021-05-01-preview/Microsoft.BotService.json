@@ -174,7 +174,12 @@
                 "SmsChannel",
                 "LineChannel",
                 "DirectLineSpeechChannel",
-                "OutlookChannel"
+                "OutlookChannel",
+                "Omnichannel",
+                "TelephonyChannel",
+                "AcsChatChannel",
+                "SearchAssistant",
+                "M365Extensions"
               ]
             },
             {
@@ -377,6 +382,21 @@
     }
   },
   "definitions": {
+    "AcsChatChannel": {
+      "type": "object",
+      "properties": {
+        "channelName": {
+          "type": "string",
+          "enum": [
+            "AcsChatChannel"
+          ]
+        }
+      },
+      "required": [
+        "channelName"
+      ],
+      "description": "AcsChat channel definition"
+    },
     "AlexaChannel": {
       "type": "object",
       "properties": {
@@ -491,12 +511,14 @@
         },
         "iconUrl": {
           "type": "string",
+          "default": "",
           "description": "The Icon Url of the bot"
         },
         "isCmekEnabled": {
           "oneOf": [
             {
-              "type": "boolean"
+              "type": "boolean",
+              "default": false
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -611,6 +633,10 @@
         "storageResourceId": {
           "type": "string",
           "description": "The storage resourceId for the bot"
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "The Tenant Id for the bot"
         }
       },
       "required": [
@@ -673,7 +699,12 @@
                 "SmsChannel",
                 "LineChannel",
                 "DirectLineSpeechChannel",
-                "OutlookChannel"
+                "OutlookChannel",
+                "Omnichannel",
+                "TelephonyChannel",
+                "AcsChatChannel",
+                "SearchAssistant",
+                "M365Extensions"
               ]
             },
             {
@@ -887,6 +918,9 @@
           "$ref": "#/definitions/EmailChannel"
         },
         {
+          "$ref": "#/definitions/OutlookChannel"
+        },
+        {
           "$ref": "#/definitions/MsTeamsChannel"
         },
         {
@@ -915,6 +949,21 @@
         },
         {
           "$ref": "#/definitions/DirectLineSpeechChannel"
+        },
+        {
+          "$ref": "#/definitions/Omnichannel"
+        },
+        {
+          "$ref": "#/definitions/TelephonyChannel"
+        },
+        {
+          "$ref": "#/definitions/AcsChatChannel"
+        },
+        {
+          "$ref": "#/definitions/SearchAssistant"
+        },
+        {
+          "$ref": "#/definitions/M365Extensions"
         }
       ],
       "properties": {
@@ -955,14 +1004,6 @@
           "type": "string",
           "description": "Client Secret associated with the Connection Setting"
         },
-        "id": {
-          "type": "string",
-          "description": "Id associated with the Connection Setting."
-        },
-        "name": {
-          "type": "string",
-          "description": "Name associated with the Connection Setting."
-        },
         "parameters": {
           "oneOf": [
             {
@@ -983,6 +1024,7 @@
         },
         "scopes": {
           "type": "string",
+          "default": "",
           "description": "Scopes associated with the Connection Setting"
         },
         "serviceProviderDisplayName": {
@@ -1029,6 +1071,16 @@
           "type": "string",
           "description": "Direct Line embed code of the resource"
         },
+        "extensionKey1": {
+          "type": "string",
+          "default": "",
+          "description": "The extensionKey1"
+        },
+        "extensionKey2": {
+          "type": "string",
+          "default": "",
+          "description": "The extensionKey1"
+        },
         "sites": {
           "oneOf": [
             {
@@ -1049,6 +1101,14 @@
     "DirectLineSite": {
       "type": "object",
       "properties": {
+        "appId": {
+          "type": "string",
+          "description": "DirectLine application id"
+        },
+        "eTag": {
+          "type": "string",
+          "description": "Entity Tag"
+        },
         "isBlockUserUploadEnabled": {
           "oneOf": [
             {
@@ -1060,6 +1120,17 @@
           ],
           "description": "Whether this site is enabled for block user upload."
         },
+        "isDetailedLoggingEnabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether this site is disabled detailed logging for"
+        },
         "isEnabled": {
           "oneOf": [
             {
@@ -1069,7 +1140,29 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Whether this site is enabled for DirectLine channel."
+          "description": "Whether this site is enabled for DirectLine channel"
+        },
+        "isEndpointParametersEnabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether this site is EndpointParameters enabled for channel"
+        },
+        "isNoStorageEnabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether this no-storage site is disabled detailed logging for"
         },
         "isSecureSiteEnabled": {
           "oneOf": [
@@ -1102,11 +1195,39 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Whether this site is enabled for Bot Framework V1 protocol."
+          "description": "Whether this site is enabled for Bot Framework V3 protocol."
+        },
+        "isWebchatPreviewEnabled": {
+          "oneOf": [
+            {
+              "type": "boolean",
+              "default": false
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether this site is enabled for preview versions of Webchat"
+        },
+        "isWebChatSpeechEnabled": {
+          "oneOf": [
+            {
+              "type": "boolean",
+              "default": false
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether this site is enabled for Webchat Speech"
         },
         "siteName": {
           "type": "string",
           "description": "Site name"
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Tenant Id"
         },
         "trustedOrigins": {
           "oneOf": [
@@ -1125,8 +1246,6 @@
       },
       "required": [
         "isEnabled",
-        "isV1Enabled",
-        "isV3Enabled",
         "siteName"
       ],
       "description": "A site for the Direct Line channel"
@@ -1164,6 +1283,10 @@
           "type": "string",
           "description": "The cognitive service region with this channel registration."
         },
+        "cognitiveServiceResourceId": {
+          "type": "string",
+          "description": "The cognitive service id with this channel registration."
+        },
         "cognitiveServiceSubscriptionKey": {
           "type": "string",
           "description": "The cognitive service subscription key to use with this channel registration."
@@ -1199,10 +1322,6 @@
           "description": "Whether this channel is enabled or not."
         }
       },
-      "required": [
-        "cognitiveServiceRegion",
-        "cognitiveServiceSubscriptionKey"
-      ],
       "description": "The parameters to provide for the DirectLine Speech channel."
     },
     "EmailChannel": {
@@ -1234,6 +1353,17 @@
     "EmailChannelProperties": {
       "type": "object",
       "properties": {
+        "authMethod": {
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Email channel auth method. 0 Password (Default); 1 Graph."
+        },
         "emailAddress": {
           "type": "string",
           "description": "The email address"
@@ -1248,6 +1378,10 @@
             }
           ],
           "description": "Whether this channel is enabled for the bot"
+        },
+        "magicCode": {
+          "type": "string",
+          "description": "The magic code for setting up the modern authentication."
         },
         "password": {
           "type": "string",
@@ -1475,6 +1609,21 @@
       },
       "description": "The properties corresponding to a line channel registration"
     },
+    "M365Extensions": {
+      "type": "object",
+      "properties": {
+        "channelName": {
+          "type": "string",
+          "enum": [
+            "M365Extensions"
+          ]
+        }
+      },
+      "required": [
+        "channelName"
+      ],
+      "description": "M365 Extensions definition"
+    },
     "MsTeamsChannel": {
       "type": "object",
       "properties": {
@@ -1515,18 +1664,20 @@
           ],
           "description": "Whether this channel accepted terms"
         },
-        "callingWebHook": {
+        "callingWebhook": {
           "type": "string",
           "description": "Webhook for Microsoft Teams channel calls"
         },
         "deploymentEnvironment": {
           "type": "string",
+          "default": "FallbackDeploymentEnvironment",
           "description": "Deployment environment for Microsoft Teams channel calls"
         },
         "enableCalling": {
           "oneOf": [
             {
-              "type": "boolean"
+              "type": "boolean",
+              "default": false
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -1555,6 +1706,36 @@
       ],
       "description": "The parameters to provide for the Microsoft Teams channel."
     },
+    "Omnichannel": {
+      "type": "object",
+      "properties": {
+        "channelName": {
+          "type": "string",
+          "enum": [
+            "Omnichannel"
+          ]
+        }
+      },
+      "required": [
+        "channelName"
+      ],
+      "description": "Omnichannel channel definition"
+    },
+    "OutlookChannel": {
+      "type": "object",
+      "properties": {
+        "channelName": {
+          "type": "string",
+          "enum": [
+            "OutlookChannel"
+          ]
+        }
+      },
+      "required": [
+        "channelName"
+      ],
+      "description": "Outlook channel definition"
+    },
     "PrivateEndpoint": {
       "type": "object",
       "properties": {},
@@ -1563,6 +1744,20 @@
     "PrivateEndpointConnectionProperties": {
       "type": "object",
       "properties": {
+        "groupIds": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Group ids"
+        },
         "privateEndpoint": {
           "oneOf": [
             {
@@ -1638,6 +1833,21 @@
       },
       "description": "A collection of information about the state of the connection between service consumer and provider."
     },
+    "SearchAssistant": {
+      "type": "object",
+      "properties": {
+        "channelName": {
+          "type": "string",
+          "enum": [
+            "SearchAssistant"
+          ]
+        }
+      },
+      "required": [
+        "channelName"
+      ],
+      "description": "SearchAssistant definition"
+    },
     "Sku": {
       "type": "object",
       "properties": {
@@ -1698,7 +1908,8 @@
         "enableCalling": {
           "oneOf": [
             {
-              "type": "boolean"
+              "type": "boolean",
+              "default": false
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -1837,17 +2048,6 @@
         "landingPageUrl": {
           "type": "string",
           "description": "The Slack landing page Url"
-        },
-        "registerBeforeOAuthFlow": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Whether to register the settings before OAuth validation is performed. Recommended to True."
         },
         "scopes": {
           "type": "string",
@@ -1999,6 +2199,169 @@
       ],
       "description": "The parameters to provide for the Telegram channel."
     },
+    "TelephonyChannel": {
+      "type": "object",
+      "properties": {
+        "channelName": {
+          "type": "string",
+          "enum": [
+            "TelephonyChannel"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/TelephonyChannelProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The parameters to provide for the Direct Line channel."
+        }
+      },
+      "required": [
+        "channelName"
+      ],
+      "description": "Telephony channel definition"
+    },
+    "TelephonyChannelProperties": {
+      "type": "object",
+      "properties": {
+        "apiConfigurations": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TelephonyChannelResourceApiConfiguration"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of Telephony api configuration"
+        },
+        "cognitiveServiceRegion": {
+          "type": "string",
+          "description": "The extensionKey2"
+        },
+        "cognitiveServiceSubscriptionKey": {
+          "type": "string",
+          "description": "The extensionKey1"
+        },
+        "defaultLocale": {
+          "type": "string",
+          "description": "The default locale of the channel"
+        },
+        "isEnabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether the channel is enabled"
+        },
+        "phoneNumbers": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TelephonyPhoneNumbers"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of Telephony phone numbers"
+        },
+        "premiumSKU": {
+          "type": "string",
+          "description": "The premium SKU applied to the channel"
+        }
+      },
+      "description": "The parameters to provide for the Direct Line channel."
+    },
+    "TelephonyChannelResourceApiConfiguration": {
+      "type": "object",
+      "properties": {
+        "cognitiveServiceRegion": {
+          "type": "string",
+          "description": "The cognitive service region."
+        },
+        "cognitiveServiceResourceId": {
+          "type": "string",
+          "description": "The cognitive service resourceId."
+        },
+        "cognitiveServiceSubscriptionKey": {
+          "type": "string",
+          "description": "The cognitive service subscription key."
+        },
+        "defaultLocale": {
+          "type": "string",
+          "description": "The default locale."
+        },
+        "id": {
+          "type": "string",
+          "description": "The id of config."
+        },
+        "providerName": {
+          "type": "string",
+          "description": "The provider name."
+        }
+      },
+      "description": "A resource Api configuration for the Telephony channel"
+    },
+    "TelephonyPhoneNumbers": {
+      "type": "object",
+      "properties": {
+        "acsEndpoint": {
+          "type": "string",
+          "description": "The endpoint of ACS."
+        },
+        "acsResourceId": {
+          "type": "string",
+          "description": "The resource id of ACS."
+        },
+        "acsSecret": {
+          "type": "string",
+          "description": "The secret of ACS."
+        },
+        "cognitiveServiceRegion": {
+          "type": "string",
+          "description": "The service region of cognitive service."
+        },
+        "cognitiveServiceResourceId": {
+          "type": "string",
+          "description": "The resource id of cognitive service."
+        },
+        "cognitiveServiceSubscriptionKey": {
+          "type": "string",
+          "description": "The subscription key of cognitive service."
+        },
+        "defaultLocale": {
+          "type": "string",
+          "description": "The default locale of the phone number."
+        },
+        "id": {
+          "type": "string",
+          "description": "The element id."
+        },
+        "offerType": {
+          "type": "string",
+          "description": "Optional Property that will determine the offering type of the phone."
+        },
+        "phoneNumber": {
+          "type": "string",
+          "description": "The phone number."
+        }
+      },
+      "description": "A telephone number for the Telephony channel"
+    },
     "WebChatChannel": {
       "type": "object",
       "properties": {
@@ -2048,6 +2411,36 @@
     "WebChatSite": {
       "type": "object",
       "properties": {
+        "appId": {
+          "type": "string",
+          "description": "DirectLine application id"
+        },
+        "eTag": {
+          "type": "string",
+          "description": "Entity Tag"
+        },
+        "isBlockUserUploadEnabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether this site is enabled for block user upload."
+        },
+        "isDetailedLoggingEnabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether this site is disabled detailed logging for"
+        },
         "isEnabled": {
           "oneOf": [
             {
@@ -2058,6 +2451,61 @@
             }
           ],
           "description": "Whether this site is enabled for DirectLine channel"
+        },
+        "isEndpointParametersEnabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether this site is EndpointParameters enabled for channel"
+        },
+        "isNoStorageEnabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether this no-storage site is disabled detailed logging for"
+        },
+        "isSecureSiteEnabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether this site is enabled for authentication with Bot Framework."
+        },
+        "isV1Enabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether this site is enabled for Bot Framework V1 protocol."
+        },
+        "isV3Enabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether this site is enabled for Bot Framework V3 protocol."
         },
         "isWebchatPreviewEnabled": {
           "oneOf": [
@@ -2071,14 +2519,43 @@
           ],
           "description": "Whether this site is enabled for preview versions of Webchat"
         },
+        "isWebChatSpeechEnabled": {
+          "oneOf": [
+            {
+              "type": "boolean",
+              "default": false
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether this site is enabled for Webchat Speech"
+        },
         "siteName": {
           "type": "string",
           "description": "Site name"
+        },
+        "tenantId": {
+          "type": "string",
+          "description": "Tenant Id"
+        },
+        "trustedOrigins": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of Trusted Origin URLs for this site. This field is applicable only if isSecureSiteEnabled is True."
         }
       },
       "required": [
         "isEnabled",
-        "isWebchatPreviewEnabled",
         "siteName"
       ],
       "description": "A site for the Webchat channel"

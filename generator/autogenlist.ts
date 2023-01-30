@@ -81,8 +81,7 @@ const disabledProviders: AutoGenConfig[] = [
     {
         basePath: 'trafficmanager/resource-manager',
         namespace: 'Microsoft.Network',
-        disabledForAutogen: true,
-        suffix: 'trafficManager',
+        suffix: 'TrafficManager',
     },
     {
         basePath: 'videoanalyzer/resource-manager',

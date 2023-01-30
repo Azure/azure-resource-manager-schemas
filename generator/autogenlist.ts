@@ -43,7 +43,6 @@ const disabledProviders: AutoGenConfig[] = [
     {
         basePath: 'dns/resource-manager',
         namespace: 'Microsoft.Network',
-        disabledForAutogen: true,
         suffix: 'DNS',
     },
     {
@@ -70,8 +69,7 @@ const disabledProviders: AutoGenConfig[] = [
     {
         basePath: 'privatedns/resource-manager',
         namespace: 'Microsoft.Network',
-        disabledForAutogen: true,
-        suffix: 'privateDns',
+        suffix: 'PrivateDns',
     },
     {
         basePath: 'service-map/resource-manager',

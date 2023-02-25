@@ -99,6 +99,12 @@ const disabledProviders: AutoGenConfig[] = [
         basePath: 'operationalinsights/resource-manager',
         namespace: 'Microsoft.OperationalInsights',
         disabledForAutogen: true,
+    },
+    {
+        // Disabled temporally due to invalid tags failure
+        basePath: 'confidentialLedger/resource-manager',
+        namespace: 'Microsoft.ConfidentialLedger',
+        disabledForAutogen: true
     }
 ];
 

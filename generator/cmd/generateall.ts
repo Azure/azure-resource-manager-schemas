@@ -94,7 +94,7 @@ executeSynchronous(async () => {
                     const startTime = Date.now();
                     const newConfigs = await generateSchemas(readme, autoGenConfig);
                     const generationTime = Date.now() - startTime;
-                    console.log(`Time taken to generate ${autoGenConfig.basePath} : ${generationTime}.`)
+                    console.log(`Time taken to generate ${autoGenConfig.basePath} : ${generationTime} ms.`);
                     schemaConfigs.push(...newConfigs);
                     pkg.result = 'succeeded';
                     logOut(summaryLogger, 

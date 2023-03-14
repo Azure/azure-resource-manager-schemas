@@ -91,7 +91,10 @@ executeSynchronous(async () => {
                     const readme = validateAndReturnReadmePath(localPath, autoGenConfig.readmeFile || autoGenConfig.basePath);
                     pkg.packageName = getPackageString(readme);
 
+                    const startTime = Date.now();
                     const newConfigs = await generateSchemas(readme, autoGenConfig);
+                    const generationTime = Date.now() - startTime;
+                    console.log(`Time taken to generate ${chalk.green.italic(autoGenConfig.basePath)} : ${chalk.magenta.bold(generationTime)} ms.`);
                     schemaConfigs.push(...newConfigs);
                     pkg.result = 'succeeded';
                     logOut(summaryLogger, 

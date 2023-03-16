@@ -94,12 +94,6 @@ const disabledProviders: AutoGenConfig[] = [
         namespace: 'Microsoft.ServiceFabricMesh',
         disabledForAutogen: true,
     },
-    { 
-        // Disabled as the swagger spec contains a bug (enum mismatch - missing: ProvisioningStateEnum)
-        basePath: 'operationalinsights/resource-manager',
-        namespace: 'Microsoft.OperationalInsights',
-        disabledForAutogen: true,
-    },
     {
         // Disabled temporally due to invalid tags failure
         basePath: 'confidentialLedger/resource-manager',

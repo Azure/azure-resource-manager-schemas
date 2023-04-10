@@ -20,11 +20,6 @@ import { lowerCaseEquals } from './utils';
 // New providers are onboarded by default. The providers listed here are the only ones **not** onboarded.
 const disabledProviders: AutoGenConfig[] = [
     {
-        basePath: 'advisor/resource-manager',
-        namespace: 'Microsoft.Advisor',
-        disabledForAutogen: true,
-    },
-    {
         basePath: 'cloudshell/resource-manager',
         namespace: 'Microsoft.Portal',
         disabledForAutogen: true,
@@ -45,6 +40,12 @@ const disabledProviders: AutoGenConfig[] = [
         namespace: 'Microsoft.Network',
         disabledForAutogen: true,
         suffix: 'DNS',
+    },
+    {
+        basePath: 'privatedns/resource-manager',
+        namespace: 'Microsoft.Network',
+        disabledForAutogen: true,
+        suffix: 'privateDns',
     },
     {
         // Disabled as the swagger spec contains a bug (enum mismatch)
@@ -68,20 +69,9 @@ const disabledProviders: AutoGenConfig[] = [
         disabledForAutogen: true,
     },
     {
-        basePath: 'privatedns/resource-manager',
-        namespace: 'Microsoft.Network',
-        disabledForAutogen: true,
-        suffix: 'privateDns',
-    },
-    {
         basePath: 'service-map/resource-manager',
         namespace: 'Microsoft.OperationalInsights',
         disabledForAutogen: true,
-    },
-    {
-        basePath: 'trafficmanager/resource-manager',
-        namespace: 'Microsoft.Network',
-        suffix: 'TrafficManager',
     },
     {
         basePath: 'videoanalyzer/resource-manager',
@@ -1097,6 +1087,11 @@ const autoGenList: AutoGenConfig[] = [
         postProcessor: mediaPostProcessor
     },
     {
+        basePath: 'trafficmanager/resource-manager',
+        namespace: 'Microsoft.Network',
+        suffix: 'TrafficManager',
+    },
+    {
         basePath: 'network/resource-manager',
         namespace: 'Microsoft.Network',
 		postProcessor: networkPostProcessor,
@@ -1111,6 +1106,16 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'azurestackhci/resource-manager',
         namespace: 'Microsoft.AzureStackHCI',
         postProcessor: azureStackHciPostProcessor
+    },
+    {
+        basePath: 'advisor/resource-manager',
+        namespace: 'Microsoft.Advisor',
+        resourceConfig: [
+            {
+                type: 'recommendations/suppressions',
+                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+        ]
     },
 ];
 

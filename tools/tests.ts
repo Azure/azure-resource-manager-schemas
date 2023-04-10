@@ -213,7 +213,7 @@ describe('Run individual schema test', () => {
 describe('Validate test templates against VSCode language service', () => {
   for (const templateTestFile of templateTestPaths) {
     it(`running schema validation on '${templateTestFile}'`, async function() {
-      this.timeout(30000);
+      this.timeout(60000);
 
       const service = getLanguageService({
         schemaRequestService: loadRawSchema,

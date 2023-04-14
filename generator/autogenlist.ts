@@ -30,6 +30,18 @@ const disabledProviders: AutoGenConfig[] = [
         disabledForAutogen: true,
     },
     {
+        // Disabled until the unexpected character error in the swagger spec is fixed
+        basePath: 'cdn/resource-manager',
+        namespace: 'Microsoft.Cdn',
+        disabledForAutogen: true,
+    },
+    {
+        // Disabled until the enum mismatch in the swagger spec is fixed
+        basePath: 'developerhub/resource-manager',
+        namespace: 'Microsoft.DevHub',
+        disabledForAutogen: true,
+    },
+    {
         // Disabled as the swagger spec contains a type ("DateTimeRfc1123") which autorest is unable to parse: https://github.com/Azure/autorest.azureresourceschema/issues/71
         basePath: 'domainservices/resource-manager',
         namespace: 'Microsoft.AAD',

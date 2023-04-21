@@ -168,10 +168,6 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'adhybridhealthservice/resource-manager',
         namespace: 'Microsoft.ADHybridHealthService',
     },
-    { 
-        basePath: 'cdn/resource-manager',
-        namespace: 'Microsoft.Cdn',
-    },
     {
         basePath: 'analysisservices/resource-manager',
         namespace: 'Microsoft.AnalysisServices',

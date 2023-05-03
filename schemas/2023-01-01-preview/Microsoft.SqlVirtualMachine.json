@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2022-02-01/Microsoft.SqlVirtualMachine.json#",
+  "id": "https://schema.management.azure.com/schemas/2023-01-01-preview/Microsoft.SqlVirtualMachine.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.SqlVirtualMachine",
   "description": "Microsoft SqlVirtualMachine Resource Types",
@@ -10,7 +10,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-02-01"
+            "2023-01-01-preview"
           ]
         },
         "location": {
@@ -79,7 +79,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-02-01"
+            "2023-01-01-preview"
           ]
         },
         "name": {
@@ -118,7 +118,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-02-01"
+            "2023-01-01-preview"
           ]
         },
         "identity": {
@@ -137,7 +137,17 @@
           "description": "Resource location."
         },
         "name": {
-          "type": "string",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^((?!_)[^\\\\/\"'\\[\\]:|<>+=;,?*@&]{1,64}(?<![.-]))$",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
           "description": "Name of the SQL virtual machine."
         },
         "properties": {
@@ -184,6 +194,16 @@
     }
   },
   "definitions": {
+    "AADAuthenticationSettings": {
+      "type": "object",
+      "properties": {
+        "clientId": {
+          "type": "string",
+          "description": "The client Id of the Managed Identity to query Microsoft Graph API. An empty string must be used for the system assigned Managed Identity"
+        }
+      },
+      "description": "Enable AAD authentication for SQL VM."
+    },
     "AdditionalFeaturesServerConfigurations": {
       "type": "object",
       "properties": {
@@ -304,7 +324,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Enable or disable assessment feature on SQL virtual machine."
+          "description": "Enable or disable SQL best practices Assessment feature on SQL virtual machine."
         },
         "runImmediately": {
           "oneOf": [
@@ -315,7 +335,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Run assessment immediately on SQL virtual machine."
+          "description": "Run SQL best practices Assessment immediately on SQL virtual machine."
         },
         "schedule": {
           "oneOf": [
@@ -325,10 +345,11 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Set assessment schedule for SQL Server."
         }
       },
-      "description": "Configure assessment for databases in your SQL virtual machine."
+      "description": "Configure SQL best practices Assessment for databases in your SQL virtual machine."
     },
     "AutoBackupSettings": {
       "type": "object",
@@ -816,7 +837,8 @@
           ],
           "description": "Number of weeks to schedule between 2 assessment runs. Takes value from 1-6"
         }
-      }
+      },
+      "description": "Set assessment schedule for SQL Server."
     },
     "ServerConfigurationsManagementSettings": {
       "type": "object",
@@ -831,6 +853,17 @@
             }
           ],
           "description": "Additional SQL Server feature settings."
+        },
+        "azureAdAuthenticationSettings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AADAuthenticationSettings"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Enable AAD authentication for SQL VM."
         },
         "sqlConnectivityUpdateSettings": {
           "oneOf": [
@@ -1016,6 +1049,17 @@
             }
           ],
           "description": "Logical Unit Numbers for the disks."
+        },
+        "useStoragePool": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Use storage pool to build a drive if true or not provided"
         }
       },
       "description": "Set disk storage settings for SQL Server."
@@ -1154,8 +1198,20 @@
         "persistFolderPath": {
           "type": "string",
           "description": "SQL Server tempdb persist folder location"
+        },
+        "useStoragePool": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Use storage pool to build a drive if true or not provided"
         }
-      }
+      },
+      "description": "Set tempDb storage settings for SQL Server."
     },
     "SqlVirtualMachineGroupProperties": {
       "type": "object",
@@ -1199,7 +1255,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-02-01"
+            "2023-01-01-preview"
           ]
         },
         "name": {
@@ -1244,7 +1300,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Configure assessment for databases in your SQL virtual machine."
+          "description": "Configure SQL best practices Assessment for databases in your SQL virtual machine."
         },
         "autoBackupSettings": {
           "oneOf": [
@@ -1268,6 +1324,18 @@
           ],
           "description": "Set a patching window during which Windows and SQL patches will be applied."
         },
+        "enableAutomaticUpgrade": {
+          "oneOf": [
+            {
+              "type": "boolean",
+              "default": false
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Enable automatic upgrade of Sql IaaS extension Agent."
+        },
         "keyVaultCredentialSettings": {
           "oneOf": [
             {
@@ -1278,6 +1346,21 @@
             }
           ],
           "description": "Configure your SQL virtual machine to be able to connect to the Azure Key Vault service."
+        },
+        "leastPrivilegeMode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Enabled",
+                "NotSet"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "SQL IaaS Agent least privilege mode."
         },
         "serverConfigurationsManagementSettings": {
           "oneOf": [
@@ -1326,7 +1409,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "SQL Server Management type."
+          "description": "SQL Server Management type. NOTE: This parameter is not used anymore. API will automatically detect the Sql Management, refrain from using it."
         },
         "sqlServerLicenseType": {
           "oneOf": [
@@ -1422,6 +1505,18 @@
           ],
           "description": "Disk configuration to apply to SQL Server."
         },
+        "enableStorageConfigBlade": {
+          "oneOf": [
+            {
+              "type": "boolean",
+              "default": false
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Enable SQL IaaS Agent storage configuration blade in Azure Portal."
+        },
         "sqlDataSettings": {
           "oneOf": [
             {
@@ -1463,7 +1558,8 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Set tempDb storage settings for SQL Server."
         },
         "storageWorkloadType": {
           "oneOf": [
@@ -1535,6 +1631,17 @@
         "fileShareWitnessPath": {
           "type": "string",
           "description": "Optional path for fileshare witness."
+        },
+        "isSqlServiceAccountGmsa": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The flag to check if SQL service account is GMSA."
         },
         "ouPath": {
           "type": "string",

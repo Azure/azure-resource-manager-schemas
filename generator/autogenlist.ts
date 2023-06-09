@@ -1111,9 +1111,11 @@ const autoGenList: AutoGenConfig[] = [
         suffix: 'DnsResolver',
     },
     {
+        //Pause autogeneration until errors are fixed
         basePath: 'azurestackhci/resource-manager',
         namespace: 'Microsoft.AzureStackHCI',
-        postProcessor: azureStackHciPostProcessor
+        postProcessor: azureStackHciPostProcessor,
+        disabledForAutogen: true,
     },
     {
         basePath: 'advisor/resource-manager',

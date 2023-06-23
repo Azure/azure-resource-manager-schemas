@@ -107,6 +107,13 @@ const disabledProviders: AutoGenConfig[] = [
         basePath: 'confidentialLedger/resource-manager',
         namespace: 'Microsoft.ConfidentialLedger',
         disabledForAutogen: true
+    },
+    {
+         // Disabled temporally due to enum mismatch introduced in this PR: https://github.com/Azure/azure-rest-api-specs/pull/24350
+         // Once this resource is enabled again, remove the comment from autoGenList to fully enable schema generation
+         basePath: 'resources/resource-manager',
+         namespace: 'Microsoft.Resources',
+         disabledForAutogen: true
     }
 ];
 
@@ -701,7 +708,7 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'redhatopenshift/resource-manager',
         namespace: 'Microsoft.RedHatOpenShift',
     },
-    {
+    /*{
         basePath: 'resources/resource-manager',
         namespace: 'Microsoft.Resources',
         resourceConfig: [
@@ -715,7 +722,7 @@ const autoGenList: AutoGenConfig[] = [
             },
         ],
         postProcessor: resourcesPostProcessor,
-    },
+    },*/
     {
         basePath: 'resources/resource-manager',
         namespace: 'Microsoft.Authorization',

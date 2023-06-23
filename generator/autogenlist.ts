@@ -107,7 +107,13 @@ const disabledProviders: AutoGenConfig[] = [
         basePath: 'confidentialLedger/resource-manager',
         namespace: 'Microsoft.ConfidentialLedger',
         disabledForAutogen: true
-    }
+    },
+    /*{
+         // Disabled temporally due to enum mismatch introduced in this PR: https://github.com/Azure/azure-rest-api-specs/pull/24350
+         basePath: 'resources/resource-manager',
+         namespace: 'Microsoft.Resources',
+         disabledForAutogen: true
+    }*/
 ];
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list

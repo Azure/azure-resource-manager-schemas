@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2020-12-01-preview/Microsoft.Purview.json#",
+  "id": "https://schema.management.azure.com/schemas/2021-12-01/Microsoft.Purview.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.Purview",
   "description": "Microsoft Purview Resource Types",
@@ -10,7 +10,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-12-01-preview"
+            "2021-12-01"
           ]
         },
         "identity": {
@@ -58,6 +58,9 @@
           "items": {
             "oneOf": [
               {
+                "$ref": "#/definitions/accounts_kafkaConfigurations_childResource"
+              },
+              {
                 "$ref": "#/definitions/accounts_privateEndpointConnections_childResource"
               }
             ]
@@ -93,13 +96,62 @@
       ],
       "description": "Microsoft.Purview/accounts"
     },
+    "accounts_kafkaConfigurations": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2021-12-01"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$",
+              "minLength": 3,
+              "maxLength": 63
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The kafka configuration name."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/KafkaConfigurationProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The kafka configuration properties of the event streaming service attached to the Purview account for kafka notifications."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Purview/accounts/kafkaConfigurations"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.Purview/accounts/kafkaConfigurations"
+    },
     "accounts_privateEndpointConnections": {
       "type": "object",
       "properties": {
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-12-01-preview"
+            "2021-12-01"
           ]
         },
         "name": {
@@ -145,11 +197,44 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "External Cloud Service connectors"
+        },
+        "managedEventHubState": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "NotSpecified",
+                "Disabled",
+                "Enabled"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": " Gets or sets the state of managed eventhub. If enabled managed eventhub will be created, if disabled the managed eventhub will be removed."
         },
         "managedResourceGroupName": {
           "type": "string",
           "description": "Gets or sets the managed resource group name"
+        },
+        "managedResourcesPublicNetworkAccess": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "NotSpecified",
+                "Enabled",
+                "Disabled"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Gets or sets the public network access for managed resources."
         },
         "publicNetworkAccess": {
           "oneOf": [
@@ -170,13 +255,62 @@
       },
       "description": "The account properties"
     },
+    "accounts_kafkaConfigurations_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2021-12-01"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$",
+              "minLength": 3,
+              "maxLength": 63
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The kafka configuration name."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/KafkaConfigurationProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The kafka configuration properties of the event streaming service attached to the Purview account for kafka notifications."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "kafkaConfigurations"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.Purview/accounts/kafkaConfigurations"
+    },
     "accounts_privateEndpointConnections_childResource": {
       "type": "object",
       "properties": {
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2020-12-01-preview"
+            "2021-12-01"
           ]
         },
         "name": {
@@ -211,17 +345,24 @@
     },
     "CloudConnectors": {
       "type": "object",
-      "properties": {}
+      "properties": {},
+      "description": "External Cloud Service connectors"
     },
-    "Identity": {
+    "Credentials": {
       "type": "object",
       "properties": {
+        "identityId": {
+          "type": "string",
+          "description": "Identity identifier for UserAssign type."
+        },
         "type": {
           "oneOf": [
             {
               "type": "string",
               "enum": [
-                "SystemAssigned"
+                "None",
+                "SystemAssigned",
+                "UserAssigned"
               ]
             },
             {
@@ -231,7 +372,119 @@
           "description": "Identity Type."
         }
       },
+      "description": "Credentials to access the event streaming service attached to the purview account."
+    },
+    "Identity": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "None",
+                "SystemAssigned",
+                "UserAssigned"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Identity Type."
+        },
+        "userAssignedIdentities": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/UserAssignedIdentity"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "User Assigned Identities"
+        }
+      },
       "description": "The Managed Identity of the resource"
+    },
+    "KafkaConfigurationProperties": {
+      "type": "object",
+      "properties": {
+        "consumerGroup": {
+          "type": "string",
+          "description": "Consumer group for hook event hub."
+        },
+        "credentials": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Credentials"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Credentials to access the event streaming service attached to the purview account."
+        },
+        "eventHubPartitionId": {
+          "type": "string",
+          "description": "Optional partition Id for notification event hub. If not set, all partitions will be leveraged."
+        },
+        "eventHubResourceId": {
+          "type": "string",
+          "format": "arm-id"
+        },
+        "eventHubType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Notification",
+                "Hook"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The event hub type."
+        },
+        "eventStreamingState": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Disabled",
+                "Enabled"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The state of the event streaming service."
+        },
+        "eventStreamingType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "None",
+                "Managed",
+                "Azure"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The event streaming service type."
+        }
+      },
+      "description": "The kafka configuration properties of the event streaming service attached to the Purview account for kafka notifications."
     },
     "PrivateEndpoint": {
       "type": "object",
@@ -302,6 +555,11 @@
         }
       },
       "description": "The private link service connection state."
+    },
+    "UserAssignedIdentity": {
+      "type": "object",
+      "properties": {},
+      "description": "Uses client ID and Principal ID"
     }
   }
 }

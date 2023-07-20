@@ -1,9 +1,6 @@
 name: Generate Schemas Batch
 
 on:
-  #TODO remove this
-  push:
-    branches: [main]
   schedule:
     - cron: '45 5 * * SUN'
   workflow_dispatch:
@@ -15,7 +12,7 @@ on:
 
 env:
   # This must be kept in sync with the arguments passed to the "batch" matrix
-  BATCH_COUNT: 100
+  BATCH_COUNT: 8
 
 jobs:
   generate:
@@ -23,8 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        #TODO update this + batch count
-        batch: [0]
+        batch: [0, 1, 2, 3, 4, 5, 6, 7]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -35,6 +31,11 @@ jobs:
           repository: Azure/azure-rest-api-specs
           path: workflow-temp/azure-rest-api-specs
           ref: ${{ github.event.inputs.api_specs_ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
       
       - name: Install generator npm packages
         run: npm ci
@@ -80,17 +81,21 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           path: workflow-temp
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
       
       - name: Install generator npm packages
         run: npm ci
         working-directory: generator
 
       - name: Combine batches
-        #TODO replace batch count here
         run: |
           npm run combine-batches -- \
             --input-path "$GITHUB_WORKSPACE/workflow-temp" \
-            --batch-count 1
+            --batch-count ${{ env.BATCH_COUNT }}
         working-directory: generator
 
       - name: Create Pull Request
@@ -99,8 +104,7 @@ jobs:
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           signoff: false
-          branch: autogenerate
-          branch-suffix: short-commit-hash
+          branch: autogenerate-batch
           delete-branch: true
           title: |
             Update Generated Schemas

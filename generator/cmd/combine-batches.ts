@@ -28,14 +28,15 @@ executeSynchronous(async () => {
     const batchSchemaConfigs: SchemaConfiguration[] = await readJsonFile(`${schemasPath}/schemaconfig.json`);
 
     const relativePaths = uniq(batchSchemaConfigs.map(x => x.relativePath));
-    for (let relativePath of relativePaths) {
-      console.log(`copying ${path.join(schemasPath, relativePath)} to ${path.join(schemasBasePath, relativePath)}`);
-      await cp(
-        path.join(schemasPath, relativePath),
-        path.join(schemasBasePath, relativePath),
-        { force: true });
+    for (const relativePath of relativePaths) {
+      const source = path.join(schemasPath, relativePath);
+      const dest = path.join(schemasBasePath, relativePath);
+
+      console.log(`copying ${source} to ${dest}`);
+      await cp(source, dest, { force: true });
     }
 
+    console.log(`schema config for batch ${i}: ${JSON.stringify(batchSchemaConfigs, null, 2)}`);
     schemaConfigs = [...schemaConfigs, ...batchSchemaConfigs];
   }
 

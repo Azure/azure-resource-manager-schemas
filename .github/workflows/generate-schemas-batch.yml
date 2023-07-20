@@ -1,6 +1,9 @@
-name: Generate Schemas batch
+name: Generate Schemas Batch
 
 on:
+  #TODO remove this
+  push:
+    branches: [main]
   schedule:
     - cron: '45 5 * * SUN'
   workflow_dispatch:
@@ -11,9 +14,8 @@ on:
         default: 'main'
 
 env:
-  SUMMARY_LOG_DIR: /tmp/summary
-  SUMMARY_LOG_PATH: /tmp/summary/summary.log
-  SUMMARY_LOG_ARTIFACT_NAME: summary-log
+  # This must be kept in sync with the arguments passed to the "batch" matrix
+  BATCH_COUNT: 100
 
 jobs:
   generate:
@@ -21,12 +23,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        batch: [0, 1, 2, 3]
+        #TODO update this + batch count
+        batch: [0]
     steps:
-      - uses: actions/checkout@v2.3.5
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
       - name: Clone azure-rest-api-specs
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v3
         with:
           repository: Azure/azure-rest-api-specs
           path: workflow-temp/azure-rest-api-specs
@@ -36,20 +40,54 @@ jobs:
         run: npm ci
         working-directory: generator
 
-      - id: generate
-        name: Run generator
+      - name: Run generator
         run: |
+          rm -Rf "$GITHUB_WORKSPACE/schemas"
+          rm -Rf "$GITHUB_WORKSPACE/summary.log"
+          mkdir -p "$GITHUB_WORKSPACE/schemas"
+
           npm run generate-all -- \
             --local-path "$GITHUB_WORKSPACE/workflow-temp/azure-rest-api-specs" \
-            --summary-log-path $SUMMARY_LOG_PATH \
-            --batch-count 4 \
+            --batch-count ${{ env.BATCH_COUNT }} \
             --batch-index ${{ matrix.batch }} \
-            --skip-root-schema-update true \
-            --skip-for-testing
+            --summary-log-path "$GITHUB_WORKSPACE/summary.log" \
+            --skip-root-schema-update true
         working-directory: generator
 
-      - name: Upload summary log
-        uses: actions/upload-artifact@v2
+      - name: Upload Schemas
+        uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.SUMMARY_LOG_ARTIFACT_NAME }}
-          path: ${{ env.SUMMARY_LOG_PATH }}
+          name: batch-${{ matrix.batch }}-schemas
+          path: schemas
+          if-no-files-found: error
+
+      - name: Upload summary log
+        uses: actions/upload-artifact@v3
+        with:
+          name: batch-${{ matrix.batch }}-summary
+          path: summary.log
+          if-no-files-found: error
+
+  summarize:
+    needs: generate
+    name: Summarize Schema Batches
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Download batch results
+        uses: actions/download-artifact@v3
+        with:
+          path: workflow-temp
+      
+      - name: Install generator npm packages
+        run: npm ci
+        working-directory: generator
+
+      - name: Combine batches
+        run: |
+          npm run combine-batches -- \
+            --input-path "$GITHUB_WORKSPACE/workflow-temp" \
+            --batch-count ${{ env.BATCH_COUNT }}
+        working-directory: generator

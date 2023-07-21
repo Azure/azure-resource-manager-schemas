@@ -6,6 +6,7 @@ using Azure.Deployments.Templates.Export;
 using Azure.Deployments.Templates.Extensions;
 using Azure.Deployments.Templates.Helpers;
 using Azure.Deployments.TemplateSchemas;
+using Microsoft.WindowsAzure.ResourceStack.Common.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -36,7 +37,7 @@ namespace DeploymentsSchemaTests
             if (schemaResults.Errors.Any())
             {
                 var errors = schemaResults.Errors
-                    .Where(err => !SchemaLoader.CircularReferenceSchemas.Contains(err.Target))
+                    .Where(err => !new SchemaLoader().CircularReferenceSchemas.Contains(err.Target))
                     .ToArray();
 
                 if (errors.Any())

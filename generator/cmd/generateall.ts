@@ -56,8 +56,12 @@ executeSynchronous(async () => {
     // resolve absolute path
     summaryPath = await resolveAbsolutePath(summaryPath);
 
-    if (args['batch-count'] !== undefined && args['batch-index'] !== undefined) {
-        basePaths = chunker(basePaths, args['batch-count'])[args['batch-index']];
+    const batchIndex = args['batch-index'];
+    const batchCount = args['batch-count'];
+    if (batchCount !== undefined && batchIndex !== undefined) {
+        basePaths = chunker(basePaths, batchCount)[batchIndex];
+
+        console.log(`Generating following base paths for batch ${batchIndex}: ${JSON.stringify(basePaths, null, 2)}`);
     }
 
     const schemaConfigs: SchemaConfiguration[] = [];

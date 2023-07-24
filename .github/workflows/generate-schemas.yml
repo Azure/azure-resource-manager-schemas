@@ -1,71 +1,116 @@
 name: Generate Schemas
 
 on:
+  schedule:
+    - cron: '45 5 * * SUN'
   workflow_dispatch:
     inputs:
       api_specs_ref:
         description: 'Git ref or full SHA for https://github.com/Azure/azure-rest-api-specs.'
         required: true
         default: 'main'
-      single_path:
-        description: 'The path to generate types for (e.g. "compute", or "keyvault"). Leave blank to generate all types.'
-        required: false
+
+env:
+  # This must be kept in sync with the arguments passed to the "batch" matrix
+  BATCH_COUNT: 20
 
 jobs:
-  update-schemas:
-    name: Update Schemas
+  generate:
+    name: Update Schemas Batch ${{ matrix.batch }}
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        batch: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
     steps:
-      - uses: actions/checkout@v2.3.5
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
       - name: Clone azure-rest-api-specs
-        uses: actions/checkout@v2.3.5
+        uses: actions/checkout@v3
         with:
           repository: Azure/azure-rest-api-specs
           path: workflow-temp/azure-rest-api-specs
           ref: ${{ github.event.inputs.api_specs_ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
       
       - name: Install generator npm packages
         run: npm ci
         working-directory: generator
-      
-      - id: generate
-        name: Run generator
+
+      - name: Run generator
         run: |
-          if [ -z "${{ github.event.inputs.single_path }}" ]
-          then
-            npm run generate-all -- --local-path "$GITHUB_WORKSPACE/workflow-temp/azure-rest-api-specs"
-          else
-            npm run generate-single -- --base-path '${{ github.event.inputs.single_path }}/resource-manager' --local-path "$GITHUB_WORKSPACE/workflow-temp/azure-rest-api-specs"
-          fi
+          rm -Rf "$GITHUB_WORKSPACE/schemas"
+          rm -Rf "$GITHUB_WORKSPACE/summary.log"
+          mkdir -p "$GITHUB_WORKSPACE/schemas"
+
+          npm run generate-all -- \
+            --local-path "$GITHUB_WORKSPACE/workflow-temp/azure-rest-api-specs" \
+            --batch-count ${{ env.BATCH_COUNT }} \
+            --batch-index ${{ matrix.batch }} \
+            --summary-log-path "$GITHUB_WORKSPACE/summary.log" \
+            --combine-batch-mode true
         working-directory: generator
 
-      - id: get_swagger_gh_uri
-        name: Get GitHub URI for azure-rest-api-specs
+      - name: Upload Schemas
+        uses: actions/upload-artifact@v3
+        with:
+          name: batch-${{ matrix.batch }}-schemas
+          path: schemas
+          if-no-files-found: error
+
+      - name: Upload summary log
+        uses: actions/upload-artifact@v3
+        with:
+          name: batch-${{ matrix.batch }}-summary
+          path: summary.log
+          if-no-files-found: error
+
+  combine:
+    needs: generate
+    name: Combine Schema Batches
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Download batch results
+        uses: actions/download-artifact@v3
+        with:
+          path: workflow-temp
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+      
+      - name: Install generator npm packages
+        run: npm ci
+        working-directory: generator
+
+      - name: Combine batches
         run: |
-          git_sha=`git rev-parse HEAD`
-          echo "::set-output name=gh_uri::https://github.com/Azure/azure-rest-api-specs/tree/$git_sha"
-        working-directory: workflow-temp/azure-rest-api-specs
+          npm run combine-batches -- \
+            --input-path "$GITHUB_WORKSPACE/workflow-temp" \
+            --batch-count ${{ env.BATCH_COUNT }}
+        working-directory: generator
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v4.1.3
+        uses: peter-evans/create-pull-request@v5
         with:
           committer: GitHub <noreply@github.com>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           signoff: false
-          branch: autogenerate
-          branch-suffix: short-commit-hash
+          branch: autogenerate-batch
           delete-branch: true
           title: |
-            Update Generated Types ${{ github.event.inputs.single_path && format('(single path: {0})', github.event.inputs.single_path) || '' }}
+            Update Generated Schemas
           body:  |
-            Update Generated Types ${{ github.event.inputs.single_path && format('(single path: {0})', github.event.inputs.single_path) || '' }}
-
-            Generate types for ${{ steps.get_swagger_gh_uri.outputs.gh_uri }}
+            Update Generated Schemas
           commit-message: |
-            Update Generated Types ${{ github.event.inputs.single_path && format('(single path: {0})', github.event.inputs.single_path) || '' }}
-
-            Generate types for ${{ steps.get_swagger_gh_uri.outputs.gh_uri }}
+            Update Generated Schemas
           labels: autogenerate
           draft: false

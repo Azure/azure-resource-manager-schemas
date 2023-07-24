@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 import { ScopeType, AutoGenConfig } from './models';
 import { postProcessor as insightsApplicationPostProcessor } from './processors/Microsoft.Insights.Application';
-import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
 import { postProcessor as machineLearningPostProcessor } from './processors/Microsoft.MachineLearning';
 import { postProcessor as kustoPostProcessor } from './processors/Microsoft.Kusto';
 import { postProcessor as machineLearningServicesPostProcessor } from './processors/Microsoft.MachineLearningServices';

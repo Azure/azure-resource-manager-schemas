@@ -2,7 +2,7 @@
 // Licensed under the MIT License.
 import { spawn } from 'child_process';
 import path from 'path';
-import chalk from 'chalk';
+import colors from 'colors';
 import { series } from 'async';
 import { existsSync } from 'fs';
 import { readdir, stat, unlink, rmdir, readFile, writeFile, mkdir } from 'fs/promises';
@@ -16,8 +16,8 @@ export function executeCmd(cwd: string, cmd: string, args: string[]) : Promise<n
             windowsHide: true,
         });
 
-        child.stdout.on('data', data => process.stdout.write(chalk.grey(data.toString())));
-        child.stderr.on('data', data => process.stdout.write(chalk.red(data.toString())));
+        child.stdout.on('data', data => process.stdout.write(colors.grey(data.toString())));
+        child.stderr.on('data', data => process.stdout.write(colors.red(data.toString())));
         child.on('error', err => {
             reject(err);
         });

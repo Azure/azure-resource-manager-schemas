@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-import os from 'os';
 import path from 'path';
 
 export const generatorRoot = path.resolve(__dirname, '../');

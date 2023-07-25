@@ -5,7 +5,7 @@ import os from 'os';
 import { findRecursive, findDirRecursive, executeCmd, rmdirRecursive, lowerCaseCompare, lowerCaseCompareLists, lowerCaseStartsWith, readJsonFile, writeJsonFile, safeMkdir, safeUnlink, fileExists, lowerCaseEquals, lowerCaseContains } from './utils';
 import * as constants from './constants';
 import { prepareReadme } from './specs';
-import chalk from 'chalk';
+import colors from 'colors';
 import { ScopeType, AutoGenConfig } from './models';
 import { get, set, flatten, uniq, concat, Dictionary, groupBy, keys, difference, pickBy } from 'lodash';
 
@@ -206,15 +206,15 @@ async function generateSchemaConfig(outputFile: string, namespace: string, apiVe
     const schemaPath = path.join(constants.schemasBasePath, relativePath);
 
     console.log('================================================================================================================================');
-    console.log('Filename: ' + chalk.green(schemaPath));
-    console.log('Provider Namespace: ' + chalk.green(namespace));
-    console.log('API Version: ' + chalk.green(apiVersion));
+    console.log('Filename: ' + colors.green(schemaPath));
+    console.log('Provider Namespace: ' + colors.green(namespace));
+    console.log('API Version: ' + colors.green(apiVersion));
 
     const tenantSchemaRefs = references.filter(x => x.scope & ScopeType.Tenant);
     if (tenantSchemaRefs.length > 0) {
         console.log('Resource Types (Tenant Scope):');
         for (const schemaRef of tenantSchemaRefs) {
-            console.log('- ' + chalk.green(schemaRef.type));
+            console.log('- ' + colors.green(schemaRef.type));
         }
     }
 
@@ -222,7 +222,7 @@ async function generateSchemaConfig(outputFile: string, namespace: string, apiVe
     if (managementGroupSchemaRefs.length > 0) {
         console.log('Resource Types (Management Group Scope):');
         for (const schemaRef of managementGroupSchemaRefs) {
-            console.log('- ' + chalk.green(schemaRef.type));
+            console.log('- ' + colors.green(schemaRef.type));
         }
     }
 
@@ -230,7 +230,7 @@ async function generateSchemaConfig(outputFile: string, namespace: string, apiVe
     if (subscriptionSchemaRefs.length > 0) {
         console.log('Resource Types (Subscription Scope):');
         for (const schemaRef of subscriptionSchemaRefs) {
-            console.log('- ' + chalk.green(schemaRef.type));
+            console.log('- ' + colors.green(schemaRef.type));
         }
     }
 
@@ -238,7 +238,7 @@ async function generateSchemaConfig(outputFile: string, namespace: string, apiVe
     if (resourceGroupSchemaRefs.length > 0) {
         console.log('Resource Types (Resource Group Scope):');
         for (const schemaRef of resourceGroupSchemaRefs) {
-            console.log('- ' + chalk.green(schemaRef.type));
+            console.log('- ' + colors.green(schemaRef.type));
         }
     }
 
@@ -246,7 +246,7 @@ async function generateSchemaConfig(outputFile: string, namespace: string, apiVe
     if (extensionSchemaRefs.length > 0) {
         console.log('Resource Types (Extension Scope):');
         for (const schemaRef of extensionSchemaRefs) {
-            console.log('- ' + chalk.green(schemaRef.type));
+            console.log('- ' + colors.green(schemaRef.type));
         }
     }
 
@@ -254,7 +254,7 @@ async function generateSchemaConfig(outputFile: string, namespace: string, apiVe
     if (unknownSchemaRefs.length > 0) {
         console.log('Resource Types (Unknown Scope):');
         for (const schemaRef of unknownSchemaRefs) {
-            console.log('- ' + chalk.red(schemaRef.type));
+            console.log('- ' + colors.red(schemaRef.type));
         }
     }
 

@@ -681,6 +681,11 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.DBforPostgreSQL',
     },
     {
+        basePath: 'postgresqlhsc/resource-manager',
+        namespace: 'Microsoft.DBforPostgreSQL',
+        suffix: 'Hsc',
+    },
+    {
         basePath: 'powerbiembedded/resource-manager',
         namespace: 'Microsoft.PowerBI',
     },

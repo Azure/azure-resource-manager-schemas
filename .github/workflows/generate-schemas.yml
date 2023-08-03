@@ -72,6 +72,8 @@ jobs:
   combine:
     needs: generate
     name: Combine Schema Batches
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -98,19 +100,10 @@ jobs:
             --batch-count ${{ env.BATCH_COUNT }}
         working-directory: generator
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
+      - name: Push to autogenerate-batch branch
+        uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          committer: GitHub <noreply@github.com>
-          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
-          signoff: false
+          commit_message: Update Generated Schemas
           branch: autogenerate-batch
-          delete-branch: true
-          title: |
-            Update Generated Schemas
-          body:  |
-            Update Generated Schemas
-          commit-message: |
-            Update Generated Schemas
-          labels: autogenerate
-          draft: false
+          push_options: '--force'
+          create_branch: true

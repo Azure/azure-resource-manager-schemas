@@ -872,6 +872,10 @@ const autoGenList: AutoGenConfig[] = [
                 type: 'iotSites',
                 scopes: ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
+	    {
+                type: 'pricings',
+                scopes: ScopeType.Subscription,
+            },
         ]
     },
     {

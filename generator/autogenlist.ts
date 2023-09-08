@@ -873,7 +873,15 @@ const autoGenList: AutoGenConfig[] = [
                 scopes: ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
 	    {
-                type: 'pricings',
+                type: 'assessments/governanceAssignments',
+                scopes: ScopeType.Subscription,
+            },
+            {
+                type: 'governanceRules',
+                scopes: ScopeType.Subscription,
+            },
+            {
+                type: 'defenderForStorageSettings',
                 scopes: ScopeType.Subscription,
             },
         ]

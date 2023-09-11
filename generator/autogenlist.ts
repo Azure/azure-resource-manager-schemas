@@ -96,7 +96,7 @@ const disabledProviders: AutoGenConfig[] = [
         namespace: 'Microsoft.ServiceFabricMesh',
         disabledForAutogen: true,
     },
-    { 
+    {
         // Disabled as the swagger spec contains a bug (enum mismatch - missing: ProvisioningStateEnum)
         basePath: 'operationalinsights/resource-manager',
         namespace: 'Microsoft.OperationalInsights',
@@ -216,7 +216,7 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'azurestack/resource-manager',
         namespace: 'Microsoft.AzureStack',
     },
-    { 
+    {
         basePath: 'batch/resource-manager',
         namespace: 'Microsoft.Batch',
     },
@@ -410,14 +410,14 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.DesktopVirtualization',
     },
     {
-      basePath: 'digitaltwins/resource-manager',
-      namespace: 'Microsoft.DigitalTwins',
-      resourceConfig: [
-          {
-              type: 'integrationResources',
-              scopes: ScopeType.Extension,
-          }
-      ]
+        basePath: 'digitaltwins/resource-manager',
+        namespace: 'Microsoft.DigitalTwins',
+        resourceConfig: [
+            {
+                type: 'integrationResources',
+                scopes: ScopeType.Extension,
+            }
+        ]
     },
     {
         basePath: 'deviceprovisioningservices/resource-manager',
@@ -444,11 +444,11 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'resourcegraph/resource-manager',
         namespace: 'Microsoft.ResourceGraph',
     },
-    { 
+    {
         basePath: 'redis/resource-manager',
         namespace: 'Microsoft.Cache',
     },
-    { 
+    {
         basePath: 'redisenterprise/resource-manager',
         namespace: 'Microsoft.Cache',
         suffix: 'Enterprise'
@@ -489,7 +489,7 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'healthcareapis/resource-manager',
         namespace: 'Microsoft.HealthcareApis',
-    }, 
+    },
     {
         basePath: 'hybridcompute/resource-manager',
         namespace: 'Microsoft.HybridCompute',
@@ -542,7 +542,7 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'labservices/resource-manager',
         namespace: 'Microsoft.LabServices',
     },
-    { 
+    {
         basePath: 'eventgrid/resource-manager',
         namespace: 'Microsoft.EventGrid',
         resourceConfig: [
@@ -641,8 +641,8 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.NetApp',
     },
     {
-      basePath: 'notificationhubs/resource-manager',
-      namespace: 'Microsoft.NotificationHubs'
+        basePath: 'notificationhubs/resource-manager',
+        namespace: 'Microsoft.NotificationHubs'
     },
     {
         basePath: 'policyinsights/resource-manager',
@@ -866,6 +866,18 @@ const autoGenList: AutoGenConfig[] = [
                 type: 'iotSites',
                 scopes: ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
+            {
+                type: 'assessments/governanceAssignments',
+                scopes: ScopeType.Subscription,
+            },
+            {
+                type: 'governanceRules',
+                scopes: ScopeType.Subscription,
+            },
+            {
+                type: 'defenderForStorageSettings',
+                scopes: ScopeType.Subscription,
+            },
         ]
     },
     {
@@ -910,11 +922,11 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'visualstudio/resource-manager',
         namespace: 'Microsoft.VisualStudio',
     },
-    { 
+    {
         basePath: 'sql/resource-manager',
         namespace: 'Microsoft.Sql',
     },
-    { 
+    {
         basePath: 'scheduler/resource-manager',
         namespace: 'Microsoft.Scheduler',
     },
@@ -922,16 +934,16 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'search/resource-manager',
         namespace: 'Microsoft.Search',
     },
-    { 
+    {
         basePath: 'subscription/resource-manager',
         namespace: 'Microsoft.Subscription',
     },
-    { 
+    {
         basePath: 'storsimple8000series/resource-manager',
         namespace: 'Microsoft.StorSimple',
         suffix: '8000',
     },
-    { 
+    {
         basePath: 'support/resource-manager',
         namespace: 'Microsoft.Support',
     },
@@ -1107,10 +1119,10 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'network/resource-manager',
         namespace: 'Microsoft.Network',
-		postProcessor: networkPostProcessor,
+        postProcessor: networkPostProcessor,
         suffix: 'NRP'
     },
-	{
+    {
         basePath: 'dnsresolver/resource-manager',
         namespace: 'Microsoft.Network',
         suffix: 'DnsResolver',

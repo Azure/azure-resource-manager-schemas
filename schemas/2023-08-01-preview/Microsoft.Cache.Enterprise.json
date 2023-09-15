@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2023-07-01/Microsoft.Cache.Enterprise.json#",
+  "id": "https://schema.management.azure.com/schemas/2023-08-01-preview/Microsoft.Cache.Enterprise.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.Cache",
   "description": "Microsoft Cache Resource Types",
@@ -10,8 +10,19 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2023-07-01"
+            "2023-08-01-preview"
           ]
+        },
+        "identity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ManagedServiceIdentity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Managed service identity (system assigned and/or user assigned identities)"
         },
         "location": {
           "type": "string",
@@ -108,7 +119,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2023-07-01"
+            "2023-08-01-preview"
           ]
         },
         "name": {
@@ -147,7 +158,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2023-07-01"
+            "2023-08-01-preview"
           ]
         },
         "name": {
@@ -185,6 +196,17 @@
     "ClusterProperties": {
       "type": "object",
       "properties": {
+        "encryption": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ClusterPropertiesEncryption"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Encryption-at-rest configuration for the cluster."
+        },
         "minimumTlsVersion": {
           "oneOf": [
             {
@@ -203,6 +225,69 @@
         }
       },
       "description": "Properties of RedisEnterprise clusters, as opposed to general resource properties like location, tags"
+    },
+    "ClusterPropertiesEncryption": {
+      "type": "object",
+      "properties": {
+        "customerManagedKeyEncryption": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ClusterPropertiesEncryptionCustomerManagedKeyEncryption"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "All Customer-managed key encryption properties for the resource. Set this to an empty object to use Microsoft-managed key encryption."
+        }
+      },
+      "description": "Encryption-at-rest configuration for the cluster."
+    },
+    "ClusterPropertiesEncryptionCustomerManagedKeyEncryption": {
+      "type": "object",
+      "properties": {
+        "keyEncryptionKeyIdentity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ClusterPropertiesEncryptionCustomerManagedKeyEncryptionKeyEncryptionKeyIdentity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "All identity configuration for Customer-managed key settings defining which identity should be used to auth to Key Vault."
+        },
+        "keyEncryptionKeyUrl": {
+          "type": "string",
+          "description": "Key encryption key Url, versioned only. Ex: https://contosovault.vault.azure.net/keys/contosokek/562a4bb76b524a1493a6afe8e536ee78"
+        }
+      },
+      "description": "All Customer-managed key encryption properties for the resource. Set this to an empty object to use Microsoft-managed key encryption."
+    },
+    "ClusterPropertiesEncryptionCustomerManagedKeyEncryptionKeyEncryptionKeyIdentity": {
+      "type": "object",
+      "properties": {
+        "identityType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "systemAssignedIdentity",
+                "userAssignedIdentity"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Only userAssignedIdentity is supported in this API version; other types may be supported in the future."
+        },
+        "userAssignedIdentityResourceId": {
+          "type": "string",
+          "description": "User assigned identity to use for accessing key encryption key Url. Ex: /subscriptions/<sub uuid>/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId."
+        }
+      },
+      "description": "All identity configuration for Customer-managed key settings defining which identity should be used to auth to Key Vault."
     },
     "DatabaseProperties": {
       "type": "object",
@@ -337,11 +422,50 @@
       "properties": {
         "id": {
           "type": "string",
-          "format": "arm-id",
           "description": "Resource ID of a database resource to link with this database."
         }
       },
       "description": "Specifies details of a linked database resource."
+    },
+    "ManagedServiceIdentity": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "None",
+                "SystemAssigned",
+                "UserAssigned",
+                "SystemAssigned, UserAssigned"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "userAssignedIdentities": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/UserAssignedIdentity"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Managed service identity (system assigned and/or user assigned identities)"
     },
     "Module": {
       "type": "object",
@@ -508,7 +632,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2023-07-01"
+            "2023-08-01-preview"
           ]
         },
         "name": {
@@ -547,7 +671,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2023-07-01"
+            "2023-08-01-preview"
           ]
         },
         "name": {
@@ -619,6 +743,11 @@
         "name"
       ],
       "description": "SKU parameters supplied to the create RedisEnterprise operation."
+    },
+    "UserAssignedIdentity": {
+      "type": "object",
+      "properties": {},
+      "description": "User assigned identity properties"
     }
   }
 }

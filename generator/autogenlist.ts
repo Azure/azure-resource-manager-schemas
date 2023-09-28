@@ -15,6 +15,7 @@ import { postProcessor as mediaPostProcessor } from './processors/Microsoft.Medi
 import { postProcessor as networkPostProcessor } from './processors/Microsoft.Network';
 import { postProcessor as azureStackHciPostProcessor } from './processors/Microsoft.AzureStackHCI';
 import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
+import { postProcessor as serviceFabricPostProcessor } from './processors/Microsoft.ServiceFabric';
 import { lowerCaseEquals } from './utils';
 
 // New providers are onboarded by default. The providers listed here are the only ones **not** onboarded.
@@ -107,7 +108,7 @@ const disabledProviders: AutoGenConfig[] = [
         basePath: 'confidentialLedger/resource-manager',
         namespace: 'Microsoft.ConfidentialLedger',
         disabledForAutogen: true
-    }
+    },
 ];
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
@@ -782,6 +783,7 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'servicefabric/resource-manager',
         namespace: 'Microsoft.ServiceFabric',
+        postProcessor: serviceFabricPostProcessor,
     },
     {
         basePath: 'servicelinker/resource-manager',

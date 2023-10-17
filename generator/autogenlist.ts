@@ -367,8 +367,14 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.CustomerLockbox',
     },
     {
-        basePath: 'containerservice/resource-manager',
+        basePath: 'containerservice/resource-manager/aks',
         namespace: 'Microsoft.ContainerService',
+        suffix: 'Aks'
+    },
+    {
+        basePath: 'containerservice/resource-manager/fleet',
+        namespace: 'Microsoft.ContainerService',
+        suffix: 'Fleet'
     },
     {
         basePath: 'commerce/resource-manager',

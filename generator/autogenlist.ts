@@ -109,6 +109,12 @@ const disabledProviders: AutoGenConfig[] = [
         namespace: 'Microsoft.ConfidentialLedger',
         disabledForAutogen: true
     },
+    {
+        // Disabled temporally due to unsupported directory structure
+        basePath: 'containerservice/resource-manager',
+        namespace: 'Microsoft.ContainerService',
+        disabledForAutogen: true,
+    },
 ];
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
@@ -365,10 +371,6 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'customerlockbox/resource-manager',
         namespace: 'Microsoft.CustomerLockbox',
-    },
-    {
-        basePath: 'containerservice/resource-manager',
-        namespace: 'Microsoft.ContainerService',
     },
     {
         basePath: 'commerce/resource-manager',

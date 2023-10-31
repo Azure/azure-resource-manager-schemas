@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2022-02-14/Microsoft.VirtualMachineImages.json#",
+  "id": "https://schema.management.azure.com/schemas/2023-07-01/Microsoft.VirtualMachineImages.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.VirtualMachineImages",
   "description": "Microsoft VirtualMachineImages Resource Types",
@@ -10,7 +10,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2022-02-14"
+            "2023-07-01"
           ]
         },
         "identity": {
@@ -51,6 +51,16 @@
           ],
           "description": "Describes the properties of an image template"
         },
+        "resources": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/imageTemplates_triggers_childResource"
+              }
+            ]
+          }
+        },
         "tags": {
           "oneOf": [
             {
@@ -82,9 +92,112 @@
         "type"
       ],
       "description": "Microsoft.VirtualMachineImages/imageTemplates"
+    },
+    "imageTemplates_triggers": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2023-07-01"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9-_.]{1,64}$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the trigger"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/TriggerProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Describes the properties of a trigger"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.VirtualMachineImages/imageTemplates/triggers"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.VirtualMachineImages/imageTemplates/triggers"
     }
   },
   "definitions": {
+    "DistributeVersioner": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/DistributeVersionerLatest"
+        },
+        {
+          "$ref": "#/definitions/DistributeVersionerSource"
+        }
+      ],
+      "properties": {},
+      "description": "Describes how to generate new x.y.z version number for distribution."
+    },
+    "DistributeVersionerLatest": {
+      "type": "object",
+      "properties": {
+        "major": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": -1,
+              "default": "-1"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Major version for the generated version number. Determine what is \"latest\" based on versions with this value as the major version. -1 is equivalent to leaving it unset."
+        },
+        "scheme": {
+          "type": "string",
+          "enum": [
+            "Latest"
+          ]
+        }
+      },
+      "required": [
+        "scheme"
+      ],
+      "description": "Generates version number that will be latest based on existing version numbers."
+    },
+    "DistributeVersionerSource": {
+      "type": "object",
+      "properties": {
+        "scheme": {
+          "type": "string",
+          "enum": [
+            "Source"
+          ]
+        }
+      },
+      "required": [
+        "scheme"
+      ],
+      "description": "Generates version number based on version number of source image"
+    },
     "ImageTemplateCustomizer": {
       "type": "object",
       "oneOf": [
@@ -187,6 +300,34 @@
       ],
       "description": "Uploads files to VMs (Linux, Windows). Corresponds to Packer file provisioner"
     },
+    "ImageTemplateFileValidator": {
+      "type": "object",
+      "properties": {
+        "destination": {
+          "type": "string",
+          "description": "The absolute path to a file (with nested directory structures already created) where the file (from sourceUri) will be uploaded to in the VM"
+        },
+        "sha256Checksum": {
+          "type": "string",
+          "default": "",
+          "description": "SHA256 checksum of the file provided in the sourceUri field above"
+        },
+        "sourceUri": {
+          "type": "string",
+          "description": "The URI of the file to be uploaded to the VM for validation. It can be a github link, Azure Storage URI (authorized or SAS), etc"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "File"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Uploads files required for validation to VMs (Linux, Windows). Corresponds to Packer file provisioner"
+    },
     "ImageTemplateIdentity": {
       "type": "object",
       "properties": {
@@ -231,6 +372,9 @@
         },
         {
           "$ref": "#/definitions/ImageTemplatePowerShellValidator"
+        },
+        {
+          "$ref": "#/definitions/ImageTemplateFileValidator"
         }
       ],
       "properties": {
@@ -495,7 +639,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Maximum duration to wait while building the image template (includes all customizations, validations, and distributions). Omit or specify 0 to use the default (4 hours)."
+          "description": "Maximum duration to wait while building the image template (includes all customizations, optimization, validations, and distributions). Omit or specify 0 to use the default (4 hours)."
         },
         "customize": {
           "oneOf": [
@@ -524,6 +668,28 @@
             }
           ],
           "description": "The distribution targets where the image output needs to go to."
+        },
+        "errorHandling": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ImageTemplatePropertiesErrorHandling"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Error handling options upon a build failure"
+        },
+        "optimize": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ImageTemplatePropertiesOptimize"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies optimization to be performed on image."
         },
         "source": {
           "oneOf": [
@@ -568,6 +734,80 @@
         "source"
       ],
       "description": "Describes the properties of an image template"
+    },
+    "ImageTemplatePropertiesErrorHandling": {
+      "type": "object",
+      "properties": {
+        "onCustomizerError": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "cleanup",
+                "abort"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "If there is a customizer error and this field is set to 'cleanup', the build VM and associated network resources will be cleaned up. This is the default behavior. If there is a customizer error and this field is set to 'abort', the build VM will be preserved."
+        },
+        "onValidationError": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "cleanup",
+                "abort"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "If there is a validation error and this field is set to 'cleanup', the build VM and associated network resources will be cleaned up. This is the default behavior. If there is a validation error and this field is set to 'abort', the build VM will be preserved."
+        }
+      },
+      "description": "Error handling options upon a build failure"
+    },
+    "ImageTemplatePropertiesOptimize": {
+      "type": "object",
+      "properties": {
+        "vmBoot": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ImageTemplatePropertiesOptimizeVmBoot"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Optimization is applied on the image for a faster VM boot."
+        }
+      },
+      "description": "Specifies optimization to be performed on image."
+    },
+    "ImageTemplatePropertiesOptimizeVmBoot": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Enabled",
+                "Disabled"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Enabling this field will improve VM boot time by optimizing the final customized image output."
+        }
+      },
+      "description": "Optimization is applied on the image for a faster VM boot."
     },
     "ImageTemplatePropertiesValidate": {
       "type": "object",
@@ -657,7 +897,7 @@
         },
         "galleryImageId": {
           "type": "string",
-          "description": "Resource Id of the Shared Image Gallery image"
+          "description": "Resource Id of the Azure Compute Gallery image"
         },
         "replicationRegions": {
           "oneOf": [
@@ -671,7 +911,7 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "A list of regions that the image will be replicated to"
+          "description": "[Deprecated] A list of regions that the image will be replicated to. This list can be specified only if targetRegions is not specified. This field is deprecated - use targetRegions instead."
         },
         "storageAccountType": {
           "oneOf": [
@@ -679,35 +919,60 @@
               "type": "string",
               "enum": [
                 "Standard_LRS",
-                "Standard_ZRS"
+                "Standard_ZRS",
+                "Premium_LRS"
               ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "Storage account type to be used to store the shared image. Omit to use the default (Standard_LRS)."
+          "description": "[Deprecated] Storage account type to be used to store the shared image. Omit to use the default (Standard_LRS). This field can be specified only if replicationRegions is specified. This field is deprecated - use targetRegions instead."
+        },
+        "targetRegions": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TargetRegion"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The target regions where the distributed Image Version is going to be replicated to. This object supersedes replicationRegions and can be specified only if replicationRegions is not specified."
         },
         "type": {
           "type": "string",
           "enum": [
             "SharedImage"
           ]
+        },
+        "versioning": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DistributeVersioner"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Describes how to generate new x.y.z version number for distribution."
         }
       },
       "required": [
         "galleryImageId",
-        "replicationRegions",
         "type"
       ],
-      "description": "Distribute via Shared Image Gallery."
+      "description": "Distribute via Azure Compute Gallery."
     },
     "ImageTemplateSharedImageVersionSource": {
       "type": "object",
       "properties": {
         "imageVersionId": {
           "type": "string",
-          "description": "ARM resource id of the image version in the shared image gallery"
+          "description": "ARM resource id of the image version. When image version name is 'latest', the version is evaluated when the image build takes place."
         },
         "type": {
           "type": "string",
@@ -720,7 +985,7 @@
         "imageVersionId",
         "type"
       ],
-      "description": "Describes an image source that is an image version in a shared image gallery."
+      "description": "Describes an image source that is an image version in an Azure Compute Gallery or a Direct Shared Gallery."
     },
     "ImageTemplateShellCustomizer": {
       "type": "object",
@@ -814,6 +1079,53 @@
       "properties": {},
       "description": "Describes a virtual machine image source for building, customizing and distributing"
     },
+    "imageTemplates_triggers_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2023-07-01"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9-_.]{1,64}$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the trigger"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/TriggerProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Describes the properties of a trigger"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "triggers"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.VirtualMachineImages/imageTemplates/triggers"
+    },
     "ImageTemplateVhdDistributor": {
       "type": "object",
       "properties": {
@@ -822,6 +1134,10 @@
           "enum": [
             "VHD"
           ]
+        },
+        "uri": {
+          "type": "string",
+          "description": "Optional Azure Storage URI for the distributed VHD blob. Omit to use the default (empty string) in which case VHD would be published to the storage account in the staging resource group."
         }
       },
       "required": [
@@ -946,6 +1262,73 @@
         "planPublisher"
       ],
       "description": "Purchase plan configuration for platform image."
+    },
+    "SourceImageTriggerProperties": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "SourceImage"
+          ]
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "description": "Properties of SourceImage kind of trigger"
+    },
+    "TargetRegion": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the region."
+        },
+        "replicaCount": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "default": "1"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The number of replicas of the Image Version to be created in this region. Omit to use the default (1)."
+        },
+        "storageAccountType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Standard_LRS",
+                "Standard_ZRS",
+                "Premium_LRS"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies the storage account type to be used to store the image in this region. Omit to use the default (Standard_LRS)."
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "description": "Describes the target region information."
+    },
+    "TriggerProperties": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/SourceImageTriggerProperties"
+        }
+      ],
+      "properties": {},
+      "description": "Describes the properties of a trigger"
     },
     "UserAssignedIdentity": {
       "type": "object",

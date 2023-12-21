@@ -788,6 +788,12 @@ const autoGenList: AutoGenConfig[] = [
         postProcessor: serviceFabricPostProcessor,
     },
     {
+        basePath: 'servicefabricmanagedclusters/resource-manager',
+        namespace: 'Microsoft.ServiceFabric',
+        postProcessor: serviceFabricPostProcessor,
+        suffix: 'ManagedClusters'
+    },
+    {
         basePath: 'servicelinker/resource-manager',
         namespace: 'Microsoft.ServiceLinker',
         resourceConfig: [

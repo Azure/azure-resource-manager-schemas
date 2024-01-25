@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2023-09-01-preview/Microsoft.ServiceFabric.json#",
+  "id": "https://schema.management.azure.com/schemas/2023-12-01-preview/Microsoft.ServiceFabric.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.ServiceFabric",
   "description": "Microsoft ServiceFabric Resource Types",
@@ -10,7 +10,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2023-09-01-preview"
+            "2023-12-01-preview"
           ]
         },
         "location": {
@@ -108,7 +108,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2023-09-01-preview"
+            "2023-12-01-preview"
           ]
         },
         "identity": {
@@ -198,7 +198,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2023-09-01-preview"
+            "2023-12-01-preview"
           ]
         },
         "location": {
@@ -267,7 +267,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2023-09-01-preview"
+            "2023-12-01-preview"
           ]
         },
         "location": {
@@ -346,7 +346,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2023-09-01-preview"
+            "2023-12-01-preview"
           ]
         },
         "location": {
@@ -415,7 +415,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2023-09-01-preview"
+            "2023-12-01-preview"
           ]
         },
         "name": {
@@ -837,6 +837,179 @@
         "isAdmin"
       ],
       "description": "Client certificate definition."
+    },
+    "ClusterHealthPolicy": {
+      "type": "object",
+      "properties": {
+        "maxPercentUnhealthyApplications": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100,
+              "default": "0"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The maximum allowed percentage of unhealthy applications before reporting an error. For example, to allow 10% of applications to be unhealthy, this value would be 10.\n\nThe percentage represents the maximum tolerated percentage of applications that can be unhealthy before the cluster is considered in error.\nIf the percentage is respected but there is at least one unhealthy application, the health is evaluated as Warning.\nThis is calculated by dividing the number of unhealthy applications over the total number of application instances in the cluster, excluding applications of application types that are included in the ApplicationTypeHealthPolicyMap.\nThe computation rounds up to tolerate one failure on small numbers of applications. Default percentage is zero.\n"
+        },
+        "maxPercentUnhealthyNodes": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100,
+              "default": "0"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The maximum allowed percentage of unhealthy nodes before reporting an error. For example, to allow 10% of nodes to be unhealthy, this value would be 10.\n\nThe percentage represents the maximum tolerated percentage of nodes that can be unhealthy before the cluster is considered in error.\nIf the percentage is respected but there is at least one unhealthy node, the health is evaluated as Warning.\nThe percentage is calculated by dividing the number of unhealthy nodes over the total number of nodes in the cluster.\nThe computation rounds up to tolerate one failure on small numbers of nodes. Default percentage is zero.\n\nIn large clusters, some nodes will always be down or out for repairs, so this percentage should be configured to tolerate that.\n"
+        }
+      },
+      "required": [
+        "maxPercentUnhealthyApplications",
+        "maxPercentUnhealthyNodes"
+      ],
+      "description": "Defines a health policy used to evaluate the health of the cluster or of a cluster node.\n"
+    },
+    "ClusterMonitoringPolicy": {
+      "type": "object",
+      "properties": {
+        "healthCheckRetryTimeout": {
+          "type": "string",
+          "description": "The amount of time to retry health evaluation when the application or cluster is unhealthy before the upgrade rolls back. The timeout can be in either hh:mm:ss or in d.hh:mm:ss.ms format."
+        },
+        "healthCheckStableDuration": {
+          "type": "string",
+          "description": "The amount of time that the application or cluster must remain healthy before the upgrade proceeds to the next upgrade domain. The duration can be in either hh:mm:ss or in d.hh:mm:ss.ms format."
+        },
+        "healthCheckWaitDuration": {
+          "type": "string",
+          "description": "The length of time to wait after completing an upgrade domain before performing health checks. The duration can be in either hh:mm:ss or in d.hh:mm:ss.ms format."
+        },
+        "upgradeDomainTimeout": {
+          "type": "string",
+          "description": "The amount of time each upgrade domain has to complete before the upgrade rolls back. The timeout can be in either hh:mm:ss or in d.hh:mm:ss.ms format."
+        },
+        "upgradeTimeout": {
+          "type": "string",
+          "description": "The amount of time the overall upgrade has to complete before the upgrade rolls back. The timeout can be in either hh:mm:ss or in d.hh:mm:ss.ms format."
+        }
+      },
+      "required": [
+        "healthCheckRetryTimeout",
+        "healthCheckStableDuration",
+        "healthCheckWaitDuration",
+        "upgradeDomainTimeout",
+        "upgradeTimeout"
+      ],
+      "description": "Describes the monitoring policies for the cluster upgrade."
+    },
+    "ClusterUpgradeDeltaHealthPolicy": {
+      "type": "object",
+      "properties": {
+        "maxPercentDeltaUnhealthyApplications": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The maximum allowed percentage of applications health degradation allowed during cluster upgrades.\nThe delta is measured between the state of the applications at the beginning of upgrade and the state of the applications at the time of the health evaluation.\nThe check is performed after every upgrade domain upgrade completion to make sure the global state of the cluster is within tolerated limits. System services are not included in this.\nNOTE: This value will overwrite the value specified in properties.UpgradeDescription.HealthPolicy.MaxPercentUnhealthyApplications\n"
+        },
+        "maxPercentDeltaUnhealthyNodes": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The maximum allowed percentage of nodes health degradation allowed during cluster upgrades.\nThe delta is measured between the state of the nodes at the beginning of upgrade and the state of the nodes at the time of the health evaluation.\nThe check is performed after every upgrade domain upgrade completion to make sure the global state of the cluster is within tolerated limits.\n"
+        },
+        "maxPercentUpgradeDomainDeltaUnhealthyNodes": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The maximum allowed percentage of upgrade domain nodes health degradation allowed during cluster upgrades.\nThe delta is measured between the state of the upgrade domain nodes at the beginning of upgrade and the state of the upgrade domain nodes at the time of the health evaluation.\nThe check is performed after every upgrade domain upgrade completion for all completed upgrade domains to make sure the state of the upgrade domains is within tolerated limits.\n"
+        }
+      },
+      "required": [
+        "maxPercentDeltaUnhealthyNodes"
+      ],
+      "description": "Describes the delta health policies for the cluster upgrade."
+    },
+    "ClusterUpgradePolicy": {
+      "type": "object",
+      "properties": {
+        "deltaHealthPolicy": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ClusterUpgradeDeltaHealthPolicy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Describes the delta health policies for the cluster upgrade."
+        },
+        "forceRestart": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "If true, then processes are forcefully restarted during upgrade even when the code version has not changed (the upgrade only changes configuration or data)."
+        },
+        "healthPolicy": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ClusterHealthPolicy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Defines a health policy used to evaluate the health of the cluster or of a cluster node.\n"
+        },
+        "monitoringPolicy": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ClusterMonitoringPolicy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Describes the monitoring policies for the cluster upgrade."
+        },
+        "upgradeReplicaSetCheckTimeout": {
+          "type": "string",
+          "description": "The maximum amount of time to block processing of an upgrade domain and prevent loss of availability when there are unexpected issues.\nWhen this timeout expires, processing of the upgrade domain will proceed regardless of availability loss issues.\nThe timeout is reset at the start of each upgrade domain. The timeout can be in either hh:mm:ss or in d.hh:mm:ss.ms format.\nThis value must be between 00:00:00 and 49710.06:28:15 (unsigned 32 bit integer for seconds)\n"
+        }
+      },
+      "description": "Describes the policy used when upgrading the cluster."
     },
     "EndpointRangeDescription": {
       "type": "object",
@@ -1306,6 +1479,17 @@
           ],
           "description": "Setting this to true enables automatic OS upgrade for the node types that are created using any platform OS image with version 'latest'. The default value for this setting is false."
         },
+        "enableHttpGatewayExclusiveAuthMode": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "If true, token-based authentication is not allowed on the HttpGatewayEndpoint. This is required to support TLS versions 1.3 and above. If token-based authentication is used, HttpGatewayTokenAuthConnectionPort must be defined."
+        },
         "enableIpv6": {
           "oneOf": [
             {
@@ -1354,6 +1538,17 @@
           ],
           "description": "The port used for HTTP connections to the cluster."
         },
+        "httpGatewayTokenAuthConnectionPort": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The port used for token-auth based HTTPS connections to the cluster. Cannot be set to the same port as HttpGatewayEndpoint."
+        },
         "ipTags": {
           "oneOf": [
             {
@@ -1399,7 +1594,12 @@
         "publicIPPrefixId": {
           "type": "string",
           "format": "arm-id",
-          "description": "Specify the resource id of a public IP prefix that the load balancer will allocate a public IP address from. Only supports IPv4."
+          "description": "Specify the resource id of a public IPv4 prefix that the load balancer will allocate a public IPv4 address from. This setting cannot be changed once the cluster is created."
+        },
+        "publicIPv6PrefixId": {
+          "type": "string",
+          "format": "arm-id",
+          "description": "Specify the resource id of a public IPv6 prefix that the load balancer will allocate a public IPv6 address from. This setting cannot be changed once the cluster is created."
         },
         "serviceEndpoints": {
           "oneOf": [
@@ -1418,6 +1618,17 @@
         "subnetId": {
           "type": "string",
           "description": "If specified, the node types for the cluster are created in this subnet instead of the default VNet. The **networkSecurityRules** specified for the cluster are also applied to this subnet. This setting cannot be changed once the cluster is created."
+        },
+        "upgradeDescription": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ClusterUpgradePolicy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Describes the policy used when upgrading the cluster."
         },
         "useCustomVnet": {
           "oneOf": [
@@ -1470,7 +1681,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2023-09-01-preview"
+            "2023-12-01-preview"
           ]
         },
         "identity": {
@@ -1550,7 +1761,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2023-09-01-preview"
+            "2023-12-01-preview"
           ]
         },
         "location": {
@@ -1619,7 +1830,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2023-09-01-preview"
+            "2023-12-01-preview"
           ]
         },
         "location": {
@@ -1688,7 +1899,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2023-09-01-preview"
+            "2023-12-01-preview"
           ]
         },
         "location": {
@@ -1757,7 +1968,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2023-09-01-preview"
+            "2023-12-01-preview"
           ]
         },
         "name": {

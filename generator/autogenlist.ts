@@ -463,6 +463,9 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'hdinsight/resource-manager',
         namespace: 'Microsoft.HDInsight',
+        // Disable auto-gen temporally due to we want to force it use 2023-04-15-preview as newest version.
+        // Since 2023-08-15-preview is not public available.
+        disabledForAutogen: true,
     },
     {
         basePath: 'resourcehealth/resource-manager',

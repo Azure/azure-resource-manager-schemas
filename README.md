@@ -1,5 +1,8 @@
 # azure-resource-manager-schemas 
 
+> [!WARNING]
+> ## The schemas contained in this repo are designed for best-effort validation, and should NOT be relied upon for other programmatic consumption. Please raise an issue in this repo if you have a current or potential new use-case, and we can suggest alternatives.
+
 This is the repo for template deployment schemas hosted under `https://schema.management.azure.com/schemas`. Please see below for information on contributing and publishing updated schemas.
 
 ## Updating Schemas

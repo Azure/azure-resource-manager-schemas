@@ -4,8 +4,7 @@ import * as constants from '../constants';
 import { cloneAndGenerateBasePaths, validateAndReturnReadmePath } from '../specs';
 import { findOrGenerateAutogenEntries } from '../autogenlist';
 import { executeSynchronous, writeJsonFile, safeMkdir } from '../utils';
-import { getApiVersionsByNamespace } from '../generate';
-import { keys, partition } from 'lodash';
+import { partition } from 'lodash';
 import path from 'path';
 
 executeSynchronous(async () => {
@@ -15,8 +14,7 @@ executeSynchronous(async () => {
 
     for (const basePath of basePaths) {
         const readme = validateAndReturnReadmePath(constants.specsRepoPath, basePath);
-        const namespaces = keys(await getApiVersionsByNamespace(readme));
-        const autogenlistEntries = findOrGenerateAutogenEntries(basePath, namespaces);
+        const autogenlistEntries = await findOrGenerateAutogenEntries(basePath, readme);
 
         const [unautogened, autogened] = partition(
             autogenlistEntries,

@@ -14,6 +14,7 @@ export interface AutoGenConfig {
   disabledForAutogen?: true,
   basePath: string,
   namespace: string,
+  useNamespaceFromConfig?: boolean,
   readmeFile?: string,
   readmeTag?: ReadmeTag,
   suffix?: string,

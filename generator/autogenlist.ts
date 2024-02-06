@@ -17,6 +17,7 @@ import { postProcessor as azureStackHciPostProcessor } from './processors/Micros
 import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
 import { postProcessor as serviceFabricPostProcessor } from './processors/Microsoft.ServiceFabric';
 import { lowerCaseEquals } from './utils';
+import { detectProviderNamespaces } from './generate';
 
 // New providers are onboarded by default. The providers listed here are the only ones **not** onboarded.
 const disabledProviders: AutoGenConfig[] = [
@@ -110,10 +111,16 @@ const disabledProviders: AutoGenConfig[] = [
         disabledForAutogen: true
     },
     {
-        // Disabled temporally due to unsupported directory structure
-        basePath: 'containerservice/resource-manager',
+        basePath: 'containerservice/resource-manager/Microsoft.ContainerService/aks',
         namespace: 'Microsoft.ContainerService',
-        disabledForAutogen: true,
+        useNamespaceFromConfig: true,
+        suffix: 'Aks'
+    },
+    {
+        basePath: 'containerservice/resource-manager/Microsoft.ContainerService/fleet',
+        namespace: 'Microsoft.ContainerService',
+        useNamespaceFromConfig: true,
+        suffix: 'Fleet'
     },
 ];
 
@@ -1160,10 +1167,16 @@ export function findAutogenEntries(basePath: string): AutoGenConfig[] {
     return autoGenList.filter(w => lowerCaseEquals(w.basePath, basePath));
 }
 
-export function findOrGenerateAutogenEntries(basePath: string, namespaces: string[]): AutoGenConfig[] {
-    const entries = findAutogenEntries(basePath).filter(e => namespaces.some(ns => lowerCaseEquals(e.namespace, ns)));
+export async function findOrGenerateAutogenEntries(basePath: string, readme: string): Promise<AutoGenConfig[]> {
+    let entries = findAutogenEntries(basePath);
+    if (entries.some(e => e.useNamespaceFromConfig)) {
+        return entries;
+    }
 
-    for (const namespace of namespaces) {
+    const detectedNamespaces = await detectProviderNamespaces(readme);
+    entries = entries.filter(e => detectedNamespaces.some(ns => lowerCaseEquals(e.namespace, ns)));
+
+    for (const namespace of detectedNamespaces) {
         if (!entries.some(e => lowerCaseEquals(e.namespace, namespace))) {
             // Generate configuration for any RPs not explicitly declared in the autogen list
             entries.push({

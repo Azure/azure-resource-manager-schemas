@@ -2,13 +2,14 @@
 // Licensed under the MIT License.
 import path from 'path';
 import { cloneGitRepo } from './git';
-import { findRecursive, lowerCaseEquals } from './utils';
+import { findRecursive, lowerCaseContains } from './utils';
 import { ReadmeTag, AutoGenConfig, CodeBlock } from './models';
 import * as constants from './constants'
 import * as cm from '@ts-common/commonmark-to-markdown'
 import * as yaml from 'js-yaml'
 import { existsSync } from 'fs';
 import { readFile, writeFile } from 'fs/promises';
+import { apiVersionRegex } from './generate';
 
 export async function resolveAbsolutePath(localPath: string) {
     if (path.isAbsolute(localPath)) {
@@ -76,7 +77,7 @@ function isExcludedBasePath(basePath: string) {
         .some(prefix => basePath.toLowerCase().startsWith(prefix));
 }
 
-export async function prepareReadme(readme: string, autoGenConfig?: AutoGenConfig) {
+export async function prepareReadme(readme: string, autoGenConfig: AutoGenConfig) {
     const content = (await readFile(readme)).toString();
     const markdownEx = cm.parse(content);
     const fileSet = new Set<string>();
@@ -101,21 +102,24 @@ export async function prepareReadme(readme: string, autoGenConfig?: AutoGenConfi
     }
 
     let readmeTag = {} as ReadmeTag;
-    fileSet.forEach(inputFile => {
-        const match = constants.pathRegex.exec(inputFile);
-        if (match) {
-            const mNamespace = match[1];
-            const mApiVersion = match[2];
-            if (!autoGenConfig || lowerCaseEquals(mNamespace, autoGenConfig.namespace)) {
-                if (!readmeTag[mApiVersion]) {
-                    readmeTag[mApiVersion] = [];
-                }
-                readmeTag[mApiVersion].push(inputFile);
-            }
-        }
-    });
+    for (const inputFile of fileSet) {
+        const pathComponents = inputFile.split(path.sep);
 
-    if (autoGenConfig?.readmeTag) {
+        if (!autoGenConfig.useNamespaceFromConfig &&
+            !lowerCaseContains(pathComponents, autoGenConfig.namespace)) {
+            continue;
+        }
+
+        const apiVersion = pathComponents.filter(p => p.match(apiVersionRegex) !== null)[0];
+        if (!apiVersion) {
+            continue;
+        }
+
+        readmeTag[apiVersion] ??= readmeTag[apiVersion] || [];
+        readmeTag[apiVersion].push(inputFile);
+    }
+
+    if (autoGenConfig.readmeTag) {
         readmeTag = {...readmeTag, ...autoGenConfig.readmeTag };
     }
 

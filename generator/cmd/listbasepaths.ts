@@ -5,16 +5,14 @@ import { cloneAndGenerateBasePaths, validateAndReturnReadmePath } from '../specs
 import colors from 'colors';
 import { findOrGenerateAutogenEntries } from '../autogenlist';
 import { executeSynchronous } from '../utils';
-import { getApiVersionsByNamespace } from '../generate';
-import { keys, partition } from 'lodash';
+import { partition } from 'lodash';
 
 executeSynchronous(async () => {
     const basePaths = await cloneAndGenerateBasePaths(constants.specsRepoPath, constants.specsRepoUri, constants.specsRepoCommitHash);
 
     for (const basePath of basePaths) {
         const readme = validateAndReturnReadmePath(constants.specsRepoPath, basePath);
-        const namespaces = keys(await getApiVersionsByNamespace(readme));
-        const autogenlistEntries = findOrGenerateAutogenEntries(basePath, namespaces);
+        const autogenlistEntries = await findOrGenerateAutogenEntries(basePath, readme);
 
         const [unautogened, autogened] = partition(
             autogenlistEntries,

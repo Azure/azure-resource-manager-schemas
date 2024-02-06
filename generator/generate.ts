@@ -2,15 +2,15 @@
 // Licensed under the MIT License.
 import path from 'path';
 import os from 'os';
-import { findRecursive, findDirRecursive, executeCmd, rmdirRecursive, lowerCaseCompare, lowerCaseCompareLists, lowerCaseStartsWith, readJsonFile, writeJsonFile, safeMkdir, safeUnlink, fileExists, lowerCaseEquals, lowerCaseContains } from './utils';
+import { findRecursive, findDirRecursive, executeCmd, rmdirRecursive, lowerCaseCompare, lowerCaseCompareLists, lowerCaseStartsWith, readJsonFile, writeJsonFile, safeMkdir, safeUnlink, fileExists, lowerCaseEquals } from './utils';
 import * as constants from './constants';
 import { prepareReadme } from './specs';
 import colors from 'colors';
 import { ScopeType, AutoGenConfig } from './models';
-import { get, set, flatten, uniq, concat, Dictionary, groupBy, keys, difference, pickBy } from 'lodash';
+import { get, set, flatten, uniq, concat, Dictionary, groupBy, keys, difference } from 'lodash';
 
 const autorestBinary = os.platform() === 'win32' ? 'autorest.cmd' : 'autorest';
-const apiVersionRegex = /^\d{4}-\d{2}-\d{2}(|-preview)$/;
+export const apiVersionRegex = /^\d{4}-\d{2}-\d{2}(|-preview)$/;
 
 export interface SchemaConfiguration {
     references: SchemaReference[];
@@ -35,26 +35,16 @@ const RootSchemaConfigs: Map<ScopeType, RootSchemaConfiguration> = new Map([
     [ScopeType.ManagementGroup, constants.managementGroupRootSchema]
 ]);
 
-export async function getApiVersionsByNamespace(readme: string): Promise<Dictionary<string[]>> {
+export async function detectProviderNamespaces(readme: string) {
     const searchPath = path.resolve(`${readme}/..`);
+
+    // To try and detect possible provider namespaces, assume a folder structure of <provider>/preview|stable/<api-version>/..., based on convention
     const apiVersionPaths = await findDirRecursive(searchPath, p => path.basename(p).match(apiVersionRegex) !== null);
-
-    const output: Dictionary<string[]> = {};
-    for (const [namespace, , apiVersion] of apiVersionPaths.map(p => path.relative(searchPath, p).split(path.sep))) {
-        output[namespace] = [...(output[namespace] ?? []), apiVersion];
-    }
-
-    return output;
+    return uniq(apiVersionPaths.map(p => path.relative(searchPath, p).split(path.sep)[0]));
 }
 
-export async function generateSchemas(readme: string, autoGenConfig?: AutoGenConfig): Promise<SchemaConfiguration[]> {
+export async function generateSchemas(readme: string, autoGenConfig: AutoGenConfig): Promise<SchemaConfiguration[]> {
     await prepareReadme(readme, autoGenConfig);
-
-    const apiVersionsByNamespace = pickBy(
-        await getApiVersionsByNamespace(readme),
-        (_, key) => !autoGenConfig || lowerCaseEquals(key, autoGenConfig.namespace));
-
-    const namespaces = keys(apiVersionsByNamespace);
 
     const schemaConfigs: SchemaConfiguration[] = [];
     const tmpFolder = path.join(os.tmpdir(), Math.random().toString(36).substr(2));
@@ -64,7 +54,7 @@ export async function generateSchemas(readme: string, autoGenConfig?: AutoGenCon
 
         for (const schemaPath of generatedSchemas) {
             const namespace = path.basename(schemaPath.substring(0, schemaPath.lastIndexOf(path.extname(schemaPath))));
-            if (!lowerCaseContains(namespaces, namespace)) {
+            if (!lowerCaseEquals(autoGenConfig.namespace, namespace)) {
                 continue;
             }
 

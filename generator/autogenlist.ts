@@ -22,11 +22,6 @@ import { detectProviderNamespaces } from './generate';
 // New providers are onboarded by default. The providers listed here are the only ones **not** onboarded.
 const disabledProviders: AutoGenConfig[] = [
     {
-        basePath: 'cloudshell/resource-manager',
-        namespace: 'Microsoft.Portal',
-        disabledForAutogen: true,
-    },
-    {
         basePath: 'compute/resource-manager',
         namespace: 'Microsoft.ContainerService',
         disabledForAutogen: true,

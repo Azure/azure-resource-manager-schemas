@@ -1,0 +1,1054 @@
+{
+  "id": "https://schema.management.azure.com/schemas/2023-04-01-preview/Microsoft.ServiceLinker.json#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Microsoft.ServiceLinker",
+  "description": "Microsoft ServiceLinker Resource Types",
+  "resourceDefinitions": {
+    "locations_connectors": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2023-04-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of resource."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/LinkerProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties of the Linker."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ServiceLinker/locations/connectors"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.ServiceLinker/locations/connectors"
+    },
+    "locations_dryruns": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2023-04-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of dryrun."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DryrunProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties of the dryrun job"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ServiceLinker/locations/dryruns"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.ServiceLinker/locations/dryruns"
+    }
+  },
+  "unknown_resourceDefinitions": {
+    "dryruns": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2023-04-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of dryrun."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DryrunProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties of the dryrun job"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ServiceLinker/dryruns"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.ServiceLinker/dryruns"
+    },
+    "linkers": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2023-04-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The name Linker resource."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/LinkerProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties of the Linker."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ServiceLinker/linkers"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.ServiceLinker/linkers"
+    }
+  },
+  "definitions": {
+    "AccessKeyInfoBase": {
+      "type": "object",
+      "properties": {
+        "authType": {
+          "type": "string",
+          "enum": [
+            "accessKey"
+          ]
+        },
+        "permissions": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Read",
+                  "Write",
+                  "Listen",
+                  "Send",
+                  "Manage"
+                ]
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Permissions of the accessKey. `Read` and `Write` are for Azure Cosmos DB and Azure App Configuration, `Listen`, `Send` and `Manage` are for Azure Event Hub and Azure Service Bus."
+        }
+      },
+      "required": [
+        "authType"
+      ],
+      "description": "The access key directly from target resource properties, which target service is Azure Resource, such as Microsoft.Storage"
+    },
+    "AuthInfoBase": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/AccessKeyInfoBase"
+        },
+        {
+          "$ref": "#/definitions/SecretAuthInfo"
+        },
+        {
+          "$ref": "#/definitions/ServicePrincipalCertificateAuthInfo"
+        },
+        {
+          "$ref": "#/definitions/EasyAuthMicrosoftEntraIDAuthInfo"
+        }
+      ],
+      "properties": {
+        "authMode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "optInAllAuth",
+                "optOutAllAuth"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Optional. Indicates how to configure authentication. If optInAllAuth, service linker configures authentication such as enabling identity on source resource and granting RBAC roles. If optOutAllAuth, opt out authentication setup. Default is optInAllAuth."
+        }
+      },
+      "description": "The authentication info"
+    },
+    "AzureKeyVaultProperties": {
+      "type": "object",
+      "properties": {
+        "connectAsKubernetesCsiDriver": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "True if connect via Kubernetes CSI Driver."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "KeyVault"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "The resource properties when type is Azure Key Vault"
+    },
+    "AzureResource": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The Id of azure resource."
+        },
+        "resourceProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AzureResourcePropertiesBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The azure resource properties"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "AzureResource"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "The azure resource info when target service type is AzureResource"
+    },
+    "AzureResourcePropertiesBase": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/AzureKeyVaultProperties"
+        }
+      ],
+      "properties": {},
+      "description": "The azure resource properties"
+    },
+    "ConfigurationInfo": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Internal",
+                "enable",
+                "optOut"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Optional, indicate whether to apply configurations on source application. If enable, generate configurations and applied to the source application. Default is enable. If optOut, no configuration change will be made on source."
+        },
+        "additionalConfigurations": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A dictionary of additional configurations to be added. Service will auto generate a set of basic configurations and this property is to full fill more customized configurations"
+        },
+        "additionalConnectionStringProperties": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A dictionary of additional properties to be added in the end of connection string."
+        },
+        "configurationStore": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ConfigurationStore"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "An option to store configuration into different place"
+        },
+        "customizedKeys": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Optional. A dictionary of default key name and customized key name mapping. If not specified, default key name will be used for generate configurations"
+        },
+        "daprProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DaprProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates some additional properties for dapr client type"
+        },
+        "deleteOrUpdateBehavior": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Default",
+                "ForcedCleanup"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates whether to clean up previous operation when Linker is updating or deleting."
+        }
+      },
+      "description": "The configuration information, used to generate configurations or save to applications"
+    },
+    "ConfigurationStore": {
+      "type": "object",
+      "properties": {
+        "appConfigurationId": {
+          "type": "string",
+          "description": "The app configuration id to store configuration"
+        }
+      },
+      "description": "An option to store configuration into different place"
+    },
+    "ConfluentBootstrapServer": {
+      "type": "object",
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "description": "The endpoint of service."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "ConfluentBootstrapServer"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "The service properties when target service type is ConfluentBootstrapServer"
+    },
+    "ConfluentSchemaRegistry": {
+      "type": "object",
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "description": "The endpoint of service."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "ConfluentSchemaRegistry"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "The service properties when target service type is ConfluentSchemaRegistry"
+    },
+    "DaprMetadata": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "The description of the metadata, returned from configuration api"
+        },
+        "name": {
+          "type": "string",
+          "description": "Metadata property name."
+        },
+        "required": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The value indicating whether the metadata is required or not."
+        },
+        "secretRef": {
+          "type": "string",
+          "description": "The secret name where dapr could get value"
+        },
+        "value": {
+          "type": "string",
+          "description": "Metadata property value."
+        }
+      },
+      "description": "The dapr component metadata."
+    },
+    "DaprProperties": {
+      "type": "object",
+      "properties": {
+        "componentType": {
+          "type": "string",
+          "description": "The dapr component type"
+        },
+        "metadata": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DaprMetadata"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Additional dapr metadata"
+        },
+        "scopes": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The dapr component scopes"
+        },
+        "secretStoreComponent": {
+          "type": "string",
+          "description": "The name of a secret store dapr to retrieve secret"
+        },
+        "version": {
+          "type": "string",
+          "description": "The dapr component version"
+        }
+      },
+      "description": "Indicates some additional properties for dapr client type"
+    },
+    "DryrunParameters": {
+      "type": "object",
+      "properties": {},
+      "description": "The parameters of the dryrun"
+    },
+    "DryrunProperties": {
+      "type": "object",
+      "properties": {
+        "parameters": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DryrunParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The parameters of the dryrun"
+        }
+      },
+      "description": "The properties of the dryrun job"
+    },
+    "EasyAuthMicrosoftEntraIDAuthInfo": {
+      "type": "object",
+      "properties": {
+        "authType": {
+          "type": "string",
+          "enum": [
+            "easyAuthMicrosoftEntraID"
+          ]
+        },
+        "clientId": {
+          "type": "string",
+          "description": "Application clientId for EasyAuth Microsoft Entra ID."
+        },
+        "deleteOrUpdateBehavior": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Default",
+                "ForcedCleanup"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates whether to clean up previous operation when Linker is updating or deleting."
+        },
+        "secret": {
+          "type": "string",
+          "description": "Application Secret for EasyAuth Microsoft Entra ID."
+        }
+      },
+      "required": [
+        "authType"
+      ],
+      "description": "The authentication info when authType is EasyAuth Microsoft Entra ID"
+    },
+    "FirewallRules": {
+      "type": "object",
+      "properties": {
+        "azureServices": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Allow Azure services to access the target service if true."
+        },
+        "callerClientIP": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Allow caller client IP to access the target service if true. the property is used when connecting local application to target service."
+        },
+        "ipRanges": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "This value specifies the set of IP addresses or IP address ranges in CIDR form to be included as the allowed list of client IPs for a given database account."
+        }
+      },
+      "description": "Target service's firewall rules. to allow connections from source service."
+    },
+    "KeyVaultSecretReferenceSecretInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the Key Vault secret."
+        },
+        "secretType": {
+          "type": "string",
+          "enum": [
+            "keyVaultSecretReference"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "description": "Version of the Key Vault secret."
+        }
+      },
+      "required": [
+        "secretType"
+      ],
+      "description": "The secret info when type is keyVaultSecretReference. It's for scenario that user provides a secret stored in user's keyvault and source is Azure Kubernetes. The key Vault's resource id is linked to secretStore.keyVaultId."
+    },
+    "KeyVaultSecretUriSecretInfo": {
+      "type": "object",
+      "properties": {
+        "secretType": {
+          "type": "string",
+          "enum": [
+            "keyVaultSecretUri"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "description": "URI to the keyvault secret"
+        }
+      },
+      "required": [
+        "secretType"
+      ],
+      "description": "The secret info when type is keyVaultSecretUri. It's for scenario that user provides a secret stored in user's keyvault and source is Web App, Spring Cloud or Container App."
+    },
+    "LinkerProperties": {
+      "type": "object",
+      "properties": {
+        "authInfo": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AuthInfoBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The authentication info"
+        },
+        "clientType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "none",
+                "dotnet",
+                "java",
+                "python",
+                "go",
+                "php",
+                "ruby",
+                "django",
+                "nodejs",
+                "springBoot",
+                "kafka-springBoot",
+                "jms-springBoot",
+                "dapr"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The application client type."
+        },
+        "configurationInfo": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ConfigurationInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The configuration information, used to generate configurations or save to applications"
+        },
+        "publicNetworkSolution": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PublicNetworkSolution"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates public network solution, include firewall rules"
+        },
+        "scope": {
+          "type": "string",
+          "description": "connection scope in source service."
+        },
+        "secretStore": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretStore"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "An option to store secret value in secure place"
+        },
+        "targetService": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/TargetServiceBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The target service properties"
+        },
+        "vNetSolution": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/VNetSolution"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The VNet solution for linker"
+        }
+      },
+      "description": "The properties of the Linker."
+    },
+    "PublicNetworkSolution": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Internal",
+                "enable",
+                "optOut"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Optional. Indicates public network solution. If enable, enable public network access of target service with best try. Default is enable. If optOut, opt out public network access configuration."
+        },
+        "deleteOrUpdateBehavior": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Default",
+                "ForcedCleanup"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates whether to clean up previous operation(such as firewall rules) when Linker is updating or deleting."
+        },
+        "firewallRules": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/FirewallRules"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Target service's firewall rules. to allow connections from source service."
+        }
+      },
+      "description": "Indicates public network solution, include firewall rules"
+    },
+    "SecretAuthInfo": {
+      "type": "object",
+      "properties": {
+        "authType": {
+          "type": "string",
+          "enum": [
+            "secret"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "Username or account name for secret auth."
+        },
+        "secretInfo": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretInfoBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The secret info"
+        }
+      },
+      "required": [
+        "authType"
+      ],
+      "description": "The authentication info when authType is secret"
+    },
+    "SecretInfoBase": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/ValueSecretInfo"
+        },
+        {
+          "$ref": "#/definitions/KeyVaultSecretReferenceSecretInfo"
+        },
+        {
+          "$ref": "#/definitions/KeyVaultSecretUriSecretInfo"
+        }
+      ],
+      "properties": {},
+      "description": "The secret info"
+    },
+    "SecretStore": {
+      "type": "object",
+      "properties": {
+        "keyVaultId": {
+          "type": "string",
+          "description": "The key vault id to store secret"
+        },
+        "keyVaultSecretName": {
+          "type": "string",
+          "description": "The key vault secret name to store secret, only valid when storing one secret"
+        }
+      },
+      "description": "An option to store secret value in secure place"
+    },
+    "SelfHostedServer": {
+      "type": "object",
+      "properties": {
+        "endpoint": {
+          "type": "string",
+          "description": "The endpoint of service."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "SelfHostedServer"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "The service properties when target service type is SelfHostedServer"
+    },
+    "ServicePrincipalCertificateAuthInfo": {
+      "type": "object",
+      "properties": {
+        "authType": {
+          "type": "string",
+          "enum": [
+            "servicePrincipalCertificate"
+          ]
+        },
+        "certificate": {
+          "type": "string",
+          "description": "ServicePrincipal certificate for servicePrincipal auth."
+        },
+        "clientId": {
+          "type": "string",
+          "description": "Application clientId for servicePrincipal auth."
+        },
+        "deleteOrUpdateBehavior": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Default",
+                "ForcedCleanup"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates whether to clean up previous operation when Linker is updating or deleting."
+        },
+        "principalId": {
+          "type": "string",
+          "description": "Principal Id for servicePrincipal auth."
+        },
+        "roles": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Optional, this value specifies the Azure roles to be assigned. Automatically "
+        }
+      },
+      "required": [
+        "authType",
+        "certificate",
+        "clientId",
+        "principalId"
+      ],
+      "description": "The authentication info when authType is servicePrincipal certificate"
+    },
+    "TargetServiceBase": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/definitions/AzureResource"
+        },
+        {
+          "$ref": "#/definitions/ConfluentBootstrapServer"
+        },
+        {
+          "$ref": "#/definitions/SelfHostedServer"
+        },
+        {
+          "$ref": "#/definitions/ConfluentSchemaRegistry"
+        }
+      ],
+      "properties": {},
+      "description": "The target service properties"
+    },
+    "ValueSecretInfo": {
+      "type": "object",
+      "properties": {
+        "secretType": {
+          "type": "string",
+          "enum": [
+            "rawValue"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "description": "The actual value of the secret."
+        }
+      },
+      "required": [
+        "secretType"
+      ],
+      "description": "The secret info when type is rawValue. It's for scenarios that user input the secret."
+    },
+    "VNetSolution": {
+      "type": "object",
+      "properties": {
+        "deleteOrUpdateBehavior": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Default",
+                "ForcedCleanup"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates whether to clean up previous operation when Linker is updating or deleting."
+        },
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "serviceEndpoint",
+                "privateLink"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Type of VNet solution."
+        }
+      },
+      "description": "The VNet solution for linker"
+    }
+  }
+}

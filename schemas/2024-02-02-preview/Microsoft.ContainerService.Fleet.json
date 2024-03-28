@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2023-06-15-preview/Microsoft.ContainerService.Fleet.json#",
+  "id": "https://schema.management.azure.com/schemas/2024-02-02-preview/Microsoft.ContainerService.Fleet.json#",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.ContainerService",
   "description": "Microsoft ContainerService Resource Types",
@@ -10,7 +10,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2023-06-15-preview"
+            "2024-02-02-preview"
           ]
         },
         "identity": {
@@ -62,6 +62,9 @@
               },
               {
                 "$ref": "#/definitions/fleets_updateRuns_childResource"
+              },
+              {
+                "$ref": "#/definitions/fleets_updateStrategies_childResource"
               }
             ]
           }
@@ -103,7 +106,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2023-06-15-preview"
+            "2024-02-02-preview"
           ]
         },
         "name": {
@@ -152,7 +155,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2023-06-15-preview"
+            "2024-02-02-preview"
           ]
         },
         "name": {
@@ -194,6 +197,55 @@
         "type"
       ],
       "description": "Microsoft.ContainerService/fleets/updateRuns"
+    },
+    "fleets_updateStrategies": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2024-02-02-preview"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$",
+              "minLength": 1,
+              "maxLength": 50
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the UpdateStrategy resource."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/FleetUpdateStrategyProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties of the UpdateStrategy."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ContainerService/fleets/updateStrategies"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.ContainerService/fleets/updateStrategies"
     }
   },
   "definitions": {
@@ -204,6 +256,10 @@
           "type": "string",
           "format": "arm-id",
           "description": "A type definition that refers the id to an Azure Resource Manager resource."
+        },
+        "vmSize": {
+          "type": "string",
+          "description": "The virtual machine size of the Fleet hub."
         }
       },
       "description": "Agent profile for the Fleet hub."
@@ -334,7 +390,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2023-06-15-preview"
+            "2024-02-02-preview"
           ]
         },
         "name": {
@@ -383,7 +439,7 @@
         "apiVersion": {
           "type": "string",
           "enum": [
-            "2023-06-15-preview"
+            "2024-02-02-preview"
           ]
         },
         "name": {
@@ -425,6 +481,75 @@
         "type"
       ],
       "description": "Microsoft.ContainerService/fleets/updateRuns"
+    },
+    "fleets_updateStrategies_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2024-02-02-preview"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$",
+              "minLength": 1,
+              "maxLength": 50
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name of the UpdateStrategy resource."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/FleetUpdateStrategyProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The properties of the UpdateStrategy."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "updateStrategies"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.ContainerService/fleets/updateStrategies"
+    },
+    "FleetUpdateStrategyProperties": {
+      "type": "object",
+      "properties": {
+        "strategy": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/UpdateRunStrategy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Defines the update sequence of the clusters via stages and groups.\n\nStages within a run are executed sequentially one after another.\nGroups within a stage are executed in parallel.\nMember clusters within a group are updated sequentially one after another.\n\nA valid strategy contains no duplicate groups within or across stages."
+        }
+      },
+      "required": [
+        "strategy"
+      ],
+      "description": "The properties of the UpdateStrategy."
     },
     "ManagedClusterUpdate": {
       "type": "object",
@@ -469,7 +594,8 @@
               "type": "string",
               "enum": [
                 "Full",
-                "NodeImageOnly"
+                "NodeImageOnly",
+                "ControlPlaneOnly"
               ]
             },
             {
@@ -595,6 +721,11 @@
             }
           ],
           "description": "Defines the update sequence of the clusters via stages and groups.\n\nStages within a run are executed sequentially one after another.\nGroups within a stage are executed in parallel.\nMember clusters within a group are updated sequentially one after another.\n\nA valid strategy contains no duplicate groups within or across stages."
+        },
+        "updateStrategyId": {
+          "type": "string",
+          "format": "arm-id",
+          "description": "A type definition that refers the id to an Azure Resource Manager resource."
         }
       },
       "required": [

@@ -103,7 +103,7 @@ export async function prepareReadme(readme: string, autoGenConfig: AutoGenConfig
 
     let readmeTag = {} as ReadmeTag;
     for (const inputFile of fileSet) {
-        const pathComponents = inputFile.split(path.sep);
+        const pathComponents = inputFile.split("/");
 
         if (!autoGenConfig.useNamespaceFromConfig &&
             !lowerCaseContains(pathComponents, autoGenConfig.namespace)) {

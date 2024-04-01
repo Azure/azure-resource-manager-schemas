@@ -8,7 +8,7 @@ OUTPUT_PATH=$2
 
 pushd generator
 
-echo "npm run generate-all -- --local-path $LOCAL_PATH --readme-files $README_FILES --output-path $OUTPUT_PATH"
-npm run generate-all -- --local-path $LOCAL_PATH --readme-files $README_FILES --output-path $OUTPUT_PATH
+echo "npm run generate-all -- --specs-dir $LOCAL_PATH --readme-files $README_FILES --output-path $OUTPUT_PATH"
+npm run generate-all -- --specs-dir $LOCAL_PATH --readme-files $README_FILES --output-path $OUTPUT_PATH
 
 popd

@@ -1,7 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import path from 'path';
-import { cloneGitRepo } from './git';
 import { findRecursive, lowerCaseContains } from './utils';
 import { ReadmeTag, AutoGenConfig, CodeBlock } from './models';
 import * as constants from './constants'
@@ -18,25 +17,19 @@ export async function resolveAbsolutePath(localPath: string) {
     return path.resolve(constants.generatorRoot, localPath);
 }
 
-export function validateAndReturnReadmePath(localPath: string, basePath: string) {
+export function validateAndReturnReadmePath(specsPath: string, basePath: string) {
     let readme = '';
     if (basePath.toLowerCase().endsWith('readme.md')) {
-        readme = path.resolve(localPath, basePath);
+        readme = path.resolve(specsPath, basePath);
     } else {
-        readme = path.resolve(localPath, 'specification', basePath, 'readme.md')
+        readme = path.resolve(specsPath, 'specification', basePath, 'readme.md')
     }
 
     if (!existsSync(readme)) {
-        throw new Error(`Unable to find readme '${readme}' in specs repo`);
+        throw new Error(`Unable to find a readme under '${specsPath}' for base path '${basePath}'.`);
     }
 
     return readme;
-}
-
-export async function cloneAndGenerateBasePaths(localPath: string, remoteUri: string, commitHash: string) {
-    await cloneGitRepo(localPath, remoteUri, commitHash);
-
-    return await generateBasePaths(localPath);
 }
 
 export async function generateBasePaths(localPath: string) {

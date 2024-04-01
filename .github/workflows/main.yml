@@ -9,15 +9,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2.3.5
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3.5.0
+        uses: actions/setup-node@v4
         with:
           node-version: 16.x
 
       - name: Setup .NET Core
-        uses: actions/setup-dotnet@v3.0.0
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '5.0.x'
 
@@ -42,10 +43,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2.3.5
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3.5.0
+        uses: actions/setup-node@v4
         with:
           node-version: 16.x
       
@@ -59,40 +61,4 @@ jobs:
 
       - name: Build
         run: npm run build
-        working-directory: ./generator
-
-  automerge:
-    runs-on: ubuntu-latest
-    needs: schema-tests
-    env:
-      PR_PREFIX: sdkAuto/
-    if: ${{ github.event.pull_request.user.login == 'azure-sdk' }}
-    steps:
-      - uses: actions/checkout@v2.3.5
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3.5.0
-        with:
-          node-version: 16.x
-
-      - name: Install NPM modules
-        run: npm ci
-        working-directory: ./generator
-
-      - name: Check RP in Autogenlist
-        run: |
-          check_result='';
-          exec=$(npm run find-basepath ${{ github.head_ref }} $PR_PREFIX); 
-          while read line; 
-          do
-            # overriding check_result until the last line is read, last line contains
-            # the result to whether or not the basepath was found in autogenlist.
-            check_result=$line; 
-            echo $check_result;
-          done <<< "$exec";
-          
-          if [ $check_result == 'false' ] ; then
-            echo "Base path: '$basePath' not onboarded for autogeneration" 1>&2
-            exit 1
-          fi
         working-directory: ./generator

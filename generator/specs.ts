@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import path from 'path';
-import { cloneGitRepo } from './git';
-import { findRecursive, lowerCaseEquals } from './utils';
+import { findRecursive, lowerCaseContains } from './utils';
 import { ReadmeTag, AutoGenConfig, CodeBlock } from './models';
 import * as constants from './constants'
 import * as cm from '@ts-common/commonmark-to-markdown'
 import * as yaml from 'js-yaml'
 import { existsSync } from 'fs';
 import { readFile, writeFile } from 'fs/promises';
+import { apiVersionRegex } from './generate';
 
 export async function resolveAbsolutePath(localPath: string) {
     if (path.isAbsolute(localPath)) {
@@ -17,25 +17,19 @@ export async function resolveAbsolutePath(localPath: string) {
     return path.resolve(constants.generatorRoot, localPath);
 }
 
-export function validateAndReturnReadmePath(localPath: string, basePath: string) {
+export function validateAndReturnReadmePath(specsPath: string, basePath: string) {
     let readme = '';
     if (basePath.toLowerCase().endsWith('readme.md')) {
-        readme = path.resolve(localPath, basePath);
+        readme = path.resolve(specsPath, basePath);
     } else {
-        readme = path.resolve(localPath, 'specification', basePath, 'readme.md')
+        readme = path.resolve(specsPath, 'specification', basePath, 'readme.md')
     }
 
     if (!existsSync(readme)) {
-        throw new Error(`Unable to find readme '${readme}' in specs repo`);
+        throw new Error(`Unable to find a readme under '${specsPath}' for base path '${basePath}'.`);
     }
 
     return readme;
-}
-
-export async function cloneAndGenerateBasePaths(localPath: string, remoteUri: string, commitHash: string) {
-    await cloneGitRepo(localPath, remoteUri, commitHash);
-
-    return await generateBasePaths(localPath);
 }
 
 export async function generateBasePaths(localPath: string) {
@@ -76,7 +70,7 @@ function isExcludedBasePath(basePath: string) {
         .some(prefix => basePath.toLowerCase().startsWith(prefix));
 }
 
-export async function prepareReadme(readme: string, autoGenConfig?: AutoGenConfig) {
+export async function prepareReadme(readme: string, autoGenConfig: AutoGenConfig) {
     const content = (await readFile(readme)).toString();
     const markdownEx = cm.parse(content);
     const fileSet = new Set<string>();
@@ -101,21 +95,24 @@ export async function prepareReadme(readme: string, autoGenConfig?: AutoGenConfi
     }
 
     let readmeTag = {} as ReadmeTag;
-    fileSet.forEach(inputFile => {
-        const match = constants.pathRegex.exec(inputFile);
-        if (match) {
-            const mNamespace = match[1];
-            const mApiVersion = match[2];
-            if (!autoGenConfig || lowerCaseEquals(mNamespace, autoGenConfig.namespace)) {
-                if (!readmeTag[mApiVersion]) {
-                    readmeTag[mApiVersion] = [];
-                }
-                readmeTag[mApiVersion].push(inputFile);
-            }
-        }
-    });
+    for (const inputFile of fileSet) {
+        const pathComponents = inputFile.split("/");
 
-    if (autoGenConfig?.readmeTag) {
+        if (!autoGenConfig.useNamespaceFromConfig &&
+            !lowerCaseContains(pathComponents, autoGenConfig.namespace)) {
+            continue;
+        }
+
+        const apiVersion = pathComponents.filter(p => p.match(apiVersionRegex) !== null)[0];
+        if (!apiVersion) {
+            continue;
+        }
+
+        readmeTag[apiVersion] ??= readmeTag[apiVersion] || [];
+        readmeTag[apiVersion].push(inputFile);
+    }
+
+    if (autoGenConfig.readmeTag) {
         readmeTag = {...readmeTag, ...autoGenConfig.readmeTag };
     }
 

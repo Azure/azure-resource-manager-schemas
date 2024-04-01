@@ -1,0 +1,61 @@
+name: Generate Single
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_specs_ref:
+        description: 'Git ref or full SHA for https://github.com/Azure/azure-rest-api-specs.'
+        required: true
+        default: 'main'
+      single_path:
+        description: 'The path to generate types for (e.g. "compute/resource-manager", or "keyvault/resource-manager").'
+        required: true
+
+jobs:
+  update-schemas:
+    name: Update Schemas
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Clone azure-rest-api-specs
+        uses: actions/checkout@v3
+        with:
+          repository: Azure/azure-rest-api-specs
+          path: workflow-temp/azure-rest-api-specs
+          ref: ${{ github.event.inputs.api_specs_ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 16.x
+      
+      - name: Install generator npm packages
+        run: npm ci
+        working-directory: generator
+
+      - name: Run generator
+        run: |
+          npm run generate-single -- \
+            --specs-dir "$GITHUB_WORKSPACE/workflow-temp/azure-rest-api-specs" \
+            --base-path '${{ github.event.inputs.single_path }}'
+        working-directory: generator
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          signoff: false
+          branch: autogenerate-${{ github.event.inputs.single_path }}
+          delete-branch: true
+          title: |
+            Update Generated Schemas (${{ github.event.inputs.single_path }})
+          body:  |
+            Update Generated Schemas (${{ github.event.inputs.single_path }})
+          commit-message: |
+            Update Generated Schemas (${{ github.event.inputs.single_path }})
+          labels: autogenerate
+          draft: false

@@ -1,5 +1,8 @@
 # azure-resource-manager-schemas 
 
+> [!WARNING]
+> ## The schemas in this repository are designed for best-effort validation, and should NOT be relied upon for accuracy or programmatic consumption. If you have a current (or potential new) dependency that you would like to discuss alternatives for, please raise an issue.
+
 This is the repo for template deployment schemas hosted under `https://schema.management.azure.com/schemas`. Please see below for information on contributing and publishing updated schemas.
 
 ## Updating Schemas
@@ -21,17 +24,18 @@ Please see [generator/autogenlist.ts](/generator/autogenlist.ts) for the list of
 You can use the generator in this repo to automatically generate a schema from a swagger spec checked into the [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) repo.
 
 #### Generating locally
+1. Clone [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs).
 1. Fork this repo, and clone it locally.
-2. Run the following commands (replace the base path accordingly - valid paths can be disovered with `npm run list-basepaths`):
+1. Run the following commands (replace the base path accordingly - valid paths can be disovered with `npm run list-basepaths -- --specs-dir path/to/azure-rest-api-specs`):
 ```bash
 cd generator
 npm install
-npm run generate-single -- --base-path myprovider/resource-manager
+npm run generate-single -- --specs-dir path/to/azure-rest-api-specs --base-path myprovider/resource-manager
 ```
-4. Review the generator logs to ensure no errors, and review the changes generated.
-5. Ensure that you have reviewed the guidelines under [Submitting a PR](#submitting-a-pr).
-6. Generate a commit and push it to your fork.
-7. Submit a pull request to this repo. Please include the full command output in a PR comment.
+1. Review the generator logs to ensure no errors, and review the changes generated.
+1. Ensure that you have reviewed the guidelines under [Submitting a PR](#submitting-a-pr).
+1. Generate a commit and push it to your fork.
+1. Submit a pull request to this repo. Please include the full command output in a PR comment.
 
 Alternatively, you can hand-author your schema, but **please note** that this process is error-prone, and ARM will not be responsible for reviewing for accuracy when validating your PR.
 

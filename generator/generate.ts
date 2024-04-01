@@ -2,15 +2,15 @@
 // Licensed under the MIT License.
 import path from 'path';
 import os from 'os';
-import { findRecursive, findDirRecursive, executeCmd, rmdirRecursive, lowerCaseCompare, lowerCaseCompareLists, lowerCaseStartsWith, readJsonFile, writeJsonFile, safeMkdir, safeUnlink, fileExists, lowerCaseEquals, lowerCaseContains } from './utils';
+import { findRecursive, findDirRecursive, executeCmd, rmdirRecursive, lowerCaseCompare, lowerCaseCompareLists, lowerCaseStartsWith, readJsonFile, writeJsonFile, safeMkdir, safeUnlink, fileExists, lowerCaseEquals } from './utils';
 import * as constants from './constants';
 import { prepareReadme } from './specs';
-import chalk from 'chalk';
+import colors from 'colors';
 import { ScopeType, AutoGenConfig } from './models';
-import { get, set, flatten, uniq, concat, Dictionary, groupBy, keys, difference, pickBy } from 'lodash';
+import { get, set, flatten, uniq, concat, Dictionary, groupBy, keys, difference } from 'lodash';
 
 const autorestBinary = os.platform() === 'win32' ? 'autorest.cmd' : 'autorest';
-const apiVersionRegex = /^\d{4}-\d{2}-\d{2}(|-preview)$/;
+export const apiVersionRegex = /^\d{4}-\d{2}-\d{2}(|-preview)$/;
 
 export interface SchemaConfiguration {
     references: SchemaReference[];
@@ -35,26 +35,16 @@ const RootSchemaConfigs: Map<ScopeType, RootSchemaConfiguration> = new Map([
     [ScopeType.ManagementGroup, constants.managementGroupRootSchema]
 ]);
 
-export async function getApiVersionsByNamespace(readme: string): Promise<Dictionary<string[]>> {
+export async function detectProviderNamespaces(readme: string) {
     const searchPath = path.resolve(`${readme}/..`);
+
+    // To try and detect possible provider namespaces, assume a folder structure of <provider>/preview|stable/<api-version>/..., based on convention
     const apiVersionPaths = await findDirRecursive(searchPath, p => path.basename(p).match(apiVersionRegex) !== null);
-
-    const output: Dictionary<string[]> = {};
-    for (const [namespace, , apiVersion] of apiVersionPaths.map(p => path.relative(searchPath, p).split(path.sep))) {
-        output[namespace] = [...(output[namespace] ?? []), apiVersion];
-    }
-
-    return output;
+    return uniq(apiVersionPaths.map(p => path.relative(searchPath, p).split(path.sep)[0]));
 }
 
-export async function generateSchemas(readme: string, autoGenConfig?: AutoGenConfig): Promise<SchemaConfiguration[]> {
+export async function generateSchemas(readme: string, autoGenConfig: AutoGenConfig): Promise<SchemaConfiguration[]> {
     await prepareReadme(readme, autoGenConfig);
-
-    const apiVersionsByNamespace = pickBy(
-        await getApiVersionsByNamespace(readme),
-        (_, key) => !autoGenConfig || lowerCaseEquals(key, autoGenConfig.namespace));
-
-    const namespaces = keys(apiVersionsByNamespace);
 
     const schemaConfigs: SchemaConfiguration[] = [];
     const tmpFolder = path.join(os.tmpdir(), Math.random().toString(36).substr(2));
@@ -64,7 +54,7 @@ export async function generateSchemas(readme: string, autoGenConfig?: AutoGenCon
 
         for (const schemaPath of generatedSchemas) {
             const namespace = path.basename(schemaPath.substring(0, schemaPath.lastIndexOf(path.extname(schemaPath))));
-            if (!lowerCaseContains(namespaces, namespace)) {
+            if (!lowerCaseEquals(autoGenConfig.namespace, namespace)) {
                 continue;
             }
 
@@ -206,15 +196,15 @@ async function generateSchemaConfig(outputFile: string, namespace: string, apiVe
     const schemaPath = path.join(constants.schemasBasePath, relativePath);
 
     console.log('================================================================================================================================');
-    console.log('Filename: ' + chalk.green(schemaPath));
-    console.log('Provider Namespace: ' + chalk.green(namespace));
-    console.log('API Version: ' + chalk.green(apiVersion));
+    console.log('Filename: ' + colors.green(schemaPath));
+    console.log('Provider Namespace: ' + colors.green(namespace));
+    console.log('API Version: ' + colors.green(apiVersion));
 
     const tenantSchemaRefs = references.filter(x => x.scope & ScopeType.Tenant);
     if (tenantSchemaRefs.length > 0) {
         console.log('Resource Types (Tenant Scope):');
         for (const schemaRef of tenantSchemaRefs) {
-            console.log('- ' + chalk.green(schemaRef.type));
+            console.log('- ' + colors.green(schemaRef.type));
         }
     }
 
@@ -222,7 +212,7 @@ async function generateSchemaConfig(outputFile: string, namespace: string, apiVe
     if (managementGroupSchemaRefs.length > 0) {
         console.log('Resource Types (Management Group Scope):');
         for (const schemaRef of managementGroupSchemaRefs) {
-            console.log('- ' + chalk.green(schemaRef.type));
+            console.log('- ' + colors.green(schemaRef.type));
         }
     }
 
@@ -230,7 +220,7 @@ async function generateSchemaConfig(outputFile: string, namespace: string, apiVe
     if (subscriptionSchemaRefs.length > 0) {
         console.log('Resource Types (Subscription Scope):');
         for (const schemaRef of subscriptionSchemaRefs) {
-            console.log('- ' + chalk.green(schemaRef.type));
+            console.log('- ' + colors.green(schemaRef.type));
         }
     }
 
@@ -238,7 +228,7 @@ async function generateSchemaConfig(outputFile: string, namespace: string, apiVe
     if (resourceGroupSchemaRefs.length > 0) {
         console.log('Resource Types (Resource Group Scope):');
         for (const schemaRef of resourceGroupSchemaRefs) {
-            console.log('- ' + chalk.green(schemaRef.type));
+            console.log('- ' + colors.green(schemaRef.type));
         }
     }
 
@@ -246,7 +236,7 @@ async function generateSchemaConfig(outputFile: string, namespace: string, apiVe
     if (extensionSchemaRefs.length > 0) {
         console.log('Resource Types (Extension Scope):');
         for (const schemaRef of extensionSchemaRefs) {
-            console.log('- ' + chalk.green(schemaRef.type));
+            console.log('- ' + colors.green(schemaRef.type));
         }
     }
 
@@ -254,7 +244,7 @@ async function generateSchemaConfig(outputFile: string, namespace: string, apiVe
     if (unknownSchemaRefs.length > 0) {
         console.log('Resource Types (Unknown Scope):');
         for (const schemaRef of unknownSchemaRefs) {
-            console.log('- ' + chalk.red(schemaRef.type));
+            console.log('- ' + colors.red(schemaRef.type));
         }
     }
 

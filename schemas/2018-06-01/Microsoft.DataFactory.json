@@ -86,6 +86,9 @@
               },
               {
                 "$ref": "#/definitions/factories_globalParameters_childResource"
+              },
+              {
+                "$ref": "#/definitions/factories_adfcdcs_childResource"
               }
             ]
           }
@@ -119,6 +122,55 @@
         "type"
       ],
       "description": "Microsoft.DataFactory/factories"
+    },
+    "factories_adfcdcs": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-06-01"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_][^<>*#.%&:\\\\+?/]*$",
+              "minLength": 1,
+              "maxLength": 260
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The change data capture name."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ChangeDataCapture"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A Azure Data Factory object which automatically detects data changes at the source and then sends the updated data to the destination."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.DataFactory/factories/adfcdcs"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.DataFactory/factories/adfcdcs"
     },
     "factories_credentials": {
       "type": "object",
@@ -4346,8 +4398,18 @@
           "description": "Name of the Function that the Azure Function Activity will call. Type: string (or Expression with resultType string)"
         },
         "headers": {
-          "type": "object",
-          "properties": {},
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
           "description": "Represents the headers that will be sent to the request. For example, to set the language and type on a request: \"headers\" : { \"Accept-Language\": \"en-us\", \"Content-Type\": \"application/json\" }. Type: string (or Expression with resultType string)."
         },
         "method": {
@@ -4430,7 +4492,7 @@
         "functionAppUrl": {
           "type": "object",
           "properties": {},
-          "description": "The endpoint of the Azure Function App. URL will be in the format https://<accountName>.azurewebsites.net."
+          "description": "The endpoint of the Azure Function App. URL will be in the format https://<accountName>.azurewebsites.net. Type: string (or Expression with resultType string)."
         },
         "functionKey": {
           "oneOf": [
@@ -4446,7 +4508,7 @@
         "resourceId": {
           "type": "object",
           "properties": {},
-          "description": "Allowed token audiences for azure function."
+          "description": "Allowed token audiences for azure function. Type: string (or Expression with resultType string)."
         }
       },
       "required": [
@@ -4760,7 +4822,7 @@
         "dataPathAssignments": {
           "type": "object",
           "properties": {},
-          "description": "Dictionary used for changing data path assignments without retraining. Values will be passed in the dataPathAssignments property of the published pipeline execution request. Type: object with key value pairs (or Expression with resultType object)."
+          "description": "Dictionary used for changing data path assignments without retraining. Values will be passed in the dataPathAssignments property of the published pipeline execution request. Type: object (or Expression with resultType object)."
         },
         "experimentName": {
           "type": "object",
@@ -4913,6 +4975,11 @@
     "AzureMLServiceLinkedServiceTypeProperties": {
       "type": "object",
       "properties": {
+        "authentication": {
+          "type": "object",
+          "properties": {},
+          "description": "Type of authentication (Required to specify MSI) used to connect to AzureML. Type: string (or Expression with resultType string)."
+        },
         "encryptedCredential": {
           "type": "string",
           "description": "The encrypted credential used for authentication. Credentials are encrypted using the integration runtime credential manager. Type: string."
@@ -5939,7 +6006,7 @@
         "partitionOption": {
           "type": "object",
           "properties": {},
-          "description": "The partition mechanism that will be used for Sql read in parallel. Possible values include: \"None\", \"PhysicalPartitionsOfTable\", \"DynamicRange\"."
+          "description": "The partition mechanism that will be used for Sql read in parallel. Possible values include: \"None\", \"PhysicalPartitionsOfTable\", \"DynamicRange\". Type: string (or Expression with resultType string)."
         },
         "partitionSettings": {
           "oneOf": [
@@ -6914,6 +6981,96 @@
       ],
       "description": "Chaining Trigger properties."
     },
+    "ChangeDataCapture": {
+      "type": "object",
+      "properties": {
+        "allowVNetOverride": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A boolean to determine if the vnet configuration needs to be overwritten."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the change data capture."
+        },
+        "folder": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ChangeDataCaptureFolder"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The folder that this CDC is in. If not specified, CDC will appear at the root level."
+        },
+        "policy": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MapperPolicy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "CDC Policy."
+        },
+        "sourceConnectionsInfo": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MapperSourceConnectionsInfo"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of sources connections that can be used as sources in the CDC."
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the CDC as to if it is running or stopped."
+        },
+        "targetConnectionsInfo": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MapperTargetConnectionsInfo"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of target connections that can be used as sources in the CDC."
+        }
+      },
+      "required": [
+        "policy",
+        "sourceConnectionsInfo",
+        "targetConnectionsInfo"
+      ],
+      "description": "A Azure Data Factory object which automatically detects data changes at the source and then sends the updated data to the destination."
+    },
+    "ChangeDataCaptureFolder": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the folder that this CDC is in."
+        }
+      },
+      "description": "The folder that this CDC is in. If not specified, CDC will appear at the root level."
+    },
     "CmdkeySetup": {
       "type": "object",
       "properties": {
@@ -6958,12 +7115,12 @@
         "targetName": {
           "type": "object",
           "properties": {},
-          "description": "The server name of data source access."
+          "description": "The server name of data source access. Type: string."
         },
         "userName": {
           "type": "object",
           "properties": {},
-          "description": "The user name of data source access."
+          "description": "The user name of data source access. Type: string."
         }
       },
       "required": [
@@ -7728,6 +7885,9 @@
           "$ref": "#/definitions/AzureDatabricksDeltaLakeSink"
         },
         {
+          "$ref": "#/definitions/WarehouseSink"
+        },
+        {
           "$ref": "#/definitions/SapCloudForCustomerSink"
         },
         {
@@ -7776,6 +7936,9 @@
           "$ref": "#/definitions/SnowflakeSink"
         },
         {
+          "$ref": "#/definitions/SnowflakeV2Sink"
+        },
+        {
           "$ref": "#/definitions/OracleSink"
         },
         {
@@ -7822,6 +7985,15 @@
         },
         {
           "$ref": "#/definitions/CosmosDbMongoDbApiSink"
+        },
+        {
+          "$ref": "#/definitions/LakeHouseTableSink"
+        },
+        {
+          "$ref": "#/definitions/SalesforceV2Sink"
+        },
+        {
+          "$ref": "#/definitions/SalesforceServiceCloudV2Sink"
         }
       ],
       "properties": {
@@ -7980,13 +8152,22 @@
           "$ref": "#/definitions/HttpSource"
         },
         {
+          "$ref": "#/definitions/LakeHouseTableSource"
+        },
+        {
           "$ref": "#/definitions/SnowflakeSource"
+        },
+        {
+          "$ref": "#/definitions/SnowflakeV2Source"
         },
         {
           "$ref": "#/definitions/AzureDatabricksDeltaLakeSource"
         },
         {
           "$ref": "#/definitions/SharePointOnlineListSource"
+        },
+        {
+          "$ref": "#/definitions/SalesforceServiceCloudV2Source"
         }
       ],
       "properties": {
@@ -9396,6 +9577,47 @@
       ],
       "description": "DataLakeAnalyticsU-SQL activity properties."
     },
+    "DataMapperMapping": {
+      "type": "object",
+      "properties": {
+        "attributeMappingInfo": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MapperAttributeMappings"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Attribute mapping details."
+        },
+        "sourceConnectionReference": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MapperConnectionReference"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Source or target connection reference details."
+        },
+        "sourceDenormalizeInfo": {
+          "type": "object",
+          "properties": {},
+          "description": "This holds the source denormalization information used while joining multiple sources."
+        },
+        "sourceEntityName": {
+          "type": "string",
+          "description": "Name of the source table"
+        },
+        "targetEntityName": {
+          "type": "string",
+          "description": "Name of the target table"
+        }
+      },
+      "description": "Source and target table mapping details."
+    },
     "Dataset": {
       "type": "object",
       "oneOf": [
@@ -9523,6 +9745,9 @@
           "$ref": "#/definitions/PostgreSqlTableDataset"
         },
         {
+          "$ref": "#/definitions/PostgreSqlV2TableDataset"
+        },
+        {
           "$ref": "#/definitions/MicrosoftAccessTableDataset"
         },
         {
@@ -9593,6 +9818,9 @@
         },
         {
           "$ref": "#/definitions/GoogleBigQueryObjectDataset"
+        },
+        {
+          "$ref": "#/definitions/GoogleBigQueryV2ObjectDataset"
         },
         {
           "$ref": "#/definitions/GreenplumTableDataset"
@@ -9682,10 +9910,28 @@
           "$ref": "#/definitions/SnowflakeDataset"
         },
         {
+          "$ref": "#/definitions/SnowflakeV2Dataset"
+        },
+        {
           "$ref": "#/definitions/SharePointOnlineListResourceDataset"
         },
         {
           "$ref": "#/definitions/AzureDatabricksDeltaLakeDataset"
+        },
+        {
+          "$ref": "#/definitions/LakeHouseTableDataset"
+        },
+        {
+          "$ref": "#/definitions/SalesforceV2ObjectDataset"
+        },
+        {
+          "$ref": "#/definitions/SalesforceServiceCloudV2ObjectDataset"
+        },
+        {
+          "$ref": "#/definitions/WarehouseTableDataset"
+        },
+        {
+          "$ref": "#/definitions/ServiceNowV2ObjectDataset"
         }
       ],
       "properties": {
@@ -9863,6 +10109,9 @@
         },
         {
           "$ref": "#/definitions/HdfsLocation"
+        },
+        {
+          "$ref": "#/definitions/LakeHouseLocation"
         }
       ],
       "properties": {
@@ -12470,6 +12719,100 @@
       ],
       "description": "Azure Data Factory expression definition."
     },
+    "ExpressionV2": {
+      "type": "object",
+      "properties": {
+        "operands": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ExpressionV2"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of nested expressions."
+        },
+        "operator": {
+          "type": "string",
+          "description": "Expression operator value Type: string."
+        },
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Constant",
+                "Field",
+                "Unary",
+                "Binary"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Type of expressions supported by the system. Type: string."
+        },
+        "value": {
+          "type": "string",
+          "description": "Value for Constant/Field Type: string."
+        }
+      },
+      "description": "Nested representation of a complex expression."
+    },
+    "factories_adfcdcs_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2018-06-01"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_][^<>*#.%&:\\\\+?/]*$",
+              "minLength": 1,
+              "maxLength": 260
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The change data capture name."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ChangeDataCapture"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A Azure Data Factory object which automatically detects data changes at the source and then sends the updated data to the destination."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "adfcdcs"
+          ]
+        }
+      },
+      "required": [
+        "apiVersion",
+        "name",
+        "properties",
+        "type"
+      ],
+      "description": "Microsoft.DataFactory/factories/adfcdcs"
+    },
     "factories_credentials_childResource": {
       "type": "object",
       "properties": {
@@ -13789,6 +14132,9 @@
       "type": "object",
       "oneOf": [
         {
+          "$ref": "#/definitions/ParquetReadSettings"
+        },
+        {
           "$ref": "#/definitions/DelimitedTextReadSettings"
         },
         {
@@ -14199,7 +14545,7 @@
         "connectionProperties": {
           "type": "object",
           "properties": {},
-          "description": "Properties used to connect to GoogleAds. It is mutually exclusive with any other properties in the linked service. Type: object."
+          "description": "(Deprecated) Properties used to connect to GoogleAds. It is mutually exclusive with any other properties in the linked service. Type: object."
         },
         "developerToken": {
           "oneOf": [
@@ -14221,10 +14567,31 @@
           "type": "string",
           "description": "The encrypted credential used for authentication. Credentials are encrypted using the integration runtime credential manager. Type: string."
         },
+        "googleAdsApiVersion": {
+          "type": "object",
+          "properties": {},
+          "description": "The Google Ads API major version such as v14. The supported major versions could be found on https://developers.google.com/google-ads/api/docs/release-notes. Type: string (or Expression with resultType string)."
+        },
         "keyFilePath": {
           "type": "object",
           "properties": {},
-          "description": "The full path to the .p12 key file that is used to authenticate the service account email address and can only be used on self-hosted IR. Type: string (or Expression with resultType string)."
+          "description": "(Deprecated) The full path to the .p12 key file that is used to authenticate the service account email address and can only be used on self-hosted IR. Type: string (or Expression with resultType string)."
+        },
+        "loginCustomerID": {
+          "type": "object",
+          "properties": {},
+          "description": "The customer ID of the Google Ads Manager account through which you want to fetch report data of specific Customer. Type: string (or Expression with resultType string)."
+        },
+        "privateKey": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The base definition of a secret type."
         },
         "refreshToken": {
           "oneOf": [
@@ -14237,15 +14604,20 @@
           ],
           "description": "The base definition of a secret type."
         },
+        "supportLegacyDataTypes": {
+          "type": "object",
+          "properties": {},
+          "description": "Specifies whether to use the legacy data type mappings, which maps float, int32 and int64 from Google to string. Do not set this to true unless you want to keep backward compatibility with legacy driver's data type mappings. Type: boolean (or Expression with resultType boolean)."
+        },
         "trustedCertPath": {
           "type": "object",
           "properties": {},
-          "description": "The full path of the .pem file containing trusted CA certificates for verifying the server when connecting over SSL. This property can only be set when using SSL on self-hosted IR. The default value is the cacerts.pem file installed with the IR. Type: string (or Expression with resultType string)."
+          "description": "(Deprecated) The full path of the .pem file containing trusted CA certificates for verifying the server when connecting over SSL. This property can only be set when using SSL on self-hosted IR. The default value is the cacerts.pem file installed with the IR. Type: string (or Expression with resultType string)."
         },
         "useSystemTrustStore": {
           "type": "object",
           "properties": {},
-          "description": "Specifies whether to use a CA certificate from the system trust store or from a specified PEM file. The default value is false. Type: boolean (or Expression with resultType boolean)."
+          "description": "(Deprecated) Specifies whether to use a CA certificate from the system trust store or from a specified PEM file. The default value is false. Type: boolean (or Expression with resultType boolean)."
         }
       },
       "description": "Google AdWords service linked service properties."
@@ -14473,6 +14845,167 @@
           "type": "string",
           "enum": [
             "GoogleBigQuerySource"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "A copy activity Google BigQuery service source."
+    },
+    "GoogleBigQueryV2DatasetTypeProperties": {
+      "type": "object",
+      "properties": {
+        "dataset": {
+          "type": "object",
+          "properties": {},
+          "description": "The database name of the Google BigQuery. Type: string (or Expression with resultType string)."
+        },
+        "table": {
+          "type": "object",
+          "properties": {},
+          "description": "The table name of the Google BigQuery. Type: string (or Expression with resultType string)."
+        }
+      },
+      "description": "Google BigQuery Dataset Properties"
+    },
+    "GoogleBigQueryV2LinkedService": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "GoogleBigQueryV2"
+          ]
+        },
+        "typeProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/GoogleBigQueryV2LinkedServiceTypeProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Google BigQuery service linked service properties."
+        }
+      },
+      "required": [
+        "type",
+        "typeProperties"
+      ],
+      "description": "Google BigQuery service linked service."
+    },
+    "GoogleBigQueryV2LinkedServiceTypeProperties": {
+      "type": "object",
+      "properties": {
+        "authenticationType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "ServiceAuthentication",
+                "UserAuthentication"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The OAuth 2.0 authentication mechanism used for authentication."
+        },
+        "clientId": {
+          "type": "object",
+          "properties": {},
+          "description": "The client id of the google application used to acquire the refresh token. Type: string (or Expression with resultType string)."
+        },
+        "clientSecret": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The base definition of a secret type."
+        },
+        "encryptedCredential": {
+          "type": "string",
+          "description": "The encrypted credential used for authentication. Credentials are encrypted using the integration runtime credential manager. Type: string."
+        },
+        "keyFileContent": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The base definition of a secret type."
+        },
+        "projectId": {
+          "type": "object",
+          "properties": {},
+          "description": "The default BigQuery project id to query against. Type: string (or Expression with resultType string)."
+        },
+        "refreshToken": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The base definition of a secret type."
+        }
+      },
+      "required": [
+        "authenticationType",
+        "projectId"
+      ],
+      "description": "Google BigQuery service linked service properties."
+    },
+    "GoogleBigQueryV2ObjectDataset": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "GoogleBigQueryV2Object"
+          ]
+        },
+        "typeProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/GoogleBigQueryV2DatasetTypeProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Google BigQuery Dataset Properties"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Google BigQuery service dataset."
+    },
+    "GoogleBigQueryV2Source": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {},
+          "description": "A query to retrieve data from source. Type: string (or Expression with resultType string)."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "GoogleBigQueryV2Source"
           ]
         }
       },
@@ -15568,7 +16101,7 @@
         "clusterSize": {
           "type": "object",
           "properties": {},
-          "description": "Number of worker/data nodes in the cluster. Suggestion value: 4. Type: string (or Expression with resultType string)."
+          "description": "Number of worker/data nodes in the cluster. Suggestion value: 4. Type: int (or Expression with resultType int)."
         },
         "clusterSshPassword": {
           "oneOf": [
@@ -16499,7 +17032,7 @@
         "authHeaders": {
           "type": "object",
           "properties": {},
-          "description": "The additional HTTP headers in the request to RESTful API used for authorization. Type: object (or Expression with resultType object)."
+          "description": "The additional HTTP headers in the request to RESTful API used for authorization. Type: key value pairs (value should be string type)."
         },
         "certThumbprint": {
           "type": "object",
@@ -18122,6 +18655,277 @@
       },
       "description": "Json write settings."
     },
+    "LakeHouseLinkedService": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "LakeHouse"
+          ]
+        },
+        "typeProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/LakeHouseLinkedServiceTypeProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Microsoft Fabric LakeHouse linked service properties."
+        }
+      },
+      "required": [
+        "type",
+        "typeProperties"
+      ],
+      "description": "Microsoft Fabric LakeHouse linked service."
+    },
+    "LakeHouseLinkedServiceTypeProperties": {
+      "type": "object",
+      "properties": {
+        "artifactId": {
+          "type": "object",
+          "properties": {},
+          "description": "The ID of Microsoft Fabric LakeHouse artifact. Type: string (or Expression with resultType string)."
+        },
+        "encryptedCredential": {
+          "type": "string",
+          "description": "The encrypted credential used for authentication. Credentials are encrypted using the integration runtime credential manager. Type: string."
+        },
+        "servicePrincipalCredential": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The base definition of a secret type."
+        },
+        "servicePrincipalCredentialType": {
+          "type": "object",
+          "properties": {},
+          "description": "The service principal credential type to use in Server-To-Server authentication. 'ServicePrincipalKey' for key/secret, 'ServicePrincipalCert' for certificate. Type: string (or Expression with resultType string)."
+        },
+        "servicePrincipalId": {
+          "type": "object",
+          "properties": {},
+          "description": "The ID of the application used to authenticate against Microsoft Fabric LakeHouse. Type: string (or Expression with resultType string)."
+        },
+        "servicePrincipalKey": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The base definition of a secret type."
+        },
+        "tenant": {
+          "type": "object",
+          "properties": {},
+          "description": "The name or ID of the tenant to which the service principal belongs. Type: string (or Expression with resultType string)."
+        },
+        "workspaceId": {
+          "type": "object",
+          "properties": {},
+          "description": "The ID of Microsoft Fabric workspace. Type: string (or Expression with resultType string)."
+        }
+      },
+      "description": "Microsoft Fabric LakeHouse linked service properties."
+    },
+    "LakeHouseLocation": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "LakeHouseLocation"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "The location of Microsoft Fabric LakeHouse Files dataset."
+    },
+    "LakeHouseReadSettings": {
+      "type": "object",
+      "properties": {
+        "deleteFilesAfterCompletion": {
+          "type": "object",
+          "properties": {},
+          "description": "Indicates whether the source files need to be deleted after copy completion. Default is false. Type: boolean (or Expression with resultType boolean)."
+        },
+        "enablePartitionDiscovery": {
+          "type": "object",
+          "properties": {},
+          "description": "Indicates whether to enable partition discovery. Type: boolean (or Expression with resultType boolean)."
+        },
+        "fileListPath": {
+          "type": "object",
+          "properties": {},
+          "description": "Point to a text file that lists each file (relative path to the path configured in the dataset) that you want to copy. Type: string (or Expression with resultType string)."
+        },
+        "modifiedDatetimeEnd": {
+          "type": "object",
+          "properties": {},
+          "description": "The end of file's modified datetime. Type: string (or Expression with resultType string)."
+        },
+        "modifiedDatetimeStart": {
+          "type": "object",
+          "properties": {},
+          "description": "The start of file's modified datetime. Type: string (or Expression with resultType string)."
+        },
+        "partitionRootPath": {
+          "type": "object",
+          "properties": {},
+          "description": "Specify the root path where partition discovery starts from. Type: string (or Expression with resultType string)."
+        },
+        "recursive": {
+          "type": "object",
+          "properties": {},
+          "description": "If true, files under the folder path will be read recursively. Default is true. Type: boolean (or Expression with resultType boolean)."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "LakeHouseReadSettings"
+          ]
+        },
+        "wildcardFileName": {
+          "type": "object",
+          "properties": {},
+          "description": "Microsoft Fabric LakeHouse Files wildcardFileName. Type: string (or Expression with resultType string)."
+        },
+        "wildcardFolderPath": {
+          "type": "object",
+          "properties": {},
+          "description": "Microsoft Fabric LakeHouse Files wildcardFolderPath. Type: string (or Expression with resultType string)."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Microsoft Fabric LakeHouse Files read settings."
+    },
+    "LakeHouseTableDataset": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "LakeHouseTable"
+          ]
+        },
+        "typeProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/LakeHouseTableDatasetTypeProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Microsoft Fabric LakeHouse Table dataset properties."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Microsoft Fabric LakeHouse Table."
+    },
+    "LakeHouseTableDatasetTypeProperties": {
+      "type": "object",
+      "properties": {
+        "table": {
+          "type": "object",
+          "properties": {},
+          "description": "The name of Microsoft Fabric LakeHouse Table. Type: string (or Expression with resultType string)."
+        }
+      },
+      "description": "Microsoft Fabric LakeHouse Table dataset properties."
+    },
+    "LakeHouseTableSink": {
+      "type": "object",
+      "properties": {
+        "partitionNameList": {
+          "type": "object",
+          "properties": {},
+          "description": "Specify the partition column names from sink columns. Type: array of objects (or Expression with resultType array of objects)."
+        },
+        "partitionOption": {
+          "type": "object",
+          "properties": {},
+          "description": "Create partitions in folder structure based on one or multiple columns. Each distinct column value (pair) will be a new partition. Possible values include: \"None\", \"PartitionByKey\"."
+        },
+        "tableActionOption": {
+          "type": "object",
+          "properties": {},
+          "description": "The type of table action for LakeHouse Table sink. Possible values include: \"None\", \"Append\", \"Overwrite\"."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "LakeHouseTableSink"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "A copy activity for Microsoft Fabric LakeHouse Table sink."
+    },
+    "LakeHouseTableSource": {
+      "type": "object",
+      "properties": {
+        "additionalColumns": {
+          "type": "object",
+          "properties": {},
+          "description": "Specifies the additional columns to be added to source data. Type: array of objects(AdditionalColumns) (or Expression with resultType array of objects)."
+        },
+        "timestampAsOf": {
+          "type": "object",
+          "properties": {},
+          "description": "Query an older snapshot by timestamp. Type: string (or Expression with resultType string)."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "LakeHouseTableSource"
+          ]
+        },
+        "versionAsOf": {
+          "type": "object",
+          "properties": {},
+          "description": "Query an older snapshot by version. Type: integer (or Expression with resultType integer)."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "A copy activity source for Microsoft Fabric LakeHouse Table."
+    },
+    "LakeHouseWriteSettings": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "LakeHouseWriteSettings"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Microsoft Fabric LakeHouse Files write settings."
+    },
     "LicensedComponentSetupTypeProperties": {
       "type": "object",
       "properties": {
@@ -18296,6 +19100,9 @@
           "$ref": "#/definitions/PostgreSqlLinkedService"
         },
         {
+          "$ref": "#/definitions/PostgreSqlV2LinkedService"
+        },
+        {
           "$ref": "#/definitions/SybaseLinkedService"
         },
         {
@@ -18449,6 +19256,9 @@
           "$ref": "#/definitions/GoogleBigQueryLinkedService"
         },
         {
+          "$ref": "#/definitions/GoogleBigQueryV2LinkedService"
+        },
+        {
           "$ref": "#/definitions/GreenplumLinkedService"
         },
         {
@@ -18554,10 +19364,28 @@
           "$ref": "#/definitions/SnowflakeLinkedService"
         },
         {
+          "$ref": "#/definitions/SnowflakeV2LinkedService"
+        },
+        {
           "$ref": "#/definitions/SharePointOnlineListLinkedService"
         },
         {
           "$ref": "#/definitions/AzureSynapseArtifactsLinkedService"
+        },
+        {
+          "$ref": "#/definitions/LakeHouseLinkedService"
+        },
+        {
+          "$ref": "#/definitions/SalesforceV2LinkedService"
+        },
+        {
+          "$ref": "#/definitions/SalesforceServiceCloudV2LinkedService"
+        },
+        {
+          "$ref": "#/definitions/WarehouseLinkedService"
+        },
+        {
+          "$ref": "#/definitions/ServiceNowV2LinkedService"
         }
       ],
       "properties": {
@@ -19206,6 +20034,426 @@
       ],
       "description": "Managed Virtual Network reference type."
     },
+    "MapperAttributeMapping": {
+      "type": "object",
+      "properties": {
+        "attributeReference": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MapperAttributeReference"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Attribute reference details for the referred column."
+        },
+        "attributeReferences": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MapperAttributeReference"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of references for source columns. It is used for 'Derived' and 'Aggregate' type mappings only."
+        },
+        "expression": {
+          "type": "string",
+          "description": "Expression used for 'Aggregate' and 'Derived' type mapping."
+        },
+        "functionName": {
+          "type": "string",
+          "description": "Name of the function used for 'Aggregate' and 'Derived' (except 'Advanced') type mapping."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the target column."
+        },
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Direct",
+                "Derived",
+                "Aggregate"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Type of the CDC attribute mapping. Note: 'Advanced' mapping type is also saved as 'Derived'."
+        }
+      },
+      "description": "Source and target column mapping details."
+    },
+    "MapperAttributeMappings": {
+      "type": "object",
+      "properties": {
+        "attributeMappings": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MapperAttributeMapping"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of attribute mappings."
+        }
+      },
+      "description": "Attribute mapping details."
+    },
+    "MapperAttributeReference": {
+      "type": "object",
+      "properties": {
+        "entity": {
+          "type": "string",
+          "description": "Name of the table."
+        },
+        "entityConnectionReference": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MapperConnectionReference"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Source or target connection reference details."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the column."
+        }
+      },
+      "description": "Attribute reference details for the referred column."
+    },
+    "MapperConnection": {
+      "type": "object",
+      "properties": {
+        "commonDslConnectorProperties": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MapperDslConnectorProperties"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of name/value pairs for connection properties."
+        },
+        "isInlineDataset": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A boolean indicating whether linked service is of type inline dataset. Currently only inline datasets are supported."
+        },
+        "linkedService": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/LinkedServiceReference"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Linked service reference type."
+        },
+        "linkedServiceType": {
+          "type": "string",
+          "description": "Type of the linked service e.g.: AzureBlobFS."
+        },
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "linkedservicetype"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Type of connection via linked service or dataset."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Source connection details."
+    },
+    "MapperConnectionReference": {
+      "type": "object",
+      "properties": {
+        "connectionName": {
+          "type": "string",
+          "description": "Name of the connection"
+        },
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "linkedservicetype"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Type of connection via linked service or dataset."
+        }
+      },
+      "description": "Source or target connection reference details."
+    },
+    "MapperDslConnectorProperties": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the property."
+        },
+        "value": {
+          "type": "object",
+          "properties": {},
+          "description": "Value of the property."
+        }
+      },
+      "description": "Connector properties of a CDC table in terms of name / value pairs."
+    },
+    "MapperPolicy": {
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "description": "Mode of running the CDC: batch vs continuous."
+        },
+        "recurrence": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MapperPolicyRecurrence"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "CDC policy recurrence details."
+        }
+      },
+      "description": "CDC Policy."
+    },
+    "MapperPolicyRecurrence": {
+      "type": "object",
+      "properties": {
+        "frequency": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Hour",
+                "Minute",
+                "Second"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Frequency of period in terms of 'Hour', 'Minute' or 'Second'."
+        },
+        "interval": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Actual interval value as per chosen frequency."
+        }
+      },
+      "description": "CDC policy recurrence details."
+    },
+    "MapperSourceConnectionsInfo": {
+      "type": "object",
+      "properties": {
+        "connection": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MapperConnection"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Source connection details."
+        },
+        "sourceEntities": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MapperTable"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of source tables for a source connection."
+        }
+      },
+      "description": "A object which contains list of tables and connection details for a source connection."
+    },
+    "MapperTable": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the table."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MapperTableProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties for a CDC table."
+        }
+      },
+      "description": "CDC table details."
+    },
+    "MapperTableProperties": {
+      "type": "object",
+      "properties": {
+        "dslConnectorProperties": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MapperDslConnectorProperties"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of name/value pairs for connection properties."
+        },
+        "schema": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MapperTableSchema"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of columns for the source table."
+        }
+      },
+      "description": "Properties for a CDC table."
+    },
+    "MapperTableSchema": {
+      "type": "object",
+      "properties": {
+        "dataType": {
+          "type": "string",
+          "description": "Data type of the column."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the column."
+        }
+      },
+      "description": "Schema of a CDC table in terms of column names and their corresponding data types."
+    },
+    "MapperTargetConnectionsInfo": {
+      "type": "object",
+      "properties": {
+        "connection": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MapperConnection"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Source connection details."
+        },
+        "dataMapperMappings": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DataMapperMapping"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of table mappings."
+        },
+        "relationships": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {}
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of relationship info among the tables."
+        },
+        "targetEntities": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MapperTable"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of source tables for a target connection."
+        }
+      },
+      "description": "A object which contains list of tables and connection details for a target connection."
+    },
     "MappingDataFlow": {
       "type": "object",
       "properties": {
@@ -19333,11 +20581,21 @@
           "properties": {},
           "description": "An ODBC connection string. Type: string, SecureString or AzureKeyVaultSecretReference."
         },
+        "database": {
+          "type": "object",
+          "properties": {},
+          "description": "Database name for connection. Type: string."
+        },
+        "driverVersion": {
+          "type": "object",
+          "properties": {},
+          "description": "The version of the MariaDB driver. Type: string. V1 or empty for legacy driver, V2 for new driver. V1 can support connection string and property bag, V2 can only support connection string."
+        },
         "encryptedCredential": {
           "type": "string",
           "description": "The encrypted credential used for authentication. Credentials are encrypted using the integration runtime credential manager. Type: string."
         },
-        "pwd": {
+        "password": {
           "oneOf": [
             {
               "$ref": "#/definitions/AzureKeyVaultSecretReference"
@@ -19347,6 +20605,21 @@
             }
           ],
           "description": "Azure Key Vault secret reference."
+        },
+        "port": {
+          "type": "object",
+          "properties": {},
+          "description": "The port for the connection. Type: integer."
+        },
+        "server": {
+          "type": "object",
+          "properties": {},
+          "description": "Server name for connection. Type: string."
+        },
+        "username": {
+          "type": "object",
+          "properties": {},
+          "description": "Username for authentication. Type: string."
         }
       },
       "description": "MariaDB server linked service properties."
@@ -19776,10 +21049,10 @@
           "properties": {},
           "description": "The name of the MongoDB Atlas database that you want to access. Type: string (or Expression with resultType string)."
         },
-        "mongoDbAtlasDriverVersion": {
+        "driverVersion": {
           "type": "object",
           "properties": {},
-          "description": "The MongoDB Atlas Driver version that you want to choose. Allowed value are 2.10.4 and 2.19.0. Type: string (or Expression with resultType string)."
+          "description": "The driver version that you want to choose. Allowed value are v1 and v2. Type: string (or Expression with resultType string)."
         }
       },
       "required": [
@@ -20296,6 +21569,16 @@
           "properties": {},
           "description": "The connection string. Type: string, SecureString or AzureKeyVaultSecretReference."
         },
+        "database": {
+          "type": "object",
+          "properties": {},
+          "description": "Database name for connection. Type: string."
+        },
+        "driverVersion": {
+          "type": "object",
+          "properties": {},
+          "description": "The version of the MySQL driver. Type: string. V1 or empty for legacy driver, V2 for new driver. V1 can support connection string and property bag, V2 can only support connection string."
+        },
         "encryptedCredential": {
           "type": "string",
           "description": "The encrypted credential used for authentication. Credentials are encrypted using the integration runtime credential manager. Type: string."
@@ -20310,11 +21593,33 @@
             }
           ],
           "description": "Azure Key Vault secret reference."
+        },
+        "port": {
+          "type": "object",
+          "properties": {},
+          "description": "The port for the connection. Type: integer."
+        },
+        "server": {
+          "type": "object",
+          "properties": {},
+          "description": "Server name for connection. Type: string."
+        },
+        "sslMode": {
+          "type": "object",
+          "properties": {},
+          "description": "SSL mode for connection. Type: integer. 0: disable, 1: prefer, 2: require, 3: verify-ca, 4: verify-full."
+        },
+        "username": {
+          "type": "object",
+          "properties": {},
+          "description": "Username for authentication. Type: string."
+        },
+        "useSystemTrustStore": {
+          "type": "object",
+          "properties": {},
+          "description": "Use system trust store for connection. Type: integer. 0: enable, 1: disable."
         }
       },
-      "required": [
-        "connectionString"
-      ],
       "description": "MySQL linked service properties."
     },
     "MySqlSource": {
@@ -20630,7 +21935,7 @@
         "authHeaders": {
           "type": "object",
           "properties": {},
-          "description": "The additional HTTP headers in the request to RESTful API used for authorization. Type: object (or Expression with resultType object)."
+          "description": "The additional HTTP headers in the request to RESTful API used for authorization. Type: key value pairs (value should be string type)."
         },
         "azureCloudType": {
           "type": "object",
@@ -21068,7 +22373,7 @@
         "outputColumns": {
           "type": "object",
           "properties": {},
-          "description": "The columns to be read out from the Office 365 table. Type: array of objects (or Expression with resultType array of objects). Example: [ { \"name\": \"Id\" }, { \"name\": \"CreatedDateTime\" } ]"
+          "description": "The columns to be read out from the Office 365 table. Type: array of objects (or Expression with resultType array of objects). itemType: OutputColumn. Example: [ { \"name\": \"Id\" }, { \"name\": \"CreatedDateTime\" } ]"
         },
         "startTime": {
           "type": "object",
@@ -21850,6 +23155,48 @@
       ],
       "description": "The data stored in Parquet format."
     },
+    "ParquetReadSettings": {
+      "type": "object",
+      "properties": {
+        "additionalProperties": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "properties": {}
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Unmatched properties from the message are deserialized this collection"
+        },
+        "compressionProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CompressionReadSettings"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Compression read settings."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "ParquetReadSettings"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Parquet read settings."
+    },
     "ParquetSink": {
       "type": "object",
       "properties": {
@@ -21894,6 +23241,17 @@
           "type": "object",
           "properties": {},
           "description": "Specifies the additional columns to be added to source data. Type: array of objects(AdditionalColumns) (or Expression with resultType array of objects)."
+        },
+        "formatSettings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ParquetReadSettings"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Parquet read settings."
         },
         "storeSettings": {
           "oneOf": [
@@ -22402,6 +23760,32 @@
           ],
           "description": "Unmatched properties from the message are deserialized this collection"
         },
+        "numberOfExternalNodes": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Number of the the external nodes, which should be greater than 0 and less than 11."
+        },
+        "numberOfPipelineNodes": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Number of the pipeline nodes, which should be greater than 0 and less than 11."
+        },
         "timeToLive": {
           "oneOf": [
             {
@@ -22650,6 +24034,207 @@
         }
       },
       "description": "PostgreSQL table dataset properties."
+    },
+    "PostgreSqlV2LinkedService": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "PostgreSqlV2"
+          ]
+        },
+        "typeProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PostgreSqlV2LinkedServiceTypeProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "PostgreSqlV2 linked service properties."
+        }
+      },
+      "required": [
+        "type",
+        "typeProperties"
+      ],
+      "description": "Linked service for PostgreSQLV2 data source."
+    },
+    "PostgreSqlV2LinkedServiceTypeProperties": {
+      "type": "object",
+      "properties": {
+        "commandTimeout": {
+          "type": "object",
+          "properties": {},
+          "description": "The time to wait (in seconds) while trying to execute a command before terminating the attempt and generating an error. Set to zero for infinity. Type: integer."
+        },
+        "connectionTimeout": {
+          "type": "object",
+          "properties": {},
+          "description": "The time to wait (in seconds) while trying to establish a connection before terminating the attempt and generating an error. Type: integer."
+        },
+        "database": {
+          "type": "object",
+          "properties": {},
+          "description": "Database name for connection. Type: string."
+        },
+        "encoding": {
+          "type": "object",
+          "properties": {},
+          "description": "Gets or sets the .NET encoding that will be used to encode/decode PostgreSQL string data. Type: string"
+        },
+        "encryptedCredential": {
+          "type": "string",
+          "description": "The encrypted credential used for authentication. Credentials are encrypted using the integration runtime credential manager. Type: string."
+        },
+        "logParameters": {
+          "type": "object",
+          "properties": {},
+          "description": "When enabled, parameter values are logged when commands are executed. Type: boolean."
+        },
+        "password": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AzureKeyVaultSecretReference"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Azure Key Vault secret reference."
+        },
+        "pooling": {
+          "type": "object",
+          "properties": {},
+          "description": "Whether connection pooling should be used. Type: boolean."
+        },
+        "port": {
+          "type": "object",
+          "properties": {},
+          "description": "The port for the connection. Type: integer."
+        },
+        "readBufferSize": {
+          "type": "object",
+          "properties": {},
+          "description": "Determines the size of the internal buffer uses when reading. Increasing may improve performance if transferring large values from the database. Type: integer."
+        },
+        "schema": {
+          "type": "object",
+          "properties": {},
+          "description": "Sets the schema search path. Type: string."
+        },
+        "server": {
+          "type": "object",
+          "properties": {},
+          "description": "Server name for connection. Type: string."
+        },
+        "sslCertificate": {
+          "type": "object",
+          "properties": {},
+          "description": "Location of a client certificate to be sent to the server. Type: string."
+        },
+        "sslKey": {
+          "type": "object",
+          "properties": {},
+          "description": "Location of a client key for a client certificate to be sent to the server. Type: string."
+        },
+        "sslMode": {
+          "type": "object",
+          "properties": {},
+          "description": "SSL mode for connection. Type: integer. 0: disable, 1:allow, 2: prefer, 3: require, 4: verify-ca, 5: verify-full. Type: integer."
+        },
+        "sslPassword": {
+          "type": "object",
+          "properties": {},
+          "description": "Password for a key for a client certificate. Type: string."
+        },
+        "timezone": {
+          "type": "object",
+          "properties": {},
+          "description": "Gets or sets the session timezone. Type: string."
+        },
+        "trustServerCertificate": {
+          "type": "object",
+          "properties": {},
+          "description": "Whether to trust the server certificate without validating it. Type: boolean."
+        },
+        "username": {
+          "type": "object",
+          "properties": {},
+          "description": "Username for authentication. Type: string."
+        }
+      },
+      "required": [
+        "database",
+        "server",
+        "sslMode",
+        "username"
+      ],
+      "description": "PostgreSqlV2 linked service properties."
+    },
+    "PostgreSqlV2Source": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "object",
+          "properties": {},
+          "description": "Database query. Type: string (or Expression with resultType string)."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "PostgreSqlV2Source"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "A copy activity source for PostgreSQL databases."
+    },
+    "PostgreSqlV2TableDataset": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "PostgreSqlV2Table"
+          ]
+        },
+        "typeProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PostgreSqlV2TableDatasetTypeProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "PostgreSQLV2 table dataset properties."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "The PostgreSQLV2 table dataset."
+    },
+    "PostgreSqlV2TableDatasetTypeProperties": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "type": "object",
+          "properties": {},
+          "description": "The PostgreSQL schema name. Type: string (or Expression with resultType string)."
+        },
+        "table": {
+          "type": "object",
+          "properties": {},
+          "description": "The PostgreSQL table name. Type: string (or Expression with resultType string)."
+        }
+      },
+      "description": "PostgreSQLV2 table dataset properties."
     },
     "PowerQuerySink": {
       "type": "object",
@@ -24014,12 +25599,12 @@
         "additionalHeaders": {
           "type": "object",
           "properties": {},
-          "description": "The additional HTTP headers in the request to the RESTful API. Type: string (or Expression with resultType string)."
+          "description": "The additional HTTP headers in the request to the RESTful API. Type: key value pairs (value should be string type)."
         },
         "httpCompressionType": {
           "type": "object",
           "properties": {},
-          "description": "Http Compression Type to Send data in compressed format with Optimal Compression Level, Default is None. And The Only Supported option is Gzip. "
+          "description": "Http Compression Type to Send data in compressed format with Optimal Compression Level, Default is None. And The Only Supported option is Gzip. Type: string (or Expression with resultType string)."
         },
         "httpRequestTimeout": {
           "type": "object",
@@ -24054,7 +25639,7 @@
         "additionalColumns": {
           "type": "object",
           "properties": {},
-          "description": "Specifies the additional columns to be added to source data. Type: array of objects(AdditionalColumns) (or Expression with resultType array of objects)."
+          "description": "Specifies the additional columns to be added to source data. Type: key value pairs (value should be string type)."
         },
         "additionalHeaders": {
           "type": "object",
@@ -24522,19 +26107,9 @@
           "description": "Database query. Type: string (or Expression with resultType string)."
         },
         "readBehavior": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Query",
-                "QueryAll"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The read behavior for the operation. Default is Query."
+          "type": "object",
+          "properties": {},
+          "description": "The read behavior for the operation. Default is Query. Allowed values: Query/QueryAll. Type: string (or Expression with resultType string)."
         },
         "type": {
           "type": "string",
@@ -24547,6 +26122,186 @@
         "type"
       ],
       "description": "A copy activity Salesforce Service Cloud source."
+    },
+    "SalesforceServiceCloudV2LinkedService": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "SalesforceServiceCloudV2"
+          ]
+        },
+        "typeProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SalesforceServiceCloudV2LinkedServiceTypeProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Salesforce Service Cloud V2 linked service properties."
+        }
+      },
+      "required": [
+        "type",
+        "typeProperties"
+      ],
+      "description": "Linked service for Salesforce Service Cloud V2."
+    },
+    "SalesforceServiceCloudV2LinkedServiceTypeProperties": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "object",
+          "properties": {},
+          "description": "The Salesforce API version used in ADF. The version must be larger than or equal to 47.0 which is required by Salesforce BULK API 2.0. Type: string (or Expression with resultType string)."
+        },
+        "authenticationType": {
+          "type": "object",
+          "properties": {},
+          "description": "The authentication type to be used to connect to the Salesforce. Currently, we only support OAuth2ClientCredentials, it is also the default value"
+        },
+        "clientId": {
+          "type": "object",
+          "properties": {},
+          "description": "The client Id for OAuth 2.0 Client Credentials Flow authentication of the Salesforce instance. Type: string (or Expression with resultType string)."
+        },
+        "clientSecret": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The base definition of a secret type."
+        },
+        "encryptedCredential": {
+          "type": "string",
+          "description": "The encrypted credential used for authentication. Credentials are encrypted using the integration runtime credential manager. Type: string."
+        },
+        "environmentUrl": {
+          "type": "object",
+          "properties": {},
+          "description": "The URL of Salesforce Service Cloud instance. For example, 'https://[domain].my.salesforce.com'. Type: string (or Expression with resultType string)."
+        }
+      },
+      "description": "Salesforce Service Cloud V2 linked service properties."
+    },
+    "SalesforceServiceCloudV2ObjectDataset": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "SalesforceServiceCloudV2Object"
+          ]
+        },
+        "typeProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SalesforceServiceCloudV2ObjectDatasetTypeProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Salesforce Service Cloud V2 object dataset properties."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "The Salesforce Service Cloud V2 object dataset."
+    },
+    "SalesforceServiceCloudV2ObjectDatasetTypeProperties": {
+      "type": "object",
+      "properties": {
+        "objectApiName": {
+          "type": "object",
+          "properties": {},
+          "description": "The Salesforce Service Cloud V2 object API name. Type: string (or Expression with resultType string)."
+        },
+        "reportId": {
+          "type": "object",
+          "properties": {},
+          "description": "The Salesforce Service Cloud V2 reportId. Type: string (or Expression with resultType string)."
+        }
+      },
+      "description": "Salesforce Service Cloud V2 object dataset properties."
+    },
+    "SalesforceServiceCloudV2Sink": {
+      "type": "object",
+      "properties": {
+        "externalIdFieldName": {
+          "type": "object",
+          "properties": {},
+          "description": "The name of the external ID field for upsert operation. Default value is 'Id' column. Type: string (or Expression with resultType string)."
+        },
+        "ignoreNullValues": {
+          "type": "object",
+          "properties": {},
+          "description": "The flag indicating whether or not to ignore null values from input dataset (except key fields) during write operation. Default value is false. If set it to true, it means ADF will leave the data in the destination object unchanged when doing upsert/update operation and insert defined default value when doing insert operation, versus ADF will update the data in the destination object to NULL when doing upsert/update operation and insert NULL value when doing insert operation. Type: boolean (or Expression with resultType boolean)."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "SalesforceServiceCloudV2Sink"
+          ]
+        },
+        "writeBehavior": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Insert",
+                "Upsert"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The write behavior for the operation. Default is Insert."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "A copy activity Salesforce Service Cloud V2 sink."
+    },
+    "SalesforceServiceCloudV2Source": {
+      "type": "object",
+      "properties": {
+        "additionalColumns": {
+          "type": "object",
+          "properties": {},
+          "description": "Specifies the additional columns to be added to source data. Type: array of objects(AdditionalColumns) (or Expression with resultType array of objects)."
+        },
+        "includeDeletedObjects": {
+          "type": "object",
+          "properties": {},
+          "description": "This property control whether query result contains Deleted objects. Default is false. Type: boolean (or Expression with resultType boolean)."
+        },
+        "SOQLQuery": {
+          "type": "object",
+          "properties": {},
+          "description": "Database query. Type: string (or Expression with resultType string)."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "SalesforceServiceCloudV2Source"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "A copy activity Salesforce Service Cloud V2 source."
     },
     "SalesforceSink": {
       "type": "object",
@@ -24597,19 +26352,9 @@
           "description": "Database query. Type: string (or Expression with resultType string)."
         },
         "readBehavior": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Query",
-                "QueryAll"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The read behavior for the operation. Default is Query."
+          "type": "object",
+          "properties": {},
+          "description": "The read behavior for the operation. Default is Query. Allowed values: Query/QueryAll. Type: string (or Expression with resultType string)."
         },
         "type": {
           "type": "string",
@@ -24622,6 +26367,181 @@
         "type"
       ],
       "description": "A copy activity Salesforce source."
+    },
+    "SalesforceV2LinkedService": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "SalesforceV2"
+          ]
+        },
+        "typeProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SalesforceV2LinkedServiceTypeProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Salesforce V2 linked service properties."
+        }
+      },
+      "required": [
+        "type",
+        "typeProperties"
+      ],
+      "description": "Linked service for Salesforce V2."
+    },
+    "SalesforceV2LinkedServiceTypeProperties": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "object",
+          "properties": {},
+          "description": "The Salesforce API version used in ADF. The version must be larger than or equal to 47.0 which is required by Salesforce BULK API 2.0. Type: string (or Expression with resultType string)."
+        },
+        "authenticationType": {
+          "type": "object",
+          "properties": {},
+          "description": "The authentication type to be used to connect to the Salesforce. Currently, we only support OAuth2ClientCredentials, it is also the default value"
+        },
+        "clientId": {
+          "type": "object",
+          "properties": {},
+          "description": "The client Id for OAuth 2.0 Client Credentials Flow authentication of the Salesforce instance. Type: string (or Expression with resultType string)."
+        },
+        "clientSecret": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The base definition of a secret type."
+        },
+        "encryptedCredential": {
+          "type": "string",
+          "description": "The encrypted credential used for authentication. Credentials are encrypted using the integration runtime credential manager. Type: string."
+        },
+        "environmentUrl": {
+          "type": "object",
+          "properties": {},
+          "description": "The URL of Salesforce instance. For example, 'https://[domain].my.salesforce.com'. Type: string (or Expression with resultType string)."
+        }
+      },
+      "description": "Salesforce V2 linked service properties."
+    },
+    "SalesforceV2ObjectDataset": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "SalesforceV2Object"
+          ]
+        },
+        "typeProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SalesforceV2ObjectDatasetTypeProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Salesforce V2 object dataset properties."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "The Salesforce V2 object dataset."
+    },
+    "SalesforceV2ObjectDatasetTypeProperties": {
+      "type": "object",
+      "properties": {
+        "objectApiName": {
+          "type": "object",
+          "properties": {},
+          "description": "The Salesforce V2 object API name. Type: string (or Expression with resultType string)."
+        },
+        "reportId": {
+          "type": "object",
+          "properties": {},
+          "description": "The Salesforce V2 report Id. Type: string (or Expression with resultType string)."
+        }
+      },
+      "description": "Salesforce V2 object dataset properties."
+    },
+    "SalesforceV2Sink": {
+      "type": "object",
+      "properties": {
+        "externalIdFieldName": {
+          "type": "object",
+          "properties": {},
+          "description": "The name of the external ID field for upsert operation. Default value is 'Id' column. Type: string (or Expression with resultType string)."
+        },
+        "ignoreNullValues": {
+          "type": "object",
+          "properties": {},
+          "description": "The flag indicating whether or not to ignore null values from input dataset (except key fields) during write operation. Default value is false. If set it to true, it means ADF will leave the data in the destination object unchanged when doing upsert/update operation and insert defined default value when doing insert operation, versus ADF will update the data in the destination object to NULL when doing upsert/update operation and insert NULL value when doing insert operation. Type: boolean (or Expression with resultType boolean)."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "SalesforceV2Sink"
+          ]
+        },
+        "writeBehavior": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Insert",
+                "Upsert"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The write behavior for the operation. Default is Insert."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "A copy activity Salesforce V2 sink."
+    },
+    "SalesforceV2Source": {
+      "type": "object",
+      "properties": {
+        "includeDeletedObjects": {
+          "type": "object",
+          "properties": {},
+          "description": "This property control whether query result contains Deleted objects. Default is false. Type: boolean (or Expression with resultType boolean)."
+        },
+        "SOQLQuery": {
+          "type": "object",
+          "properties": {},
+          "description": "Database query. Type: string (or Expression with resultType string)."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "SalesforceV2Source"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "A copy activity Salesforce V2 source."
     },
     "SapBwCubeDataset": {
       "type": "object",
@@ -26208,6 +28128,34 @@
       "properties": {},
       "description": "The base definition of a secret type."
     },
+    "SecureInputOutputPolicy": {
+      "type": "object",
+      "properties": {
+        "secureInput": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "When set to true, Input from activity is considered as secure and will not be logged to monitoring."
+        },
+        "secureOutput": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "When set to true, Output from activity is considered as secure and will not be logged to monitoring."
+        }
+      },
+      "description": "Execution policy for an activity that supports secure input and output."
+    },
     "SecureString": {
       "type": "object",
       "properties": {
@@ -26311,6 +28259,17 @@
             }
           ],
           "description": "The base definition of a linked integration runtime."
+        },
+        "selfContainedInteractiveAuthoringEnabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "An alternative option to ensure interactive authoring function when your self-hosted integration runtime is unable to establish a connection with Azure Relay."
         }
       },
       "description": "The self-hosted integration runtime properties."
@@ -26469,9 +28428,170 @@
       ],
       "description": "A copy activity ServiceNow server source."
     },
+    "ServiceNowV2LinkedService": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "ServiceNowV2"
+          ]
+        },
+        "typeProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ServiceNowV2LinkedServiceTypeProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "ServiceNowV2 server linked service properties."
+        }
+      },
+      "required": [
+        "type",
+        "typeProperties"
+      ],
+      "description": "ServiceNowV2 server linked service."
+    },
+    "ServiceNowV2LinkedServiceTypeProperties": {
+      "type": "object",
+      "properties": {
+        "authenticationType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Basic",
+                "OAuth2"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The authentication type to use."
+        },
+        "clientId": {
+          "type": "object",
+          "properties": {},
+          "description": "The client id for OAuth2 authentication."
+        },
+        "clientSecret": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The base definition of a secret type."
+        },
+        "encryptedCredential": {
+          "type": "string",
+          "description": "The encrypted credential used for authentication. Credentials are encrypted using the integration runtime credential manager. Type: string."
+        },
+        "endpoint": {
+          "type": "object",
+          "properties": {},
+          "description": "The endpoint of the ServiceNowV2 server. (i.e. <instance>.service-now.com)"
+        },
+        "grantType": {
+          "type": "object",
+          "properties": {},
+          "description": "GrantType for OAuth2 authentication. Default value is password."
+        },
+        "password": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The base definition of a secret type."
+        },
+        "username": {
+          "type": "object",
+          "properties": {},
+          "description": "The user name used to connect to the ServiceNowV2 server for Basic and OAuth2 authentication."
+        }
+      },
+      "required": [
+        "authenticationType",
+        "endpoint"
+      ],
+      "description": "ServiceNowV2 server linked service properties."
+    },
+    "ServiceNowV2ObjectDataset": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "ServiceNowV2Object"
+          ]
+        },
+        "typeProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/GenericDatasetTypeProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Properties specific to this dataset type."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "ServiceNowV2 server dataset."
+    },
+    "ServiceNowV2Source": {
+      "type": "object",
+      "properties": {
+        "expression": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ExpressionV2"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Nested representation of a complex expression."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "ServiceNowV2Source"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "A copy activity ServiceNowV2 server source."
+    },
     "SetVariableActivity": {
       "type": "object",
       "properties": {
+        "policy": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecureInputOutputPolicy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Execution policy for an activity that supports secure input and output."
+        },
         "type": {
           "type": "string",
           "enum": [
@@ -27268,6 +29388,116 @@
       ],
       "description": "Snowflake linked service properties."
     },
+    "SnowflakeLinkedV2ServiceTypeProperties": {
+      "type": "object",
+      "properties": {
+        "accountIdentifier": {
+          "type": "object",
+          "properties": {},
+          "description": "The account identifier of your Snowflake account, e.g. xy12345.east-us-2.azure"
+        },
+        "authenticationType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Basic",
+                "KeyPair",
+                "AADServicePrincipal"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The type used for authentication. Type: string."
+        },
+        "clientId": {
+          "type": "object",
+          "properties": {},
+          "description": "The client ID of the application registered in Azure Active Directory for AADServicePrincipal authentication."
+        },
+        "clientSecret": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The base definition of a secret type."
+        },
+        "database": {
+          "type": "object",
+          "properties": {},
+          "description": "The name of the Snowflake database."
+        },
+        "encryptedCredential": {
+          "type": "string",
+          "description": "The encrypted credential used for authentication. Credentials are encrypted using the integration runtime credential manager. Type: string."
+        },
+        "password": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The base definition of a secret type."
+        },
+        "privateKey": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The base definition of a secret type."
+        },
+        "privateKeyPassphrase": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The base definition of a secret type."
+        },
+        "scope": {
+          "type": "object",
+          "properties": {},
+          "description": "The scope of the application registered in Azure Active Directory for AADServicePrincipal authentication."
+        },
+        "tenantId": {
+          "type": "object",
+          "properties": {},
+          "description": "The tenant ID of the application registered in Azure Active Directory for AADServicePrincipal authentication."
+        },
+        "user": {
+          "type": "object",
+          "properties": {},
+          "description": "The name of the Snowflake user."
+        },
+        "warehouse": {
+          "type": "object",
+          "properties": {},
+          "description": "The name of the Snowflake warehouse."
+        }
+      },
+      "required": [
+        "accountIdentifier",
+        "database",
+        "warehouse"
+      ],
+      "description": "Snowflake linked service properties."
+    },
     "SnowflakeSink": {
       "type": "object",
       "properties": {
@@ -27322,6 +29552,123 @@
           "type": "string",
           "enum": [
             "SnowflakeSource"
+          ]
+        }
+      },
+      "required": [
+        "exportSettings",
+        "type"
+      ],
+      "description": "A copy activity snowflake source."
+    },
+    "SnowflakeV2Dataset": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "SnowflakeV2Table"
+          ]
+        },
+        "typeProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SnowflakeDatasetTypeProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Snowflake dataset properties."
+        }
+      },
+      "required": [
+        "type",
+        "typeProperties"
+      ],
+      "description": "The snowflake dataset."
+    },
+    "SnowflakeV2LinkedService": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "SnowflakeV2"
+          ]
+        },
+        "typeProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SnowflakeLinkedV2ServiceTypeProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Snowflake linked service properties."
+        }
+      },
+      "required": [
+        "type",
+        "typeProperties"
+      ],
+      "description": "Snowflake linked service."
+    },
+    "SnowflakeV2Sink": {
+      "type": "object",
+      "properties": {
+        "importSettings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SnowflakeImportCopyCommand"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Snowflake import command settings."
+        },
+        "preCopyScript": {
+          "type": "object",
+          "properties": {},
+          "description": "SQL pre-copy script. Type: string (or Expression with resultType string)."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "SnowflakeV2Sink"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "A copy activity snowflake sink."
+    },
+    "SnowflakeV2Source": {
+      "type": "object",
+      "properties": {
+        "exportSettings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SnowflakeExportCopyCommand"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Snowflake export command settings."
+        },
+        "query": {
+          "type": "object",
+          "properties": {},
+          "description": "Snowflake Sql query. Type: string (or Expression with resultType string)."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "SnowflakeV2Source"
           ]
         }
       },
@@ -27715,7 +30062,7 @@
         "partitionOption": {
           "type": "object",
           "properties": {},
-          "description": "The partition mechanism that will be used for Sql read in parallel. Possible values include: \"None\", \"PhysicalPartitionsOfTable\", \"DynamicRange\"."
+          "description": "The partition mechanism that will be used for Sql read in parallel. Possible values include: \"None\", \"PhysicalPartitionsOfTable\", \"DynamicRange\". Type: string (or Expression with resultType string)."
         },
         "partitionSettings": {
           "oneOf": [
@@ -27829,7 +30176,7 @@
         "writeBehavior": {
           "type": "object",
           "properties": {},
-          "description": "White behavior when copying data into azure SQL MI. Type: SqlWriteBehaviorEnum (or Expression with resultType SqlWriteBehaviorEnum)"
+          "description": "White behavior when copying data into azure SQL MI. Type: string (or Expression with resultType string)"
         }
       },
       "required": [
@@ -27848,7 +30195,7 @@
         "partitionOption": {
           "type": "object",
           "properties": {},
-          "description": "The partition mechanism that will be used for Sql read in parallel. Possible values include: \"None\", \"PhysicalPartitionsOfTable\", \"DynamicRange\"."
+          "description": "The partition mechanism that will be used for Sql read in parallel. Possible values include: \"None\", \"PhysicalPartitionsOfTable\", \"DynamicRange\". Type: string (or Expression with resultType string)."
         },
         "partitionSettings": {
           "oneOf": [
@@ -28044,7 +30391,7 @@
         "writeBehavior": {
           "type": "object",
           "properties": {},
-          "description": "Write behavior when copying data into sql server. Type: SqlWriteBehaviorEnum (or Expression with resultType SqlWriteBehaviorEnum)"
+          "description": "Write behavior when copying data into sql server. Type: string (or Expression with resultType string)."
         }
       },
       "required": [
@@ -28063,7 +30410,7 @@
         "partitionOption": {
           "type": "object",
           "properties": {},
-          "description": "The partition mechanism that will be used for Sql read in parallel. Possible values include: \"None\", \"PhysicalPartitionsOfTable\", \"DynamicRange\"."
+          "description": "The partition mechanism that will be used for Sql read in parallel. Possible values include: \"None\", \"PhysicalPartitionsOfTable\", \"DynamicRange\". Type: string (or Expression with resultType string)."
         },
         "partitionSettings": {
           "oneOf": [
@@ -28259,7 +30606,7 @@
         "writeBehavior": {
           "type": "object",
           "properties": {},
-          "description": "Write behavior when copying data into sql. Type: SqlWriteBehaviorEnum (or Expression with resultType SqlWriteBehaviorEnum)"
+          "description": "Write behavior when copying data into sql. Type: string (or Expression with resultType string)."
         }
       },
       "required": [
@@ -28278,7 +30625,7 @@
         "partitionOption": {
           "type": "object",
           "properties": {},
-          "description": "The partition mechanism that will be used for Sql read in parallel. Possible values include: \"None\", \"PhysicalPartitionsOfTable\", \"DynamicRange\"."
+          "description": "The partition mechanism that will be used for Sql read in parallel. Possible values include: \"None\", \"PhysicalPartitionsOfTable\", \"DynamicRange\". Type: string (or Expression with resultType string)."
         },
         "partitionSettings": {
           "oneOf": [
@@ -28859,6 +31206,9 @@
         },
         {
           "$ref": "#/definitions/HdfsReadSettings"
+        },
+        {
+          "$ref": "#/definitions/LakeHouseReadSettings"
         }
       ],
       "properties": {
@@ -28911,6 +31261,9 @@
         },
         {
           "$ref": "#/definitions/AzureFileStorageWriteSettings"
+        },
+        {
+          "$ref": "#/definitions/LakeHouseWriteSettings"
         }
       ],
       "properties": {
@@ -28944,6 +31297,20 @@
           "type": "object",
           "properties": {},
           "description": "The maximum concurrent connection count for the source data store. Type: integer (or Expression with resultType integer)."
+        },
+        "metadata": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MetadataItem"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specify the custom metadata to be added to sink data. Type: array of objects (or Expression with resultType array of objects)."
         }
       },
       "description": "Connector write settings."
@@ -29603,6 +31970,9 @@
           "$ref": "#/definitions/PostgreSqlSource"
         },
         {
+          "$ref": "#/definitions/PostgreSqlV2Source"
+        },
+        {
           "$ref": "#/definitions/SybaseSource"
         },
         {
@@ -29676,6 +32046,9 @@
         },
         {
           "$ref": "#/definitions/GoogleBigQuerySource"
+        },
+        {
+          "$ref": "#/definitions/GoogleBigQueryV2Source"
         },
         {
           "$ref": "#/definitions/GreenplumSource"
@@ -29760,6 +32133,15 @@
         },
         {
           "$ref": "#/definitions/AmazonRedshiftSource"
+        },
+        {
+          "$ref": "#/definitions/WarehouseSource"
+        },
+        {
+          "$ref": "#/definitions/SalesforceV2Source"
+        },
+        {
+          "$ref": "#/definitions/ServiceNowV2Source"
         }
       ],
       "properties": {
@@ -30919,6 +33301,238 @@
       ],
       "description": "Wait activity properties."
     },
+    "WarehouseLinkedService": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Warehouse"
+          ]
+        },
+        "typeProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WarehouseLinkedServiceTypeProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Microsoft Fabric Warehouse linked service properties."
+        }
+      },
+      "required": [
+        "type",
+        "typeProperties"
+      ],
+      "description": "Microsoft Fabric Warehouse linked service."
+    },
+    "WarehouseLinkedServiceTypeProperties": {
+      "type": "object",
+      "properties": {
+        "artifactId": {
+          "type": "object",
+          "properties": {},
+          "description": "The ID of Microsoft Fabric Warehouse artifact. Type: string (or Expression with resultType string)."
+        },
+        "encryptedCredential": {
+          "type": "string",
+          "description": "The encrypted credential used for authentication. Credentials are encrypted using the integration runtime credential manager. Type: string."
+        },
+        "endpoint": {
+          "type": "object",
+          "properties": {},
+          "description": "The endpoint of Microsoft Fabric Warehouse server. Type: string (or Expression with resultType string)."
+        },
+        "servicePrincipalCredential": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The base definition of a secret type."
+        },
+        "servicePrincipalCredentialType": {
+          "type": "object",
+          "properties": {},
+          "description": "The service principal credential type to use in Server-To-Server authentication. 'ServicePrincipalKey' for key/secret, 'ServicePrincipalCert' for certificate. Type: string (or Expression with resultType string)."
+        },
+        "servicePrincipalId": {
+          "type": "object",
+          "properties": {},
+          "description": "The ID of the application used to authenticate against Microsoft Fabric Warehouse. Type: string (or Expression with resultType string)."
+        },
+        "servicePrincipalKey": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The base definition of a secret type."
+        },
+        "tenant": {
+          "type": "object",
+          "properties": {},
+          "description": "The name or ID of the tenant to which the service principal belongs. Type: string (or Expression with resultType string)."
+        },
+        "workspaceId": {
+          "type": "object",
+          "properties": {},
+          "description": "The ID of Microsoft Fabric workspace. Type: string (or Expression with resultType string)."
+        }
+      },
+      "required": [
+        "artifactId",
+        "endpoint"
+      ],
+      "description": "Microsoft Fabric Warehouse linked service properties."
+    },
+    "WarehouseSink": {
+      "type": "object",
+      "properties": {
+        "allowCopyCommand": {
+          "type": "object",
+          "properties": {},
+          "description": "Indicates to use Copy Command to copy data into SQL Data Warehouse. Type: boolean (or Expression with resultType boolean)."
+        },
+        "copyCommandSettings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DWCopyCommandSettings"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "DW Copy Command settings."
+        },
+        "preCopyScript": {
+          "type": "object",
+          "properties": {},
+          "description": "SQL pre-copy script. Type: string (or Expression with resultType string)."
+        },
+        "tableOption": {
+          "type": "object",
+          "properties": {},
+          "description": "The option to handle sink table, such as autoCreate. For now only 'autoCreate' value is supported. Type: string (or Expression with resultType string)."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "WarehouseSink"
+          ]
+        },
+        "writeBehavior": {
+          "type": "object",
+          "properties": {},
+          "description": "Write behavior when copying data into azure Microsoft Fabric Data Warehouse. Type: DWWriteBehaviorEnum (or Expression with resultType DWWriteBehaviorEnum)"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "A copy activity Microsoft Fabric Warehouse sink."
+    },
+    "WarehouseSource": {
+      "type": "object",
+      "properties": {
+        "isolationLevel": {
+          "type": "object",
+          "properties": {},
+          "description": "Specifies the transaction locking behavior for the Microsoft Fabric Warehouse source. Allowed values: ReadCommitted/ReadUncommitted/RepeatableRead/Serializable/Snapshot. The default value is ReadCommitted. Type: string (or Expression with resultType string)."
+        },
+        "partitionOption": {
+          "type": "object",
+          "properties": {},
+          "description": "The partition mechanism that will be used for Sql read in parallel. Possible values include: \"None\", \"PhysicalPartitionsOfTable\", \"DynamicRange\"."
+        },
+        "partitionSettings": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SqlPartitionSettings"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The settings that will be leveraged for Sql source partitioning."
+        },
+        "sqlReaderQuery": {
+          "type": "object",
+          "properties": {},
+          "description": "Microsoft Fabric Warehouse reader query. Type: string (or Expression with resultType string)."
+        },
+        "sqlReaderStoredProcedureName": {
+          "type": "object",
+          "properties": {},
+          "description": "Name of the stored procedure for a Microsoft Fabric Warehouse source. This cannot be used at the same time as SqlReaderQuery. Type: string (or Expression with resultType string)."
+        },
+        "storedProcedureParameters": {
+          "type": "object",
+          "properties": {},
+          "description": "Value and type setting for stored procedure parameters. Example: \"{Parameter1: {value: \"1\", type: \"int\"}}\". Type: object (or Expression with resultType object), itemType: StoredProcedureParameter."
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "WarehouseSource"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "A copy activity Microsoft Fabric Warehouse source."
+    },
+    "WarehouseTableDataset": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "WarehouseTable"
+          ]
+        },
+        "typeProperties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WarehouseTableDatasetTypeProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Microsoft Fabric Warehouse dataset properties."
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "description": "Microsoft Fabric Warehouse dataset."
+    },
+    "WarehouseTableDatasetTypeProperties": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "type": "object",
+          "properties": {},
+          "description": "The schema name of the Microsoft Fabric Warehouse. Type: string (or Expression with resultType string)."
+        },
+        "table": {
+          "type": "object",
+          "properties": {},
+          "description": "The table name of the Microsoft Fabric Warehouse. Type: string (or Expression with resultType string)."
+        }
+      },
+      "description": "Microsoft Fabric Warehouse dataset properties."
+    },
     "WebActivity": {
       "type": "object",
       "properties": {
@@ -31060,9 +33674,24 @@
           "description": "When set to true, Certificate validation will be disabled."
         },
         "headers": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Represents the headers that will be sent to the request. For example, to set the language and type on a request: \"headers\" : { \"Accept-Language\": \"en-us\", \"Content-Type\": \"application/json\" }. Type: string (or Expression with resultType string)."
+        },
+        "httpRequestTimeout": {
           "type": "object",
           "properties": {},
-          "description": "Represents the headers that will be sent to the request. For example, to set the language and type on a request: \"headers\" : { \"Accept-Language\": \"en-us\", \"Content-Type\": \"application/json\" }. Type: string (or Expression with resultType string)."
+          "description": "Timeout for the HTTP request to get a response. Format is in TimeSpan (hh:mm:ss). This value is the timeout to get a response, not the activity timeout. The default value is 00:01:00 (1 minute). The range is from 1 to 10 minutes"
         },
         "linkedServices": {
           "oneOf": [
@@ -31094,6 +33723,17 @@
             }
           ],
           "description": "Rest API method for target endpoint."
+        },
+        "turnOffAsync": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Option to disable invoking HTTP GET on location given in response header of a HTTP 202 Response. If set true, it stops invoking HTTP GET on http location given in response header. If set false then continues to invoke HTTP GET call on location given in http response headers."
         },
         "url": {
           "type": "object",
@@ -31197,6 +33837,17 @@
     "WebHookActivity": {
       "type": "object",
       "properties": {
+        "policy": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecureInputOutputPolicy"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Execution policy for an activity that supports secure input and output."
+        },
         "type": {
           "type": "string",
           "enum": [
@@ -31241,8 +33892,18 @@
           "description": "Represents the payload that will be sent to the endpoint. Required for POST/PUT method, not allowed for GET method Type: string (or Expression with resultType string)."
         },
         "headers": {
-          "type": "object",
-          "properties": {},
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {}
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
           "description": "Represents the headers that will be sent to the request. For example, to set the language and type on a request: \"headers\" : { \"Accept-Language\": \"en-us\", \"Content-Type\": \"application/json\" }. Type: string (or Expression with resultType string)."
         },
         "method": {

@@ -32,10 +32,9 @@ const disabledProviders: AutoGenConfig[] = [
         disabledForAutogen: true,
     },
     {
-        // Disabled until the unexpected character error in the swagger spec is fixed
         basePath: 'cdn/resource-manager',
         namespace: 'Microsoft.Cdn',
-        disabledForAutogen: true,
+        useAutorestV2: true,
     },
     {
         // Disabled until the enum mismatch in the swagger spec is fixed

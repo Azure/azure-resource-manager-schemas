@@ -2,14 +2,14 @@
 // Licensed under the MIT License.
 import path from 'path';
 import os from 'os';
-import { findRecursive, findDirRecursive, executeCmd, rmdirRecursive, lowerCaseCompare, lowerCaseCompareLists, lowerCaseStartsWith, readJsonFile, writeJsonFile, safeMkdir, safeUnlink, fileExists, lowerCaseEquals } from './utils';
+import { findDirRecursive, rmdirRecursive, lowerCaseCompare, lowerCaseCompareLists, lowerCaseStartsWith, readJsonFile, writeJsonFile, safeMkdir, safeUnlink, lowerCaseEquals } from './utils';
 import * as constants from './constants';
-import { prepareReadme } from './specs';
 import colors from 'colors';
 import { ScopeType, AutoGenConfig } from './models';
 import { get, set, flatten, uniq, concat, Dictionary, groupBy, keys, difference } from 'lodash';
+import { generateAutorestV2Config, runAutorestV2 } from './autorestV2';
+import { generateAutorestConfig, runAutorest } from './autorest';
 
-const autorestBinary = os.platform() === 'win32' ? 'autorest.cmd' : 'autorest';
 export const apiVersionRegex = /^\d{4}-\d{2}-\d{2}(|-preview)$/;
 
 export interface SchemaConfiguration {
@@ -44,21 +44,29 @@ export async function detectProviderNamespaces(readme: string) {
 }
 
 export async function generateSchemas(readme: string, autoGenConfig: AutoGenConfig): Promise<SchemaConfiguration[]> {
-    await prepareReadme(readme, autoGenConfig);
+    if (autoGenConfig.useAutorestV2) {
+        const bicepReadmePath = `${path.dirname(readme)}/readme.bicep.md`;
+        await generateAutorestV2Config(readme, bicepReadmePath);
+    } else {
+        await generateAutorestConfig(readme, autoGenConfig);
+    }
 
     const schemaConfigs: SchemaConfiguration[] = [];
     const tmpFolder = path.join(os.tmpdir(), Math.random().toString(36).substr(2));
 
     try {
-        const generatedSchemas = await generateSchema(readme, tmpFolder);
+        const generatedSchemas = autoGenConfig.useAutorestV2 ? 
+            await runAutorestV2(readme, tmpFolder) : 
+            await runAutorest(readme, tmpFolder);
 
         for (const schemaPath of generatedSchemas) {
-            const namespace = path.basename(schemaPath.substring(0, schemaPath.lastIndexOf(path.extname(schemaPath))));
-            if (!lowerCaseEquals(autoGenConfig.namespace, namespace)) {
+            const contents = await readJsonFile(schemaPath);
+            const namespace = contents.title as string;
+            if (!lowerCaseEquals(autoGenConfig!.namespace, namespace)) {
                 continue;
             }
 
-            const generatedSchemaConfig = await handleGeneratedSchema(readme, schemaPath, autoGenConfig);
+            const generatedSchemaConfig = await handleGeneratedSchema(readme, schemaPath, namespace, autoGenConfig);
 
             schemaConfigs.push(generatedSchemaConfig);
         }
@@ -70,13 +78,7 @@ export async function generateSchemas(readme: string, autoGenConfig: AutoGenConf
     return schemaConfigs;
 }
 
-async function handleGeneratedSchema(readme: string, schemaPath: string, autoGenConfig?: AutoGenConfig) {
-    const namespace = path.basename(schemaPath.substring(0, schemaPath.lastIndexOf(path.extname(schemaPath))));
-
-    if (autoGenConfig && autoGenConfig.namespace.toLowerCase() !== namespace.toLowerCase()) {
-        throw new Error(`Encountered unexpected namespace ${namespace} in readme ${readme}`);
-    }
-
+async function handleGeneratedSchema(readme: string, schemaPath: string, namespace: string, autoGenConfig?: AutoGenConfig) {
     const apiVersion = path.basename(path.resolve(`${schemaPath}/..`));
 
     const schemaConfig = await generateSchemaConfig(schemaPath, namespace, apiVersion, autoGenConfig);
@@ -89,34 +91,6 @@ async function handleGeneratedSchema(readme: string, schemaPath: string, autoGen
     await saveSchemaFile(schemaPath, schemaConfig);
 
     return schemaConfig;
-}
-
-async function execAutoRest(tmpFolder: string, params: string[]) {
-    await executeCmd(__dirname, `${__dirname}/node_modules/.bin/${autorestBinary}`, params);
-    if (!fileExists(tmpFolder)) {
-        return [];
-    }
-
-    return await findRecursive(tmpFolder, p => path.extname(p) === '.json');
-}
-
-async function generateSchema(readme: string, tmpFolder: string) {
-    const autoRestParams = [
-        `--version=${constants.autorestCoreVersion}`,
-        `--use=@autorest/azureresourceschema@${constants.azureresourceschemaVersion}`,
-        '--azureresourceschema',
-        `--output-folder=${tmpFolder}`,
-        '--multiapi',
-        '--pass-thru:subset-reducer',
-        '--pass-thru:schema-validator-swagger',
-        readme,
-    ];
-
-    if (constants.autoRestVerboseOutput) {
-        autoRestParams.push('--verbose');
-    }
-
-    return await execAutoRest(tmpFolder, autoRestParams);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

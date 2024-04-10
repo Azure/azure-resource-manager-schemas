@@ -11,6 +11,7 @@ export enum ScopeType {
 }
 
 export interface AutoGenConfig {
+  useAutorestV2?: true,
   disabledForAutogen?: true,
   basePath: string,
   namespace: string,

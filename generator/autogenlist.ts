@@ -1131,17 +1131,20 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'trafficmanager/resource-manager',
         namespace: 'Microsoft.Network',
         suffix: 'TrafficManager',
+        useAutorestV2: true,
     },
     {
         basePath: 'network/resource-manager',
         namespace: 'Microsoft.Network',
         postProcessor: networkPostProcessor,
-        suffix: 'NRP'
+        suffix: 'NRP',
+        useAutorestV2: true,
     },
     {
         basePath: 'dnsresolver/resource-manager',
         namespace: 'Microsoft.Network',
         suffix: 'DnsResolver',
+        useAutorestV2: true,
     },
     {
         //Pause autogeneration until errors are fixed

@@ -109,18 +109,6 @@ const disabledProviders: AutoGenConfig[] = [
         namespace: 'Microsoft.ConfidentialLedger',
         disabledForAutogen: true
     },
-    {
-        basePath: 'containerservice/resource-manager/Microsoft.ContainerService/aks',
-        namespace: 'Microsoft.ContainerService',
-        useNamespaceFromConfig: true,
-        suffix: 'Aks'
-    },
-    {
-        basePath: 'containerservice/resource-manager/Microsoft.ContainerService/fleet',
-        namespace: 'Microsoft.ContainerService',
-        useNamespaceFromConfig: true,
-        suffix: 'Fleet'
-    },
 ];
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
@@ -1159,6 +1147,25 @@ const autoGenList: AutoGenConfig[] = [
                 scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
         ]
+    },
+    {
+        basePath: 'containerservice/resource-manager/Microsoft.ContainerService/aks',
+        namespace: 'Microsoft.ContainerService',
+        useNamespaceFromConfig: true,
+        suffix: 'Aks'
+    },
+    {
+        basePath: 'containerservice/resource-manager/Microsoft.ContainerService/fleet',
+        namespace: 'Microsoft.ContainerService',
+        useNamespaceFromConfig: true,
+        suffix: 'Fleet'
+    },
+    {
+        basePath: 'hdinsight/resource-manager/Microsoft.HDInsight/HDInsightOnAks',
+        namespace: 'Microsoft.HDInsight',
+        useNamespaceFromConfig: true,
+        useAutorestV2: true,
+        suffix: 'OnAks',
     },
 ];
 

@@ -722,15 +722,18 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'recoveryservicessiterecovery/resource-manager',
         namespace: 'Microsoft.RecoveryServices',
         suffix: 'SiteRecovery',
+        useAutorestV2: true,
     },
     {
         basePath: 'recoveryservicesbackup/resource-manager',
         namespace: 'Microsoft.RecoveryServices',
-        suffix: "Backup"
+        suffix: "Backup",
+        useAutorestV2: true,
     },
     {
         basePath: "recoveryservices/resource-manager",
-        namespace: "Microsoft.RecoveryServices"
+        namespace: "Microsoft.RecoveryServices",
+        useAutorestV2: true,
     },
     {
         basePath: 'reservations/resource-manager',

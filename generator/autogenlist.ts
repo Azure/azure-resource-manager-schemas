@@ -875,7 +875,8 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'storage/resource-manager',
         namespace: 'Microsoft.Storage',
-        postProcessor: storageProcessor
+        postProcessor: storageProcessor,
+        useAutorestV2: true,
     },
     {
         basePath: 'compute/resource-manager',

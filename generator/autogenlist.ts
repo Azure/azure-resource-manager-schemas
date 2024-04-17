@@ -37,18 +37,6 @@ const disabledProviders: AutoGenConfig[] = [
         useAutorestV2: true,
     },
     {
-        // Disabled until the enum mismatch in the swagger spec is fixed
-        basePath: 'developerhub/resource-manager',
-        namespace: 'Microsoft.DevHub',
-        disabledForAutogen: true,
-    },
-    {
-        // Disabled as the swagger spec contains a type ("DateTimeRfc1123") which autorest is unable to parse: https://github.com/Azure/autorest.azureresourceschema/issues/71
-        basePath: 'domainservices/resource-manager',
-        namespace: 'Microsoft.AAD',
-        disabledForAutogen: true,
-    },
-    {
         basePath: 'dns/resource-manager',
         namespace: 'Microsoft.Network',
         disabledForAutogen: true,
@@ -59,12 +47,6 @@ const disabledProviders: AutoGenConfig[] = [
         namespace: 'Microsoft.Network',
         disabledForAutogen: true,
         suffix: 'privateDns',
-    },
-    {
-        // Disabled as the swagger spec contains a bug (enum mismatch)
-        basePath: 'edgeorderpartner/resource-manager',
-        namespace: 'Microsoft.EdgeOrderPartner',
-        disabledForAutogen: true,
     },
     {
         basePath: 'logic/resource-manager',
@@ -90,24 +72,6 @@ const disabledProviders: AutoGenConfig[] = [
         basePath: 'videoanalyzer/resource-manager',
         namespace: 'Microsoft.Media',
         disabledForAutogen: true,
-    },
-    {
-        // Disabled as the swagger spec contains a bug (enum mismatch)
-        basePath: 'servicefabricmesh/resource-manager',
-        namespace: 'Microsoft.ServiceFabricMesh',
-        disabledForAutogen: true,
-    },
-    {
-        // Disabled as the swagger spec contains a bug (enum mismatch - missing: ProvisioningStateEnum)
-        basePath: 'operationalinsights/resource-manager',
-        namespace: 'Microsoft.OperationalInsights',
-        disabledForAutogen: true,
-    },
-    {
-        // Disabled temporally due to invalid tags failure
-        basePath: 'confidentialLedger/resource-manager',
-        namespace: 'Microsoft.ConfidentialLedger',
-        disabledForAutogen: true
     },
 ];
 
@@ -1169,6 +1133,36 @@ const autoGenList: AutoGenConfig[] = [
         useNamespaceFromConfig: true,
         useAutorestV2: true,
         suffix: 'OnAks',
+    },
+    {
+        basePath: 'developerhub/resource-manager',
+        namespace: 'Microsoft.DevHub',
+        useAutorestV2: true,
+    },
+    {
+        basePath: 'domainservices/resource-manager',
+        namespace: 'Microsoft.AAD',
+        useAutorestV2: true,
+    },
+    {
+        basePath: 'edgeorderpartner/resource-manager',
+        namespace: 'Microsoft.EdgeOrderPartner',
+        useAutorestV2: true,
+    },
+    {
+        basePath: 'servicefabricmesh/resource-manager',
+        namespace: 'Microsoft.ServiceFabricMesh',
+        useAutorestV2: true,
+    },
+    {
+        basePath: 'operationalinsights/resource-manager',
+        namespace: 'Microsoft.OperationalInsights',
+        useAutorestV2: true,
+    },
+    {
+        basePath: 'confidentialLedger/resource-manager',
+        namespace: 'Microsoft.ConfidentialLedger',
+        useAutorestV2: true
     },
 ];
 

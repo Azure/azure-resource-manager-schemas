@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2021-12-01-preview/Microsoft.OperationalInsights.json#",
+  "id": "https://schema.management.azure.com/schemas/2023-09-01/Microsoft.OperationalInsights.json#",
   "title": "Microsoft.OperationalInsights",
   "description": "Microsoft OperationalInsights Resource Types",
   "$schema": "http://json-schema.org/draft-04/schema#",
@@ -9,13 +9,24 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2021-12-01-preview"
+            "2023-09-01"
           ],
           "type": "string"
         },
-        "eTag": {
-          "description": "The ETag of the workspace.",
+        "etag": {
+          "description": "The etag of the workspace.",
           "type": "string"
+        },
+        "identity": {
+          "description": "The identity of the resource.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Identity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "location": {
           "description": "The geo-location where the resource lives",
@@ -46,16 +57,6 @@
             }
           ]
         },
-        "resources": {
-          "items": {
-            "oneOf": [
-              {
-                "$ref": "#/definitions/workspaces_tables_childResource"
-              }
-            ]
-          },
-          "type": "array"
-        },
         "tags": {
           "description": "Resource tags.",
           "oneOf": [
@@ -85,93 +86,20 @@
         "type"
       ],
       "type": "object"
-    },
-    "workspaces_tables": {
-      "description": "Microsoft.OperationalInsights/workspaces/tables",
-      "properties": {
-        "apiVersion": {
-          "enum": [
-            "2021-12-01-preview"
-          ],
-          "type": "string"
-        },
-        "name": {
-          "description": "The name of the table.",
-          "type": "string"
-        },
-        "properties": {
-          "description": "Table's properties.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/TableProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.OperationalInsights/workspaces/tables"
-          ],
-          "type": "string"
-        }
-      },
-      "required": [
-        "name",
-        "properties",
-        "apiVersion",
-        "type"
-      ],
-      "type": "object"
     }
   },
   "definitions": {
-    "Column": {
-      "description": "Table column.",
+    "Identity": {
+      "description": "Identity for the resource.",
       "properties": {
-        "dataTypeHint": {
-          "description": "Column data type logical hint.",
-          "oneOf": [
-            {
-              "enum": [
-                "uri",
-                "guid",
-                "armPath",
-                "ip"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "description": {
-          "description": "Column description.",
-          "type": "string"
-        },
-        "displayName": {
-          "description": "Column display name.",
-          "type": "string"
-        },
-        "name": {
-          "description": "Column name.",
-          "type": "string"
-        },
         "type": {
-          "description": "Column data type.",
+          "description": "Type of managed service identity.",
           "oneOf": [
             {
               "enum": [
-                "string",
-                "int",
-                "long",
-                "real",
-                "boolean",
-                "dateTime",
-                "guid",
-                "dynamic"
+                "SystemAssigned",
+                "UserAssigned",
+                "None"
               ],
               "type": "string"
             },
@@ -179,191 +107,31 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
-        }
-      },
-      "type": "object"
-    },
-    "RestoredLogs": {
-      "description": "Restore parameters.",
-      "properties": {
-        "endRestoreTime": {
-          "description": "The timestamp to end the restore by (UTC).",
-          "format": "date-time",
-          "type": "string"
         },
-        "sourceTable": {
-          "description": "The table to restore data from.",
-          "type": "string"
-        },
-        "startRestoreTime": {
-          "description": "The timestamp to start the restore from (UTC).",
-          "format": "date-time",
-          "type": "string"
-        }
-      },
-      "type": "object"
-    },
-    "ResultStatistics": {
-      "description": "Search job execution statistics.",
-      "properties": {},
-      "type": "object"
-    },
-    "Schema": {
-      "description": "Table's schema.",
-      "properties": {
-        "columns": {
-          "description": "A list of table custom columns.",
+        "userAssignedIdentities": {
+          "description": "The list of user identities associated with the resource. The user identity dictionary key references will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}'.",
           "oneOf": [
             {
-              "items": {
-                "$ref": "#/definitions/Column"
+              "additionalProperties": {
+                "$ref": "#/definitions/UserIdentityProperties"
               },
-              "type": "array"
+              "properties": {},
+              "type": "object"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
-        },
-        "description": {
-          "description": "Table description.",
-          "type": "string"
-        },
-        "displayName": {
-          "description": "Table display name.",
-          "type": "string"
-        },
-        "name": {
-          "description": "Table name.",
-          "type": "string"
         }
       },
+      "required": [
+        "type"
+      ],
       "type": "object"
     },
-    "SearchResults": {
-      "description": "Parameters of the search job that initiated this table.",
-      "properties": {
-        "description": {
-          "description": "Search job Description.",
-          "type": "string"
-        },
-        "endSearchTime": {
-          "description": "The timestamp to end the search by (UTC)",
-          "format": "date-time",
-          "type": "string"
-        },
-        "limit": {
-          "description": "Limit the search job to return up to specified number of rows.",
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "query": {
-          "description": "Search job query.",
-          "type": "string"
-        },
-        "startSearchTime": {
-          "description": "The timestamp to start the search from (UTC)",
-          "format": "date-time",
-          "type": "string"
-        }
-      },
-      "type": "object"
-    },
-    "TableProperties": {
-      "description": "Table properties.",
-      "properties": {
-        "plan": {
-          "description": "Instruct the system how to handle and charge the logs ingested to this table.",
-          "oneOf": [
-            {
-              "enum": [
-                "Basic",
-                "Analytics"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "restoredLogs": {
-          "description": "Parameters of the restore operation that initiated this table.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/RestoredLogs"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "resultStatistics": {
-          "description": "Search job execution statistics.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ResultStatistics"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "retentionInDays": {
-          "description": "The table retention in days, between 4 and 730. Setting this property to -1 will default to the workspace retention.",
-          "oneOf": [
-            {
-              "maximum": 730,
-              "minimum": 4,
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "schema": {
-          "description": "Table schema.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/Schema"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "searchResults": {
-          "description": "Parameters of the search job that initiated this table.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/SearchResults"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "totalRetentionInDays": {
-          "description": "The table total retention in days, between 4 and 2555. Setting this property to -1 will default to table retention.",
-          "oneOf": [
-            {
-              "maximum": 2555,
-              "minimum": 4,
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
+    "UserIdentityProperties": {
+      "description": "User assigned identity properties.",
+      "properties": {},
       "type": "object"
     },
     "WorkspaceCapping": {
@@ -578,45 +346,6 @@
       },
       "required": [
         "name"
-      ],
-      "type": "object"
-    },
-    "workspaces_tables_childResource": {
-      "description": "Microsoft.OperationalInsights/workspaces/tables",
-      "properties": {
-        "apiVersion": {
-          "enum": [
-            "2021-12-01-preview"
-          ],
-          "type": "string"
-        },
-        "name": {
-          "description": "The name of the table.",
-          "type": "string"
-        },
-        "properties": {
-          "description": "Table's properties.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/TableProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "type": {
-          "enum": [
-            "tables"
-          ],
-          "type": "string"
-        }
-      },
-      "required": [
-        "name",
-        "properties",
-        "apiVersion",
-        "type"
       ],
       "type": "object"
     }

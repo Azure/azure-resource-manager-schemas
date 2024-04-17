@@ -758,15 +758,18 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'recoveryservicessiterecovery/resource-manager',
         namespace: 'Microsoft.RecoveryServices',
         suffix: 'SiteRecovery',
+        useAutorestV2: true,
     },
     {
         basePath: 'recoveryservicesbackup/resource-manager',
         namespace: 'Microsoft.RecoveryServices',
-        suffix: "Backup"
+        suffix: "Backup",
+        useAutorestV2: true,
     },
     {
         basePath: "recoveryservices/resource-manager",
-        namespace: "Microsoft.RecoveryServices"
+        namespace: "Microsoft.RecoveryServices",
+        useAutorestV2: true,
     },
     {
         basePath: 'reservations/resource-manager',
@@ -911,7 +914,8 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'storage/resource-manager',
         namespace: 'Microsoft.Storage',
-        postProcessor: storageProcessor
+        postProcessor: storageProcessor,
+        useAutorestV2: true,
     },
     {
         basePath: 'compute/resource-manager',
@@ -929,6 +933,7 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'sql/resource-manager',
         namespace: 'Microsoft.Sql',
+        useAutorestV2: true,
     },
     {
         basePath: 'scheduler/resource-manager',
@@ -1042,7 +1047,8 @@ const autoGenList: AutoGenConfig[] = [
                 'Microsoft.KeyVault/preview/2018-02-14-preview/providers.json',
                 'Microsoft.KeyVault/preview/2018-02-14-preview/secrets.json',
             ],
-        }
+        },
+        useAutorestV2: true,
     },
     {
         basePath: 'hybridkubernetes/resource-manager',
@@ -1096,11 +1102,13 @@ const autoGenList: AutoGenConfig[] = [
     },
     {
         basePath: 'web/resource-manager',
-        namespace: 'Microsoft.CertificateRegistration'
+        namespace: 'Microsoft.CertificateRegistration',
+        useAutorestV2: true,
     },
     {
         basePath: 'web/resource-manager',
-        namespace: 'Microsoft.DomainRegistration'
+        namespace: 'Microsoft.DomainRegistration',
+        useAutorestV2: true,
     },
     {
         basePath: 'web/resource-manager',

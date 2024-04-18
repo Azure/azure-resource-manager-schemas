@@ -580,6 +580,7 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'mysql/resource-manager',
         namespace: 'Microsoft.DBforMySQL',
+        useAutorestV2: true,
     },
     {
         basePath: 'managementgroups/resource-manager',
@@ -634,6 +635,7 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'postgresql/resource-manager',
         namespace: 'Microsoft.DBforPostgreSQL',
+        useAutorestV2: true,
     },
     {
         basePath: 'postgresqlhsc/resource-manager',
@@ -897,6 +899,7 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'sql/resource-manager',
         namespace: 'Microsoft.Sql',
+        useAutorestV2: true,
     },
     {
         basePath: 'scheduler/resource-manager',

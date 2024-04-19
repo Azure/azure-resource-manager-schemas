@@ -1067,15 +1067,18 @@ const autoGenList: AutoGenConfig[] = [
     },
     {
         basePath: 'web/resource-manager',
-        namespace: 'Microsoft.CertificateRegistration'
+        namespace: 'Microsoft.CertificateRegistration',
+        useAutorestV2: true,
     },
     {
         basePath: 'web/resource-manager',
-        namespace: 'Microsoft.DomainRegistration'
+        namespace: 'Microsoft.DomainRegistration',
+        useAutorestV2: true,
     },
     {
         basePath: 'web/resource-manager',
-        namespace: 'Microsoft.Web'
+        namespace: 'Microsoft.Web',
+        useAutorestV2: true,
     },
     {
         basePath: 'deviceupdate/resource-manager',

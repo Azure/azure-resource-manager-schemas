@@ -37,18 +37,6 @@ const disabledProviders: AutoGenConfig[] = [
         useAutorestV2: true,
     },
     {
-        basePath: 'dns/resource-manager',
-        namespace: 'Microsoft.Network',
-        disabledForAutogen: true,
-        suffix: 'DNS',
-    },
-    {
-        basePath: 'privatedns/resource-manager',
-        namespace: 'Microsoft.Network',
-        disabledForAutogen: true,
-        suffix: 'privateDns',
-    },
-    {
         basePath: 'logic/resource-manager',
         namespace: 'Microsoft.Logic',
         disabledForAutogen: true,
@@ -437,11 +425,6 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'engagementfabric/resource-manager',
         namespace: 'Microsoft.EngagementFabric',
-    },
-    {
-        basePath: 'frontdoor/resource-manager',
-        namespace: 'Microsoft.Network',
-        suffix: 'FrontDoor',
     },
     {
         basePath: 'hanaonazure/resource-manager',
@@ -1106,11 +1089,29 @@ const autoGenList: AutoGenConfig[] = [
         useAutorestV2: true,
     },
     {
+        basePath: 'frontdoor/resource-manager',
+        namespace: 'Microsoft.Network',
+        suffix: 'FrontDoor',
+        useAutorestV2: true,
+    },
+    {
+        basePath: 'dns/resource-manager',
+        namespace: 'Microsoft.Network',
+        suffix: 'DNS',
+        useAutorestV2: true,
+    },
+    {
+        basePath: 'privatedns/resource-manager',
+        namespace: 'Microsoft.Network',
+        suffix: 'privateDns',
+        useAutorestV2: true,
+    },
+    {
         //Pause autogeneration until errors are fixed
         basePath: 'azurestackhci/resource-manager',
         namespace: 'Microsoft.AzureStackHCI',
         postProcessor: azureStackHciPostProcessor,
-        disabledForAutogen: true,
+        useAutorestV2: true,
     },
     {
         basePath: 'advisor/resource-manager',

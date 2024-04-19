@@ -7,7 +7,7 @@ import path from 'path';
 import fs from 'fs';
 import { readFile } from 'fs/promises';
 import { getLanguageService } from 'vscode-json-languageservice';
-import { TextDocument } from 'vscode-languageserver-types';
+import { TextDocument } from 'vscode-languageserver-textdocument';
 import draft4MetaSchema from 'ajv/lib/refs/json-schema-draft-04.json';
 import * as schemaTestsRunner from './schemaTestsRunner';
 import 'mocha';
@@ -25,18 +25,18 @@ const ajvInstance = new Ajv({
   strictDefaults: true,
   schemaId: 'id',
   meta: true,
-  }).addMetaSchema(draft4MetaSchema)
-  .addFormat('int32',  /.*/)
-  .addFormat('duration',  /.*/)
-  .addFormat('password',  /.*/);
+}).addMetaSchema(draft4MetaSchema)
+  .addFormat('int32', /.*/)
+  .addFormat('duration', /.*/)
+  .addFormat('password', /.*/);
 
-async function loadRawSchema(uri: string) : Promise<string> {
+async function loadRawSchema(uri: string): Promise<string> {
   const hashIndex = uri.indexOf("#");
   if (hashIndex !== -1) {
     uri = uri.substring(0, hashIndex);
   }
 
-  let jsonPath : string;
+  let jsonPath: string;
   if (uri.match(armSchemasPrefix)) {
     jsonPath = uri.replace(armSchemasPrefix, schemasFolder);
   }
@@ -54,7 +54,7 @@ async function loadRawSchema(uri: string) : Promise<string> {
   return await readFile(jsonPath, { encoding: "utf8" });
 }
 
-async function loadSchema(uri: string) : Promise<object> {
+async function loadSchema(uri: string): Promise<object> {
   const rawSchema = await loadRawSchema(uri);
 
   return JSON.parse(rawSchema);
@@ -73,7 +73,7 @@ function listSchemaPaths(basePath: string): string[] {
       continue;
     }
 
-    if (!fileStat.isFile()) {
+    if (!fileStat.isFile() || path.extname(subPath).toLowerCase() !== '.json') {
       continue;
     }
 
@@ -146,7 +146,7 @@ schemaTestPaths.push(testSchemasFolder + 'ResourceMetaSchema.tests.json');
 const templateTestPaths = listSchemaPaths(templateTestsFolder);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const schemaTestMap: {[path: string]: any} = {};
+const schemaTestMap: { [path: string]: any } = {};
 for (const testPath of schemaTestPaths) {
   const contents = fs.readFileSync(testPath, { encoding: 'utf8' });
   const data = JSON.parse(contents);
@@ -155,52 +155,57 @@ for (const testPath of schemaTestPaths) {
 }
 
 describe('Validate individual resource schemas', () => {
-  for (const schemaPath of schemaPaths) {
-    describe(schemaPath, () => {
-      it(`can be parsed with JSON.parse`, async function () {
-        const schema = await loadRawSchema(schemaPath);
+  it(`can be parsed with JSON.parse`, async function () {
+    for (const schemaPath of schemaPaths) {
+      const schema = await loadRawSchema(schemaPath);
 
-        expect(() => JSON.parse(schema)).not.to.throw();
-      });
+      expect(() => JSON.parse(schema), `Parsing ${schemaPath}`).not.to.throw();
+    }
+  });
 
-      for (const metaSchemaPath of metaSchemaPaths) {
-        it(`validates against '${metaSchemaPath}'`, async function() {
-          this.timeout(60000);
-          const schema = await loadSchema(schemaPath);
-          const metaSchema = await loadSchema(metaSchemaPath);
-  
-          const validate = await ajvInstance.compileAsync(metaSchema);
-          const result = await validate(schema);
-
-          expect(result, `Validation failed with errors ${JSON.stringify(validate.errors, null, 2)}`).to.be.true;
-        });
-      }
-
-      it(`can be compiled`, async function() {
-        this.timeout(60000);
+  for (const metaSchemaPath of metaSchemaPaths) {
+    it(`validates against '${metaSchemaPath}'`, async function () {
+      this.timeout(60000);
+      for (const schemaPath of schemaPaths) {
         const schema = await loadSchema(schemaPath);
-  
-        await ajvInstance.compileAsync(schema);
-      });
-  
-      if (!schemasToSkipForCyclicValidation.has(schemaPath)) {
-        it(`does not contain any cycles`, async function() {
-          this.timeout(60000);
-          const schema = await loadSchema(schemaPath);
-    
-          const cycle = findCycle(schema);
-          expect(cycle, `Found cycle ${cycle?.join(' -> ')}`).to.be.undefined;
-        });
+        const metaSchema = await loadSchema(metaSchemaPath);
+
+        const validate = await ajvInstance.compileAsync(metaSchema);
+        const result = await validate(schema);
+
+        expect(result, `Validating ${schemaPath} failed with errors ${JSON.stringify(validate.errors, null, 2)}`).to.be.true;
       }
     });
   }
+
+  it(`can be compiled`, async function () {
+    this.timeout(60000);
+    for (const schemaPath of schemaPaths) {
+      const schema = await loadSchema(schemaPath);
+
+      expect(() => ajvInstance.compile(schema), `Compiling ${schemaPath}`).not.to.throw();
+    }
+  });
+
+  it(`does not contain any cycles`, async function () {
+
+    for (const schemaPath of schemaPaths) {
+      if (!schemasToSkipForCyclicValidation.has(schemaPath)) {
+        this.timeout(60000);
+        const schema = await loadSchema(schemaPath);
+
+        const cycle = findCycle(schema);
+        expect(cycle, `Found ${schemaPath} cycle ${cycle?.join(' -> ')}`).to.be.undefined;
+      }
+    }
+  });
 });
 
 describe('Run individual schema test', () => {
   for (const testPath of schemaTestPaths) {
     describe(testPath, () => {
       for (const test of schemaTestMap[testPath].tests) {
-        it(test.name, async function() {
+        it(test.name, async function () {
           this.timeout(10000);
 
           await schemaTestsRunner.execute(test, loadSchema);
@@ -212,12 +217,12 @@ describe('Run individual schema test', () => {
 
 describe('Validate test templates against VSCode language service', () => {
   for (const templateTestFile of templateTestPaths) {
-    it(`running schema validation on '${templateTestFile}'`, async function() {
+    it(`running schema validation on '${templateTestFile}'`, async function () {
       this.timeout(60000);
 
       const service = getLanguageService({
         schemaRequestService: loadRawSchema,
-        workspaceContext: { 
+        workspaceContext: {
           resolveRelativePath: (relativePath, resource) => url.resolve(resource, relativePath)
         },
       });
@@ -225,7 +230,7 @@ describe('Validate test templates against VSCode language service', () => {
       const content = await readFile(templateTestFile, { encoding: 'utf8' });
       const textDocument = TextDocument.create(templateTestFile, 'json', 0, content);
       const jsonDocument = service.parseJSONDocument(textDocument);
-    
+
       const result = await service.doValidation(textDocument, jsonDocument);
       expect(result).to.deep.equal([]);
     });

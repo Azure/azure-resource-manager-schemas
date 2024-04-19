@@ -11,7 +11,6 @@ export enum ScopeType {
 }
 
 export interface AutoGenConfig {
-  useAutorestV2?: true,
   disabledForAutogen?: true,
   basePath: string,
   namespace: string,
@@ -36,9 +35,14 @@ export interface AutoGenResourceConfig {
   scopes?: ScopeType,
 }
 
+export interface SchemaPostProcessorOnSaveAdditionalSchema {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (fileName: string, schema: any): Promise<void>,
+}
+
 export interface SchemaPostProcessor {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (namespace: string, apiVersion: string, schema: any): Promise<void>,
+  (namespace: string, apiVersion: string, schema: any, onSaveAdditional: SchemaPostProcessorOnSaveAdditionalSchema): Promise<void>,
 }
 
 export interface Package {

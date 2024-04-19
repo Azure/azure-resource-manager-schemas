@@ -1,12 +1,11 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 import { SchemaPostProcessor } from '../models';
+import { replaceRefByName } from './helpers';
 
 export const postProcessor: SchemaPostProcessor = async (namespace, apiVersion, schema) => {
-
-    const IpTag = schema.definitions?.IpConfigurationPublicIPAddressConfiguration?.properties?.ipTags?.oneOf[0].items;
-    if (IpTag && IpTag['$ref']) {
-        IpTag['$ref'] = '#/definitions/IPTag';
+    if (schema.definitions?.IPTag) {
+        replaceRefByName(schema, 'IpTag', { '$ref': '#/definitions/IPTag' });
+        delete schema.definitions.IpTag;
     }
-
 }

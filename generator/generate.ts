@@ -7,13 +7,13 @@ import * as constants from './constants';
 import colors from 'colors';
 import { ScopeType, AutoGenConfig } from './models';
 import { get, set, flatten, uniq, concat, Dictionary, groupBy, keys, difference } from 'lodash';
-import { generateAutorestV2Config, runAutorestV2 } from './autorestV2';
 import { generateAutorestConfig, runAutorest } from './autorest';
 
 export const apiVersionRegex = /^\d{4}-\d{2}-\d{2}(|-preview)$/;
 
 export interface SchemaConfiguration {
     references: SchemaReference[];
+    temporaryPath: string;
     relativePath: string;
 }
 
@@ -44,20 +44,14 @@ export async function detectProviderNamespaces(readme: string) {
 }
 
 export async function generateSchemas(readme: string, autoGenConfig: AutoGenConfig): Promise<SchemaConfiguration[]> {
-    if (autoGenConfig.useAutorestV2) {
-        const bicepReadmePath = `${path.dirname(readme)}/readme.bicep.md`;
-        await generateAutorestV2Config(readme, bicepReadmePath);
-    } else {
-        await generateAutorestConfig(readme, autoGenConfig);
-    }
+    const bicepReadmePath = `${path.dirname(readme)}/readme.bicep.md`;
+    await generateAutorestConfig(readme, bicepReadmePath);
 
     const schemaConfigs: SchemaConfiguration[] = [];
     const tmpFolder = path.join(os.tmpdir(), Math.random().toString(36).substr(2));
 
     try {
-        const generatedSchemas = autoGenConfig.useAutorestV2 ? 
-            await runAutorestV2(readme, tmpFolder) : 
-            await runAutorest(readme, tmpFolder);
+        const generatedSchemas = await runAutorest(readme, tmpFolder);
 
         for (const schemaPath of generatedSchemas) {
             const contents = await readJsonFile(schemaPath);
@@ -66,9 +60,9 @@ export async function generateSchemas(readme: string, autoGenConfig: AutoGenConf
                 continue;
             }
 
-            const generatedSchemaConfig = await handleGeneratedSchema(readme, schemaPath, namespace, autoGenConfig);
+            const generatedSchemaConfigs = await handleGeneratedSchema(readme, schemaPath, namespace, autoGenConfig);
 
-            schemaConfigs.push(generatedSchemaConfig);
+            schemaConfigs.push(...generatedSchemaConfigs);
         }
     }
     finally {
@@ -81,16 +75,17 @@ export async function generateSchemas(readme: string, autoGenConfig: AutoGenConf
 async function handleGeneratedSchema(readme: string, schemaPath: string, namespace: string, autoGenConfig?: AutoGenConfig) {
     const apiVersion = path.basename(path.resolve(`${schemaPath}/..`));
 
-    const schemaConfig = await generateSchemaConfig(schemaPath, namespace, apiVersion, autoGenConfig);
-
-    const unknownScopeResources = schemaConfig.references.filter(x => x.scope & ScopeType.Unknown);
-    if (autoGenConfig && unknownScopeResources.length > 0) {
-        throw new Error(`Unable to determine scope for resource types ${unknownScopeResources.map(x => x.type).join(', ')} in readme ${readme}`);
+    const schemaConfigs = await generateSchemaConfigs(schemaPath, namespace, apiVersion, autoGenConfig);
+    for (const schemaConfig of schemaConfigs) {
+        const unknownScopeResources = schemaConfig.references.filter(x => x.scope & ScopeType.Unknown);
+        if (autoGenConfig && unknownScopeResources.length > 0) {
+            throw new Error(`Unable to determine scope for resource types ${unknownScopeResources.map(x => x.type).join(', ')} in readme ${readme}`);
+        }
+    
+        await saveSchemaFile(schemaConfig);
     }
 
-    await saveSchemaFile(schemaPath, schemaConfig);
-
-    return schemaConfig;
+    return schemaConfigs;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -139,18 +134,8 @@ function getSchemaFileName(namespace: string, suffix: string | undefined) {
     return `${namespace}.${suffix}.json`;
 }
 
-async function generateSchemaConfig(outputFile: string, namespace: string, apiVersion: string, autoGenConfig?: AutoGenConfig): Promise<SchemaConfiguration> {
-    namespace = autoGenConfig?.namespace ?? namespace;
-    const suffix = autoGenConfig?.suffix;
-    const relativePath = `${apiVersion}/${getSchemaFileName(namespace, suffix)}`;
-
-    const output = await readJsonFile(outputFile);
-    if (autoGenConfig?.postProcessor) {
-        await autoGenConfig?.postProcessor(namespace, apiVersion, output);
-
-        await writeJsonFile(outputFile, output);
-    }
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getSchemaConfig(filePath: string, output: any, namespace: string, apiVersion: string, relativePath: string, autoGenConfig?: AutoGenConfig): SchemaConfiguration { 
     const knownReferences = [
         ...getSchemaRefs(output, ScopeType.Tenant, 'tenant_resourceDefinitions'),
         ...getSchemaRefs(output, ScopeType.ManagementGroup, 'managementGroup_resourceDefinitions'),
@@ -226,18 +211,43 @@ async function generateSchemaConfig(outputFile: string, namespace: string, apiVe
 
     return {
         references,
+        temporaryPath: filePath,
         relativePath,
     };
 }
 
-async function saveSchemaFile(outputFile: string, schemaConfig: SchemaConfiguration) {
+async function generateSchemaConfigs(schemaFilePath: string, namespace: string, apiVersion: string, autoGenConfig?: AutoGenConfig): Promise<SchemaConfiguration[]> {
+    namespace = autoGenConfig?.namespace ?? namespace;
+    const suffix = autoGenConfig?.suffix;
+    const relativePath = `${apiVersion}/${getSchemaFileName(namespace, suffix)}`;
+
+    const configs = [];
+    const mainSchema = await readJsonFile(schemaFilePath);
+
+    if (autoGenConfig?.postProcessor) {
+        await autoGenConfig.postProcessor(namespace, apiVersion, mainSchema, async (additionalFileName, additionalSchema) => {
+            const additionalFilePath = path.resolve(schemaFilePath, '..', additionalFileName);
+            await writeJsonFile(additionalFilePath, additionalSchema);
+
+            configs.push(getSchemaConfig(additionalFilePath, additionalSchema, namespace, apiVersion, `${apiVersion}/${additionalFileName}`, autoGenConfig));
+        });
+
+        await writeJsonFile(schemaFilePath, mainSchema);
+    }
+
+    configs.push(getSchemaConfig(schemaFilePath, mainSchema, namespace, apiVersion, relativePath, autoGenConfig));
+
+    return configs;
+}
+
+async function saveSchemaFile(schemaConfig: SchemaConfiguration) {
     const schemaRef = `${constants.schemasBaseUri}/${schemaConfig.relativePath}#`
 
     const schemaPath = path.join(constants.schemasBasePath, schemaConfig.relativePath);
 
     await safeMkdir(path.dirname(schemaPath));
 
-    const output = await readJsonFile(outputFile);
+    const output = await readJsonFile(schemaConfig.temporaryPath);
     output.id = schemaRef;
 
     await writeJsonFile(schemaPath, output);

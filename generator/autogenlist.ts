@@ -34,7 +34,6 @@ const disabledProviders: AutoGenConfig[] = [
     {
         basePath: 'cdn/resource-manager',
         namespace: 'Microsoft.Cdn',
-        useAutorestV2: true,
     },
     {
         basePath: 'logic/resource-manager',
@@ -563,7 +562,6 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'mysql/resource-manager',
         namespace: 'Microsoft.DBforMySQL',
-        useAutorestV2: true,
     },
     {
         basePath: 'managementgroups/resource-manager',
@@ -618,7 +616,6 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'postgresql/resource-manager',
         namespace: 'Microsoft.DBforPostgreSQL',
-        useAutorestV2: true,
     },
     {
         basePath: 'postgresqlhsc/resource-manager',
@@ -707,18 +704,15 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'recoveryservicessiterecovery/resource-manager',
         namespace: 'Microsoft.RecoveryServices',
         suffix: 'SiteRecovery',
-        useAutorestV2: true,
     },
     {
         basePath: 'recoveryservicesbackup/resource-manager',
         namespace: 'Microsoft.RecoveryServices',
         suffix: "Backup",
-        useAutorestV2: true,
     },
     {
         basePath: "recoveryservices/resource-manager",
         namespace: "Microsoft.RecoveryServices",
-        useAutorestV2: true,
     },
     {
         basePath: 'reservations/resource-manager',
@@ -864,7 +858,6 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'storage/resource-manager',
         namespace: 'Microsoft.Storage',
         postProcessor: storageProcessor,
-        useAutorestV2: true,
     },
     {
         basePath: 'compute/resource-manager',
@@ -882,7 +875,6 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'sql/resource-manager',
         namespace: 'Microsoft.Sql',
-        useAutorestV2: true,
     },
     {
         basePath: 'scheduler/resource-manager',
@@ -1051,17 +1043,14 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'web/resource-manager',
         namespace: 'Microsoft.CertificateRegistration',
-        useAutorestV2: true,
     },
     {
         basePath: 'web/resource-manager',
         namespace: 'Microsoft.DomainRegistration',
-        useAutorestV2: true,
     },
     {
         basePath: 'web/resource-manager',
         namespace: 'Microsoft.Web',
-        useAutorestV2: true,
     },
     {
         basePath: 'deviceupdate/resource-manager',
@@ -1076,45 +1065,38 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'trafficmanager/resource-manager',
         namespace: 'Microsoft.Network',
         suffix: 'TrafficManager',
-        useAutorestV2: true,
     },
     {
         basePath: 'network/resource-manager',
         namespace: 'Microsoft.Network',
         postProcessor: networkPostProcessor,
         suffix: 'NRP',
-        useAutorestV2: true,
     },
     {
         basePath: 'dnsresolver/resource-manager',
         namespace: 'Microsoft.Network',
         suffix: 'DnsResolver',
-        useAutorestV2: true,
     },
     {
         basePath: 'frontdoor/resource-manager',
         namespace: 'Microsoft.Network',
         suffix: 'FrontDoor',
-        useAutorestV2: true,
     },
     {
         basePath: 'dns/resource-manager',
         namespace: 'Microsoft.Network',
         suffix: 'DNS',
-        useAutorestV2: true,
     },
     {
         basePath: 'privatedns/resource-manager',
         namespace: 'Microsoft.Network',
         suffix: 'privateDns',
-        useAutorestV2: true,
     },
     {
         //Pause autogeneration until errors are fixed
         basePath: 'azurestackhci/resource-manager',
         namespace: 'Microsoft.AzureStackHCI',
         postProcessor: azureStackHciPostProcessor,
-        useAutorestV2: true,
     },
     {
         basePath: 'advisor/resource-manager',
@@ -1142,38 +1124,31 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'hdinsight/resource-manager/Microsoft.HDInsight/HDInsightOnAks',
         namespace: 'Microsoft.HDInsight',
         useNamespaceFromConfig: true,
-        useAutorestV2: true,
         suffix: 'OnAks',
     },
     {
         basePath: 'developerhub/resource-manager',
         namespace: 'Microsoft.DevHub',
-        useAutorestV2: true,
     },
     {
         basePath: 'domainservices/resource-manager',
         namespace: 'Microsoft.AAD',
-        useAutorestV2: true,
     },
     {
         basePath: 'edgeorderpartner/resource-manager',
         namespace: 'Microsoft.EdgeOrderPartner',
-        useAutorestV2: true,
     },
     {
         basePath: 'servicefabricmesh/resource-manager',
         namespace: 'Microsoft.ServiceFabricMesh',
-        useAutorestV2: true,
     },
     {
         basePath: 'operationalinsights/resource-manager',
         namespace: 'Microsoft.OperationalInsights',
-        useAutorestV2: true,
     },
     {
         basePath: 'confidentialLedger/resource-manager',
         namespace: 'Microsoft.ConfidentialLedger',
-        useAutorestV2: true
     },
 ];
 

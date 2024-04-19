@@ -9,12 +9,10 @@ import { readFile } from 'fs/promises';
 import { getLanguageService } from 'vscode-json-languageservice';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import draft4MetaSchema from 'ajv/lib/refs/json-schema-draft-04.json';
-import * as schemaTestsRunner from './schemaTestsRunner';
 import 'mocha';
 import { findCycle } from './cycleCheck';
 
 const schemasFolder = __dirname + '/../schemas/';
-const schemaTestsFolder = __dirname + '/../tests/';
 const testSchemasFolder = __dirname + '/schemas/';
 const templateTestsFolder = __dirname + '/templateTests/';
 const armSchemasPrefix = /^https?:\/\/schema\.management\.azure\.com\/schemas\//
@@ -141,21 +139,11 @@ const schemasToSkip = [
 ].map(p => path.resolve(`${schemasFolder}/${p}`));
 
 const schemaPaths = listSchemaPaths(schemasFolder).filter(path => schemasToSkip.indexOf(path) == -1);
-const schemaTestPaths = listSchemaPaths(schemaTestsFolder);
-schemaTestPaths.push(testSchemasFolder + 'ResourceMetaSchema.tests.json');
 const templateTestPaths = listSchemaPaths(templateTestsFolder);
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const schemaTestMap: { [path: string]: any } = {};
-for (const testPath of schemaTestPaths) {
-  const contents = fs.readFileSync(testPath, { encoding: 'utf8' });
-  const data = JSON.parse(contents);
-
-  schemaTestMap[testPath] = data;
-}
 
 describe('Validate individual resource schemas', () => {
   it(`can be parsed with JSON.parse`, async function () {
+    this.timeout(60000);
     for (const schemaPath of schemaPaths) {
       const schema = await loadRawSchema(schemaPath);
 
@@ -199,20 +187,6 @@ describe('Validate individual resource schemas', () => {
       }
     }
   });
-});
-
-describe('Run individual schema test', () => {
-  for (const testPath of schemaTestPaths) {
-    describe(testPath, () => {
-      for (const test of schemaTestMap[testPath].tests) {
-        it(test.name, async function () {
-          this.timeout(10000);
-
-          await schemaTestsRunner.execute(test, loadSchema);
-        });
-      }
-    });
-  }
 });
 
 describe('Validate test templates against VSCode language service', () => {

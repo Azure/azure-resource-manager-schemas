@@ -103,7 +103,7 @@ executeSynchronous(async () => {
                     pkg.packageName = autoGenConfig.basePath;
                     pkg.result = 'failed';
                     console.log(colors.red(`Caught exception processing autogenlist entry ${autoGenConfig.basePath}.`));
-                    console.log(colors.red(`${error}`));
+                    console.log(colors.red(`${(error as Error)?.stack || error}`));
             
                     // Use markdown formatting as this summary will be included in the PR description
                     logOut(summaryLogger, 

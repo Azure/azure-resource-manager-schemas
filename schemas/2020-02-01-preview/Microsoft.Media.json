@@ -1,23 +1,24 @@
 {
   "id": "https://schema.management.azure.com/schemas/2020-02-01-preview/Microsoft.Media.json#",
-  "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.Media",
   "description": "Microsoft Media Resource Types",
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "resourceDefinitions": {
     "mediaServices_mediaGraphs": {
-      "type": "object",
+      "description": "Microsoft.Media/mediaServices/mediaGraphs",
       "properties": {
         "apiVersion": {
-          "type": "string",
           "enum": [
             "2020-02-01-preview"
-          ]
+          ],
+          "type": "string"
         },
         "name": {
-          "type": "string",
-          "description": "The Media Graph name."
+          "description": "The Media Graph name.",
+          "type": "string"
         },
         "properties": {
+          "description": "Class for Media Graph properties.",
           "oneOf": [
             {
               "$ref": "#/definitions/MediaGraphProperties"
@@ -25,93 +26,120 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Class for Media Graph properties."
+          ]
         },
         "type": {
-          "type": "string",
           "enum": [
             "Microsoft.Media/mediaServices/mediaGraphs"
-          ]
+          ],
+          "type": "string"
         }
       },
       "required": [
-        "apiVersion",
         "name",
         "properties",
+        "apiVersion",
         "type"
       ],
-      "description": "Microsoft.Media/mediaServices/mediaGraphs"
+      "type": "object"
     }
   },
   "definitions": {
-    "MediaGraphAssetSink": {
-      "type": "object",
-      "properties": {
-        "@odata.type": {
-          "type": "string",
-          "enum": [
-            "#Microsoft.Media.MediaGraphAssetSink"
-          ]
-        },
-        "assetName": {
-          "type": "string",
-          "description": "Asset name."
-        }
-      },
-      "required": [
-        "@odata.type",
-        "assetName"
-      ],
-      "description": "Asset sink."
-    },
     "MediaGraphCertificateSource": {
-      "type": "object",
+      "description": "Base class for certificate sources.",
       "oneOf": [
         {
-          "$ref": "#/definitions/MediaGraphPemCertificateList"
+          "description": "A list of PEM formatted certificates.",
+          "properties": {
+            "certificates": {
+              "description": "PEM formatted public certificates, one per entry.",
+              "oneOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "certificates"
+          ],
+          "type": "object"
         }
       ],
       "properties": {},
-      "description": "Base class for certificate sources."
-    },
-    "MediaGraphClearEndpoint": {
-      "type": "object",
-      "properties": {
-        "@odata.type": {
-          "type": "string",
-          "enum": [
-            "#Microsoft.Media.MediaGraphClearEndpoint"
-          ]
-        }
-      },
-      "required": [
-        "@odata.type"
-      ],
-      "description": "An endpoint to connect to with no encryption in transit."
+      "type": "object"
     },
     "MediaGraphCredentials": {
-      "type": "object",
+      "description": "Credentials to present during authentication.",
       "oneOf": [
         {
-          "$ref": "#/definitions/MediaGraphUsernamePasswordCredentials"
+          "description": "Username/password credential pair.",
+          "properties": {
+            "password": {
+              "description": "Password for a username/password pair.",
+              "type": "string"
+            },
+            "username": {
+              "description": "Username for a username/password pair.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "username",
+            "password"
+          ],
+          "type": "object"
         }
       ],
       "properties": {},
-      "description": "Credentials to present during authentication."
+      "type": "object"
     },
     "MediaGraphEndpoint": {
-      "type": "object",
+      "description": "Base class for endpoints.",
       "oneOf": [
         {
-          "$ref": "#/definitions/MediaGraphClearEndpoint"
+          "description": "An endpoint to connect to with no encryption in transit.",
+          "properties": {},
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/MediaGraphTlsEndpoint"
+          "description": "An endpoint which must be connected over TLS/SSL.",
+          "properties": {
+            "trustedCertificates": {
+              "description": "What certificates should be trusted when authenticating a TLS connection. Null designates that Azure Media's source of trust should be used.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/MediaGraphCertificateSource"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "validationOptions": {
+              "description": "Validation options to use when authenticating a TLS connection. By default, strict validation is used.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/MediaGraphTlsValidationOptions"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "type": "object"
         }
       ],
       "properties": {
         "credentials": {
+          "description": "Polymorphic credentials to present to the endpoint.",
           "oneOf": [
             {
               "$ref": "#/definitions/MediaGraphCredentials"
@@ -119,226 +147,159 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Credentials to present during authentication."
+          ]
         },
         "url": {
-          "type": "string",
-          "description": "Url for the endpoint."
+          "description": "Url for the endpoint.",
+          "type": "string"
         }
       },
       "required": [
         "url"
       ],
-      "description": "Base class for endpoints."
-    },
-    "MediaGraphPemCertificateList": {
-      "type": "object",
-      "properties": {
-        "@odata.type": {
-          "type": "string",
-          "enum": [
-            "#Microsoft.Media.MediaGraphPemCertificateList"
-          ]
-        },
-        "certificates": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "PEM formatted public certificates, one per entry."
-        }
-      },
-      "required": [
-        "@odata.type",
-        "certificates"
-      ],
-      "description": "A list of PEM formatted certificates."
+      "type": "object"
     },
     "MediaGraphProperties": {
-      "type": "object",
+      "description": "Class for Media Graph properties.",
       "properties": {
         "description": {
-          "type": "string",
-          "description": "Media Graph description."
+          "description": "Media Graph description.",
+          "type": "string"
         },
         "sinks": {
+          "description": "Media Graph sinks.",
           "oneOf": [
             {
-              "type": "array",
               "items": {
                 "$ref": "#/definitions/MediaGraphSink"
-              }
+              },
+              "type": "array"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Media Graph sinks."
-        },
-        "sources": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/MediaGraphSource"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Media Graph sources."
-        }
-      },
-      "required": [
-        "sinks",
-        "sources"
-      ],
-      "description": "Class for Media Graph properties."
-    },
-    "MediaGraphRtspSource": {
-      "type": "object",
-      "properties": {
-        "@odata.type": {
-          "type": "string",
-          "enum": [
-            "#Microsoft.Media.MediaGraphRtspSource"
           ]
         },
-        "endpoint": {
+        "sources": {
+          "description": "Media Graph sources.",
           "oneOf": [
             {
-              "$ref": "#/definitions/MediaGraphEndpoint"
+              "items": {
+                "$ref": "#/definitions/MediaGraphSource"
+              },
+              "type": "array"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Base class for endpoints."
-        },
-        "transport": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Http",
-                "Tcp"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Underlying RTSP transport. This can be used to enable or disable HTTP tunneling."
+          ]
         }
       },
       "required": [
-        "@odata.type",
-        "endpoint",
-        "transport"
+        "sources",
+        "sinks"
       ],
-      "description": "RTSP source."
+      "type": "object"
     },
     "MediaGraphSink": {
-      "type": "object",
+      "description": "Media Sink.",
       "oneOf": [
         {
-          "$ref": "#/definitions/MediaGraphAssetSink"
+          "description": "Asset sink.",
+          "properties": {
+            "assetName": {
+              "description": "Asset name.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "assetName"
+          ],
+          "type": "object"
         }
       ],
       "properties": {
         "inputs": {
+          "description": "Sink inputs.",
           "oneOf": [
             {
-              "type": "array",
               "items": {
                 "type": "string"
-              }
+              },
+              "type": "array"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Sink inputs."
-        },
-        "name": {
-          "type": "string",
-          "description": "Sink name."
-        }
-      },
-      "required": [
-        "inputs",
-        "name"
-      ],
-      "description": "Media Sink."
-    },
-    "MediaGraphSource": {
-      "type": "object",
-      "oneOf": [
-        {
-          "$ref": "#/definitions/MediaGraphRtspSource"
-        }
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Source name."
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "description": "Media source."
-    },
-    "MediaGraphTlsEndpoint": {
-      "type": "object",
-      "properties": {
-        "@odata.type": {
-          "type": "string",
-          "enum": [
-            "#Microsoft.Media.MediaGraphTlsEndpoint"
           ]
         },
-        "trustedCertificates": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/MediaGraphCertificateSource"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Base class for certificate sources."
-        },
-        "validationOptions": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/MediaGraphTlsValidationOptions"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Options for controlling the authentication of TLS endpoints."
+        "name": {
+          "description": "Sink name.",
+          "type": "string"
         }
       },
       "required": [
-        "@odata.type"
+        "name",
+        "inputs"
       ],
-      "description": "An endpoint which must be connected over TLS/SSL."
+      "type": "object"
+    },
+    "MediaGraphSource": {
+      "description": "Media source.",
+      "oneOf": [
+        {
+          "description": "RTSP source.",
+          "properties": {
+            "endpoint": {
+              "description": "RTSP endpoint of the stream being connected to.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/MediaGraphEndpoint"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "transport": {
+              "description": "Underlying RTSP transport. This can be used to enable or disable HTTP tunneling.",
+              "oneOf": [
+                {
+                  "enum": [
+                    "Http",
+                    "Tcp"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "transport",
+            "endpoint"
+          ],
+          "type": "object"
+        }
+      ],
+      "properties": {
+        "name": {
+          "description": "Source name.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
     },
     "MediaGraphTlsValidationOptions": {
-      "type": "object",
+      "description": "Options for controlling the authentication of TLS endpoints.",
       "properties": {
         "ignoreHostname": {
+          "description": "Ignore the host name (common name) during validation.",
           "oneOf": [
             {
               "type": "boolean"
@@ -346,10 +307,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Ignore the host name (common name) during validation."
+          ]
         },
         "ignoreSignature": {
+          "description": "Ignore the integrity of the certificate chain at the current time.",
           "oneOf": [
             {
               "type": "boolean"
@@ -357,40 +318,14 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Ignore the integrity of the certificate chain at the current time."
+          ]
         }
       },
       "required": [
         "ignoreHostname",
         "ignoreSignature"
       ],
-      "description": "Options for controlling the authentication of TLS endpoints."
-    },
-    "MediaGraphUsernamePasswordCredentials": {
-      "type": "object",
-      "properties": {
-        "@odata.type": {
-          "type": "string",
-          "enum": [
-            "#Microsoft.Media.MediaGraphUsernamePasswordCredentials"
-          ]
-        },
-        "password": {
-          "type": "string",
-          "description": "Password for a username/password pair."
-        },
-        "username": {
-          "type": "string",
-          "description": "Username for a username/password pair."
-        }
-      },
-      "required": [
-        "@odata.type",
-        "password",
-        "username"
-      ],
-      "description": "Username/password credential pair."
+      "type": "object"
     }
   }
 }

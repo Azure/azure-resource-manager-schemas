@@ -1,27 +1,28 @@
 {
   "id": "https://schema.management.azure.com/schemas/2018-04-16/Microsoft.Insights.json#",
-  "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.Insights",
   "description": "Microsoft Insights Resource Types",
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "resourceDefinitions": {
     "scheduledQueryRules": {
-      "type": "object",
+      "description": "Microsoft.Insights/scheduledQueryRules",
       "properties": {
         "apiVersion": {
-          "type": "string",
           "enum": [
             "2018-04-16"
-          ]
+          ],
+          "type": "string"
         },
         "location": {
-          "type": "string",
-          "description": "Resource location"
+          "description": "Resource location",
+          "type": "string"
         },
         "name": {
-          "type": "string",
-          "description": "The name of the rule."
+          "description": "The name of the rule.",
+          "type": "string"
         },
         "properties": {
+          "description": "The rule properties of the resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/LogSearchRule"
@@ -29,212 +30,220 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Log Search Rule Definition"
+          ]
         },
         "tags": {
+          "description": "Resource tags",
           "oneOf": [
             {
-              "type": "object",
               "additionalProperties": {
                 "type": "string"
               },
-              "properties": {}
+              "properties": {},
+              "type": "object"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Resource tags"
+          ]
         },
         "type": {
-          "type": "string",
           "enum": [
             "Microsoft.Insights/scheduledQueryRules"
-          ]
+          ],
+          "type": "string"
         }
       },
       "required": [
-        "apiVersion",
-        "location",
         "name",
         "properties",
+        "apiVersion",
         "type"
       ],
-      "description": "Microsoft.Insights/scheduledQueryRules"
+      "type": "object"
     }
   },
   "definitions": {
     "Action": {
-      "type": "object",
+      "description": "Action descriptor.",
       "oneOf": [
         {
-          "$ref": "#/definitions/AlertingAction"
+          "description": "Specify action need to be taken when rule type is Alert",
+          "properties": {
+            "aznsAction": {
+              "description": "Azure action group reference.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/AzNsActionGroup"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "severity": {
+              "description": "Severity of the alert",
+              "oneOf": [
+                {
+                  "enum": [
+                    "0",
+                    "1",
+                    "2",
+                    "3",
+                    "4"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "throttlingInMin": {
+              "description": "time (in minutes) for which Alerts should be throttled or suppressed.",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "trigger": {
+              "description": "The trigger condition that results in the alert rule being.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/TriggerCondition"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "severity",
+            "trigger"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/LogToMetricAction"
+          "description": "Specify action need to be taken when rule type is converting log to metric",
+          "properties": {
+            "criteria": {
+              "description": "Criteria of Metric",
+              "oneOf": [
+                {
+                  "items": {
+                    "$ref": "#/definitions/Criteria"
+                  },
+                  "type": "array"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "criteria"
+          ],
+          "type": "object"
         }
       ],
       "properties": {},
-      "description": "Action descriptor."
-    },
-    "AlertingAction": {
-      "type": "object",
-      "properties": {
-        "aznsAction": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/AzNsActionGroup"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Azure action group"
-        },
-        "odata.type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
-          ]
-        },
-        "severity": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "0",
-                "1",
-                "2",
-                "3",
-                "4"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Severity of the alert."
-        },
-        "throttlingInMin": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "time (in minutes) for which Alerts should be throttled or suppressed."
-        },
-        "trigger": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/TriggerCondition"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The condition that results in the Log Search rule."
-        }
-      },
-      "required": [
-        "odata.type",
-        "severity",
-        "trigger"
-      ],
-      "description": "Specify action need to be taken when rule type is Alert"
+      "type": "object"
     },
     "AzNsActionGroup": {
-      "type": "object",
+      "description": "Azure action group",
       "properties": {
         "actionGroup": {
+          "description": "Azure Action Group reference.",
           "oneOf": [
             {
-              "type": "array",
               "items": {
                 "type": "string"
-              }
+              },
+              "type": "array"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Azure Action Group reference."
+          ]
         },
         "customWebhookPayload": {
-          "type": "string",
-          "description": "Custom payload to be sent for all webhook URI in Azure action group"
+          "description": "Custom payload to be sent for all webhook URI in Azure action group",
+          "type": "string"
         },
         "emailSubject": {
-          "type": "string",
-          "description": "Custom subject override for all email ids in Azure action group"
+          "description": "Custom subject override for all email ids in Azure action group",
+          "type": "string"
         }
       },
-      "description": "Azure action group"
+      "type": "object"
     },
     "Criteria": {
-      "type": "object",
+      "description": "Specifies the criteria for converting log to metric.",
       "properties": {
         "dimensions": {
+          "description": "List of Dimensions for creating metric",
           "oneOf": [
             {
-              "type": "array",
               "items": {
                 "$ref": "#/definitions/Dimension"
-              }
+              },
+              "type": "array"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "List of Dimensions for creating metric"
+          ]
         },
         "metricName": {
-          "type": "string",
-          "description": "Name of the metric"
+          "description": "Name of the metric",
+          "type": "string"
         }
       },
       "required": [
         "metricName"
       ],
-      "description": "Specifies the criteria for converting log to metric."
+      "type": "object"
     },
     "Dimension": {
-      "type": "object",
+      "description": "Specifies the criteria for converting log to metric.",
       "properties": {
         "name": {
-          "type": "string",
-          "description": "Name of the dimension"
+          "description": "Name of the dimension",
+          "type": "string"
         },
         "operator": {
+          "description": "Operator for dimension values",
           "oneOf": [
             {
-              "type": "string",
               "enum": [
                 "Include"
-              ]
+              ],
+              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Operator for dimension values"
+          ]
         },
         "values": {
+          "description": "List of dimension values",
           "oneOf": [
             {
-              "type": "array",
               "items": {
                 "type": "string"
-              }
+              },
+              "type": "array"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "List of dimension values"
+          ]
         }
       },
       "required": [
@@ -242,31 +251,32 @@
         "operator",
         "values"
       ],
-      "description": "Specifies the criteria for converting log to metric."
+      "type": "object"
     },
     "LogMetricTrigger": {
-      "type": "object",
+      "description": "A log metrics trigger descriptor.",
       "properties": {
         "metricColumn": {
-          "type": "string",
-          "description": "Evaluation of metric on a particular column"
+          "description": "Evaluation of metric on a particular column",
+          "type": "string"
         },
         "metricTriggerType": {
+          "description": "Metric Trigger Type - 'Consecutive' or 'Total'",
           "oneOf": [
             {
-              "type": "string",
               "enum": [
                 "Consecutive",
                 "Total"
-              ]
+              ],
+              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Metric Trigger Type - 'Consecutive' or 'Total'."
+          ]
         },
         "threshold": {
+          "description": "The threshold of the metric trigger.",
           "oneOf": [
             {
               "type": "number"
@@ -274,34 +284,34 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "The threshold of the metric trigger."
+          ]
         },
         "thresholdOperator": {
+          "description": "Evaluation operation for Metric -'GreaterThan' or 'LessThan' or 'Equal'.",
           "oneOf": [
             {
-              "type": "string",
               "enum": [
                 "GreaterThanOrEqual",
                 "LessThanOrEqual",
                 "GreaterThan",
                 "LessThan",
                 "Equal"
-              ]
+              ],
+              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Evaluation operation for Metric -'GreaterThan' or 'LessThan' or 'Equal'."
+          ]
         }
       },
-      "description": "A log metrics trigger descriptor."
+      "type": "object"
     },
     "LogSearchRule": {
-      "type": "object",
+      "description": "Log Search Rule Definition",
       "properties": {
         "action": {
+          "description": "Action needs to be taken on rule execution.",
           "oneOf": [
             {
               "$ref": "#/definitions/Action"
@@ -309,45 +319,44 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Action descriptor."
+          ]
         },
         "autoMitigate": {
+          "description": "The flag that indicates whether the alert should be automatically resolved or not. The default is false.",
           "oneOf": [
             {
-              "type": "boolean",
-              "default": false
+              "type": "boolean"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "The flag that indicates whether the alert should be automatically resolved or not. The default is false."
+          ]
         },
         "description": {
-          "type": "string",
-          "description": "The description of the Log Search rule."
+          "description": "The description of the Log Search rule.",
+          "type": "string"
         },
         "displayName": {
-          "type": "string",
-          "description": "The display name of the alert rule"
+          "description": "The display name of the alert rule",
+          "type": "string"
         },
         "enabled": {
+          "description": "The flag which indicates whether the Log Search rule is enabled. Value should be true or false",
           "oneOf": [
             {
-              "type": "string",
               "enum": [
                 "true",
                 "false"
-              ]
+              ],
+              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "The flag which indicates whether the Log Search rule is enabled. Value should be true or false."
+          ]
         },
         "schedule": {
+          "description": "Schedule (Frequency, Time Window) for rule. Required for action type - AlertingAction",
           "oneOf": [
             {
               "$ref": "#/definitions/Schedule"
@@ -355,10 +364,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Defines how often to run the search and the time interval."
+          ]
         },
         "source": {
+          "description": "Data Source against which rule will Query Data",
           "oneOf": [
             {
               "$ref": "#/definitions/Source"
@@ -366,50 +375,20 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Specifies the log search query."
-        }
-      },
-      "required": [
-        "action",
-        "source"
-      ],
-      "description": "Log Search Rule Definition"
-    },
-    "LogToMetricAction": {
-      "type": "object",
-      "properties": {
-        "criteria": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Criteria"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Criteria of Metric"
-        },
-        "odata.type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.LogToMetricAction"
           ]
         }
       },
       "required": [
-        "criteria",
-        "odata.type"
+        "source",
+        "action"
       ],
-      "description": "Specify action need to be taken when rule type is converting log to metric"
+      "type": "object"
     },
     "Schedule": {
-      "type": "object",
+      "description": "Defines how often to run the search and the time interval.",
       "properties": {
         "frequencyInMinutes": {
+          "description": "frequency (in minutes) at which rule condition should be evaluated.",
           "oneOf": [
             {
               "type": "integer"
@@ -417,10 +396,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "frequency (in minutes) at which rule condition should be evaluated."
+          ]
         },
         "timeWindowInMinutes": {
+          "description": "Time window for which data needs to be fetched for query (should be greater than or equal to frequencyInMinutes).",
           "oneOf": [
             {
               "type": "integer"
@@ -428,65 +407,65 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Time window for which data needs to be fetched for query (should be greater than or equal to frequencyInMinutes)."
+          ]
         }
       },
       "required": [
         "frequencyInMinutes",
         "timeWindowInMinutes"
       ],
-      "description": "Defines how often to run the search and the time interval."
+      "type": "object"
     },
     "Source": {
-      "type": "object",
+      "description": "Specifies the log search query.",
       "properties": {
         "authorizedResources": {
+          "description": "List of  Resource referred into query",
           "oneOf": [
             {
-              "type": "array",
               "items": {
                 "type": "string"
-              }
+              },
+              "type": "array"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "List of  Resource referred into query"
+          ]
         },
         "dataSourceId": {
-          "type": "string",
-          "description": "The resource uri over which log search query is to be run."
+          "description": "The resource uri over which log search query is to be run.",
+          "type": "string"
         },
         "query": {
-          "type": "string",
-          "description": "Log search query. Required for action type - AlertingAction"
+          "description": "Log search query. Required for action type - AlertingAction",
+          "type": "string"
         },
         "queryType": {
+          "description": "Set value to 'ResultCount' .",
           "oneOf": [
             {
-              "type": "string",
               "enum": [
                 "ResultCount"
-              ]
+              ],
+              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Set value to 'ResultCount'."
+          ]
         }
       },
       "required": [
         "dataSourceId"
       ],
-      "description": "Specifies the log search query."
+      "type": "object"
     },
     "TriggerCondition": {
-      "type": "object",
+      "description": "The condition that results in the Log Search rule.",
       "properties": {
         "metricTrigger": {
+          "description": "Trigger condition for metric query rule",
           "oneOf": [
             {
               "$ref": "#/definitions/LogMetricTrigger"
@@ -494,10 +473,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "A log metrics trigger descriptor."
+          ]
         },
         "threshold": {
+          "description": "Result or count threshold based on which rule should be triggered.",
           "oneOf": [
             {
               "type": "number"
@@ -505,33 +484,32 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Result or count threshold based on which rule should be triggered."
+          ]
         },
         "thresholdOperator": {
+          "description": "Evaluation operation for rule - 'GreaterThan' or 'LessThan.",
           "oneOf": [
             {
-              "type": "string",
               "enum": [
                 "GreaterThanOrEqual",
                 "LessThanOrEqual",
                 "GreaterThan",
                 "LessThan",
                 "Equal"
-              ]
+              ],
+              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Evaluation operation for rule - 'GreaterThan' or 'LessThan."
+          ]
         }
       },
       "required": [
-        "threshold",
-        "thresholdOperator"
+        "thresholdOperator",
+        "threshold"
       ],
-      "description": "The condition that results in the Log Search rule."
+      "type": "object"
     }
   }
 }

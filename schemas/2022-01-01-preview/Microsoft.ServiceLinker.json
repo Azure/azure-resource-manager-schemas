@@ -1,24 +1,24 @@
 {
   "id": "https://schema.management.azure.com/schemas/2022-01-01-preview/Microsoft.ServiceLinker.json#",
-  "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.ServiceLinker",
   "description": "Microsoft ServiceLinker Resource Types",
-  "resourceDefinitions": {},
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "unknown_resourceDefinitions": {
     "linkers": {
-      "type": "object",
+      "description": "Microsoft.ServiceLinker/linkers",
       "properties": {
         "apiVersion": {
-          "type": "string",
           "enum": [
             "2022-01-01-preview"
-          ]
+          ],
+          "type": "string"
         },
         "name": {
-          "type": "string",
-          "description": "The name Linker resource."
+          "description": "The name Linker resource.",
+          "type": "string"
         },
         "properties": {
+          "description": "The properties of the linker.",
           "oneOf": [
             {
               "$ref": "#/definitions/LinkerProperties"
@@ -26,198 +26,147 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "The properties of the linker."
+          ]
         },
         "type": {
-          "type": "string",
           "enum": [
             "Microsoft.ServiceLinker/linkers"
-          ]
+          ],
+          "type": "string"
         }
       },
       "required": [
-        "apiVersion",
         "name",
         "properties",
+        "apiVersion",
         "type"
       ],
-      "description": "Microsoft.ServiceLinker/linkers"
+      "type": "object"
     }
   },
   "definitions": {
     "AuthInfoBase": {
-      "type": "object",
+      "description": "The authentication info",
       "oneOf": [
         {
-          "$ref": "#/definitions/SecretAuthInfo"
+          "description": "The authentication info when authType is secret",
+          "properties": {
+            "name": {
+              "description": "Username or account name for secret auth.",
+              "type": "string"
+            },
+            "secretInfo": {
+              "description": "Password or key vault secret for secret auth.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/SecretInfoBase"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/UserAssignedIdentityAuthInfo"
+          "description": "The authentication info when authType is servicePrincipal certificate",
+          "properties": {
+            "certificate": {
+              "description": "ServicePrincipal certificate for servicePrincipal auth.",
+              "type": "string"
+            },
+            "clientId": {
+              "description": "Application clientId for servicePrincipal auth.",
+              "type": "string"
+            },
+            "principalId": {
+              "description": "Principal Id for servicePrincipal auth.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "clientId",
+            "principalId",
+            "certificate"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/SystemAssignedIdentityAuthInfo"
+          "description": "The authentication info when authType is servicePrincipal secret",
+          "properties": {
+            "clientId": {
+              "description": "ServicePrincipal application clientId for servicePrincipal auth.",
+              "type": "string"
+            },
+            "principalId": {
+              "description": "Principal Id for servicePrincipal auth.",
+              "type": "string"
+            },
+            "secret": {
+              "description": "Secret for servicePrincipal auth.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "clientId",
+            "principalId",
+            "secret"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/ServicePrincipalSecretAuthInfo"
+          "description": "The authentication info when authType is systemAssignedIdentity",
+          "properties": {},
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/ServicePrincipalCertificateAuthInfo"
+          "description": "The authentication info when authType is userAssignedIdentity",
+          "properties": {
+            "clientId": {
+              "description": "Client Id for userAssignedIdentity.",
+              "type": "string"
+            },
+            "subscriptionId": {
+              "description": "Subscription id for userAssignedIdentity.",
+              "type": "string"
+            }
+          },
+          "type": "object"
         }
       ],
       "properties": {},
-      "description": "The authentication info"
-    },
-    "AzureKeyVaultProperties": {
-      "type": "object",
-      "properties": {
-        "connectAsKubernetesCsiDriver": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "True if connect via Kubernetes CSI Driver."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "KeyVault"
-          ]
-        }
-      },
-      "required": [
-        "type"
-      ],
-      "description": "The resource properties when type is Azure Key Vault"
-    },
-    "AzureResource": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "The Id of azure resource."
-        },
-        "resourceProperties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/AzureResourcePropertiesBase"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The azure resource properties"
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "AzureResource"
-          ]
-        }
-      },
-      "required": [
-        "type"
-      ],
-      "description": "The azure resource info when target service type is AzureResource"
+      "type": "object"
     },
     "AzureResourcePropertiesBase": {
-      "type": "object",
+      "description": "The azure resource properties",
       "oneOf": [
         {
-          "$ref": "#/definitions/AzureKeyVaultProperties"
+          "description": "The resource properties when type is Azure Key Vault",
+          "properties": {
+            "connectAsKubernetesCsiDriver": {
+              "description": "True if connect via Kubernetes CSI Driver.",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "type": "object"
         }
       ],
       "properties": {},
-      "description": "The azure resource properties"
-    },
-    "ConfluentBootstrapServer": {
-      "type": "object",
-      "properties": {
-        "endpoint": {
-          "type": "string",
-          "description": "The endpoint of service."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "ConfluentBootstrapServer"
-          ]
-        }
-      },
-      "required": [
-        "type"
-      ],
-      "description": "The service properties when target service type is ConfluentBootstrapServer"
-    },
-    "ConfluentSchemaRegistry": {
-      "type": "object",
-      "properties": {
-        "endpoint": {
-          "type": "string",
-          "description": "The endpoint of service."
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "ConfluentSchemaRegistry"
-          ]
-        }
-      },
-      "required": [
-        "type"
-      ],
-      "description": "The service properties when target service type is ConfluentSchemaRegistry"
-    },
-    "KeyVaultSecretReferenceSecretInfo": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Name of the Key Vault secret."
-        },
-        "secretType": {
-          "type": "string",
-          "enum": [
-            "keyVaultSecretReference"
-          ]
-        },
-        "version": {
-          "type": "string",
-          "description": "Version of the Key Vault secret."
-        }
-      },
-      "required": [
-        "secretType"
-      ],
-      "description": "The secret info when type is keyVaultSecretReference. It's for scenario that user provides a secret stored in user's keyvault and source is Azure Kubernetes. The key Vault's resource id is linked to secretStore.keyVaultId."
-    },
-    "KeyVaultSecretUriSecretInfo": {
-      "type": "object",
-      "properties": {
-        "secretType": {
-          "type": "string",
-          "enum": [
-            "keyVaultSecretUri"
-          ]
-        },
-        "value": {
-          "type": "string",
-          "description": "URI to the keyvault secret"
-        }
-      },
-      "required": [
-        "secretType"
-      ],
-      "description": "The secret info when type is keyVaultSecretUri. It's for scenario that user provides a secret stored in user's keyvault and source is Web App, Spring Cloud or Container App."
+      "type": "object"
     },
     "LinkerProperties": {
-      "type": "object",
+      "description": "The properties of the linker.",
       "properties": {
         "authInfo": {
+          "description": "The authentication type.",
           "oneOf": [
             {
               "$ref": "#/definitions/AuthInfoBase"
@@ -225,13 +174,12 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "The authentication info"
+          ]
         },
         "clientType": {
+          "description": "The application client type",
           "oneOf": [
             {
-              "type": "string",
               "enum": [
                 "none",
                 "dotnet",
@@ -243,19 +191,20 @@
                 "django",
                 "nodejs",
                 "springBoot"
-              ]
+              ],
+              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "The application client type."
+          ]
         },
         "scope": {
-          "type": "string",
-          "description": "connection scope in source service."
+          "description": "connection scope in source service.",
+          "type": "string"
         },
         "secretStore": {
+          "description": "An option to store secret value in secure place",
           "oneOf": [
             {
               "$ref": "#/definitions/SecretStore"
@@ -263,10 +212,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "An option to store secret value in secure place"
+          ]
         },
         "targetService": {
+          "description": "The target service properties",
           "oneOf": [
             {
               "$ref": "#/definitions/TargetServiceBase"
@@ -274,10 +223,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "The target service properties"
+          ]
         },
         "vNetSolution": {
+          "description": "The VNet solution.",
           "oneOf": [
             {
               "$ref": "#/definitions/VNetSolution"
@@ -285,221 +234,130 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "The VNet solution for linker"
-        }
-      },
-      "description": "The properties of the linker."
-    },
-    "SecretAuthInfo": {
-      "type": "object",
-      "properties": {
-        "authType": {
-          "type": "string",
-          "enum": [
-            "secret"
           ]
-        },
-        "name": {
-          "type": "string",
-          "description": "Username or account name for secret auth."
-        },
-        "secretInfo": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/SecretInfoBase"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The secret info"
         }
       },
-      "required": [
-        "authType"
-      ],
-      "description": "The authentication info when authType is secret"
+      "type": "object"
     },
     "SecretInfoBase": {
-      "type": "object",
+      "description": "The secret info",
       "oneOf": [
         {
-          "$ref": "#/definitions/ValueSecretInfo"
+          "description": "The secret info when type is keyVaultSecretReference. It's for scenario that user provides a secret stored in user's keyvault and source is Azure Kubernetes. The key Vault's resource id is linked to secretStore.keyVaultId.",
+          "properties": {
+            "name": {
+              "description": "Name of the Key Vault secret.",
+              "type": "string"
+            },
+            "version": {
+              "description": "Version of the Key Vault secret.",
+              "type": "string"
+            }
+          },
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/KeyVaultSecretReferenceSecretInfo"
+          "description": "The secret info when type is keyVaultSecretUri. It's for scenario that user provides a secret stored in user's keyvault and source is Web App, Spring Cloud or Container App.",
+          "properties": {
+            "value": {
+              "description": "URI to the keyvault secret",
+              "type": "string"
+            }
+          },
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/KeyVaultSecretUriSecretInfo"
+          "description": "The secret info when type is rawValue. It's for scenarios that user input the secret.",
+          "properties": {
+            "value": {
+              "description": "The actual value of the secret.",
+              "type": "string"
+            }
+          },
+          "type": "object"
         }
       ],
       "properties": {},
-      "description": "The secret info"
+      "type": "object"
     },
     "SecretStore": {
-      "type": "object",
+      "description": "An option to store secret value in secure place",
       "properties": {
         "keyVaultId": {
-          "type": "string",
-          "description": "The key vault id to store secret"
+          "description": "The key vault id to store secret",
+          "type": "string"
         }
       },
-      "description": "An option to store secret value in secure place"
-    },
-    "ServicePrincipalCertificateAuthInfo": {
-      "type": "object",
-      "properties": {
-        "authType": {
-          "type": "string",
-          "enum": [
-            "servicePrincipalCertificate"
-          ]
-        },
-        "certificate": {
-          "type": "string",
-          "description": "ServicePrincipal certificate for servicePrincipal auth."
-        },
-        "clientId": {
-          "type": "string",
-          "description": "Application clientId for servicePrincipal auth."
-        },
-        "principalId": {
-          "type": "string",
-          "description": "Principal Id for servicePrincipal auth."
-        }
-      },
-      "required": [
-        "authType",
-        "certificate",
-        "clientId",
-        "principalId"
-      ],
-      "description": "The authentication info when authType is servicePrincipal certificate"
-    },
-    "ServicePrincipalSecretAuthInfo": {
-      "type": "object",
-      "properties": {
-        "authType": {
-          "type": "string",
-          "enum": [
-            "servicePrincipalSecret"
-          ]
-        },
-        "clientId": {
-          "type": "string",
-          "description": "ServicePrincipal application clientId for servicePrincipal auth."
-        },
-        "principalId": {
-          "type": "string",
-          "description": "Principal Id for servicePrincipal auth."
-        },
-        "secret": {
-          "type": "string",
-          "description": "Secret for servicePrincipal auth."
-        }
-      },
-      "required": [
-        "authType",
-        "clientId",
-        "principalId",
-        "secret"
-      ],
-      "description": "The authentication info when authType is servicePrincipal secret"
-    },
-    "SystemAssignedIdentityAuthInfo": {
-      "type": "object",
-      "properties": {
-        "authType": {
-          "type": "string",
-          "enum": [
-            "systemAssignedIdentity"
-          ]
-        }
-      },
-      "required": [
-        "authType"
-      ],
-      "description": "The authentication info when authType is systemAssignedIdentity"
+      "type": "object"
     },
     "TargetServiceBase": {
-      "type": "object",
+      "description": "The target service properties",
       "oneOf": [
         {
-          "$ref": "#/definitions/AzureResource"
+          "description": "The azure resource info when target service type is AzureResource",
+          "properties": {
+            "id": {
+              "description": "The Id of azure resource.",
+              "type": "string"
+            },
+            "resourceProperties": {
+              "description": "The azure resource connection related properties.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/AzureResourcePropertiesBase"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/ConfluentBootstrapServer"
+          "description": "The service properties when target service type is ConfluentBootstrapServer",
+          "properties": {
+            "endpoint": {
+              "description": "The endpoint of service.",
+              "type": "string"
+            }
+          },
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/ConfluentSchemaRegistry"
+          "description": "The service properties when target service type is ConfluentSchemaRegistry",
+          "properties": {
+            "endpoint": {
+              "description": "The endpoint of service.",
+              "type": "string"
+            }
+          },
+          "type": "object"
         }
       ],
       "properties": {},
-      "description": "The target service properties"
-    },
-    "UserAssignedIdentityAuthInfo": {
-      "type": "object",
-      "properties": {
-        "authType": {
-          "type": "string",
-          "enum": [
-            "userAssignedIdentity"
-          ]
-        },
-        "clientId": {
-          "type": "string",
-          "description": "Client Id for userAssignedIdentity."
-        },
-        "subscriptionId": {
-          "type": "string",
-          "description": "Subscription id for userAssignedIdentity."
-        }
-      },
-      "required": [
-        "authType"
-      ],
-      "description": "The authentication info when authType is userAssignedIdentity"
-    },
-    "ValueSecretInfo": {
-      "type": "object",
-      "properties": {
-        "secretType": {
-          "type": "string",
-          "enum": [
-            "rawValue"
-          ]
-        },
-        "value": {
-          "type": "string",
-          "description": "The actual value of the secret."
-        }
-      },
-      "required": [
-        "secretType"
-      ],
-      "description": "The secret info when type is rawValue. It's for scenarios that user input the secret."
+      "type": "object"
     },
     "VNetSolution": {
-      "type": "object",
+      "description": "The VNet solution for linker",
       "properties": {
         "type": {
+          "description": "Type of VNet solution.",
           "oneOf": [
             {
-              "type": "string",
               "enum": [
                 "serviceEndpoint",
                 "privateLink"
-              ]
+              ],
+              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Type of VNet solution."
+          ]
         }
       },
-      "description": "The VNet solution for linker"
+      "type": "object"
     }
   }
 }

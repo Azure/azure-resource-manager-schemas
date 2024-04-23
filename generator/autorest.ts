@@ -2,15 +2,21 @@
 // Licensed under the MIT License.
 import path from 'path';
 import os from 'os';
-import { findRecursive, lowerCaseContains, executeCmd, fileExists } from './utils';
+import { findRecursive, executeCmd, fileExists } from './utils';
 import * as constants from './constants';
-import { ReadmeTag, AutoGenConfig, CodeBlock } from './models';
-import * as cm from '@ts-common/commonmark-to-markdown'
-import * as yaml from 'js-yaml'
 import { readFile, writeFile } from 'fs/promises';
+import * as markdown from '@ts-common/commonmark-to-markdown'
+import * as yaml from 'js-yaml'
 
 const autorestBinary = os.platform() === 'win32' ? 'autorest.cmd' : 'autorest';
-export const apiVersionRegex = /^\d{4}-\d{2}-\d{2}(|-preview)$/;
+
+const rootDir = `${__dirname}/../`;
+const extensionDir = path.resolve(`${rootDir}/bicep-types-az/src/autorest.bicep/`);
+
+function normalizeJsonPath(jsonPath: string) {
+  // eslint-disable-next-line no-useless-escape
+  return path.normalize(jsonPath).replace(/[\\\/]/g, '/');
+}
 
 async function execAutoRest(tmpFolder: string, params: string[]) {
     await executeCmd(__dirname, `${__dirname}/node_modules/.bin/${autorestBinary}`, params);
@@ -23,13 +29,17 @@ async function execAutoRest(tmpFolder: string, params: string[]) {
 
 export async function runAutorest(readme: string, tmpFolder: string) {
     const autoRestParams = [
-        `--version=${constants.autorestCoreVersion}`,
-        `--use=@autorest/azureresourceschema@${constants.azureresourceschemaVersion}`,
-        '--azureresourceschema',
+        `--use=@autorest/modelerfour`,
+        `--use=${extensionDir}`,
+        '--bicep',
         `--output-folder=${tmpFolder}`,
         '--multiapi',
-        '--pass-thru:subset-reducer',
-        '--pass-thru:schema-validator-swagger',
+        '--title=none',
+        // This is necessary to avoid failures such as "ERROR: Semantic violation: Discriminator must be a required property." blocking type generation.
+        // In an ideal world, we'd raise issues in https://github.com/Azure/azure-rest-api-specs and force RP teams to fix them, but this isn't very practical
+        // as new validations are added continuously, and there's often quite a lag before teams will fix them - we don't want to be blocked by this in generating types.
+        `--skip-semantics-validation`,
+        `--arm-schema=true`,
         readme,
     ];
 
@@ -40,81 +50,108 @@ export async function runAutorest(readme: string, tmpFolder: string) {
     return await execAutoRest(tmpFolder, autoRestParams);
 }
 
+export async function generateAutorestConfig(readmePath: string, bicepReadmePath: string) {
+  // This function takes in an input autorest configuration file (readme.md), and generates a autorest configuration file tailored for use by autorest.bicep (readme.bicep.md)
+  // We search for markdown yaml blocks containing input .json files, and unconditionally use them to generate output.
+  // The expected output file should consist of a set of blocks tagged by api version and a 'multi-api' block with links to tags:
+  //
+  //   ##Bicep
+  //   
+  //   ### Bicep multi-api
+  //   ```yaml $(bicep) && $(multiapi)
+  //   batch:
+  //     - tag: microsoft.securityinsights-2024-03-01
+  //     - tag: microsoft.securityinsights-2024-01-01-preview
+  //     ...
+  //   ```
+  //
+  //   ### Tag: microsoft.securityinsights-2024-03-01 and bicep
+  //   ```yaml $(tag) == 'microsoft.securityinsights-2024-03-01' && $(bicep)
+  //   input-file:
+  //     - Microsoft.SecurityInsights/stable/2024-03-01/AlertRules.json
+  //     - Microsoft.SecurityInsights/stable/2024-03-01/AutomationRules.json
+  //     ...
+  //   ```
+  //
+  //   ### Tag: microsoft.securityinsights-2024-01-01-preview and bicep
+  //   ```yaml $(tag) == 'microsoft.securityinsights-2024-01-01-preview' && $(bicep)
+  //   input-file:
+  //     - Microsoft.SecurityInsights/preview/2024-01-01-preview/AlertRules.json
+  //     - Microsoft.SecurityInsights/preview/2024-01-01-preview/AutomationRules.json
+  //     - Microsoft.SecurityInsights/preview/2024-01-01-preview/BillingStatistics.json
+  //     ...
 
+  // We expect a path format convention of <provider>/(any/number/of/intervening/folders)/<yyyy>-<mm>-<dd>(|-preview)/<filename>.json
+  // This information is used to generate individual tags in the generated autorest configuration
+  // eslint-disable-next-line no-useless-escape
+  const pathRegex = /^(\$\(this-folder\)\/|)([^\/]+)(?:\/[^\/]+)*\/(\d{4}-\d{2}-\d{2}(|-preview))\/.*\.json$/i;
 
-export async function generateAutorestConfig(readme: string, autoGenConfig: AutoGenConfig) {
-    const content = (await readFile(readme)).toString();
-    const markdownEx = cm.parse(content);
-    const fileSet = new Set<string>();
-    for (const node of cm.iterate(markdownEx.markDown)) {
-        // We're only interested in yaml code blocks
-        if (node.type !== 'code_block' || !node.info || !node.literal ||
-            !node.info.trim().startsWith('yaml')) {
-            continue;
-        }
-        
-        const DOC = (yaml.load(node.literal) as CodeBlock);
-        if (DOC) {
-            const inputFile = DOC['input-file'];
-            if (typeof inputFile === 'string') {
-                fileSet.add(inputFile);
-            } else if (inputFile instanceof Array) {
-                for (const i of inputFile) {
-                    fileSet.add(i);
-                }
-            }
-        }
+  const readmeContents = await readFile(readmePath, { encoding: 'utf8' });
+  const readmeMarkdown = markdown.parse(readmeContents);
+
+  const inputFiles = new Set<string>();
+  // we need to look for all autorest configuration elements containing input files, and collect that list of files. These will look like (e.g.):
+  // ```yaml $(tag) == 'someTag'
+  // input-file:
+  // - path/to/file.json
+  // - path/to/other_file.json
+  // ```
+  for (const node of markdown.iterate(readmeMarkdown.markDown)) {
+    // We're only interested in yaml code blocks
+    if (node.type !== 'code_block' || !node.info || !node.literal ||
+      !node.info.trim().startsWith('yaml')) {
+      continue;
     }
 
-    let readmeTag = {} as ReadmeTag;
-    for (const inputFile of fileSet) {
-        const pathComponents = inputFile.split("/");
-
-        if (!autoGenConfig.useNamespaceFromConfig &&
-            !lowerCaseContains(pathComponents, autoGenConfig.namespace)) {
-            continue;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const yamlData = yaml.load(node.literal) as any;
+    if (yamlData) {
+      // input-file may be a single string or an array of strings
+      const inputFile = yamlData['input-file'];
+      if (typeof inputFile === 'string') {
+        inputFiles.add(inputFile);
+      } else if (inputFile instanceof Array) {
+        for (const i of inputFile) {
+          inputFiles.add(i);
         }
-
-        const apiVersion = pathComponents.filter(p => p.match(apiVersionRegex) !== null)[0];
-        if (!apiVersion) {
-            continue;
-        }
-
-        readmeTag[apiVersion] ??= readmeTag[apiVersion] || [];
-        readmeTag[apiVersion].push(inputFile);
+      }
     }
+  }
 
-    if (autoGenConfig.readmeTag) {
-        readmeTag = {...readmeTag, ...autoGenConfig.readmeTag };
+  const filesByTag: Record<string, string[]> = {};
+  for (const file of inputFiles) {
+    const normalizedFile = normalizeJsonPath(file);
+    const match = pathRegex.exec(normalizedFile);
+    if (match) {
+      // Generate a unique tag. We can't process all of the different API versions in one autorest pass
+      // because there are constraints on naming uniqueness (e.g. naming of definitions), so we want to pass over
+      // each API version separately.
+      const tagName = `${match[2].toLowerCase()}-${match[3].toLowerCase()}`;
+      if (!filesByTag[tagName]) {
+        filesByTag[tagName] = [];
+      }
+
+      filesByTag[tagName].push(normalizedFile);
+    } else {
+      console.warn(`WARNING: Unable to parse swagger path "${file}"`);
     }
+  }
 
-    const schemaReadmeContent = compositeSchemaReadme(readmeTag);
+  let generatedContent = `##Bicep
 
-    const schemaReadme = readme.replace(/\.md$/i, '.azureresourceschema.md');
-
-    await writeFile(schemaReadme, schemaReadmeContent);
-}
-
-function compositeSchemaReadme(readmeTag: ReadmeTag): string {
-    let content =
-`## AzureResourceSchema
-
-### AzureResourceSchema multi-api
-
-\`\`\` yaml $(azureresourceschema) && $(multiapi)
-${yaml.dump({ 'batch': Object.keys(readmeTag).map(apiVersion => ({ 'tag': `schema-${apiVersion}`})) }, { lineWidth: 1000 })}
+### Bicep multi-api
+\`\`\`yaml $(bicep) && $(multiapi)
+${yaml.dump({ 'batch': Object.keys(filesByTag).map(tag => ({ 'tag': tag })) }, { lineWidth: 1000 })}
 \`\`\`
+`;
 
-`
-    for (const apiVersion of Object.keys(readmeTag)) {
-        content +=
-`
-### Tag: schema-${apiVersion} and azureresourceschema
-
-\`\`\` yaml $(tag) == 'schema-${apiVersion}' && $(azureresourceschema)
-${yaml.dump({ 'input-file': readmeTag[apiVersion] }, { lineWidth: 1000})}
+  for (const tag of Object.keys(filesByTag)) {
+    generatedContent += `### Tag: ${tag} and bicep
+\`\`\`yaml $(tag) == '${tag}' && $(bicep)
+${yaml.dump({ 'input-file': filesByTag[tag] }, { lineWidth: 1000})}
 \`\`\`
-`
-    }
-    return content;
+`;
+  }
+
+  await writeFile(bicepReadmePath, generatedContent);
 }

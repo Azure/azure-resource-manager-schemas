@@ -160,17 +160,25 @@ export function apiVersionCompare(a: string, b: string) {
   }
 }
 
-export async function readJsonFile(filePath: string) {    
-    const rawContents = await readFile(filePath, { encoding: 'utf8' });
+export async function readJsonFile(filePath: string) {
+    try {
+        const rawContents = await readFile(filePath, { encoding: 'utf8' });
 
-    return JSON.parse(rawContents);
+        return JSON.parse(rawContents);    
+    } catch (err) {
+        throw new Error(`Failed to read JSON file '${filePath}': ${err}`);
+    }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function writeJsonFile(filePath: string, json: any) {
-    const rawContents = JSON.stringify(json, null, 2);
+    try {
+        const rawContents = JSON.stringify(json, null, 2);
 
-    await writeFile(filePath, rawContents, { encoding: 'utf8' });
+        await writeFile(filePath, rawContents, { encoding: 'utf8' });
+    } catch (err) {
+        throw new Error(`Failed to read JSON file '${filePath}': ${err}`);
+    }
 }
 
 export async function safeMkdir(filePath: string) {

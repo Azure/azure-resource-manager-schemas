@@ -3,7 +3,7 @@
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function replaceRefByName(schema: any, definitionName: string, replacement: any) {
-  doRecursively(schema, val => {
+  transformSchemaRecursively(schema, val => {
     if (val['$ref'] === `#/definitions/${definitionName}`) {
       return replacement;
     }
@@ -19,7 +19,7 @@ export function replaceCyclicRefByName(schema: any, definitionName: string, repl
   for (const refName in schema.definitions) {
     refVertices[refName] = new Set<string>();
 
-    doRecursively(schema.definitions[refName], val => {
+    transformSchemaRecursively(schema.definitions[refName], val => {
       if (val['$ref'] && val['$ref'].startsWith('#/definitions/')) {
         refVertices[refName].add(val['$ref'].substring('#/definitions/'.length));
       }
@@ -35,19 +35,19 @@ export function replaceCyclicRefByName(schema: any, definitionName: string, repl
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function doRecursively(schema: any, func: (input: any) => any) {
+function transformSchemaRecursively(schema: any, transformFunc: (input: any) => any) {
   if (typeof schema === 'object') {
     for (const key of Object.keys(schema)) {
-      schema[key] = doRecursively(schema[key], func);
+      schema[key] = transformSchemaRecursively(schema[key], transformFunc);
     }
   }
   else if (Array.isArray(schema)) {
     for (let i = 0; i < schema.length; i++) {
-      schema[i] = doRecursively(schema[i], func);
+      schema[i] = transformSchemaRecursively(schema[i], transformFunc);
     }
   }
 
-  return func(schema);
+  return transformFunc(schema);
 }
 
 function findCyclicReferencingDefinitions(refVertices: Record<string, Set<string>>, definitionName: string) {

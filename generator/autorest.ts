@@ -13,7 +13,74 @@ const autorestBinary = os.platform() === 'win32' ? 'autorest.cmd' : 'autorest';
 const rootDir = `${__dirname}/../`;
 const extensionDir = path.resolve(`${rootDir}/bicep-types-az/src/autorest.bicep/`);
 
+function normalizeJsonPath(jsonPath: string) {
+  // eslint-disable-next-line no-useless-escape
+  return path.normalize(jsonPath).replace(/[\\\/]/g, '/');
+}
+
+async function execAutoRest(tmpFolder: string, params: string[]) {
+    await executeCmd(__dirname, `${__dirname}/node_modules/.bin/${autorestBinary}`, params);
+    if (!fileExists(tmpFolder)) {
+        return [];
+    }
+
+    return await findRecursive(tmpFolder, p => path.extname(p) === '.json');
+}
+
+export async function runAutorest(readme: string, tmpFolder: string) {
+    const autoRestParams = [
+        `--use=@autorest/modelerfour`,
+        `--use=${extensionDir}`,
+        '--bicep',
+        `--output-folder=${tmpFolder}`,
+        '--multiapi',
+        '--title=none',
+        // This is necessary to avoid failures such as "ERROR: Semantic violation: Discriminator must be a required property." blocking type generation.
+        // In an ideal world, we'd raise issues in https://github.com/Azure/azure-rest-api-specs and force RP teams to fix them, but this isn't very practical
+        // as new validations are added continuously, and there's often quite a lag before teams will fix them - we don't want to be blocked by this in generating types.
+        `--skip-semantics-validation`,
+        `--arm-schema=true`,
+        readme,
+    ];
+
+    if (constants.autoRestVerboseOutput) {
+        autoRestParams.push('--verbose');
+    }
+
+    return await execAutoRest(tmpFolder, autoRestParams);
+}
+
 export async function generateAutorestConfig(readmePath: string, bicepReadmePath: string) {
+  // This function takes in an input autorest configuration file (readme.md), and generates a autorest configuration file tailored for use by autorest.bicep (readme.bicep.md)
+  // We search for markdown yaml blocks containing input .json files, and unconditionally use them to generate output.
+  // The expected output file should consist of a set of blocks tagged by api version and a 'multi-api' block with links to tags:
+  //
+  //   ##Bicep
+  //   
+  //   ### Bicep multi-api
+  //   ```yaml $(bicep) && $(multiapi)
+  //   batch:
+  //     - tag: microsoft.securityinsights-2024-03-01
+  //     - tag: microsoft.securityinsights-2024-01-01-preview
+  //     ...
+  //   ```
+  //
+  //   ### Tag: microsoft.securityinsights-2024-03-01 and bicep
+  //   ```yaml $(tag) == 'microsoft.securityinsights-2024-03-01' && $(bicep)
+  //   input-file:
+  //     - Microsoft.SecurityInsights/stable/2024-03-01/AlertRules.json
+  //     - Microsoft.SecurityInsights/stable/2024-03-01/AutomationRules.json
+  //     ...
+  //   ```
+  //
+  //   ### Tag: microsoft.securityinsights-2024-01-01-preview and bicep
+  //   ```yaml $(tag) == 'microsoft.securityinsights-2024-01-01-preview' && $(bicep)
+  //   input-file:
+  //     - Microsoft.SecurityInsights/preview/2024-01-01-preview/AlertRules.json
+  //     - Microsoft.SecurityInsights/preview/2024-01-01-preview/AutomationRules.json
+  //     - Microsoft.SecurityInsights/preview/2024-01-01-preview/BillingStatistics.json
+  //     ...
+
   // We expect a path format convention of <provider>/(any/number/of/intervening/folders)/<yyyy>-<mm>-<dd>(|-preview)/<filename>.json
   // This information is used to generate individual tags in the generated autorest configuration
   // eslint-disable-next-line no-useless-escape
@@ -87,41 +154,4 @@ ${yaml.dump({ 'input-file': filesByTag[tag] }, { lineWidth: 1000})}
   }
 
   await writeFile(bicepReadmePath, generatedContent);
-}
-
-function normalizeJsonPath(jsonPath: string) {
-  // eslint-disable-next-line no-useless-escape
-  return path.normalize(jsonPath).replace(/[\\\/]/g, '/');
-}
-
-async function execAutoRest(tmpFolder: string, params: string[]) {
-    await executeCmd(__dirname, `${__dirname}/node_modules/.bin/${autorestBinary}`, params);
-    if (!fileExists(tmpFolder)) {
-        return [];
-    }
-
-    return await findRecursive(tmpFolder, p => path.extname(p) === '.json');
-}
-
-export async function runAutorest(readme: string, tmpFolder: string) {
-    const autoRestParams = [
-        `--use=@autorest/modelerfour`,
-        `--use=${extensionDir}`,
-        '--bicep',
-        `--output-folder=${tmpFolder}`,
-        '--multiapi',
-        '--title=none',
-        // This is necessary to avoid failures such as "ERROR: Semantic violation: Discriminator must be a required property." blocking type generation.
-        // In an ideal world, we'd raise issues in https://github.com/Azure/azure-rest-api-specs and force RP teams to fix them, but this isn't very practical
-        // as new validations are added continuously, and there's often quite a lag before teams will fix them - we don't want to be blocked by this in generating types.
-        `--skip-semantics-validation`,
-        `--arm-schema=true`,
-        readme,
-    ];
-
-    if (constants.autoRestVerboseOutput) {
-        autoRestParams.push('--verbose');
-    }
-
-    return await execAutoRest(tmpFolder, autoRestParams);
 }

@@ -27,12 +27,6 @@ const disabledProviders: AutoGenConfig[] = [
         namespace: 'Microsoft.Logic',
         disabledForAutogen: true,
     },
-    {
-        // Failed to install extension '@microsoft.azure/classic-openapi-validator' (~1.1.5)
-        basePath: 'service-map/resource-manager',
-        namespace: 'Microsoft.OperationalInsights',
-        disabledForAutogen: true,
-    },
 ];
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list

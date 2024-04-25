@@ -22,42 +22,15 @@ import { detectProviderNamespaces } from './generate';
 // New providers are onboarded by default. The providers listed here are the only ones **not** onboarded.
 const disabledProviders: AutoGenConfig[] = [
     {
-        basePath: 'cloudshell/resource-manager',
-        namespace: 'Microsoft.Portal',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'compute/resource-manager',
-        namespace: 'Microsoft.ContainerService',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'cdn/resource-manager',
-        namespace: 'Microsoft.Cdn',
-    },
-    {
+        // Need to be very careful - Microsoft.Logic are heavily dependent on Export Template, and are sensitive to properties being removed unintentionally
         basePath: 'logic/resource-manager',
         namespace: 'Microsoft.Logic',
         disabledForAutogen: true,
     },
     {
-        basePath: 'managedservices/resource-manager',
-        namespace: 'Microsoft.ManagedServices',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'operationsmanagement/resource-manager',
-        namespace: 'Microsoft.OperationsManagement',
-        disabledForAutogen: true,
-    },
-    {
+        // Failed to install extension '@microsoft.azure/classic-openapi-validator' (~1.1.5)
         basePath: 'service-map/resource-manager',
         namespace: 'Microsoft.OperationalInsights',
-        disabledForAutogen: true,
-    },
-    {
-        basePath: 'videoanalyzer/resource-manager',
-        namespace: 'Microsoft.Media',
         disabledForAutogen: true,
     },
 ];
@@ -1149,6 +1122,20 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'confidentialLedger/resource-manager',
         namespace: 'Microsoft.ConfidentialLedger',
+    },
+    {
+        basePath: 'managedservices/resource-manager',
+        namespace: 'Microsoft.ManagedServices',
+        resourceConfig: [
+            {
+                type: 'registrationDefinitions',
+                scopes: ScopeType.Subscription,
+            },
+            {
+                type: 'registrationAssignments',
+                scopes: ScopeType.Subscription | ScopeType.ResourceGroup,
+            },
+        ]
     },
 ];
 

@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-import { expect } from 'chai';
 import Ajv from 'ajv';
 import * as url from 'url';
 import path from 'path';
@@ -9,12 +8,11 @@ import { readFile } from 'fs/promises';
 import { getLanguageService } from 'vscode-json-languageservice';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import draft4MetaSchema from 'ajv/lib/refs/json-schema-draft-04.json';
-import 'mocha';
-import { findCycle } from './cycleCheck';
+import { findCycle } from '../src/cycleCheck';
 
-const schemasFolder = __dirname + '/../schemas/';
-const testSchemasFolder = __dirname + '/schemas/';
-const templateTestsFolder = __dirname + '/templateTests/';
+const schemasFolder = path.join(__dirname, '../../schemas/');
+const testSchemasFolder = path.join(__dirname, '../testSchemas/');
+const templateTestsFolder = path.join(__dirname, '../templateTests/');
 const armSchemasPrefix = /^https?:\/\/schema\.management\.azure\.com\/schemas\//
 const jsonSchemaDraft4Prefix = /^https?:\/\/json-schema\.org\/draft-04\/schema/
 
@@ -140,20 +138,19 @@ const schemasToSkip = [
 
 const schemaPaths = listSchemaPaths(schemasFolder).filter(path => schemasToSkip.indexOf(path) == -1);
 const templateTestPaths = listSchemaPaths(templateTestsFolder);
+const TIMEOUT_1_MINUTE = 60000;
 
 describe('Validate individual resource schemas', () => {
   it(`can be parsed with JSON.parse`, async function () {
-    this.timeout(60000);
     for (const schemaPath of schemaPaths) {
       const schema = await loadRawSchema(schemaPath);
 
-      expect(() => JSON.parse(schema), `Parsing ${schemaPath}`).not.to.throw();
+      expect(() => JSON.parse(schema)).not.toThrow();
     }
-  });
+  }, TIMEOUT_1_MINUTE);
 
   for (const metaSchemaPath of metaSchemaPaths) {
     it(`validates against '${metaSchemaPath}'`, async function () {
-      this.timeout(60000);
       for (const schemaPath of schemaPaths) {
         const schema = await loadSchema(schemaPath);
         const metaSchema = await loadSchema(metaSchemaPath);
@@ -161,39 +158,42 @@ describe('Validate individual resource schemas', () => {
         const validate = await ajvInstance.compileAsync(metaSchema);
         const result = await validate(schema);
 
-        expect(result, `Validating ${schemaPath} failed with errors ${JSON.stringify(validate.errors, null, 2)}`).to.be.true;
+        if (!result) {
+          console.error(`Validating ${schemaPath} failed with errors ${JSON.stringify(validate.errors, null, 2)}`);
+        }
+        expect(result).toBeTruthy();
       }
-    });
+    }, TIMEOUT_1_MINUTE);
   }
 
   it(`can be compiled`, async function () {
-    this.timeout(60000);
     for (const schemaPath of schemaPaths) {
       const schema = await loadSchema(schemaPath);
 
-      expect(() => ajvInstance.compile(schema), `Compiling ${schemaPath}`).not.to.throw();
+      expect(() => ajvInstance.compile(schema)).not.toThrow();
     }
-  });
+  }, TIMEOUT_1_MINUTE);
 
   it(`does not contain any cycles`, async function () {
 
     for (const schemaPath of schemaPaths) {
       if (!schemasToSkipForCyclicValidation.has(schemaPath)) {
-        this.timeout(60000);
         const schema = await loadSchema(schemaPath);
 
         const cycle = findCycle(schema);
-        expect(cycle, `Found ${schemaPath} cycle ${cycle?.join(' -> ')}`).to.be.undefined;
+
+        if (cycle) {
+          console.error(`Found ${schemaPath} cycle ${cycle?.join(' -> ')}`);
+        }
+        expect(cycle).toBeUndefined();
       }
     }
-  });
+  }, TIMEOUT_1_MINUTE);
 });
 
 describe('Validate test templates against VSCode language service', () => {
   for (const templateTestFile of templateTestPaths) {
     it(`running schema validation on '${templateTestFile}'`, async function () {
-      this.timeout(60000);
-
       const service = getLanguageService({
         schemaRequestService: loadRawSchema,
         workspaceContext: {
@@ -206,7 +206,7 @@ describe('Validate test templates against VSCode language service', () => {
       const jsonDocument = service.parseJSONDocument(textDocument);
 
       const result = await service.doValidation(textDocument, jsonDocument);
-      expect(result).to.deep.equal([]);
-    });
+      expect(result).toEqual([]);
+    }, TIMEOUT_1_MINUTE);
   }
 });

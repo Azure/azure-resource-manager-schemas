@@ -27,6 +27,12 @@ const disabledProviders: AutoGenConfig[] = [
         namespace: 'Microsoft.Logic',
         disabledForAutogen: true,
     },
+    {
+        // Duplicated under 'containerservice/resource-manager/Microsoft.ContainerService/aks'
+        basePath: 'compute/resource-manager',
+        namespace: 'Microsoft.ContainerService',
+        disabledForAutogen: true,
+    },
 ];
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list

@@ -9,7 +9,7 @@ export async function resolveAbsolutePath(localPath: string) {
     if (path.isAbsolute(localPath)) {
         return path.resolve(localPath);
     }
-    return path.resolve(constants.generatorRoot, localPath);
+    return path.resolve(constants.repoRoot, localPath);
 }
 
 export function validateAndReturnReadmePath(specsPath: string, basePath: string) {

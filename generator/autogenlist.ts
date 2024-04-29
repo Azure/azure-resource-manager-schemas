@@ -1114,6 +1114,11 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.OperationalInsights',
     },
     {
+        basePath: 'service-map/resource-manager',
+        namespace: 'Microsoft.OperationalInsights',
+        suffix: 'ServiceMap',
+    },
+    {
         basePath: 'confidentialLedger/resource-manager',
         namespace: 'Microsoft.ConfidentialLedger',
     },

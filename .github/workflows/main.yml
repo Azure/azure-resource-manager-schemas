@@ -7,10 +7,19 @@ jobs:
   schema-tests:
     name: Schema Tests
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -38,13 +47,25 @@ jobs:
         run: dotnet test DeploymentsSchemaTests/DeploymentsSchemaTests.csproj
         working-directory: ./tools
 
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
   build-generator:
     name: Build Generator
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+      
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -62,3 +83,6 @@ jobs:
       - name: Build
         run: npm run build
         working-directory: ./generator
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3

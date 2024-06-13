@@ -1184,15 +1184,11 @@
             }
           ]
         },
-        "messageTimestampType": {
-          "description": "Denotes the type of timestamp the message will hold. Two types of timestamp types AppendTime, CreateTime. AppendTime refers the time in which message got appended inside broker log. CreateTime refers to the time in which the message was generated on source side and producers can set this timestamp while sending the message. Default value is AppendTime. If you are using AMQP protocol, CreateTime equals AppendTime for now and will full have runtime support later.",
+        "messageTimestampDescription": {
+          "description": "Properties of MessageTimestamp Description",
           "oneOf": [
             {
-              "enum": [
-                "AppendTime",
-                "CreateTime"
-              ],
-              "type": "string"
+              "$ref": "#/definitions/MessageTimestampDescription"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -1344,6 +1340,27 @@
         "keyVersion": {
           "description": "Key Version",
           "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "MessageTimestampDescription": {
+      "description": "Properties of MessageTimestamp Description",
+      "properties": {
+        "timestampType": {
+          "description": "Denotes the type of timestamp the message will hold.Two types of timestamp types - \"AppendTime\" and \"CreateTime\". AppendTime refers the time in which message got appended inside broker log. CreateTime refers to the time in which the message was generated on source side and producers can set this timestamp while sending the message. Default value is AppendTime. If you are using AMQP protocol, CreateTime equals AppendTime and its behavior remains the same.",
+          "oneOf": [
+            {
+              "enum": [
+                "LogAppend",
+                "Create"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "type": "object"
@@ -1589,7 +1606,7 @@
               "enum": [
                 "Delete",
                 "Compact",
-                "Delete,Compact"
+                "DeleteOrCompact"
               ],
               "type": "string"
             },
@@ -1599,7 +1616,7 @@
           ]
         },
         "minCompactionLagInMins": {
-          "description": "The minimum time a message will remain ineligible for compaction in the log. Only applicable for logs that are being compacted.",
+          "description": "The minimum time a message will remain ineligible for compaction in the log. This value is used when cleanupPolicy is Compact or DeleteOrCompact.",
           "oneOf": [
             {
               "type": "integer"
@@ -1610,7 +1627,7 @@
           ]
         },
         "retentionTimeInHours": {
-          "description": "Number of hours to retain the events for this Event Hub. If cleanupPolicy is Compact the returned value of this property is Long.MaxValue ",
+          "description": "Number of hours to retain the events for this Event Hub. This should be positive value upto namespace SKU max. -1 is a special case where retention time is infinite, but the size of an entity is restricted and its size depends on namespace SKU type.",
           "oneOf": [
             {
               "type": "integer"
@@ -1621,7 +1638,7 @@
           ]
         },
         "tombstoneRetentionTimeInHours": {
-          "description": "Number of hours to retain the tombstone markers of a compacted Event Hub. This value is only used when cleanupPolicy is Compact. Consumer must complete reading the tombstone marker within this specified amount of time if consumer begins from starting offset to ensure they get a valid snapshot for the specific key described by the tombstone marker within the compacted Event Hub",
+          "description": "Number of hours to retain the tombstone markers of a compacted Event Hub. This value is used when cleanupPolicy is Compact or DeleteOrCompact. Consumer must complete reading the tombstone marker within this specified amount of time if consumer begins from starting offset to ensure they get a valid snapshot for the specific key described by the tombstone marker within the compacted Event Hub",
           "oneOf": [
             {
               "type": "integer"

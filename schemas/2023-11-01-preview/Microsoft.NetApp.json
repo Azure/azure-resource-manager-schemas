@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2023-11-01/Microsoft.NetApp.json#",
+  "id": "https://schema.management.azure.com/schemas/2023-11-01-preview/Microsoft.NetApp.json#",
   "title": "Microsoft.NetApp",
   "description": "Microsoft NetApp Resource Types",
   "$schema": "http://json-schema.org/draft-04/schema#",
@@ -9,7 +9,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2023-11-01"
+            "2023-11-01-preview"
           ],
           "type": "string"
         },
@@ -108,7 +108,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2023-11-01"
+            "2023-11-01-preview"
           ],
           "type": "string"
         },
@@ -166,7 +166,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2023-11-01"
+            "2023-11-01-preview"
           ],
           "type": "string"
         },
@@ -242,7 +242,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2023-11-01"
+            "2023-11-01-preview"
           ],
           "type": "string"
         },
@@ -289,7 +289,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2023-11-01"
+            "2023-11-01-preview"
           ],
           "type": "string"
         },
@@ -367,7 +367,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2023-11-01"
+            "2023-11-01-preview"
           ],
           "type": "string"
         },
@@ -467,7 +467,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2023-11-01"
+            "2023-11-01-preview"
           ],
           "type": "string"
         },
@@ -510,7 +510,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2023-11-01"
+            "2023-11-01-preview"
           ],
           "type": "string"
         },
@@ -559,7 +559,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2023-11-01"
+            "2023-11-01-preview"
           ],
           "type": "string"
         },
@@ -617,7 +617,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2023-11-01"
+            "2023-11-01-preview"
           ],
           "type": "string"
         },
@@ -675,7 +675,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2023-11-01"
+            "2023-11-01-preview"
           ],
           "type": "string"
         },
@@ -790,6 +790,19 @@
           "oneOf": [
             {
               "$ref": "#/definitions/AccountEncryption"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "nfsV4IDDomain": {
+          "description": "Domain for NFSv4 user ID mapping. This property will be set for all NetApp accounts in the subscription and region and only affect non ldap NFSv4 volumes.",
+          "oneOf": [
+            {
+              "maxLength": 255,
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9.-]{0,253}[a-zA-Z0-9]$",
+              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -1587,6 +1600,29 @@
       ],
       "type": "object"
     },
+    "RemotePath": {
+      "description": "The full path to a volume that is to be migrated into ANF. Required for Migration volumes",
+      "properties": {
+        "externalHostName": {
+          "description": "The Path to a ONTAP Host",
+          "type": "string"
+        },
+        "serverName": {
+          "description": "The name of a server on the ONTAP Host",
+          "type": "string"
+        },
+        "volumeName": {
+          "description": "The name of a volume on the server",
+          "type": "string"
+        }
+      },
+      "required": [
+        "externalHostName",
+        "serverName",
+        "volumeName"
+      ],
+      "type": "object"
+    },
     "ReplicationObject": {
       "description": "Replication properties",
       "properties": {
@@ -1605,12 +1641,23 @@
             }
           ]
         },
+        "remotePath": {
+          "description": "The full path to a volume that is to be migrated into ANF. Required for Migration volumes",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/RemotePath"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
         "remoteVolumeRegion": {
           "description": "The remote region for the other end of the Volume Replication.",
           "type": "string"
         },
         "remoteVolumeResourceId": {
-          "description": "The resource ID of the remote volume.",
+          "description": "The resource ID of the remote volume. Required for cross region and cross zone replication",
           "type": "string"
         },
         "replicationSchedule": {
@@ -1888,6 +1935,21 @@
     "VolumeProperties": {
       "description": "Volume properties",
       "properties": {
+        "acceptGrowCapacityPoolForShortTermCloneSplit": {
+          "description": "While auto splitting the short term clone volume, if the parent pool does not have enough space to accommodate the volume after split, it will be automatically resized, which will lead to increased billing. To accept capacity pool size auto grow and create a short term clone volume, set the property as accepted.",
+          "oneOf": [
+            {
+              "enum": [
+                "Accepted",
+                "Declined"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
         "avsDataStore": {
           "description": "Specifies whether the volume is enabled for Azure VMware Solution (AVS) datastore purpose",
           "oneOf": [
@@ -2098,6 +2160,88 @@
           "description": "The resource ID of private endpoint for KeyVault. It must reside in the same VNET as the volume. Only applicable if encryptionKeySource = 'Microsoft.KeyVault'.",
           "type": "string"
         },
+        "language": {
+          "description": "Language supported for volume.",
+          "oneOf": [
+            {
+              "enum": [
+                "c.utf-8",
+                "utf8mb4",
+                "ar",
+                "ar.utf-8",
+                "hr",
+                "hr.utf-8",
+                "cs",
+                "cs.utf-8",
+                "da",
+                "da.utf-8",
+                "nl",
+                "nl.utf-8",
+                "en",
+                "en.utf-8",
+                "fi",
+                "fi.utf-8",
+                "fr",
+                "fr.utf-8",
+                "de",
+                "de.utf-8",
+                "he",
+                "he.utf-8",
+                "hu",
+                "hu.utf-8",
+                "it",
+                "it.utf-8",
+                "ja",
+                "ja.utf-8",
+                "ja-v1",
+                "ja-v1.utf-8",
+                "ja-jp.pck",
+                "ja-jp.pck.utf-8",
+                "ja-jp.932",
+                "ja-jp.932.utf-8",
+                "ja-jp.pck-v2",
+                "ja-jp.pck-v2.utf-8",
+                "ko",
+                "ko.utf-8",
+                "no",
+                "no.utf-8",
+                "pl",
+                "pl.utf-8",
+                "pt",
+                "pt.utf-8",
+                "c",
+                "ro",
+                "ro.utf-8",
+                "ru",
+                "ru.utf-8",
+                "zh",
+                "zh.utf-8",
+                "zh.gbk",
+                "zh.gbk.utf-8",
+                "zh-tw.big5",
+                "zh-tw.big5.utf-8",
+                "zh-tw",
+                "zh-tw.utf-8",
+                "sk",
+                "sk.utf-8",
+                "sl",
+                "sl.utf-8",
+                "es",
+                "es.utf-8",
+                "sv",
+                "sv.utf-8",
+                "tr",
+                "tr.utf-8",
+                "en-us",
+                "en-us.utf-8"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
         "ldapEnabled": {
           "description": "Specifies whether LDAP is enabled or not for a given NFS volume.",
           "oneOf": [
@@ -2296,7 +2440,7 @@
           "type": "string"
         },
         "volumeType": {
-          "description": "What type of volume is this. For destination volumes in Cross Region Replication, set type to DataProtection",
+          "description": "What type of volume is this. For destination volumes in Cross Region Replication, set type to DataProtection. For creating clone volume, set type to ShortTermClone",
           "type": "string"
         }
       },
@@ -2501,7 +2645,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2023-11-01"
+            "2023-11-01-preview"
           ],
           "type": "string"
         },
@@ -2559,7 +2703,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2023-11-01"
+            "2023-11-01-preview"
           ],
           "type": "string"
         },
@@ -2606,7 +2750,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2023-11-01"
+            "2023-11-01-preview"
           ],
           "type": "string"
         },
@@ -2672,7 +2816,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2023-11-01"
+            "2023-11-01-preview"
           ],
           "type": "string"
         },
@@ -2740,7 +2884,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2023-11-01"
+            "2023-11-01-preview"
           ],
           "type": "string"
         },
@@ -2824,7 +2968,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2023-11-01"
+            "2023-11-01-preview"
           ],
           "type": "string"
         },
@@ -2867,7 +3011,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2023-11-01"
+            "2023-11-01-preview"
           ],
           "type": "string"
         },
@@ -2916,7 +3060,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2023-11-01"
+            "2023-11-01-preview"
           ],
           "type": "string"
         },
@@ -2974,7 +3118,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2023-11-01"
+            "2023-11-01-preview"
           ],
           "type": "string"
         },
@@ -3032,7 +3176,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2023-11-01"
+            "2023-11-01-preview"
           ],
           "type": "string"
         },

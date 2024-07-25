@@ -1,6 +1,5 @@
 #!/bin/bash
-
-set -e
+set -eou pipefail
 
 LOCAL_PATH=$(cat $1 | jq -r '.specFolder')
 README_FILES=$(cat $1 | jq -r '[.relatedReadmeMdFiles[]] | join(",")')

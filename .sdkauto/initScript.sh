@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -eou pipefail
 
 git submodule update --init --recursive
 

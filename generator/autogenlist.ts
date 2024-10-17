@@ -634,6 +634,10 @@ const autoGenList: AutoGenConfig[] = [
                 type: 'tags',
                 scopes: ScopeType.ManagementGroup | ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
+            {
+                type: 'dataBoundaries',
+                scopes: ScopeType.Tenant | ScopeType.Subscription | ScopeType.ResourceGroup,
+            },
         ],
         postProcessor: resourcesPostProcessor,
     },

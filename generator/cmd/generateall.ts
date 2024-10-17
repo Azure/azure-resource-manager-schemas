@@ -104,7 +104,9 @@ executeSynchronous(async () => {
                     pkg.result = 'failed';
                     console.log(colors.red(`Caught exception processing autogenlist entry ${autoGenConfig.basePath}.`));
                     console.log(colors.red(`${(error as Error)?.stack || error}`));
-            
+
+                    // return a non-zero exit code to mark the process as failed
+                    process.exitCode = 1;
                     // Use markdown formatting as this summary will be included in the PR description
                     logOut(summaryLogger, 
                         `<details>
@@ -118,6 +120,8 @@ executeSynchronous(async () => {
                 packages.push(pkg);
             }
         } catch (error) {
+            // return a non-zero exit code to mark the process as failed
+            process.exitCode = 1;
             // Use markdown formatting as this summary will be included in the PR description
             // This error usually indicates that a file has not been found (readme)
             logOut(summaryLogger, 

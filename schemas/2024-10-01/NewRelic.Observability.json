@@ -1,0 +1,833 @@
+{
+  "id": "https://schema.management.azure.com/schemas/2024-10-01/NewRelic.Observability.json#",
+  "title": "NewRelic.Observability",
+  "description": "NewRelic Observability Resource Types",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "resourceDefinitions": {
+    "monitors": {
+      "description": "NewRelic.Observability/monitors",
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "2024-10-01"
+          ],
+          "type": "string"
+        },
+        "identity": {
+          "description": "The managed service identities assigned to this resource.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ManagedServiceIdentity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "location": {
+          "description": "The geo-location where the resource lives",
+          "type": "string"
+        },
+        "name": {
+          "description": "Name of the Monitors resource",
+          "type": "string"
+        },
+        "properties": {
+          "description": "The resource-specific properties for this resource.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MonitorProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "resources": {
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/monitors_tagRules_childResource"
+              },
+              {
+                "$ref": "#/definitions/monitors_monitoredSubscriptions_childResource"
+              }
+            ]
+          },
+          "type": "array"
+        },
+        "tags": {
+          "description": "Resource tags.",
+          "oneOf": [
+            {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {},
+              "type": "object"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "enum": [
+            "NewRelic.Observability/monitors"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "properties",
+        "apiVersion",
+        "type"
+      ],
+      "type": "object"
+    },
+    "monitors_monitoredSubscriptions": {
+      "description": "NewRelic.Observability/monitors/monitoredSubscriptions",
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "2024-10-01"
+          ],
+          "type": "string"
+        },
+        "name": {
+          "description": "The configuration name. Only 'default' value is supported.",
+          "oneOf": [
+            {
+              "pattern": "^.*/default$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "description": "The request to update subscriptions needed to be monitored by the NewRelic monitor resource.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SubscriptionList"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "enum": [
+            "NewRelic.Observability/monitors/monitoredSubscriptions"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "properties",
+        "apiVersion",
+        "type"
+      ],
+      "type": "object"
+    },
+    "monitors_tagRules": {
+      "description": "NewRelic.Observability/monitors/tagRules",
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "2024-10-01"
+          ],
+          "type": "string"
+        },
+        "name": {
+          "description": "Name of the TagRule",
+          "type": "string"
+        },
+        "properties": {
+          "description": "The resource-specific properties for this resource.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MonitoringTagRulesProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "enum": [
+            "NewRelic.Observability/monitors/tagRules"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "properties",
+        "apiVersion",
+        "type"
+      ],
+      "type": "object"
+    }
+  },
+  "definitions": {
+    "AccountInfo": {
+      "description": "Account Info of the NewRelic account",
+      "properties": {
+        "accountId": {
+          "description": "Account id",
+          "type": "string"
+        },
+        "ingestionKey": {
+          "description": "ingestion key of account",
+          "type": "string"
+        },
+        "region": {
+          "description": "Region where New Relic account is present",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "FilteringTag": {
+      "description": "The definition of a filtering tag. Filtering tags are used for capturing resources and include/exclude them from being monitored.",
+      "properties": {
+        "action": {
+          "description": "Valid actions for a filtering tag. Exclusion takes priority over inclusion.",
+          "oneOf": [
+            {
+              "enum": [
+                "Include",
+                "Exclude"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "name": {
+          "description": "The name (also known as the key) of the tag.",
+          "type": "string"
+        },
+        "value": {
+          "description": "The value of the tag.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "LogRules": {
+      "description": "Set of rules for sending logs for the Monitor resource.",
+      "properties": {
+        "filteringTags": {
+          "description": "List of filtering tags to be used for capturing logs. This only takes effect if SendActivityLogs flag is enabled. If empty, all resources will be captured.\nIf only Exclude action is specified, the rules will apply to the list of all available resources. If Include actions are specified, the rules will only include resources with the associated tags.",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/FilteringTag"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "sendAadLogs": {
+          "description": "Flag specifying if AAD logs should be sent for the Monitor resource.",
+          "oneOf": [
+            {
+              "enum": [
+                "Enabled",
+                "Disabled"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "sendActivityLogs": {
+          "description": "Flag specifying if activity logs from Azure resources should be sent for the Monitor resource.",
+          "oneOf": [
+            {
+              "enum": [
+                "Enabled",
+                "Disabled"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "sendSubscriptionLogs": {
+          "description": "Flag specifying if subscription logs should be sent for the Monitor resource.",
+          "oneOf": [
+            {
+              "enum": [
+                "Enabled",
+                "Disabled"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "ManagedServiceIdentity": {
+      "description": "Managed service identity (system assigned and/or user assigned identities)",
+      "properties": {
+        "type": {
+          "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).",
+          "oneOf": [
+            {
+              "enum": [
+                "None",
+                "SystemAssigned",
+                "UserAssigned",
+                "SystemAssigned, UserAssigned"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "userAssignedIdentities": {
+          "description": "The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.",
+          "oneOf": [
+            {
+              "additionalProperties": {
+                "$ref": "#/definitions/UserAssignedIdentity"
+              },
+              "properties": {},
+              "type": "object"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
+    "MetricRules": {
+      "description": "Set of rules for sending metrics for the Monitor resource.",
+      "properties": {
+        "filteringTags": {
+          "description": "List of filtering tags to be used for capturing metrics.",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/FilteringTag"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "sendMetrics": {
+          "description": "Flag specifying if metrics should be sent for the Monitor resource.",
+          "oneOf": [
+            {
+              "enum": [
+                "Enabled",
+                "Disabled"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "userEmail": {
+          "description": "User Email",
+          "oneOf": [
+            {
+              "pattern": "^[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9-]+\\.)+[A-Za-z]{2,}$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "MonitorProperties": {
+      "description": "Properties specific to the NewRelic Monitor resource",
+      "properties": {
+        "accountCreationSource": {
+          "description": "Source of account creation",
+          "oneOf": [
+            {
+              "enum": [
+                "LIFTR",
+                "NEWRELIC"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "newRelicAccountProperties": {
+          "description": "MarketplaceSubscriptionStatus of the resource",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/NewRelicAccountProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "orgCreationSource": {
+          "description": "Source of org creation",
+          "oneOf": [
+            {
+              "enum": [
+                "LIFTR",
+                "NEWRELIC"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "planData": {
+          "description": "Plan details",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PlanData"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "saaSAzureSubscriptionStatus": {
+          "description": "Status of Azure Subscription where Marketplace SaaS is located.",
+          "type": "string"
+        },
+        "subscriptionState": {
+          "description": "State of the Azure Subscription containing the monitor resource",
+          "type": "string"
+        },
+        "userInfo": {
+          "description": "User Info",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/UserInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "MonitoredSubscription": {
+      "description": "The list of subscriptions and it's monitoring status by current NewRelic monitor.",
+      "properties": {
+        "error": {
+          "description": "The reason of not monitoring the subscription.",
+          "type": "string"
+        },
+        "status": {
+          "description": "The state of monitoring.",
+          "oneOf": [
+            {
+              "enum": [
+                "InProgress",
+                "Active",
+                "Failed",
+                "Deleting"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "subscriptionId": {
+          "description": "The subscriptionId to be monitored.",
+          "type": "string"
+        },
+        "tagRules": {
+          "description": "The resource-specific properties for this resource.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MonitoringTagRulesProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "MonitoringTagRulesProperties": {
+      "description": "The resource-specific properties for this resource.",
+      "properties": {
+        "logRules": {
+          "description": "Set of rules for sending logs for the Monitor resource.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/LogRules"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "metricRules": {
+          "description": "Set of rules for sending metrics for the Monitor resource.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MetricRules"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "NewRelicAccountProperties": {
+      "description": "Properties of the NewRelic account",
+      "properties": {
+        "accountInfo": {
+          "description": "NewRelic Account Information",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AccountInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "organizationInfo": {
+          "description": "NewRelic Organization Information",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/OrganizationInfo"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "singleSignOnProperties": {
+          "description": "date when plan was applied",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/NewRelicSingleSignOnProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "userId": {
+          "description": "User id",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "NewRelicSingleSignOnProperties": {
+      "description": "Single sign on Info of the NewRelic account",
+      "properties": {
+        "enterpriseAppId": {
+          "description": "The Id of the Enterprise App used for Single sign-on.",
+          "type": "string"
+        },
+        "provisioningState": {
+          "description": "Provisioning state",
+          "oneOf": [
+            {
+              "enum": [
+                "Accepted",
+                "Creating",
+                "Updating",
+                "Deleting",
+                "Succeeded",
+                "Failed",
+                "Canceled",
+                "Deleted",
+                "NotSpecified"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "singleSignOnState": {
+          "description": "Single sign-on state",
+          "oneOf": [
+            {
+              "enum": [
+                "Initial",
+                "Enable",
+                "Disable",
+                "Existing"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "singleSignOnUrl": {
+          "description": "The login URL specific to this NewRelic Organization",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "OrganizationInfo": {
+      "description": "Organization Info of the NewRelic account",
+      "properties": {
+        "organizationId": {
+          "description": "Organization id",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "PlanData": {
+      "description": "Plan data of NewRelic Monitor resource",
+      "properties": {
+        "billingCycle": {
+          "description": "Different billing cycles like Monthly/Weekly.",
+          "type": "string"
+        },
+        "effectiveDate": {
+          "description": "date when plan was applied",
+          "format": "date-time",
+          "type": "string"
+        },
+        "planDetails": {
+          "description": "plan id as published by NewRelic",
+          "type": "string"
+        },
+        "usageType": {
+          "description": "Different usage type like PAYG/COMMITTED. this could be enum",
+          "oneOf": [
+            {
+              "enum": [
+                "PAYG",
+                "COMMITTED"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "SubscriptionList": {
+      "description": "The request to update subscriptions needed to be monitored by the NewRelic monitor resource.",
+      "properties": {
+        "monitoredSubscriptionList": {
+          "description": "List of subscriptions and the state of the monitoring.",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/MonitoredSubscription"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "patchOperation": {
+          "description": "The operation for the patch on the resource.",
+          "oneOf": [
+            {
+              "enum": [
+                "AddBegin",
+                "AddComplete",
+                "DeleteBegin",
+                "DeleteComplete",
+                "Active"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "UserAssignedIdentity": {
+      "description": "User assigned identity properties",
+      "properties": {},
+      "type": "object"
+    },
+    "UserInfo": {
+      "description": "User Info of NewRelic Monitor resource",
+      "properties": {
+        "country": {
+          "description": "country if user",
+          "type": "string"
+        },
+        "emailAddress": {
+          "description": "User Email",
+          "oneOf": [
+            {
+              "pattern": "^[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9-]+\\.)+[A-Za-z]{2,}$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "firstName": {
+          "description": "First name",
+          "maxLength": 50,
+          "type": "string"
+        },
+        "lastName": {
+          "description": "Last name",
+          "maxLength": 50,
+          "type": "string"
+        },
+        "phoneNumber": {
+          "description": "Contact phone number",
+          "maxLength": 40,
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "monitors_monitoredSubscriptions_childResource": {
+      "description": "NewRelic.Observability/monitors/monitoredSubscriptions",
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "2024-10-01"
+          ],
+          "type": "string"
+        },
+        "name": {
+          "description": "The configuration name. Only 'default' value is supported.",
+          "oneOf": [
+            {
+              "enum": [
+                "default"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "description": "The request to update subscriptions needed to be monitored by the NewRelic monitor resource.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SubscriptionList"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "enum": [
+            "monitoredSubscriptions"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "properties",
+        "apiVersion",
+        "type"
+      ],
+      "type": "object"
+    },
+    "monitors_tagRules_childResource": {
+      "description": "NewRelic.Observability/monitors/tagRules",
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "2024-10-01"
+          ],
+          "type": "string"
+        },
+        "name": {
+          "description": "Name of the TagRule",
+          "type": "string"
+        },
+        "properties": {
+          "description": "The resource-specific properties for this resource.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MonitoringTagRulesProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "enum": [
+            "tagRules"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "properties",
+        "apiVersion",
+        "type"
+      ],
+      "type": "object"
+    }
+  }
+}

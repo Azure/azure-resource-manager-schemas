@@ -1129,10 +1129,6 @@ const autoGenList: AutoGenConfig[] = [
         suffix: 'ServiceMap',
     },
     {
-        basePath: 'confidentialLedger/resource-manager',
-        namespace: 'Microsoft.ConfidentialLedger',
-    },
-    {
         basePath: 'managedservices/resource-manager',
         namespace: 'Microsoft.ManagedServices',
         resourceConfig: [

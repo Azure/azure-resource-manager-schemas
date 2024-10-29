@@ -117,6 +117,8 @@ function assignScopesToUnknownReferences(knownReferences: SchemaReference[], unk
 
         if (config && (schemaRef.scope & ScopeType.Unknown)) {
             schemaRef.scope = config.scopes || ScopeType.None;
+        } else {
+            schemaRef.scope = ScopeType.Tenant | ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.ManagementGroup | ScopeType.Extension;
         }
 
         for (const knownReference of knownReferences.filter(r => lowerCaseCompare(r.type, schemaRef.type) === 0)) {

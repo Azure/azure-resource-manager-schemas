@@ -33,6 +33,28 @@ const disabledProviders: AutoGenConfig[] = [
         namespace: 'Microsoft.ContainerService',
         disabledForAutogen: true,
     },
+    {
+        // has errors
+        basePath: 'adhybridhealthservice/resource-manager',
+        namespace: 'Microsoft.ADHybridHealthService',
+        disabledForAutogen: true,
+    },
+    {
+        // has errors - could be a generation bug
+        basePath: 'agrifood/resource-manager',
+        namespace: 'Microsoft.AgFoodPlatform',
+        disabledForAutogen: true,
+    },
+    {
+        // has errors - could be a generation bug
+        basePath: 'botservice/resource-manager',
+        namespace: 'Microsoft.BotService',
+    },
+    {
+        // has errors
+        basePath: 'marketplace/resource-manager',
+        namespace: 'Microsoft.Marketplace',
+    },
 ];
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
@@ -88,10 +110,6 @@ const autoGenList: AutoGenConfig[] = [
             },
         ],
         suffix: 'Authz'
-    },
-    {
-        basePath: 'adhybridhealthservice/resource-manager',
-        namespace: 'Microsoft.ADHybridHealthService',
     },
     {
         basePath: 'analysisservices/resource-manager',
@@ -170,10 +188,6 @@ const autoGenList: AutoGenConfig[] = [
                 scopes: ScopeType.Subscription | ScopeType.ManagementGroup,
             },
         ]
-    },
-    {
-        basePath: 'botservice/resource-manager',
-        namespace: 'Microsoft.BotService',
     },
     {
         basePath: 'billing/resource-manager',
@@ -527,10 +541,6 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'mariadb/resource-manager',
         namespace: 'Microsoft.DBforMariaDB',
-    },
-    {
-        basePath: 'marketplace/resource-manager',
-        namespace: 'Microsoft.Marketplace',
     },
     {
         basePath: 'mysql/resource-manager',
@@ -1071,8 +1081,9 @@ const autoGenList: AutoGenConfig[] = [
     },
     {
         //Pause autogeneration until errors are fixed
-        basePath: 'azurestackhci/resource-manager',
+        basePath: 'azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI',
         namespace: 'Microsoft.AzureStackHCI',
+        useNamespaceFromConfig: true,
         postProcessor: azureStackHciPostProcessor,
     },
     {

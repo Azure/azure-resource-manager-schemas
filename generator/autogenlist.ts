@@ -133,10 +133,6 @@ const autoGenList: AutoGenConfig[] = [
         suffix: 'Authz'
     },
     {
-        basePath: 'adhybridhealthservice/resource-manager',
-        namespace: 'Microsoft.ADHybridHealthService',
-    },
-    {
         basePath: 'analysisservices/resource-manager',
         namespace: 'Microsoft.AnalysisServices',
     },
@@ -213,10 +209,6 @@ const autoGenList: AutoGenConfig[] = [
                 scopes: ScopeType.Subscription | ScopeType.ManagementGroup,
             },
         ]
-    },
-    {
-        basePath: 'botservice/resource-manager',
-        namespace: 'Microsoft.BotService',
     },
     {
         basePath: 'billing/resource-manager',

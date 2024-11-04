@@ -33,6 +33,49 @@ const disabledProviders: AutoGenConfig[] = [
         namespace: 'Microsoft.ContainerService',
         disabledForAutogen: true,
     },
+    {
+        //Disabled until errors are fixed
+        //'datamanagerforagriculturesolutionproperties.properties.openapispecsdictionary.additionalproperties' - TypeError: Cannot convert undefined or null to object
+        basePath: 'agrifood/resource-manager',
+        namespace: 'Microsoft.AgFoodPlatform',
+        disabledForAutogen: true,
+    },
+    {
+        //Disabled until errors are fixed
+        //Enum 'nextPartitionKey' cannot have a value ' ' that result in an empty name. Use x-ms-enum.values to specify the name of the values.
+        //Enum 'nextRowKey' cannot have a value ' ' that result in an empty name. Use x-ms-enum.values to specify the name of the values.
+        basePath: 'adhybridhealthservice/resource-manager',
+        namespace: 'Microsoft.ADHybridHealthService',
+        disabledForAutogen: true,
+    },
+    {
+        //Disabled until errors are fixed
+        //'specification/common-types/resource-management/v5/types.json' doesn't exists in workspace
+        basePath: 'azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI',
+        namespace: 'preview',
+        disabledForAutogen: true,
+    },
+    {
+        //Disabled until errors are fixed
+        //'specification/common-types/resource-management/v5/types.json' doesn't exists in workspace
+        basePath: 'azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI',
+        namespace: 'stable',
+        disabledForAutogen: true,
+    },
+    {
+        //Disabled until errors are fixed
+        //'Microsoft.BotService/preview/2023-09-15-preview/botservice.json:3492:5' - TypeError: Cannot convert undefined or null to object
+        basePath: 'botservice/resource-manager',
+        namespace: 'Microsoft.BotService',
+        disabledForAutogen: true,
+    },
+    {
+        //Disabled until errors are fixed
+        //Enum types of 'undefined' and format 'undefined' are not supported. Correct your input
+        basePath: 'marketplacecatalog/resource-manager/Microsoft.Marketplace',
+        namespace: 'stable',
+        disabledForAutogen: true,
+    },
 ];
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
@@ -88,10 +131,6 @@ const autoGenList: AutoGenConfig[] = [
             },
         ],
         suffix: 'Authz'
-    },
-    {
-        basePath: 'adhybridhealthservice/resource-manager',
-        namespace: 'Microsoft.ADHybridHealthService',
     },
     {
         basePath: 'analysisservices/resource-manager',
@@ -170,10 +209,6 @@ const autoGenList: AutoGenConfig[] = [
                 scopes: ScopeType.Subscription | ScopeType.ManagementGroup,
             },
         ]
-    },
-    {
-        basePath: 'botservice/resource-manager',
-        namespace: 'Microsoft.BotService',
     },
     {
         basePath: 'billing/resource-manager',

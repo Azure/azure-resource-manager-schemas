@@ -1,35 +1,36 @@
 {
   "id": "https://schema.management.azure.com/schemas/2023-10-01-preview/Microsoft.Security.json#",
-  "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Microsoft.Security",
   "description": "Microsoft Security Resource Types",
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "resourceDefinitions": {
     "securityConnectors": {
-      "type": "object",
+      "description": "Microsoft.Security/securityConnectors",
       "properties": {
         "apiVersion": {
-          "type": "string",
           "enum": [
             "2023-10-01-preview"
-          ]
+          ],
+          "type": "string"
         },
         "etag": {
-          "type": "string",
-          "description": "Entity tag is used for comparing two or more entities from the same requested resource."
+          "description": "Entity tag is used for comparing two or more entities from the same requested resource.",
+          "type": "string"
         },
         "kind": {
-          "type": "string",
-          "description": "Kind of the resource"
+          "description": "Kind of the resource",
+          "type": "string"
         },
         "location": {
-          "type": "string",
-          "description": "Location where the resource is stored"
+          "description": "Location where the resource is stored",
+          "type": "string"
         },
         "name": {
-          "type": "string",
-          "description": "The security connector name."
+          "description": "The security connector name.",
+          "type": "string"
         },
         "properties": {
+          "description": "Security connector data",
           "oneOf": [
             {
               "$ref": "#/definitions/SecurityConnectorProperties"
@@ -37,513 +38,989 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "A set of properties that defines the security connector configuration."
+          ]
         },
         "tags": {
+          "description": "A list of key value pairs that describe the resource.",
           "oneOf": [
             {
-              "type": "object",
               "additionalProperties": {
                 "type": "string"
               },
-              "properties": {}
+              "properties": {},
+              "type": "object"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "A list of key value pairs that describe the resource."
+          ]
         },
         "type": {
-          "type": "string",
           "enum": [
             "Microsoft.Security/securityConnectors"
-          ]
+          ],
+          "type": "string"
         }
       },
       "required": [
-        "apiVersion",
         "name",
         "properties",
+        "apiVersion",
         "type"
       ],
-      "description": "Microsoft.Security/securityConnectors"
+      "type": "object"
     }
   },
   "definitions": {
-    "AwsEnvironmentData": {
-      "type": "object",
-      "properties": {
-        "environmentType": {
-          "type": "string",
-          "enum": [
-            "AwsAccount"
-          ]
-        },
-        "organizationalData": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/AwsOrganizationalData"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The AWS organization data"
-        },
-        "regions": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "list of regions to scan"
-        },
-        "scanInterval": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Scan interval in hours (value should be between 1-hour to 24-hours)"
-        }
-      },
-      "required": [
-        "environmentType"
-      ],
-      "description": "The AWS connector environment data"
-    },
     "AwsOrganizationalData": {
-      "type": "object",
+      "description": "The AWS organization data",
       "oneOf": [
         {
-          "$ref": "#/definitions/AwsOrganizationalDataMaster"
+          "description": "The AWS organization data for the member account",
+          "properties": {
+            "organizationMembershipType": {
+              "enum": [
+                "Member"
+              ],
+              "type": "string"
+            },
+            "parentHierarchyId": {
+              "description": "If the multi cloud account is not of membership type organization, this will be the ID of the account's parent",
+              "type": "string"
+            }
+          },
+          "required": [
+            "organizationMembershipType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/AwsOrganizationalDataMember"
+          "description": "The AWS organization data for the master account",
+          "properties": {
+            "excludedAccountIds": {
+              "description": "If the multi cloud account is of membership type organization, list of accounts excluded from offering",
+              "oneOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "organizationMembershipType": {
+              "enum": [
+                "Organization"
+              ],
+              "type": "string"
+            },
+            "stacksetName": {
+              "description": "If the multi cloud account is of membership type organization, this will be the name of the onboarding stackset",
+              "type": "string"
+            }
+          },
+          "required": [
+            "organizationMembershipType"
+          ],
+          "type": "object"
         }
       ],
       "properties": {},
-      "description": "The AWS organization data"
-    },
-    "AwsOrganizationalDataMaster": {
-      "type": "object",
-      "properties": {
-        "excludedAccountIds": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "If the multi cloud account is of membership type organization, list of accounts excluded from offering"
-        },
-        "organizationMembershipType": {
-          "type": "string",
-          "enum": [
-            "Organization"
-          ]
-        },
-        "stacksetName": {
-          "type": "string",
-          "description": "If the multi cloud account is of membership type organization, this will be the name of the onboarding stackset"
-        }
-      },
-      "required": [
-        "organizationMembershipType"
-      ],
-      "description": "The AWS organization data for the master account"
-    },
-    "AwsOrganizationalDataMember": {
-      "type": "object",
-      "properties": {
-        "organizationMembershipType": {
-          "type": "string",
-          "enum": [
-            "Member"
-          ]
-        },
-        "parentHierarchyId": {
-          "type": "string",
-          "description": "If the multi cloud account is not of membership type organization, this will be the ID of the account's parent"
-        }
-      },
-      "required": [
-        "organizationMembershipType"
-      ],
-      "description": "The AWS organization data for the member account"
-    },
-    "AzureDevOpsScopeEnvironmentData": {
-      "type": "object",
-      "properties": {
-        "environmentType": {
-          "type": "string",
-          "enum": [
-            "AzureDevOpsScope"
-          ]
-        }
-      },
-      "required": [
-        "environmentType"
-      ],
-      "description": "The AzureDevOps scope connector's environment data"
+      "type": "object"
     },
     "CloudOffering": {
-      "type": "object",
+      "description": "The security offering details",
       "oneOf": [
         {
-          "$ref": "#/definitions/CspmMonitorAwsOffering"
+          "description": "The CSPM monitoring for AWS offering",
+          "properties": {
+            "nativeCloudConnection": {
+              "description": "The native cloud connection configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/CspmMonitorAwsOfferingNativeCloudConnection"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "offeringType": {
+              "enum": [
+                "CspmMonitorAws"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "offeringType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/DefenderForContainersAwsOffering"
+          "description": "The CSPM monitoring for AzureDevOps offering",
+          "properties": {
+            "offeringType": {
+              "enum": [
+                "CspmMonitorAzureDevOps"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "offeringType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/DefenderForServersAwsOffering"
+          "description": "The CSPM monitoring for GCP offering",
+          "properties": {
+            "nativeCloudConnection": {
+              "description": "The native cloud connection configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/CspmMonitorGcpOfferingNativeCloudConnection"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "offeringType": {
+              "enum": [
+                "CspmMonitorGcp"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "offeringType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/DefenderFoDatabasesAwsOffering"
+          "description": "The CSPM (Cloud security posture management) monitoring for gitlab offering",
+          "properties": {
+            "offeringType": {
+              "enum": [
+                "CspmMonitorGitLab"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "offeringType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/InformationProtectionAwsOffering"
+          "description": "The CSPM monitoring for github offering",
+          "properties": {
+            "offeringType": {
+              "enum": [
+                "CspmMonitorGithub"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "offeringType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/CspmMonitorGcpOffering"
+          "description": "The CSPM P1 for AWS offering",
+          "properties": {
+            "ciem": {
+              "description": "Defenders CSPM Cloud infrastructure entitlement management (CIEM) offering configurations",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderCspmAwsOfferingCiem"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "dataSensitivityDiscovery": {
+              "description": "The Microsoft Defender Data Sensitivity discovery configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderCspmAwsOfferingDataSensitivityDiscovery"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "databasesDspm": {
+              "description": "The databases DSPM configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderCspmAwsOfferingDatabasesDspm"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "mdcContainersAgentlessDiscoveryK8s": {
+              "description": "The Microsoft Defender container agentless discovery K8s configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderCspmAwsOfferingMdcContainersAgentlessDiscoveryK8S"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "mdcContainersImageAssessment": {
+              "description": "The Microsoft Defender container image assessment configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderCspmAwsOfferingMdcContainersImageAssessment"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "offeringType": {
+              "enum": [
+                "DefenderCspmAws"
+              ],
+              "type": "string"
+            },
+            "vmScanners": {
+              "description": "The Microsoft Defender for Server VM scanning configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderCspmAwsOfferingVmScanners"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "offeringType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/DefenderForServersGcpOffering"
+          "description": "The CSPM P1 for GCP offering",
+          "properties": {
+            "ciemDiscovery": {
+              "description": "GCP Defenders CSPM Cloud infrastructure entitlement management (CIEM) discovery offering configurations",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderCspmGcpOfferingCiemDiscovery"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "dataSensitivityDiscovery": {
+              "description": "The Microsoft Defender Data Sensitivity discovery configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderCspmGcpOfferingDataSensitivityDiscovery"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "mdcContainersAgentlessDiscoveryK8s": {
+              "description": "The Microsoft Defender Container agentless discovery configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderCspmGcpOfferingMdcContainersAgentlessDiscoveryK8S"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "mdcContainersImageAssessment": {
+              "description": "The Microsoft Defender Container image assessment configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderCspmGcpOfferingMdcContainersImageAssessment"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "offeringType": {
+              "enum": [
+                "DefenderCspmGcp"
+              ],
+              "type": "string"
+            },
+            "vmScanners": {
+              "description": "The Microsoft Defender for Server VM scanning configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderCspmGcpOfferingVmScanners"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "offeringType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/DefenderForDatabasesGcpOffering"
+          "description": "The Defender for Containers AWS offering",
+          "properties": {
+            "autoProvisioning": {
+              "description": "Is audit logs pipeline auto provisioning enabled",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "cloudWatchToKinesis": {
+              "description": "The cloudwatch to kinesis connection configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForContainersAwsOfferingCloudWatchToKinesis"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "containerVulnerabilityAssessment": {
+              "description": "The container vulnerability assessment configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForContainersAwsOfferingContainerVulnerabilityAssessment"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "containerVulnerabilityAssessmentTask": {
+              "description": "The container vulnerability assessment task configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForContainersAwsOfferingContainerVulnerabilityAssessmentTask"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "enableContainerVulnerabilityAssessment": {
+              "description": "Enable container vulnerability assessment feature",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "kinesisToS3": {
+              "description": "The kinesis to s3 connection configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForContainersAwsOfferingKinesisToS3"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "kubeAuditRetentionTime": {
+              "description": "The retention time in days of kube audit logs set on the CloudWatch log group",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "kubernetesScubaReader": {
+              "description": "The kubernetes to scuba connection configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForContainersAwsOfferingKubernetesScubaReader"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "kubernetesService": {
+              "description": "The kubernetes service connection configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForContainersAwsOfferingKubernetesService"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "mdcContainersAgentlessDiscoveryK8s": {
+              "description": "The Microsoft Defender container agentless discovery K8s configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForContainersAwsOfferingMdcContainersAgentlessDiscoveryK8S"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "mdcContainersImageAssessment": {
+              "description": "The Microsoft Defender container image assessment configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForContainersAwsOfferingMdcContainersImageAssessment"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "offeringType": {
+              "enum": [
+                "DefenderForContainersAws"
+              ],
+              "type": "string"
+            },
+            "scubaExternalId": {
+              "description": "The externalId used by the data reader to prevent the confused deputy attack",
+              "type": "string"
+            }
+          },
+          "required": [
+            "offeringType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/DefenderForContainersGcpOffering"
+          "description": "The containers GCP offering",
+          "properties": {
+            "auditLogsAutoProvisioningFlag": {
+              "description": "Is audit logs data collection enabled",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "dataPipelineNativeCloudConnection": {
+              "description": "The native cloud connection configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForContainersGcpOfferingDataPipelineNativeCloudConnection"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "defenderAgentAutoProvisioningFlag": {
+              "description": "Is Microsoft Defender for Cloud Kubernetes agent auto provisioning enabled",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "mdcContainersAgentlessDiscoveryK8s": {
+              "description": "The Microsoft Defender Container agentless discovery configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForContainersGcpOfferingMdcContainersAgentlessDiscoveryK8S"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "mdcContainersImageAssessment": {
+              "description": "The Microsoft Defender Container image assessment configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForContainersGcpOfferingMdcContainersImageAssessment"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "nativeCloudConnection": {
+              "description": "The native cloud connection configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForContainersGcpOfferingNativeCloudConnection"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "offeringType": {
+              "enum": [
+                "DefenderForContainersGcp"
+              ],
+              "type": "string"
+            },
+            "policyAgentAutoProvisioningFlag": {
+              "description": "Is Policy Kubernetes agent auto provisioning enabled",
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "offeringType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/CspmMonitorGithubOffering"
+          "description": "The Defender for Databases AWS offering",
+          "properties": {
+            "arcAutoProvisioning": {
+              "description": "The ARC autoprovisioning configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderFoDatabasesAwsOfferingArcAutoProvisioning"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "databasesDspm": {
+              "description": "The databases data security posture management (DSPM) configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderFoDatabasesAwsOfferingDatabasesDspm"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "offeringType": {
+              "enum": [
+                "DefenderForDatabasesAws"
+              ],
+              "type": "string"
+            },
+            "rds": {
+              "description": "The RDS configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderFoDatabasesAwsOfferingRds"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "offeringType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/CspmMonitorAzureDevOpsOffering"
+          "description": "The Defender for Databases GCP offering configurations",
+          "properties": {
+            "arcAutoProvisioning": {
+              "description": "The ARC autoprovisioning configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForDatabasesGcpOfferingArcAutoProvisioning"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "defenderForDatabasesArcAutoProvisioning": {
+              "description": "The native cloud connection configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForDatabasesGcpOfferingDefenderForDatabasesArcAutoProvisioning"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "offeringType": {
+              "enum": [
+                "DefenderForDatabasesGcp"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "offeringType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/DefenderCspmAwsOffering"
+          "description": "The Defender for DevOps for Azure DevOps offering",
+          "properties": {
+            "offeringType": {
+              "enum": [
+                "DefenderForDevOpsAzureDevOps"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "offeringType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/DefenderCspmGcpOffering"
+          "description": "The Defender for DevOps for Gitlab offering",
+          "properties": {
+            "offeringType": {
+              "enum": [
+                "DefenderForDevOpsGitLab"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "offeringType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/DefenderForDevOpsGithubOffering"
+          "description": "The Defender for DevOps for Github offering",
+          "properties": {
+            "offeringType": {
+              "enum": [
+                "DefenderForDevOpsGithub"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "offeringType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/DefenderForDevOpsAzureDevOpsOffering"
+          "description": "The Defender for Servers AWS offering",
+          "properties": {
+            "arcAutoProvisioning": {
+              "description": "The ARC autoprovisioning configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForServersAwsOfferingArcAutoProvisioning"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "defenderForServers": {
+              "description": "The Defender for servers connection configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForServersAwsOfferingDefenderForServers"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "mdeAutoProvisioning": {
+              "description": "The Microsoft Defender for Endpoint autoprovisioning configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForServersAwsOfferingMdeAutoProvisioning"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "offeringType": {
+              "enum": [
+                "DefenderForServersAws"
+              ],
+              "type": "string"
+            },
+            "subPlan": {
+              "description": "configuration for the servers offering subPlan",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForServersAwsOfferingSubPlan"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "vaAutoProvisioning": {
+              "description": "The Vulnerability Assessment autoprovisioning configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForServersAwsOfferingVaAutoProvisioning"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "vmScanners": {
+              "description": "The Microsoft Defender for Server VM scanning configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForServersAwsOfferingVmScanners"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "offeringType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/CspmMonitorGitLabOffering"
+          "description": "The Defender for Servers GCP offering configurations",
+          "properties": {
+            "arcAutoProvisioning": {
+              "description": "The ARC autoprovisioning configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForServersGcpOfferingArcAutoProvisioning"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "defenderForServers": {
+              "description": "The Defender for servers connection configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForServersGcpOfferingDefenderForServers"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "mdeAutoProvisioning": {
+              "description": "The Microsoft Defender for Endpoint autoprovisioning configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForServersGcpOfferingMdeAutoProvisioning"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "offeringType": {
+              "enum": [
+                "DefenderForServersGcp"
+              ],
+              "type": "string"
+            },
+            "subPlan": {
+              "description": "configuration for the servers offering subPlan",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForServersGcpOfferingSubPlan"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "vaAutoProvisioning": {
+              "description": "The Vulnerability Assessment autoprovisioning configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForServersGcpOfferingVaAutoProvisioning"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "vmScanners": {
+              "description": "The Microsoft Defender for Server VM scanning configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/DefenderForServersGcpOfferingVmScanners"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "offeringType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/DefenderForDevOpsGitLabOffering"
+          "description": "The information protection for AWS offering",
+          "properties": {
+            "informationProtection": {
+              "description": "The native cloud connection configuration",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/InformationProtectionAwsOfferingInformationProtection"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "offeringType": {
+              "enum": [
+                "InformationProtectionAws"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "offeringType"
+          ],
+          "type": "object"
         }
       ],
       "properties": {},
-      "description": "The security offering details"
-    },
-    "CspmMonitorAwsOffering": {
-      "type": "object",
-      "properties": {
-        "nativeCloudConnection": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/CspmMonitorAwsOfferingNativeCloudConnection"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The native cloud connection configuration"
-        },
-        "offeringType": {
-          "type": "string",
-          "enum": [
-            "CspmMonitorAws"
-          ]
-        }
-      },
-      "required": [
-        "offeringType"
-      ],
-      "description": "The CSPM monitoring for AWS offering"
+      "type": "object"
     },
     "CspmMonitorAwsOfferingNativeCloudConnection": {
-      "type": "object",
+      "description": "The native cloud connection configuration",
       "properties": {
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS for this feature"
+          "description": "The cloud role ARN in AWS for this feature",
+          "type": "string"
         }
       },
-      "description": "The native cloud connection configuration"
-    },
-    "CspmMonitorAzureDevOpsOffering": {
-      "type": "object",
-      "properties": {
-        "offeringType": {
-          "type": "string",
-          "enum": [
-            "CspmMonitorAzureDevOps"
-          ]
-        }
-      },
-      "required": [
-        "offeringType"
-      ],
-      "description": "The CSPM monitoring for AzureDevOps offering"
-    },
-    "CspmMonitorGcpOffering": {
-      "type": "object",
-      "properties": {
-        "nativeCloudConnection": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/CspmMonitorGcpOfferingNativeCloudConnection"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The native cloud connection configuration"
-        },
-        "offeringType": {
-          "type": "string",
-          "enum": [
-            "CspmMonitorGcp"
-          ]
-        }
-      },
-      "required": [
-        "offeringType"
-      ],
-      "description": "The CSPM monitoring for GCP offering"
+      "type": "object"
     },
     "CspmMonitorGcpOfferingNativeCloudConnection": {
-      "type": "object",
+      "description": "The native cloud connection configuration",
       "properties": {
         "serviceAccountEmailAddress": {
-          "type": "string",
-          "description": "The service account email address in GCP for this offering"
+          "description": "The service account email address in GCP for this offering",
+          "type": "string"
         },
         "workloadIdentityProviderId": {
-          "type": "string",
-          "description": "The GCP workload identity provider id for the offering"
+          "description": "The GCP workload identity provider id for the offering",
+          "type": "string"
         }
       },
-      "description": "The native cloud connection configuration"
-    },
-    "CspmMonitorGithubOffering": {
-      "type": "object",
-      "properties": {
-        "offeringType": {
-          "type": "string",
-          "enum": [
-            "CspmMonitorGithub"
-          ]
-        }
-      },
-      "required": [
-        "offeringType"
-      ],
-      "description": "The CSPM monitoring for github offering"
-    },
-    "CspmMonitorGitLabOffering": {
-      "type": "object",
-      "properties": {
-        "offeringType": {
-          "type": "string",
-          "enum": [
-            "CspmMonitorGitLab"
-          ]
-        }
-      },
-      "required": [
-        "offeringType"
-      ],
-      "description": "The CSPM (Cloud security posture management) monitoring for gitlab offering"
-    },
-    "DefenderCspmAwsOffering": {
-      "type": "object",
-      "properties": {
-        "ciem": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderCspmAwsOfferingCiem"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Defenders CSPM Cloud infrastructure entitlement management (CIEM) offering configurations"
-        },
-        "databasesDspm": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderCspmAwsOfferingDatabasesDspm"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The databases DSPM configuration"
-        },
-        "dataSensitivityDiscovery": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderCspmAwsOfferingDataSensitivityDiscovery"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Microsoft Defender Data Sensitivity discovery configuration"
-        },
-        "mdcContainersAgentlessDiscoveryK8s": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderCspmAwsOfferingMdcContainersAgentlessDiscoveryK8s"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Microsoft Defender container agentless discovery K8s configuration"
-        },
-        "mdcContainersImageAssessment": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderCspmAwsOfferingMdcContainersImageAssessment"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Microsoft Defender container image assessment configuration"
-        },
-        "offeringType": {
-          "type": "string",
-          "enum": [
-            "DefenderCspmAws"
-          ]
-        },
-        "vmScanners": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderCspmAwsOfferingVmScanners"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Microsoft Defender for Server VM scanning configuration"
-        }
-      },
-      "required": [
-        "offeringType"
-      ],
-      "description": "The CSPM P1 for AWS offering"
+      "type": "object"
     },
     "DefenderCspmAwsOfferingCiem": {
-      "type": "object",
+      "description": "Defenders CSPM Cloud infrastructure entitlement management (CIEM) offering configurations",
       "properties": {
         "ciemDiscovery": {
+          "description": "Defender CSPM CIEM discovery configuration",
           "oneOf": [
             {
-              "$ref": "#/definitions/DefenderCspmAwsOfferingCiemCiemDiscovery"
+              "$ref": "#/definitions/DefenderCspmAwsOfferingCiemDiscovery"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Defender CSPM CIEM discovery configuration"
+          ]
         },
         "ciemOidc": {
+          "description": "Defender CSPM CIEM AWS OIDC (open id connect) configuration",
           "oneOf": [
             {
-              "$ref": "#/definitions/DefenderCspmAwsOfferingCiemCiemOidc"
+              "$ref": "#/definitions/DefenderCspmAwsOfferingCiemOidc"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Defender CSPM CIEM AWS OIDC (open id connect) configuration"
+          ]
         }
       },
-      "description": "Defenders CSPM Cloud infrastructure entitlement management (CIEM) offering configurations"
+      "type": "object"
     },
-    "DefenderCspmAwsOfferingCiemCiemDiscovery": {
-      "type": "object",
+    "DefenderCspmAwsOfferingCiemDiscovery": {
+      "description": "Defender CSPM CIEM discovery configuration",
       "properties": {
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS for CIEM discovery"
+          "description": "The cloud role ARN in AWS for CIEM discovery",
+          "type": "string"
         }
       },
-      "description": "Defender CSPM CIEM discovery configuration"
+      "type": "object"
     },
-    "DefenderCspmAwsOfferingCiemCiemOidc": {
-      "type": "object",
+    "DefenderCspmAwsOfferingCiemOidc": {
+      "description": "Defender CSPM CIEM AWS OIDC (open id connect) configuration",
       "properties": {
         "azureActiveDirectoryAppName": {
-          "type": "string",
-          "description": "the azure active directory app name used of authenticating against AWS"
+          "description": "the azure active directory app name used of authenticating against AWS",
+          "type": "string"
         },
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS for CIEM oidc connection"
+          "description": "The cloud role ARN in AWS for CIEM oidc connection",
+          "type": "string"
         }
       },
-      "description": "Defender CSPM CIEM AWS OIDC (open id connect) configuration"
-    },
-    "DefenderCspmAwsOfferingDatabasesDspm": {
-      "type": "object",
-      "properties": {
-        "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS for this feature"
-        },
-        "enabled": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Is databases DSPM protection enabled"
-        }
-      },
-      "description": "The databases DSPM configuration"
+      "type": "object"
     },
     "DefenderCspmAwsOfferingDataSensitivityDiscovery": {
-      "type": "object",
+      "description": "The Microsoft Defender Data Sensitivity discovery configuration",
       "properties": {
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS for this feature"
+          "description": "The cloud role ARN in AWS for this feature",
+          "type": "string"
         },
         "enabled": {
+          "description": "Is Microsoft Defender Data Sensitivity discovery enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -551,20 +1028,20 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is Microsoft Defender Data Sensitivity discovery enabled"
+          ]
         }
       },
-      "description": "The Microsoft Defender Data Sensitivity discovery configuration"
+      "type": "object"
     },
-    "DefenderCspmAwsOfferingMdcContainersAgentlessDiscoveryK8s": {
-      "type": "object",
+    "DefenderCspmAwsOfferingDatabasesDspm": {
+      "description": "The databases DSPM configuration",
       "properties": {
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS for this feature"
+          "description": "The cloud role ARN in AWS for this feature",
+          "type": "string"
         },
         "enabled": {
+          "description": "Is databases DSPM protection enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -572,20 +1049,41 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is Microsoft Defender container agentless discovery K8s enabled"
+          ]
         }
       },
-      "description": "The Microsoft Defender container agentless discovery K8s configuration"
+      "type": "object"
+    },
+    "DefenderCspmAwsOfferingMdcContainersAgentlessDiscoveryK8S": {
+      "description": "The Microsoft Defender container agentless discovery K8s configuration",
+      "properties": {
+        "cloudRoleArn": {
+          "description": "The cloud role ARN in AWS for this feature",
+          "type": "string"
+        },
+        "enabled": {
+          "description": "Is Microsoft Defender container agentless discovery K8s enabled",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
     },
     "DefenderCspmAwsOfferingMdcContainersImageAssessment": {
-      "type": "object",
+      "description": "The Microsoft Defender container image assessment configuration",
       "properties": {
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS for this feature"
+          "description": "The cloud role ARN in AWS for this feature",
+          "type": "string"
         },
         "enabled": {
+          "description": "Is Microsoft Defender container image assessment enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -593,16 +1091,16 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is Microsoft Defender container image assessment enabled"
+          ]
         }
       },
-      "description": "The Microsoft Defender container image assessment configuration"
+      "type": "object"
     },
     "DefenderCspmAwsOfferingVmScanners": {
-      "type": "object",
+      "description": "The Microsoft Defender for Server VM scanning configuration",
       "properties": {
         "configuration": {
+          "description": "configuration for Microsoft Defender for Server VM scanning",
           "oneOf": [
             {
               "$ref": "#/definitions/DefenderCspmAwsOfferingVmScannersConfiguration"
@@ -610,10 +1108,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "configuration for Microsoft Defender for Server VM scanning"
+          ]
         },
         "enabled": {
+          "description": "Is Microsoft Defender for Server VM scanning enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -621,143 +1119,73 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is Microsoft Defender for Server VM scanning enabled"
+          ]
         }
       },
-      "description": "The Microsoft Defender for Server VM scanning configuration"
+      "type": "object"
     },
     "DefenderCspmAwsOfferingVmScannersConfiguration": {
-      "type": "object",
+      "description": "configuration for Microsoft Defender for Server VM scanning",
       "properties": {
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS for this feature"
+          "description": "The cloud role ARN in AWS for this feature",
+          "type": "string"
         },
         "exclusionTags": {
+          "description": "VM tags that indicates that VM should not be scanned",
           "oneOf": [
             {
-              "type": "object",
               "additionalProperties": {
                 "type": "string"
               },
-              "properties": {}
+              "properties": {},
+              "type": "object"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "VM tags that indicates that VM should not be scanned"
-        },
-        "scanningMode": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Default"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The scanning mode for the VM scan."
-        }
-      },
-      "description": "configuration for Microsoft Defender for Server VM scanning"
-    },
-    "DefenderCspmGcpOffering": {
-      "type": "object",
-      "properties": {
-        "ciemDiscovery": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderCspmGcpOfferingCiemDiscovery"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "GCP Defenders CSPM Cloud infrastructure entitlement management (CIEM) discovery offering configurations"
-        },
-        "dataSensitivityDiscovery": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderCspmGcpOfferingDataSensitivityDiscovery"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Microsoft Defender Data Sensitivity discovery configuration"
-        },
-        "mdcContainersAgentlessDiscoveryK8s": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderCspmGcpOfferingMdcContainersAgentlessDiscoveryK8s"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Microsoft Defender Container agentless discovery configuration"
-        },
-        "mdcContainersImageAssessment": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderCspmGcpOfferingMdcContainersImageAssessment"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Microsoft Defender Container image assessment configuration"
-        },
-        "offeringType": {
-          "type": "string",
-          "enum": [
-            "DefenderCspmGcp"
           ]
         },
-        "vmScanners": {
+        "scanningMode": {
+          "description": "The scanning mode for the VM scan.",
           "oneOf": [
             {
-              "$ref": "#/definitions/DefenderCspmGcpOfferingVmScanners"
+              "enum": [
+                "Default"
+              ],
+              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "The Microsoft Defender for Server VM scanning configuration"
+          ]
         }
       },
-      "required": [
-        "offeringType"
-      ],
-      "description": "The CSPM P1 for GCP offering"
+      "type": "object"
     },
     "DefenderCspmGcpOfferingCiemDiscovery": {
-      "type": "object",
+      "description": "GCP Defenders CSPM Cloud infrastructure entitlement management (CIEM) discovery offering configurations",
       "properties": {
         "azureActiveDirectoryAppName": {
-          "type": "string",
-          "description": "the azure active directory app name used of authenticating against GCP workload identity federation"
+          "description": "the azure active directory app name used of authenticating against GCP workload identity federation",
+          "type": "string"
         },
         "serviceAccountEmailAddress": {
-          "type": "string",
-          "description": "The service account email address in GCP for CIEM discovery offering"
+          "description": "The service account email address in GCP for CIEM discovery offering",
+          "type": "string"
         },
         "workloadIdentityProviderId": {
-          "type": "string",
-          "description": "The GCP workload identity provider id for CIEM discovery offering"
+          "description": "The GCP workload identity provider id for CIEM discovery offering",
+          "type": "string"
         }
       },
-      "description": "GCP Defenders CSPM Cloud infrastructure entitlement management (CIEM) discovery offering configurations"
+      "type": "object"
     },
     "DefenderCspmGcpOfferingDataSensitivityDiscovery": {
-      "type": "object",
+      "description": "The Microsoft Defender Data Sensitivity discovery configuration",
       "properties": {
         "enabled": {
+          "description": "Is Microsoft Defender Data Sensitivity discovery enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -765,24 +1193,24 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is Microsoft Defender Data Sensitivity discovery enabled"
+          ]
         },
         "serviceAccountEmailAddress": {
-          "type": "string",
-          "description": "The service account email address in GCP for this feature"
+          "description": "The service account email address in GCP for this feature",
+          "type": "string"
         },
         "workloadIdentityProviderId": {
-          "type": "string",
-          "description": "The workload identity provider id in GCP for this feature"
+          "description": "The workload identity provider id in GCP for this feature",
+          "type": "string"
         }
       },
-      "description": "The Microsoft Defender Data Sensitivity discovery configuration"
+      "type": "object"
     },
-    "DefenderCspmGcpOfferingMdcContainersAgentlessDiscoveryK8s": {
-      "type": "object",
+    "DefenderCspmGcpOfferingMdcContainersAgentlessDiscoveryK8S": {
+      "description": "The Microsoft Defender Container agentless discovery configuration",
       "properties": {
         "enabled": {
+          "description": "Is Microsoft Defender container agentless discovery enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -790,24 +1218,24 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is Microsoft Defender container agentless discovery enabled"
+          ]
         },
         "serviceAccountEmailAddress": {
-          "type": "string",
-          "description": "The service account email address in GCP for this feature"
+          "description": "The service account email address in GCP for this feature",
+          "type": "string"
         },
         "workloadIdentityProviderId": {
-          "type": "string",
-          "description": "The workload identity provider id in GCP for this feature"
+          "description": "The workload identity provider id in GCP for this feature",
+          "type": "string"
         }
       },
-      "description": "The Microsoft Defender Container agentless discovery configuration"
+      "type": "object"
     },
     "DefenderCspmGcpOfferingMdcContainersImageAssessment": {
-      "type": "object",
+      "description": "The Microsoft Defender Container image assessment configuration",
       "properties": {
         "enabled": {
+          "description": "Is Microsoft Defender container image assessment enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -815,24 +1243,24 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is Microsoft Defender container image assessment enabled"
+          ]
         },
         "serviceAccountEmailAddress": {
-          "type": "string",
-          "description": "The service account email address in GCP for this feature"
+          "description": "The service account email address in GCP for this feature",
+          "type": "string"
         },
         "workloadIdentityProviderId": {
-          "type": "string",
-          "description": "The workload identity provider id in GCP for this feature"
+          "description": "The workload identity provider id in GCP for this feature",
+          "type": "string"
         }
       },
-      "description": "The Microsoft Defender Container image assessment configuration"
+      "type": "object"
     },
     "DefenderCspmGcpOfferingVmScanners": {
-      "type": "object",
+      "description": "The Microsoft Defender for Server VM scanning configuration",
       "properties": {
         "configuration": {
+          "description": "configuration for Microsoft Defender for Server VM scanning",
           "oneOf": [
             {
               "$ref": "#/definitions/DefenderCspmGcpOfferingVmScannersConfiguration"
@@ -840,10 +1268,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "configuration for Microsoft Defender for Server VM scanning"
+          ]
         },
         "enabled": {
+          "description": "Is Microsoft Defender for Server VM scanning enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -851,103 +1279,55 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is Microsoft Defender for Server VM scanning enabled"
+          ]
         }
       },
-      "description": "The Microsoft Defender for Server VM scanning configuration"
+      "type": "object"
     },
     "DefenderCspmGcpOfferingVmScannersConfiguration": {
-      "type": "object",
+      "description": "configuration for Microsoft Defender for Server VM scanning",
       "properties": {
         "exclusionTags": {
+          "description": "VM tags that indicates that VM should not be scanned",
           "oneOf": [
             {
-              "type": "object",
               "additionalProperties": {
                 "type": "string"
               },
-              "properties": {}
+              "properties": {},
+              "type": "object"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "VM tags that indicates that VM should not be scanned"
-        },
-        "scanningMode": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Default"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The scanning mode for the VM scan."
-        }
-      },
-      "description": "configuration for Microsoft Defender for Server VM scanning"
-    },
-    "DefenderFoDatabasesAwsOffering": {
-      "type": "object",
-      "properties": {
-        "arcAutoProvisioning": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderFoDatabasesAwsOfferingArcAutoProvisioning"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The ARC autoprovisioning configuration"
-        },
-        "databasesDspm": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderFoDatabasesAwsOfferingDatabasesDspm"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The databases data security posture management (DSPM) configuration"
-        },
-        "offeringType": {
-          "type": "string",
-          "enum": [
-            "DefenderForDatabasesAws"
           ]
         },
-        "rds": {
+        "scanningMode": {
+          "description": "The scanning mode for the VM scan.",
           "oneOf": [
             {
-              "$ref": "#/definitions/DefenderFoDatabasesAwsOfferingRds"
+              "enum": [
+                "Default"
+              ],
+              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "The RDS configuration"
+          ]
         }
       },
-      "required": [
-        "offeringType"
-      ],
-      "description": "The Defender for Databases AWS offering"
+      "type": "object"
     },
     "DefenderFoDatabasesAwsOfferingArcAutoProvisioning": {
-      "type": "object",
+      "description": "The ARC autoprovisioning configuration",
       "properties": {
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS for this feature"
+          "description": "The cloud role ARN in AWS for this feature",
+          "type": "string"
         },
         "configuration": {
+          "description": "Configuration for servers Arc auto provisioning",
           "oneOf": [
             {
               "$ref": "#/definitions/DefenderFoDatabasesAwsOfferingArcAutoProvisioningConfiguration"
@@ -955,10 +1335,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Configuration for servers Arc auto provisioning"
+          ]
         },
         "enabled": {
+          "description": "Is arc auto provisioning enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -966,34 +1346,34 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is arc auto provisioning enabled"
+          ]
         }
       },
-      "description": "The ARC autoprovisioning configuration"
+      "type": "object"
     },
     "DefenderFoDatabasesAwsOfferingArcAutoProvisioningConfiguration": {
-      "type": "object",
+      "description": "Configuration for servers Arc auto provisioning",
       "properties": {
         "privateLinkScope": {
-          "type": "string",
-          "description": "Optional Arc private link scope resource id to link the Arc agent"
+          "description": "Optional Arc private link scope resource id to link the Arc agent",
+          "type": "string"
         },
         "proxy": {
-          "type": "string",
-          "description": "Optional http proxy endpoint to use for the Arc agent"
+          "description": "Optional http proxy endpoint to use for the Arc agent",
+          "type": "string"
         }
       },
-      "description": "Configuration for servers Arc auto provisioning"
+      "type": "object"
     },
     "DefenderFoDatabasesAwsOfferingDatabasesDspm": {
-      "type": "object",
+      "description": "The databases data security posture management (DSPM) configuration",
       "properties": {
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS for this feature"
+          "description": "The cloud role ARN in AWS for this feature",
+          "type": "string"
         },
         "enabled": {
+          "description": "Is databases data security posture management (DSPM) protection enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -1001,20 +1381,20 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is databases data security posture management (DSPM) protection enabled"
+          ]
         }
       },
-      "description": "The databases data security posture management (DSPM) configuration"
+      "type": "object"
     },
     "DefenderFoDatabasesAwsOfferingRds": {
-      "type": "object",
+      "description": "The RDS configuration",
       "properties": {
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS for this feature"
+          "description": "The cloud role ARN in AWS for this feature",
+          "type": "string"
         },
         "enabled": {
+          "description": "Is RDS protection enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -1022,220 +1402,80 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is RDS protection enabled"
-        }
-      },
-      "description": "The RDS configuration"
-    },
-    "DefenderForContainersAwsOffering": {
-      "type": "object",
-      "properties": {
-        "autoProvisioning": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Is audit logs pipeline auto provisioning enabled"
-        },
-        "cloudWatchToKinesis": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForContainersAwsOfferingCloudWatchToKinesis"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The cloudwatch to kinesis connection configuration"
-        },
-        "containerVulnerabilityAssessment": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForContainersAwsOfferingContainerVulnerabilityAssessment"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The container vulnerability assessment configuration"
-        },
-        "containerVulnerabilityAssessmentTask": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForContainersAwsOfferingContainerVulnerabilityAssessmentTask"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The container vulnerability assessment task configuration"
-        },
-        "enableContainerVulnerabilityAssessment": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Enable container vulnerability assessment feature"
-        },
-        "kinesisToS3": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForContainersAwsOfferingKinesisToS3"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The kinesis to s3 connection configuration"
-        },
-        "kubeAuditRetentionTime": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The retention time in days of kube audit logs set on the CloudWatch log group"
-        },
-        "kubernetesScubaReader": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForContainersAwsOfferingKubernetesScubaReader"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The kubernetes to scuba connection configuration"
-        },
-        "kubernetesService": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForContainersAwsOfferingKubernetesService"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The kubernetes service connection configuration"
-        },
-        "mdcContainersAgentlessDiscoveryK8s": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForContainersAwsOfferingMdcContainersAgentlessDiscoveryK8s"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Microsoft Defender container agentless discovery K8s configuration"
-        },
-        "mdcContainersImageAssessment": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForContainersAwsOfferingMdcContainersImageAssessment"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Microsoft Defender container image assessment configuration"
-        },
-        "offeringType": {
-          "type": "string",
-          "enum": [
-            "DefenderForContainersAws"
           ]
-        },
-        "scubaExternalId": {
-          "type": "string",
-          "description": "The externalId used by the data reader to prevent the confused deputy attack"
         }
       },
-      "required": [
-        "offeringType"
-      ],
-      "description": "The Defender for Containers AWS offering"
+      "type": "object"
     },
     "DefenderForContainersAwsOfferingCloudWatchToKinesis": {
-      "type": "object",
+      "description": "The cloudwatch to kinesis connection configuration",
       "properties": {
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS used by CloudWatch to transfer data into Kinesis"
+          "description": "The cloud role ARN in AWS used by CloudWatch to transfer data into Kinesis",
+          "type": "string"
         }
       },
-      "description": "The cloudwatch to kinesis connection configuration"
+      "type": "object"
     },
     "DefenderForContainersAwsOfferingContainerVulnerabilityAssessment": {
-      "type": "object",
+      "description": "The container vulnerability assessment configuration",
       "properties": {
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS for this feature"
+          "description": "The cloud role ARN in AWS for this feature",
+          "type": "string"
         }
       },
-      "description": "The container vulnerability assessment configuration"
+      "type": "object"
     },
     "DefenderForContainersAwsOfferingContainerVulnerabilityAssessmentTask": {
-      "type": "object",
+      "description": "The container vulnerability assessment task configuration",
       "properties": {
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS for this feature"
+          "description": "The cloud role ARN in AWS for this feature",
+          "type": "string"
         }
       },
-      "description": "The container vulnerability assessment task configuration"
+      "type": "object"
     },
     "DefenderForContainersAwsOfferingKinesisToS3": {
-      "type": "object",
+      "description": "The kinesis to s3 connection configuration",
       "properties": {
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS used by Kinesis to transfer data into S3"
+          "description": "The cloud role ARN in AWS used by Kinesis to transfer data into S3",
+          "type": "string"
         }
       },
-      "description": "The kinesis to s3 connection configuration"
+      "type": "object"
     },
     "DefenderForContainersAwsOfferingKubernetesScubaReader": {
-      "type": "object",
+      "description": "The kubernetes to scuba connection configuration",
       "properties": {
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS for this feature used for reading data"
+          "description": "The cloud role ARN in AWS for this feature used for reading data",
+          "type": "string"
         }
       },
-      "description": "The kubernetes to scuba connection configuration"
+      "type": "object"
     },
     "DefenderForContainersAwsOfferingKubernetesService": {
-      "type": "object",
+      "description": "The kubernetes service connection configuration",
       "properties": {
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS for this feature used for provisioning resources"
+          "description": "The cloud role ARN in AWS for this feature used for provisioning resources",
+          "type": "string"
         }
       },
-      "description": "The kubernetes service connection configuration"
+      "type": "object"
     },
-    "DefenderForContainersAwsOfferingMdcContainersAgentlessDiscoveryK8s": {
-      "type": "object",
+    "DefenderForContainersAwsOfferingMdcContainersAgentlessDiscoveryK8S": {
+      "description": "The Microsoft Defender container agentless discovery K8s configuration",
       "properties": {
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS for this feature"
+          "description": "The cloud role ARN in AWS for this feature",
+          "type": "string"
         },
         "enabled": {
+          "description": "Is Microsoft Defender container agentless discovery K8s enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -1243,20 +1483,20 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is Microsoft Defender container agentless discovery K8s enabled"
+          ]
         }
       },
-      "description": "The Microsoft Defender container agentless discovery K8s configuration"
+      "type": "object"
     },
     "DefenderForContainersAwsOfferingMdcContainersImageAssessment": {
-      "type": "object",
+      "description": "The Microsoft Defender container image assessment configuration",
       "properties": {
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS for this feature"
+          "description": "The cloud role ARN in AWS for this feature",
+          "type": "string"
         },
         "enabled": {
+          "description": "Is Microsoft Defender container image assessment enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -1264,122 +1504,30 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is Microsoft Defender container image assessment enabled"
-        }
-      },
-      "description": "The Microsoft Defender container image assessment configuration"
-    },
-    "DefenderForContainersGcpOffering": {
-      "type": "object",
-      "properties": {
-        "auditLogsAutoProvisioningFlag": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Is audit logs data collection enabled"
-        },
-        "dataPipelineNativeCloudConnection": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForContainersGcpOfferingDataPipelineNativeCloudConnection"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The native cloud connection configuration"
-        },
-        "defenderAgentAutoProvisioningFlag": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Is Microsoft Defender for Cloud Kubernetes agent auto provisioning enabled"
-        },
-        "mdcContainersAgentlessDiscoveryK8s": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForContainersGcpOfferingMdcContainersAgentlessDiscoveryK8s"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Microsoft Defender Container agentless discovery configuration"
-        },
-        "mdcContainersImageAssessment": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForContainersGcpOfferingMdcContainersImageAssessment"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Microsoft Defender Container image assessment configuration"
-        },
-        "nativeCloudConnection": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForContainersGcpOfferingNativeCloudConnection"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The native cloud connection configuration"
-        },
-        "offeringType": {
-          "type": "string",
-          "enum": [
-            "DefenderForContainersGcp"
           ]
-        },
-        "policyAgentAutoProvisioningFlag": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Is Policy Kubernetes agent auto provisioning enabled"
         }
       },
-      "required": [
-        "offeringType"
-      ],
-      "description": "The containers GCP offering"
+      "type": "object"
     },
     "DefenderForContainersGcpOfferingDataPipelineNativeCloudConnection": {
-      "type": "object",
+      "description": "The native cloud connection configuration",
       "properties": {
         "serviceAccountEmailAddress": {
-          "type": "string",
-          "description": "The data collection service account email address in GCP for this offering"
+          "description": "The data collection service account email address in GCP for this offering",
+          "type": "string"
         },
         "workloadIdentityProviderId": {
-          "type": "string",
-          "description": "The data collection GCP workload identity provider id for this offering"
+          "description": "The data collection GCP workload identity provider id for this offering",
+          "type": "string"
         }
       },
-      "description": "The native cloud connection configuration"
+      "type": "object"
     },
-    "DefenderForContainersGcpOfferingMdcContainersAgentlessDiscoveryK8s": {
-      "type": "object",
+    "DefenderForContainersGcpOfferingMdcContainersAgentlessDiscoveryK8S": {
+      "description": "The Microsoft Defender Container agentless discovery configuration",
       "properties": {
         "enabled": {
+          "description": "Is Microsoft Defender container agentless discovery enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -1387,24 +1535,24 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is Microsoft Defender container agentless discovery enabled"
+          ]
         },
         "serviceAccountEmailAddress": {
-          "type": "string",
-          "description": "The service account email address in GCP for this feature"
+          "description": "The service account email address in GCP for this feature",
+          "type": "string"
         },
         "workloadIdentityProviderId": {
-          "type": "string",
-          "description": "The workload identity provider id in GCP for this feature"
+          "description": "The workload identity provider id in GCP for this feature",
+          "type": "string"
         }
       },
-      "description": "The Microsoft Defender Container agentless discovery configuration"
+      "type": "object"
     },
     "DefenderForContainersGcpOfferingMdcContainersImageAssessment": {
-      "type": "object",
+      "description": "The Microsoft Defender Container image assessment configuration",
       "properties": {
         "enabled": {
+          "description": "Is Microsoft Defender container image assessment enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -1412,75 +1560,38 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is Microsoft Defender container image assessment enabled"
+          ]
         },
         "serviceAccountEmailAddress": {
-          "type": "string",
-          "description": "The service account email address in GCP for this feature"
+          "description": "The service account email address in GCP for this feature",
+          "type": "string"
         },
         "workloadIdentityProviderId": {
-          "type": "string",
-          "description": "The workload identity provider id in GCP for this feature"
+          "description": "The workload identity provider id in GCP for this feature",
+          "type": "string"
         }
       },
-      "description": "The Microsoft Defender Container image assessment configuration"
+      "type": "object"
     },
     "DefenderForContainersGcpOfferingNativeCloudConnection": {
-      "type": "object",
+      "description": "The native cloud connection configuration",
       "properties": {
         "serviceAccountEmailAddress": {
-          "type": "string",
-          "description": "The service account email address in GCP for this offering"
+          "description": "The service account email address in GCP for this offering",
+          "type": "string"
         },
         "workloadIdentityProviderId": {
-          "type": "string",
-          "description": "The GCP workload identity provider id for this offering"
+          "description": "The GCP workload identity provider id for this offering",
+          "type": "string"
         }
       },
-      "description": "The native cloud connection configuration"
-    },
-    "DefenderForDatabasesGcpOffering": {
-      "type": "object",
-      "properties": {
-        "arcAutoProvisioning": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForDatabasesGcpOfferingArcAutoProvisioning"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The ARC autoprovisioning configuration"
-        },
-        "defenderForDatabasesArcAutoProvisioning": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForDatabasesGcpOfferingDefenderForDatabasesArcAutoProvisioning"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The native cloud connection configuration"
-        },
-        "offeringType": {
-          "type": "string",
-          "enum": [
-            "DefenderForDatabasesGcp"
-          ]
-        }
-      },
-      "required": [
-        "offeringType"
-      ],
-      "description": "The Defender for Databases GCP offering configurations"
+      "type": "object"
     },
     "DefenderForDatabasesGcpOfferingArcAutoProvisioning": {
-      "type": "object",
+      "description": "The ARC autoprovisioning configuration",
       "properties": {
         "configuration": {
+          "description": "Configuration for servers Arc auto provisioning",
           "oneOf": [
             {
               "$ref": "#/definitions/DefenderForDatabasesGcpOfferingArcAutoProvisioningConfiguration"
@@ -1488,10 +1599,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Configuration for servers Arc auto provisioning"
+          ]
         },
         "enabled": {
+          "description": "Is arc auto provisioning enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -1499,174 +1610,48 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is arc auto provisioning enabled"
+          ]
         }
       },
-      "description": "The ARC autoprovisioning configuration"
+      "type": "object"
     },
     "DefenderForDatabasesGcpOfferingArcAutoProvisioningConfiguration": {
-      "type": "object",
+      "description": "Configuration for servers Arc auto provisioning",
       "properties": {
         "privateLinkScope": {
-          "type": "string",
-          "description": "Optional Arc private link scope resource id to link the Arc agent"
+          "description": "Optional Arc private link scope resource id to link the Arc agent",
+          "type": "string"
         },
         "proxy": {
-          "type": "string",
-          "description": "Optional http proxy endpoint to use for the Arc agent"
+          "description": "Optional http proxy endpoint to use for the Arc agent",
+          "type": "string"
         }
       },
-      "description": "Configuration for servers Arc auto provisioning"
+      "type": "object"
     },
     "DefenderForDatabasesGcpOfferingDefenderForDatabasesArcAutoProvisioning": {
-      "type": "object",
+      "description": "The native cloud connection configuration",
       "properties": {
         "serviceAccountEmailAddress": {
-          "type": "string",
-          "description": "The service account email address in GCP for this offering"
+          "description": "The service account email address in GCP for this offering",
+          "type": "string"
         },
         "workloadIdentityProviderId": {
-          "type": "string",
-          "description": "The GCP workload identity provider id for this offering"
+          "description": "The GCP workload identity provider id for this offering",
+          "type": "string"
         }
       },
-      "description": "The native cloud connection configuration"
-    },
-    "DefenderForDevOpsAzureDevOpsOffering": {
-      "type": "object",
-      "properties": {
-        "offeringType": {
-          "type": "string",
-          "enum": [
-            "DefenderForDevOpsAzureDevOps"
-          ]
-        }
-      },
-      "required": [
-        "offeringType"
-      ],
-      "description": "The Defender for DevOps for Azure DevOps offering"
-    },
-    "DefenderForDevOpsGithubOffering": {
-      "type": "object",
-      "properties": {
-        "offeringType": {
-          "type": "string",
-          "enum": [
-            "DefenderForDevOpsGithub"
-          ]
-        }
-      },
-      "required": [
-        "offeringType"
-      ],
-      "description": "The Defender for DevOps for Github offering"
-    },
-    "DefenderForDevOpsGitLabOffering": {
-      "type": "object",
-      "properties": {
-        "offeringType": {
-          "type": "string",
-          "enum": [
-            "DefenderForDevOpsGitLab"
-          ]
-        }
-      },
-      "required": [
-        "offeringType"
-      ],
-      "description": "The Defender for DevOps for Gitlab offering"
-    },
-    "DefenderForServersAwsOffering": {
-      "type": "object",
-      "properties": {
-        "arcAutoProvisioning": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForServersAwsOfferingArcAutoProvisioning"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The ARC autoprovisioning configuration"
-        },
-        "defenderForServers": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForServersAwsOfferingDefenderForServers"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Defender for servers connection configuration"
-        },
-        "mdeAutoProvisioning": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForServersAwsOfferingMdeAutoProvisioning"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Microsoft Defender for Endpoint autoprovisioning configuration"
-        },
-        "offeringType": {
-          "type": "string",
-          "enum": [
-            "DefenderForServersAws"
-          ]
-        },
-        "subPlan": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForServersAwsOfferingSubPlan"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "configuration for the servers offering subPlan"
-        },
-        "vaAutoProvisioning": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForServersAwsOfferingVaAutoProvisioning"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Vulnerability Assessment autoprovisioning configuration"
-        },
-        "vmScanners": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForServersAwsOfferingVmScanners"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Microsoft Defender for Server VM scanning configuration"
-        }
-      },
-      "required": [
-        "offeringType"
-      ],
-      "description": "The Defender for Servers AWS offering"
+      "type": "object"
     },
     "DefenderForServersAwsOfferingArcAutoProvisioning": {
-      "type": "object",
+      "description": "The ARC autoprovisioning configuration",
       "properties": {
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS for this feature"
+          "description": "The cloud role ARN in AWS for this feature",
+          "type": "string"
         },
         "configuration": {
+          "description": "Configuration for servers Arc auto provisioning",
           "oneOf": [
             {
               "$ref": "#/definitions/DefenderForServersAwsOfferingArcAutoProvisioningConfiguration"
@@ -1674,10 +1659,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Configuration for servers Arc auto provisioning"
+          ]
         },
         "enabled": {
+          "description": "Is arc auto provisioning enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -1685,45 +1670,51 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is arc auto provisioning enabled"
+          ]
         }
       },
-      "description": "The ARC autoprovisioning configuration"
+      "type": "object"
     },
     "DefenderForServersAwsOfferingArcAutoProvisioningConfiguration": {
-      "type": "object",
+      "description": "Configuration for servers Arc auto provisioning",
       "properties": {
         "privateLinkScope": {
-          "type": "string",
-          "description": "Optional Arc private link scope resource id to link the Arc agent"
+          "description": "Optional Arc private link scope resource id to link the Arc agent",
+          "type": "string"
         },
         "proxy": {
-          "type": "string",
-          "description": "Optional HTTP proxy endpoint to use for the Arc agent"
+          "description": "Optional HTTP proxy endpoint to use for the Arc agent",
+          "type": "string"
         }
       },
-      "description": "Configuration for servers Arc auto provisioning"
+      "type": "object"
     },
     "DefenderForServersAwsOfferingDefenderForServers": {
-      "type": "object",
+      "description": "The Defender for servers connection configuration",
       "properties": {
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS for this feature"
+          "description": "The cloud role ARN in AWS for this feature",
+          "type": "string"
         }
       },
-      "description": "The Defender for servers connection configuration"
+      "type": "object"
     },
     "DefenderForServersAwsOfferingMdeAutoProvisioning": {
-      "type": "object",
+      "description": "The Microsoft Defender for Endpoint autoprovisioning configuration",
       "properties": {
         "configuration": {
-          "type": "object",
-          "properties": {},
-          "description": "configuration for Microsoft Defender for Endpoint autoprovisioning"
+          "description": "configuration for Microsoft Defender for Endpoint autoprovisioning",
+          "oneOf": [
+            {
+              "type": "object"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "enabled": {
+          "description": "Is Microsoft Defender for Endpoint auto provisioning enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -1731,37 +1722,37 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is Microsoft Defender for Endpoint auto provisioning enabled"
+          ]
         }
       },
-      "description": "The Microsoft Defender for Endpoint autoprovisioning configuration"
+      "type": "object"
     },
     "DefenderForServersAwsOfferingSubPlan": {
-      "type": "object",
+      "description": "configuration for the servers offering subPlan",
       "properties": {
         "type": {
+          "description": "The available sub plans",
           "oneOf": [
             {
-              "type": "string",
               "enum": [
                 "P1",
                 "P2"
-              ]
+              ],
+              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "The available sub plans."
+          ]
         }
       },
-      "description": "configuration for the servers offering subPlan"
+      "type": "object"
     },
     "DefenderForServersAwsOfferingVaAutoProvisioning": {
-      "type": "object",
+      "description": "The Vulnerability Assessment autoprovisioning configuration",
       "properties": {
         "configuration": {
+          "description": "configuration for Vulnerability Assessment autoprovisioning",
           "oneOf": [
             {
               "$ref": "#/definitions/DefenderForServersAwsOfferingVaAutoProvisioningConfiguration"
@@ -1769,10 +1760,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "configuration for Vulnerability Assessment autoprovisioning"
+          ]
         },
         "enabled": {
+          "description": "Is Vulnerability Assessment auto provisioning enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -1780,37 +1771,37 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is Vulnerability Assessment auto provisioning enabled"
+          ]
         }
       },
-      "description": "The Vulnerability Assessment autoprovisioning configuration"
+      "type": "object"
     },
     "DefenderForServersAwsOfferingVaAutoProvisioningConfiguration": {
-      "type": "object",
+      "description": "configuration for Vulnerability Assessment autoprovisioning",
       "properties": {
         "type": {
+          "description": "The Vulnerability Assessment solution to be provisioned. Can be either 'TVM' or 'Qualys'",
           "oneOf": [
             {
-              "type": "string",
               "enum": [
                 "Qualys",
                 "TVM"
-              ]
+              ],
+              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "The Vulnerability Assessment solution to be provisioned. Can be either 'TVM' or 'Qualys'."
+          ]
         }
       },
-      "description": "configuration for Vulnerability Assessment autoprovisioning"
+      "type": "object"
     },
     "DefenderForServersAwsOfferingVmScanners": {
-      "type": "object",
+      "description": "The Microsoft Defender for Server VM scanning configuration",
       "properties": {
         "configuration": {
+          "description": "configuration for Microsoft Defender for Server VM scanning",
           "oneOf": [
             {
               "$ref": "#/definitions/DefenderForServersAwsOfferingVmScannersConfiguration"
@@ -1818,10 +1809,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "configuration for Microsoft Defender for Server VM scanning"
+          ]
         },
         "enabled": {
+          "description": "Is Microsoft Defender for Server VM scanning enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -1829,136 +1820,55 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is Microsoft Defender for Server VM scanning enabled"
+          ]
         }
       },
-      "description": "The Microsoft Defender for Server VM scanning configuration"
+      "type": "object"
     },
     "DefenderForServersAwsOfferingVmScannersConfiguration": {
-      "type": "object",
+      "description": "configuration for Microsoft Defender for Server VM scanning",
       "properties": {
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS for this feature"
+          "description": "The cloud role ARN in AWS for this feature",
+          "type": "string"
         },
         "exclusionTags": {
+          "description": "VM tags that indicates that VM should not be scanned",
           "oneOf": [
             {
-              "type": "object",
               "additionalProperties": {
                 "type": "string"
               },
-              "properties": {}
+              "properties": {},
+              "type": "object"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "VM tags that indicates that VM should not be scanned"
-        },
-        "scanningMode": {
-          "oneOf": [
-            {
-              "type": "string",
-              "enum": [
-                "Default"
-              ]
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The scanning mode for the VM scan."
-        }
-      },
-      "description": "configuration for Microsoft Defender for Server VM scanning"
-    },
-    "DefenderForServersGcpOffering": {
-      "type": "object",
-      "properties": {
-        "arcAutoProvisioning": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForServersGcpOfferingArcAutoProvisioning"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The ARC autoprovisioning configuration"
-        },
-        "defenderForServers": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForServersGcpOfferingDefenderForServers"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Defender for servers connection configuration"
-        },
-        "mdeAutoProvisioning": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForServersGcpOfferingMdeAutoProvisioning"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Microsoft Defender for Endpoint autoprovisioning configuration"
-        },
-        "offeringType": {
-          "type": "string",
-          "enum": [
-            "DefenderForServersGcp"
           ]
         },
-        "subPlan": {
+        "scanningMode": {
+          "description": "The scanning mode for the VM scan.",
           "oneOf": [
             {
-              "$ref": "#/definitions/DefenderForServersGcpOfferingSubPlan"
+              "enum": [
+                "Default"
+              ],
+              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "configuration for the servers offering subPlan"
-        },
-        "vaAutoProvisioning": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForServersGcpOfferingVaAutoProvisioning"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Vulnerability Assessment autoprovisioning configuration"
-        },
-        "vmScanners": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DefenderForServersGcpOfferingVmScanners"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The Microsoft Defender for Server VM scanning configuration"
+          ]
         }
       },
-      "required": [
-        "offeringType"
-      ],
-      "description": "The Defender for Servers GCP offering configurations"
+      "type": "object"
     },
     "DefenderForServersGcpOfferingArcAutoProvisioning": {
-      "type": "object",
+      "description": "The ARC autoprovisioning configuration",
       "properties": {
         "configuration": {
+          "description": "Configuration for servers Arc auto provisioning",
           "oneOf": [
             {
               "$ref": "#/definitions/DefenderForServersGcpOfferingArcAutoProvisioningConfiguration"
@@ -1966,10 +1876,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Configuration for servers Arc auto provisioning"
+          ]
         },
         "enabled": {
+          "description": "Is arc auto provisioning enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -1977,49 +1887,55 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is arc auto provisioning enabled"
+          ]
         }
       },
-      "description": "The ARC autoprovisioning configuration"
+      "type": "object"
     },
     "DefenderForServersGcpOfferingArcAutoProvisioningConfiguration": {
-      "type": "object",
+      "description": "Configuration for servers Arc auto provisioning",
       "properties": {
         "privateLinkScope": {
-          "type": "string",
-          "description": "Optional Arc private link scope resource id to link the Arc agent"
+          "description": "Optional Arc private link scope resource id to link the Arc agent",
+          "type": "string"
         },
         "proxy": {
-          "type": "string",
-          "description": "Optional HTTP proxy endpoint to use for the Arc agent"
+          "description": "Optional HTTP proxy endpoint to use for the Arc agent",
+          "type": "string"
         }
       },
-      "description": "Configuration for servers Arc auto provisioning"
+      "type": "object"
     },
     "DefenderForServersGcpOfferingDefenderForServers": {
-      "type": "object",
+      "description": "The Defender for servers connection configuration",
       "properties": {
         "serviceAccountEmailAddress": {
-          "type": "string",
-          "description": "The service account email address in GCP for this feature"
+          "description": "The service account email address in GCP for this feature",
+          "type": "string"
         },
         "workloadIdentityProviderId": {
-          "type": "string",
-          "description": "The workload identity provider id in GCP for this feature"
+          "description": "The workload identity provider id in GCP for this feature",
+          "type": "string"
         }
       },
-      "description": "The Defender for servers connection configuration"
+      "type": "object"
     },
     "DefenderForServersGcpOfferingMdeAutoProvisioning": {
-      "type": "object",
+      "description": "The Microsoft Defender for Endpoint autoprovisioning configuration",
       "properties": {
         "configuration": {
-          "type": "object",
-          "properties": {},
-          "description": "configuration for Microsoft Defender for Endpoint autoprovisioning"
+          "description": "configuration for Microsoft Defender for Endpoint autoprovisioning",
+          "oneOf": [
+            {
+              "type": "object"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "enabled": {
+          "description": "Is Microsoft Defender for Endpoint auto provisioning enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -2027,37 +1943,37 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is Microsoft Defender for Endpoint auto provisioning enabled"
+          ]
         }
       },
-      "description": "The Microsoft Defender for Endpoint autoprovisioning configuration"
+      "type": "object"
     },
     "DefenderForServersGcpOfferingSubPlan": {
-      "type": "object",
+      "description": "configuration for the servers offering subPlan",
       "properties": {
         "type": {
+          "description": "The available sub plans",
           "oneOf": [
             {
-              "type": "string",
               "enum": [
                 "P1",
                 "P2"
-              ]
+              ],
+              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "The available sub plans."
+          ]
         }
       },
-      "description": "configuration for the servers offering subPlan"
+      "type": "object"
     },
     "DefenderForServersGcpOfferingVaAutoProvisioning": {
-      "type": "object",
+      "description": "The Vulnerability Assessment autoprovisioning configuration",
       "properties": {
         "configuration": {
+          "description": "configuration for Vulnerability Assessment autoprovisioning",
           "oneOf": [
             {
               "$ref": "#/definitions/DefenderForServersGcpOfferingVaAutoProvisioningConfiguration"
@@ -2065,10 +1981,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "configuration for Vulnerability Assessment autoprovisioning"
+          ]
         },
         "enabled": {
+          "description": "Is Vulnerability Assessment auto provisioning enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -2076,37 +1992,37 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is Vulnerability Assessment auto provisioning enabled"
+          ]
         }
       },
-      "description": "The Vulnerability Assessment autoprovisioning configuration"
+      "type": "object"
     },
     "DefenderForServersGcpOfferingVaAutoProvisioningConfiguration": {
-      "type": "object",
+      "description": "configuration for Vulnerability Assessment autoprovisioning",
       "properties": {
         "type": {
+          "description": "The Vulnerability Assessment solution to be provisioned. Can be either 'TVM' or 'Qualys'",
           "oneOf": [
             {
-              "type": "string",
               "enum": [
                 "Qualys",
                 "TVM"
-              ]
+              ],
+              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "The Vulnerability Assessment solution to be provisioned. Can be either 'TVM' or 'Qualys'."
+          ]
         }
       },
-      "description": "configuration for Vulnerability Assessment autoprovisioning"
+      "type": "object"
     },
     "DefenderForServersGcpOfferingVmScanners": {
-      "type": "object",
+      "description": "The Microsoft Defender for Server VM scanning configuration",
       "properties": {
         "configuration": {
+          "description": "configuration for Microsoft Defender for Server VM scanning",
           "oneOf": [
             {
               "$ref": "#/definitions/DefenderForServersGcpOfferingVmScannersConfiguration"
@@ -2114,10 +2030,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "configuration for Microsoft Defender for Server VM scanning"
+          ]
         },
         "enabled": {
+          "description": "Is Microsoft Defender for Server VM scanning enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -2125,274 +2041,293 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "Is Microsoft Defender for Server VM scanning enabled"
+          ]
         }
       },
-      "description": "The Microsoft Defender for Server VM scanning configuration"
+      "type": "object"
     },
     "DefenderForServersGcpOfferingVmScannersConfiguration": {
-      "type": "object",
+      "description": "configuration for Microsoft Defender for Server VM scanning",
       "properties": {
         "exclusionTags": {
+          "description": "VM tags that indicate that VM should not be scanned",
           "oneOf": [
             {
-              "type": "object",
               "additionalProperties": {
                 "type": "string"
               },
-              "properties": {}
+              "properties": {},
+              "type": "object"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "VM tags that indicate that VM should not be scanned"
+          ]
         },
         "scanningMode": {
+          "description": "The scanning mode for the VM scan.",
           "oneOf": [
             {
-              "type": "string",
               "enum": [
                 "Default"
-              ]
+              ],
+              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "The scanning mode for the VM scan."
+          ]
         }
       },
-      "description": "configuration for Microsoft Defender for Server VM scanning"
+      "type": "object"
     },
     "EnvironmentData": {
-      "type": "object",
+      "description": "The security connector environment data.",
       "oneOf": [
         {
-          "$ref": "#/definitions/AwsEnvironmentData"
+          "description": "The AWS connector environment data",
+          "properties": {
+            "environmentType": {
+              "enum": [
+                "AwsAccount"
+              ],
+              "type": "string"
+            },
+            "organizationalData": {
+              "description": "The AWS account's organizational data",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/AwsOrganizationalData"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "regions": {
+              "description": "list of regions to scan",
+              "oneOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "scanInterval": {
+              "description": "Scan interval in hours (value should be between 1-hour to 24-hours)",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "environmentType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/GcpProjectEnvironmentData"
+          "description": "The AzureDevOps scope connector's environment data",
+          "properties": {
+            "environmentType": {
+              "enum": [
+                "AzureDevOpsScope"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "environmentType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/GithubScopeEnvironmentData"
+          "description": "The GCP project connector environment data",
+          "properties": {
+            "environmentType": {
+              "enum": [
+                "GcpProject"
+              ],
+              "type": "string"
+            },
+            "organizationalData": {
+              "description": "The Gcp project's organizational data",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/GcpOrganizationalData"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "projectDetails": {
+              "description": "The Gcp project's details",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/GcpProjectDetails"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "scanInterval": {
+              "description": "Scan interval in hours (value should be between 1-hour to 24-hours)",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "environmentType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/AzureDevOpsScopeEnvironmentData"
+          "description": "The github scope connector's environment data",
+          "properties": {
+            "environmentType": {
+              "enum": [
+                "GithubScope"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "environmentType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/GitlabScopeEnvironmentData"
+          "description": "The GitLab scope connector's environment data",
+          "properties": {
+            "environmentType": {
+              "enum": [
+                "GitlabScope"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "environmentType"
+          ],
+          "type": "object"
         }
       ],
       "properties": {},
-      "description": "The security connector environment data."
+      "type": "object"
     },
     "GcpOrganizationalData": {
-      "type": "object",
+      "description": "The gcpOrganization data",
       "oneOf": [
         {
-          "$ref": "#/definitions/GcpOrganizationalDataOrganization"
+          "description": "The gcpOrganization data for the member account",
+          "properties": {
+            "managementProjectNumber": {
+              "description": "The GCP management project number from organizational onboarding",
+              "type": "string"
+            },
+            "organizationMembershipType": {
+              "enum": [
+                "Member"
+              ],
+              "type": "string"
+            },
+            "parentHierarchyId": {
+              "description": "If the multi cloud account is not of membership type organization, this will be the ID of the project's parent",
+              "type": "string"
+            }
+          },
+          "required": [
+            "organizationMembershipType"
+          ],
+          "type": "object"
         },
         {
-          "$ref": "#/definitions/GcpOrganizationalDataMember"
+          "description": "The gcpOrganization data for the parent account",
+          "properties": {
+            "excludedProjectNumbers": {
+              "description": "If the multi cloud account is of membership type organization, list of accounts excluded from offering",
+              "oneOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "organizationMembershipType": {
+              "enum": [
+                "Organization"
+              ],
+              "type": "string"
+            },
+            "serviceAccountEmailAddress": {
+              "description": "The service account email address which represents the organization level permissions container.",
+              "type": "string"
+            },
+            "workloadIdentityProviderId": {
+              "description": "The GCP workload identity provider id which represents the permissions required to auto provision security connectors",
+              "type": "string"
+            }
+          },
+          "required": [
+            "organizationMembershipType"
+          ],
+          "type": "object"
         }
       ],
       "properties": {},
-      "description": "The gcpOrganization data"
-    },
-    "GcpOrganizationalDataMember": {
-      "type": "object",
-      "properties": {
-        "managementProjectNumber": {
-          "type": "string",
-          "description": "The GCP management project number from organizational onboarding"
-        },
-        "organizationMembershipType": {
-          "type": "string",
-          "enum": [
-            "Member"
-          ]
-        },
-        "parentHierarchyId": {
-          "type": "string",
-          "description": "If the multi cloud account is not of membership type organization, this will be the ID of the project's parent"
-        }
-      },
-      "required": [
-        "organizationMembershipType"
-      ],
-      "description": "The gcpOrganization data for the member account"
-    },
-    "GcpOrganizationalDataOrganization": {
-      "type": "object",
-      "properties": {
-        "excludedProjectNumbers": {
-          "oneOf": [
-            {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "If the multi cloud account is of membership type organization, list of accounts excluded from offering"
-        },
-        "organizationMembershipType": {
-          "type": "string",
-          "enum": [
-            "Organization"
-          ]
-        },
-        "serviceAccountEmailAddress": {
-          "type": "string",
-          "description": "The service account email address which represents the organization level permissions container."
-        },
-        "workloadIdentityProviderId": {
-          "type": "string",
-          "description": "The GCP workload identity provider id which represents the permissions required to auto provision security connectors"
-        }
-      },
-      "required": [
-        "organizationMembershipType"
-      ],
-      "description": "The gcpOrganization data for the parent account"
+      "type": "object"
     },
     "GcpProjectDetails": {
-      "type": "object",
+      "description": "The details about the project represented by the security connector",
       "properties": {
         "projectId": {
-          "type": "string",
-          "description": "The GCP Project id"
+          "description": "The GCP Project id",
+          "type": "string"
         },
         "projectNumber": {
-          "type": "string",
-          "description": "The unique GCP Project number"
+          "description": "The unique GCP Project number",
+          "type": "string"
         }
       },
-      "description": "The details about the project represented by the security connector"
-    },
-    "GcpProjectEnvironmentData": {
-      "type": "object",
-      "properties": {
-        "environmentType": {
-          "type": "string",
-          "enum": [
-            "GcpProject"
-          ]
-        },
-        "organizationalData": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/GcpOrganizationalData"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The gcpOrganization data"
-        },
-        "projectDetails": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/GcpProjectDetails"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The details about the project represented by the security connector"
-        },
-        "scanInterval": {
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Scan interval in hours (value should be between 1-hour to 24-hours)"
-        }
-      },
-      "required": [
-        "environmentType"
-      ],
-      "description": "The GCP project connector environment data"
-    },
-    "GithubScopeEnvironmentData": {
-      "type": "object",
-      "properties": {
-        "environmentType": {
-          "type": "string",
-          "enum": [
-            "GithubScope"
-          ]
-        }
-      },
-      "required": [
-        "environmentType"
-      ],
-      "description": "The github scope connector's environment data"
-    },
-    "GitlabScopeEnvironmentData": {
-      "type": "object",
-      "properties": {
-        "environmentType": {
-          "type": "string",
-          "enum": [
-            "GitlabScope"
-          ]
-        }
-      },
-      "required": [
-        "environmentType"
-      ],
-      "description": "The GitLab scope connector's environment data"
-    },
-    "InformationProtectionAwsOffering": {
-      "type": "object",
-      "properties": {
-        "informationProtection": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/InformationProtectionAwsOfferingInformationProtection"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The native cloud connection configuration"
-        },
-        "offeringType": {
-          "type": "string",
-          "enum": [
-            "InformationProtectionAws"
-          ]
-        }
-      },
-      "required": [
-        "offeringType"
-      ],
-      "description": "The information protection for AWS offering"
+      "type": "object"
     },
     "InformationProtectionAwsOfferingInformationProtection": {
-      "type": "object",
+      "description": "The native cloud connection configuration",
       "properties": {
         "cloudRoleArn": {
-          "type": "string",
-          "description": "The cloud role ARN in AWS for this feature"
+          "description": "The cloud role ARN in AWS for this feature",
+          "type": "string"
         }
       },
-      "description": "The native cloud connection configuration"
+      "type": "object"
     },
     "SecurityConnectorProperties": {
-      "type": "object",
+      "description": "A set of properties that defines the security connector configuration.",
       "properties": {
         "environmentData": {
+          "description": "The security connector environment data.",
           "oneOf": [
             {
               "$ref": "#/definitions/EnvironmentData"
@@ -2400,13 +2335,12 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "The security connector environment data."
+          ]
         },
         "environmentName": {
+          "description": "The multi cloud resource's cloud name.",
           "oneOf": [
             {
-              "type": "string",
               "enum": [
                 "Azure",
                 "AWS",
@@ -2414,34 +2348,34 @@
                 "Github",
                 "AzureDevOps",
                 "GitLab"
-              ]
+              ],
+              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "The multi cloud resource's cloud name."
+          ]
         },
         "hierarchyIdentifier": {
-          "type": "string",
-          "description": "The multi cloud resource identifier (account id in case of AWS connector, project number in case of GCP connector)."
+          "description": "The multi cloud resource identifier (account id in case of AWS connector, project number in case of GCP connector).",
+          "type": "string"
         },
         "offerings": {
+          "description": "A collection of offerings for the security connector.",
           "oneOf": [
             {
-              "type": "array",
               "items": {
                 "$ref": "#/definitions/CloudOffering"
-              }
+              },
+              "type": "array"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ],
-          "description": "A collection of offerings for the security connector."
+          ]
         }
       },
-      "description": "A set of properties that defines the security connector configuration."
+      "type": "object"
     }
   }
 }

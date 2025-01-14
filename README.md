@@ -37,14 +37,6 @@ npm --prefix tools ci
 npm --prefix tools test
 ```
 
-## Manual testing with a local schema server
-This repo contains a command to run a schema web server which will host files directly from your local repo. This can be useful if you want to validate schemas against a particular tool - for example if you want to verify VSCode autocompletion and syntax highlighting. By default this will listen on port 3000, but this can be modified by editing [tools/server.ts](/tools/server.ts).
-To start an instance you can use the following commands:
-```bash
-npm --prefix tools ci
-npm --prefix tools run serve
-```
-
 Once this is running, you can create a basic template with the following structure (replacing the sections between `<` and `>` as appropriate for your scenario):
 ```json
 {

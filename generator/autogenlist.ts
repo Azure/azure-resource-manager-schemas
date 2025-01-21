@@ -16,6 +16,7 @@ import { postProcessor as networkPostProcessor } from './processors/Microsoft.Ne
 import { postProcessor as azureStackHciPostProcessor } from './processors/Microsoft.AzureStackHCI';
 import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
 import { postProcessor as serviceFabricPostProcessor } from './processors/Microsoft.ServiceFabric';
+import { postProcessor as awsConnectorPostProcessor } from './processors/Microsoft.AwsConnector';
 import { lowerCaseEquals } from './utils';
 import { detectProviderNamespaces } from './generate';
 
@@ -167,6 +168,11 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'automation/resource-manager',
         namespace: 'Microsoft.Automation',
+    },
+    {
+        basePath: 'awsConnector/resource-manager',
+        namespace: 'Microsoft.AwsConnector',
+        postProcessor: awsConnectorPostProcessor
     },
     {
         basePath: 'azurearcdata/resource-manager',

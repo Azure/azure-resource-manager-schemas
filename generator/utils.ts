@@ -14,6 +14,11 @@ export function executeCmd(cwd: string, cmd: string, args: string[]) : Promise<n
         const child = spawn(cmd, args, {
             cwd: cwd,
             windowsHide: true,
+            env: {
+              ...process.env,
+              // needed to workaround dotnet globalization issues in autorest .NET plugins
+              DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: '1',
+            },
         });
 
         child.stdout.on('data', data => process.stdout.write(colors.grey(data.toString())));

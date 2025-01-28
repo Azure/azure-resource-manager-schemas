@@ -170,7 +170,7 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.Automation',
     },
     {
-        basePath: 'awsConnector/resource-manager',
+        basePath: 'awsconnector/resource-manager',
         namespace: 'Microsoft.AwsConnector',
         postProcessor: awsConnectorPostProcessor
     },

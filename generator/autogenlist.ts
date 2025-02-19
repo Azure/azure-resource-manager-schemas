@@ -77,6 +77,13 @@ const disabledProviders: AutoGenConfig[] = [
         namespace: 'stable',
         disabledForAutogen: true,
     },
+    {
+        //Disabled until errors are fixed
+        basePath: 'servicefabricmanagedclusters/resource-manager',
+        namespace: 'Microsoft.ServiceFabric',
+        postProcessor: serviceFabricPostProcessor,
+        suffix: 'ManagedClusters'
+    },
 ];
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
@@ -744,12 +751,6 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'servicefabric/resource-manager',
         namespace: 'Microsoft.ServiceFabric',
         postProcessor: serviceFabricPostProcessor,
-    },
-    {
-        basePath: 'servicefabricmanagedclusters/resource-manager',
-        namespace: 'Microsoft.ServiceFabric',
-        postProcessor: serviceFabricPostProcessor,
-        suffix: 'ManagedClusters'
     },
     {
         basePath: 'servicelinker/resource-manager',

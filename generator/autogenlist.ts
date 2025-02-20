@@ -82,7 +82,8 @@ const disabledProviders: AutoGenConfig[] = [
         basePath: 'servicefabricmanagedclusters/resource-manager',
         namespace: 'Microsoft.ServiceFabric',
         postProcessor: serviceFabricPostProcessor,
-        suffix: 'ManagedClusters'
+        suffix: 'ManagedClusters',
+        disabledForAutogen: true,
     },
 ];
 

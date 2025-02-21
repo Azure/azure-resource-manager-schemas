@@ -14,10 +14,10 @@
           "type": "string"
         },
         "identity": {
-          "description": "Managed Identity information.",
+          "description": "The managed service identities assigned to this resource.",
           "oneOf": [
             {
-              "$ref": "#/definitions/QuantumWorkspaceIdentity"
+              "$ref": "#/definitions/ManagedServiceIdentity"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -83,6 +83,47 @@
     }
   },
   "definitions": {
+    "ManagedServiceIdentity": {
+      "description": "Managed service identity (system assigned and/or user assigned identities)",
+      "properties": {
+        "type": {
+          "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).",
+          "oneOf": [
+            {
+              "enum": [
+                "None",
+                "SystemAssigned",
+                "UserAssigned",
+                "SystemAssigned,UserAssigned"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "userAssignedIdentities": {
+          "description": "The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.",
+          "oneOf": [
+            {
+              "additionalProperties": {
+                "$ref": "#/definitions/UserAssignedIdentity"
+              },
+              "properties": {},
+              "type": "object"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
     "Provider": {
       "description": "Information about a Provider. A Provider is an entity that offers Targets to run Azure Quantum Jobs.",
       "properties": {
@@ -128,25 +169,9 @@
       },
       "type": "object"
     },
-    "QuantumWorkspaceIdentity": {
-      "description": "Managed Identity information.",
-      "properties": {
-        "type": {
-          "description": "The identity type.",
-          "oneOf": [
-            {
-              "enum": [
-                "SystemAssigned",
-                "None"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
+    "UserAssignedIdentity": {
+      "description": "User assigned identity properties",
+      "properties": {},
       "type": "object"
     },
     "WorkspaceResourceProperties": {

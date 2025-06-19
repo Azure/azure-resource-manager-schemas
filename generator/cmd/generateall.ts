@@ -14,7 +14,7 @@ import { createWriteStream } from 'fs';
 import stripAnsi from 'strip-ansi';
 import { schemasBasePath } from '../constants';
 
-const argsConfig = yargs
+const argsConfig = yargs()
   .strict()
   .option('specs-dir', { type: 'string', demandOption: true, desc: 'Path to the specs dir' })
   .option('batch-count', { type: 'number', desc: 'If running in batch mode, the total number of batch jobs running' })

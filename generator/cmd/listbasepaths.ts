@@ -7,7 +7,7 @@ import { executeSynchronous } from '../utils';
 import { partition } from 'lodash';
 import yargs from 'yargs';
 
-const argsConfig = yargs
+const argsConfig = yargs()
   .strict()
   .option('specs-dir', { type: 'string', demandOption: true, desc: 'Path to the specs dir' });
 

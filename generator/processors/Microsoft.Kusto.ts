@@ -43,7 +43,12 @@ const genevaDataConnectionProperties = () => ({
   properties: {
     genevaEnvironment: {
       type: 'string',
-      'description': 'The Geneva environment of the geneva data connection.'
+      description: 'The Geneva environment of the geneva data connection.'
+    },
+    extractBondFieldNameWithoutLinkingPolicyState: {
+      type: 'string',
+      enum: ['Enabled', 'Disabled'],
+      description: 'The extractBondFieldNameWithoutLinkingPolicyState property is used to handle Geneva event fields that contain embedded dot (.) characters. When Enabled, field names are not split by dot. Possible values: Enabled or Disabled.'
     }
   },
   required: [
@@ -51,6 +56,7 @@ const genevaDataConnectionProperties = () => ({
   ],
   description: 'Class representing the Kusto Geneva (GDS) connection properties.'
 });
+
 
 const genevaDataConnection = () => ({
   type: 'object',

@@ -7,7 +7,7 @@ import colors from 'colors';
 import { executeSynchronous } from '../utils';
 import yargs from 'yargs';
 
-const argsConfig = yargs
+const argsConfig = yargs(process.argv.slice(2))
   .strict()
   .option('specs-dir', { type: 'string', demandOption: true, desc: 'Path to the specs dir' })
   .option('base-path', { type: 'string', demandOption: true, desc: 'The swagger base path in the specs repo (e.g. "compute/resource-manager")' })

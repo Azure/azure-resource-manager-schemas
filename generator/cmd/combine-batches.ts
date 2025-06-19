@@ -8,7 +8,7 @@ import { flatten, uniq } from 'lodash';
 import { cp } from 'fs/promises';
 import { schemasBasePath } from '../constants';
 
-const argsConfig = yargs
+const argsConfig = yargs(process.argv.slice(2))
   .strict()
   .option('input-path', { type: 'string', desc: 'The path to find batch results' })
   .option('batch-count', { type: 'number', desc: 'The total number of batches' });

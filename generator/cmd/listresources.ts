@@ -53,6 +53,9 @@ async function getResourceInfo(schemaRef: string) {
 
   for (const pathElement of relativeRef.split('/')) {
     schema = schema[pathElement];
+    if(schema === undefined) {
+      throw new Error(`Unable to find expected properties for ${schemaRef}`)
+    }
   }
 
   if (!schema?.properties?.type?.enum || !schema?.properties?.apiVersion?.enum) {

@@ -15,6 +15,7 @@ import { postProcessor as mediaPostProcessor } from './processors/Microsoft.Medi
 import { postProcessor as networkPostProcessor } from './processors/Microsoft.Network';
 import { postProcessor as azureStackHciPostProcessor } from './processors/Microsoft.AzureStackHCI';
 import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
+import { postProcessor as resourcesDeploymentsPostProcessor } from './processors/Microsoft.Resources.Deployments';
 import { postProcessor as serviceFabricPostProcessor } from './processors/Microsoft.ServiceFabric';
 import { postProcessor as awsConnectorPostProcessor } from './processors/Microsoft.AwsConnector';
 import { lowerCaseEquals } from './utils';
@@ -676,10 +677,6 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.Resources',
         resourceConfig: [
             {
-                type: 'deployments',
-                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subscription | ScopeType.ResourceGroup,
-            },
-            {
                 type: 'tags',
                 scopes: ScopeType.ManagementGroup | ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
             },
@@ -689,6 +686,37 @@ const autoGenList: AutoGenConfig[] = [
             },
         ],
         postProcessor: resourcesPostProcessor,
+    },
+    {
+        basePath: 'resources/resource-manager/Microsoft.Resources/deployments',
+        namespace: 'Microsoft.Resources',
+        useNamespaceFromConfig: true,
+        suffix: 'Deployments',
+        resourceConfig: [
+            {
+                type: 'deployments',
+                scopes: ScopeType.Tenant | ScopeType.ManagementGroup | ScopeType.Subscription | ScopeType.ResourceGroup,
+            },
+        ],
+        postProcessor: resourcesDeploymentsPostProcessor,
+    },
+    {
+        basePath: 'resources/resource-manager/Microsoft.Resources/deploymentStacks',
+        namespace: 'Microsoft.Resources',
+        useNamespaceFromConfig: true,
+        suffix: 'DeploymentStacks'
+    },
+    {
+        basePath: 'resources/resource-manager/Microsoft.Resources/deploymentScripts',
+        namespace: 'Microsoft.Resources',
+        useNamespaceFromConfig: true,
+        suffix: 'DeploymentScripts'
+    },
+    {
+        basePath: 'resources/resource-manager/Microsoft.Resources/templateSpecs',
+        namespace: 'Microsoft.Resources',
+        useNamespaceFromConfig: true,
+        suffix: 'TemplateSpecs'
     },
     {
         basePath: 'resources/resource-manager',

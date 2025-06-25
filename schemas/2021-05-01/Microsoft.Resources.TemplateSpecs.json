@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2019-06-01-preview/Microsoft.Resources.json#",
+  "id": "https://schema.management.azure.com/schemas/2021-05-01/Microsoft.Resources.TemplateSpecs.json#",
   "title": "Microsoft.Resources",
   "description": "Microsoft Resources Resource Types",
   "$schema": "http://json-schema.org/draft-04/schema#",
@@ -9,7 +9,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2019-06-01-preview"
+            "2021-05-01"
           ],
           "type": "string"
         },
@@ -87,7 +87,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2019-06-01-preview"
+            "2021-05-01"
           ],
           "type": "string"
         },
@@ -152,45 +152,28 @@
     }
   },
   "definitions": {
-    "TemplateSpecArtifact": {
-      "description": "Represents a Template Spec artifact.",
-      "oneOf": [
-        {
-          "description": "Represents a Template Spec artifact containing an embedded Azure Resource Manager template.",
-          "properties": {
-            "kind": {
-              "enum": [
-                "template"
-              ],
-              "type": "string"
-            },
-            "template": {
-              "description": "The Azure Resource Manager template.",
-              "oneOf": [
-                {
-                  "type": "object"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            }
-          },
-          "required": [
-            "template",
-            "kind"
-          ],
-          "type": "object"
-        }
-      ],
+    "LinkedTemplateArtifact": {
+      "description": "Represents a Template Spec artifact containing an embedded Azure Resource Manager template for use as a linked template.",
       "properties": {
         "path": {
           "description": "A filesystem safe relative path of the artifact.",
           "type": "string"
+        },
+        "template": {
+          "description": "The Azure Resource Manager template.",
+          "oneOf": [
+            {
+              "type": "object"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "required": [
-        "path"
+        "path",
+        "template"
       ],
       "type": "object"
     },
@@ -206,6 +189,17 @@
           "description": "Template Spec display name.",
           "maxLength": 64,
           "type": "string"
+        },
+        "metadata": {
+          "description": "The Template Spec metadata. Metadata is an open-ended object and is typically a collection of key-value pairs.",
+          "oneOf": [
+            {
+              "type": "object"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "type": "object"
@@ -213,12 +207,17 @@
     "TemplateSpecVersionProperties": {
       "description": "Template Spec Version properties.",
       "properties": {
-        "artifacts": {
-          "description": "An array of Template Spec artifacts.",
+        "description": {
+          "description": "Template Spec version description.",
+          "maxLength": 4096,
+          "type": "string"
+        },
+        "linkedTemplates": {
+          "description": "An array of linked template artifacts.",
           "oneOf": [
             {
               "items": {
-                "$ref": "#/definitions/TemplateSpecArtifact"
+                "$ref": "#/definitions/LinkedTemplateArtifact"
               },
               "type": "array"
             },
@@ -227,13 +226,30 @@
             }
           ]
         },
-        "description": {
-          "description": "Template Spec version description.",
-          "maxLength": 4096,
-          "type": "string"
+        "mainTemplate": {
+          "description": "The main Azure Resource Manager template content.",
+          "oneOf": [
+            {
+              "type": "object"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
-        "template": {
-          "description": "The Azure Resource Manager template content.",
+        "metadata": {
+          "description": "The version metadata. Metadata is an open-ended object and is typically a collection of key-value pairs.",
+          "oneOf": [
+            {
+              "type": "object"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "uiFormDefinition": {
+          "description": "The Azure Resource Manager template UI definition content.",
           "oneOf": [
             {
               "type": "object"
@@ -251,7 +267,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2019-06-01-preview"
+            "2021-05-01"
           ],
           "type": "string"
         },
@@ -313,63 +329,6 @@
         "type"
       ],
       "type": "object"
-    }
-  },
-  "subscription_resourceDefinitions": {
-    "resourceGroups": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "oneOf": [
-            {
-              "type": "string",
-              "pattern": "^[-\\w\\._\\(\\)]+$",
-              "maxLength": 90,
-              "description": "the resource group name"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "type": {
-          "type": "string",
-          "enum": [
-            "Microsoft.Resources/resourceGroups"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2019-06-01-preview"
-          ]
-        },
-        "location": {
-          "type": "string",
-          "description": "the resource group location"
-        },
-        "tags": {
-          "oneOf": [
-            {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "The resource group tags."
-        }
-      },
-      "required": [
-        "name",
-        "type",
-        "apiVersion",
-        "location"
-      ],
-      "description": "Microsoft.Resources/resourceGroups"
     }
   }
 }

@@ -14,7 +14,7 @@
           "type": "string"
         },
         "location": {
-          "description": "The location of the deployment stack. It cannot be changed after creation. It must be one of the supported Azure locations.",
+          "description": "The geo-location where the resource lives. Required for subscription and management group scoped stacks. The location is inherited from the resource group for resource group scoped stacks.",
           "type": "string"
         },
         "name": {
@@ -43,7 +43,7 @@
           ]
         },
         "tags": {
-          "description": "Deployment stack resource tags.",
+          "description": "Resource tags.",
           "oneOf": [
             {
               "additionalProperties": {
@@ -84,7 +84,7 @@
           "type": "string"
         },
         "location": {
-          "description": "The location of the deployment stack. It cannot be changed after creation. It must be one of the supported Azure locations.",
+          "description": "The geo-location where the resource lives. Required for subscription and management group scoped stacks. The location is inherited from the resource group for resource group scoped stacks.",
           "type": "string"
         },
         "name": {
@@ -113,7 +113,7 @@
           ]
         },
         "tags": {
-          "description": "Deployment stack resource tags.",
+          "description": "Resource tags.",
           "oneOf": [
             {
               "additionalProperties": {
@@ -154,7 +154,7 @@
           "type": "string"
         },
         "location": {
-          "description": "The location of the deployment stack. It cannot be changed after creation. It must be one of the supported Azure locations.",
+          "description": "The geo-location where the resource lives. Required for subscription and management group scoped stacks. The location is inherited from the resource group for resource group scoped stacks.",
           "type": "string"
         },
         "name": {
@@ -183,7 +183,7 @@
           ]
         },
         "tags": {
-          "description": "Deployment stack resource tags.",
+          "description": "Resource tags.",
           "oneOf": [
             {
               "additionalProperties": {
@@ -214,11 +214,65 @@
     }
   },
   "definitions": {
+    "ActionOnUnmanage": {
+      "description": "Defines the behavior of resources that are no longer managed after the stack is updated or deleted.",
+      "properties": {
+        "managementGroups": {
+          "description": "Specifies an action for a newly unmanaged resource. Delete will attempt to delete the resource from Azure. Detach will leave the resource in it's current state.",
+          "oneOf": [
+            {
+              "enum": [
+                "delete",
+                "detach"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "resourceGroups": {
+          "description": "Specifies an action for a newly unmanaged resource. Delete will attempt to delete the resource from Azure. Detach will leave the resource in it's current state.",
+          "oneOf": [
+            {
+              "enum": [
+                "delete",
+                "detach"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "resources": {
+          "description": "Specifies an action for a newly unmanaged resource. Delete will attempt to delete the resource from Azure. Detach will leave the resource in it's current state.",
+          "oneOf": [
+            {
+              "enum": [
+                "delete",
+                "detach"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "resources"
+      ],
+      "type": "object"
+    },
     "DenySettings": {
-      "description": "Defines how resources deployed by the deployment stack are locked.",
+      "description": "Defines how resources deployed by the Deployment stack are locked.",
       "properties": {
         "applyToChildScopes": {
-          "description": "DenySettings will be applied to child scopes.",
+          "description": "DenySettings will be applied to child resource scopes of every managed resource with a deny assignment.",
           "oneOf": [
             {
               "type": "boolean"
@@ -257,7 +311,7 @@
           ]
         },
         "mode": {
-          "description": "denySettings Mode.",
+          "description": "denySettings Mode that defines denied actions.",
           "oneOf": [
             {
               "enum": [
@@ -278,14 +332,38 @@
       ],
       "type": "object"
     },
+    "DeploymentParameter": {
+      "description": "Deployment parameter for the template.",
+      "properties": {
+        "reference": {
+          "description": "Azure Key Vault parameter reference.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/KeyVaultParameterReference"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "description": "Type of the value.",
+          "type": "string"
+        },
+        "value": {
+          "description": "Input value to the parameter."
+        }
+      },
+      "type": "object"
+    },
     "DeploymentStackProperties": {
       "description": "Deployment stack properties.",
       "properties": {
         "actionOnUnmanage": {
-          "description": "Defines the behavior of resources that are not managed immediately after the stack is updated.",
+          "description": "Defines the behavior of resources that are no longer managed after the Deployment stack is updated or deleted.",
           "oneOf": [
             {
-              "$ref": "#/definitions/DeploymentStackPropertiesActionOnUnmanage"
+              "$ref": "#/definitions/ActionOnUnmanage"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -319,15 +397,15 @@
           "type": "string"
         },
         "description": {
-          "description": "Deployment stack description.",
+          "description": "Deployment stack description. Max length of 4096 characters.",
           "maxLength": 4096,
           "type": "string"
         },
         "error": {
-          "description": "Common error response for all Azure Resource Manager APIs to return error details for failed operations. (This also follows the OData error response format.).",
+          "description": "The error detail.",
           "oneOf": [
             {
-              "$ref": "#/definitions/ErrorResponse"
+              "$ref": "#/definitions/ErrorDetail"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -335,9 +413,13 @@
           ]
         },
         "parameters": {
-          "description": "Name and value pairs that define the deployment parameters for the template. Use this element when providing the parameter values directly in the request, rather than linking to an existing parameter file. Use either the parametersLink property or the parameters property, but not both. It can be a JObject or a well formed JSON string.",
+          "description": "Name and value pairs that define the deployment parameters for the template. Use this element when providing the parameter values directly in the request, rather than linking to an existing parameter file. Use either the parametersLink property or the parameters property, but not both.",
           "oneOf": [
             {
+              "additionalProperties": {
+                "$ref": "#/definitions/DeploymentParameter"
+              },
+              "properties": {},
               "type": "object"
             },
             {
@@ -360,6 +442,8 @@
           "description": "The template content. You use this element when you want to pass the template syntax directly in the request rather than link to an existing template. It can be a JObject or well-formed JSON string. Use either the templateLink property or the template property, but not both.",
           "oneOf": [
             {
+              "additionalProperties": {},
+              "properties": {},
               "type": "object"
             },
             {
@@ -382,60 +466,6 @@
       "required": [
         "actionOnUnmanage",
         "denySettings"
-      ],
-      "type": "object"
-    },
-    "DeploymentStackPropertiesActionOnUnmanage": {
-      "description": "Defines the behavior of resources that are not managed immediately after the stack is updated.",
-      "properties": {
-        "managementGroups": {
-          "description": "Specifies the action that should be taken on the resource when the deployment stack is deleted. Delete will attempt to delete the resource from Azure. Detach will leave the resource in it's current state.",
-          "oneOf": [
-            {
-              "enum": [
-                "delete",
-                "detach"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "resourceGroups": {
-          "description": "Specifies the action that should be taken on the resource when the deployment stack is deleted. Delete will attempt to delete the resource from Azure. Detach will leave the resource in it's current state.",
-          "oneOf": [
-            {
-              "enum": [
-                "delete",
-                "detach"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "resources": {
-          "description": "Specifies the action that should be taken on the resource when the deployment stack is deleted. Delete will attempt to delete the resource from Azure. Detach will leave the resource in it's current state.",
-          "oneOf": [
-            {
-              "enum": [
-                "delete",
-                "detach"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "required": [
-        "resources"
       ],
       "type": "object"
     },
@@ -474,7 +504,7 @@
           "type": "string"
         },
         "id": {
-          "description": "The resource id of a Template Spec. Use either the id or uri property, but not both.",
+          "description": "The resourceId of a Template Spec. Use either the id or uri property, but not both.",
           "type": "string"
         },
         "queryString": {
@@ -482,7 +512,7 @@
           "type": "string"
         },
         "relativePath": {
-          "description": "The relativePath property can be used to deploy a linked template at a location relative to the parent. If the parent template was linked with a TemplateSpec, this will reference an artifact in the TemplateSpec.  If the parent was linked with a URI, the child deployment will be a combination of the parent and relativePath URIs",
+          "description": "The relativePath property can be used to deploy a linked template at a location relative to the parent. If the parent template was linked with a TemplateSpec, this will reference an artifact in the TemplateSpec.  If the parent was linked with a URI, the child deployment will be a combination of the parent and relativePath URIs.",
           "type": "string"
         },
         "uri": {
@@ -497,21 +527,46 @@
       "properties": {},
       "type": "object"
     },
-    "ErrorResponse": {
-      "description": "Common error response for all Azure Resource Manager APIs to return error details for failed operations. (This also follows the OData error response format.).",
+    "KeyVaultParameterReference": {
+      "description": "Azure Key Vault parameter reference.",
       "properties": {
-        "error": {
-          "description": "The error object.",
+        "keyVault": {
+          "description": "Azure Key Vault reference.",
           "oneOf": [
             {
-              "$ref": "#/definitions/ErrorDetail"
+              "$ref": "#/definitions/KeyVaultReference"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
+        },
+        "secretName": {
+          "description": "Azure Key Vault secret name.",
+          "type": "string"
+        },
+        "secretVersion": {
+          "description": "Azure Key Vault secret version.",
+          "type": "string"
         }
       },
+      "required": [
+        "keyVault",
+        "secretName"
+      ],
+      "type": "object"
+    },
+    "KeyVaultReference": {
+      "description": "Azure Key Vault reference.",
+      "properties": {
+        "id": {
+          "description": "Azure Key Vault resourceId.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
       "type": "object"
     }
   }

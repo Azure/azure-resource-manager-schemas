@@ -38,16 +38,16 @@ const disabledProviders: AutoGenConfig[] = [
     {
         //Disabled until errors are fixed
         //'datamanagerforagriculturesolutionproperties.properties.openapispecsdictionary.additionalproperties' - TypeError: Cannot convert undefined or null to object
-        basePath: 'agrifood/resource-manager',
-        namespace: 'Microsoft.AgFoodPlatform',
+        basePath: 'agrifood/resource-manager/Microsoft.AgFoodPlatform/AgFoodPlatform',
+        namespace: 'preview',
         disabledForAutogen: true,
     },
     {
         //Disabled until errors are fixed
         //Enum 'nextPartitionKey' cannot have a value ' ' that result in an empty name. Use x-ms-enum.values to specify the name of the values.
         //Enum 'nextRowKey' cannot have a value ' ' that result in an empty name. Use x-ms-enum.values to specify the name of the values.
-        basePath: 'adhybridhealthservice/resource-manager',
-        namespace: 'Microsoft.ADHybridHealthService',
+        basePath: 'adhybridhealthservice/resource-manager/Microsoft.ADHybridHealthService/ADHybridHealthService',
+        namespace: 'stable',
         disabledForAutogen: true,
     },
     {
@@ -67,8 +67,22 @@ const disabledProviders: AutoGenConfig[] = [
     {
         //Disabled until errors are fixed
         //'Microsoft.BotService/preview/2023-09-15-preview/botservice.json:3492:5' - TypeError: Cannot convert undefined or null to object
-        basePath: 'botservice/resource-manager',
-        namespace: 'Microsoft.BotService',
+        basePath: 'botservice/resource-manager/Microsoft.BotService/BotService',
+        namespace: 'examples',
+        disabledForAutogen: true,
+    },
+    {
+        //Disabled until errors are fixed
+        //'Microsoft.BotService/preview/2023-09-15-preview/botservice.json:3492:5' - TypeError: Cannot convert undefined or null to object
+        basePath: 'botservice/resource-manager/Microsoft.BotService/BotService',
+        namespace: 'preview',
+        disabledForAutogen: true,
+    },
+    {
+        //Disabled until errors are fixed
+        //'Microsoft.BotService/preview/2023-09-15-preview/botservice.json:3492:5' - TypeError: Cannot convert undefined or null to object
+        basePath: 'botservice/resource-manager/Microsoft.BotService/BotService',
+        namespace: 'stable',
         disabledForAutogen: true,
     },
     {

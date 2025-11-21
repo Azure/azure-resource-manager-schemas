@@ -66,6 +66,13 @@ const disabledProviders: AutoGenConfig[] = [
     },
     {
         //Disabled until errors are fixed
+        //'specification/common-types/resource-management/v5/types.json' doesn't exists in workspace
+        basePath: 'azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI',
+        namespace: 'examples',
+        disabledForAutogen: true,
+    },
+    {
+        //Disabled until errors are fixed
         //'Microsoft.BotService/preview/2023-09-15-preview/botservice.json:3492:5' - TypeError: Cannot convert undefined or null to object
         basePath: 'botservice/resource-manager/Microsoft.BotService/BotService',
         namespace: 'examples',

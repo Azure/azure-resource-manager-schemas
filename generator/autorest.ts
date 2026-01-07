@@ -50,6 +50,16 @@ export async function runAutorest(readme: string, tmpFolder: string) {
     return await execAutoRest(tmpFolder, autoRestParams);
 }
 
+export async function clearAutorestTempDir() {
+    const autoRestParams = ['--clear-temp', '--allow-no-input'];
+
+    if (constants.autoRestVerboseOutput) {
+        autoRestParams.push('--verbose');
+    }
+
+    await executeCmd(__dirname, `${__dirname}/node_modules/.bin/${autorestBinary}`, autoRestParams);
+}
+
 export async function generateAutorestConfig(readmePath: string, bicepReadmePath: string) {
   // This function takes in an input autorest configuration file (readme.md), and generates a autorest configuration file tailored for use by autorest.bicep (readme.bicep.md)
   // We search for markdown yaml blocks containing input .json files, and unconditionally use them to generate output.

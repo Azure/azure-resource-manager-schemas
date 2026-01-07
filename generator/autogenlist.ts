@@ -95,7 +95,7 @@ const disabledProviders: AutoGenConfig[] = [
     {
         //Disabled until errors are fixed
         //Enum types of 'undefined' and format 'undefined' are not supported. Correct your input
-        basePath: 'marketplacecatalog/resource-manager/Microsoft.Marketplace',
+        basePath: 'marketplacecatalog/resource-manager/Microsoft.Marketplace/Marketplace',
         namespace: 'stable',
         disabledForAutogen: true,
     },
@@ -105,6 +105,34 @@ const disabledProviders: AutoGenConfig[] = [
         namespace: 'Microsoft.ServiceFabric',
         postProcessor: serviceFabricPostProcessor,
         suffix: 'ManagedClusters',
+        disabledForAutogen: true,
+    },
+    {
+        //Disabled until errors are fixed
+        //Remove deprectaed version 2024-01-01-preview from readme
+        basePath: 'monitor/resource-manager',
+        namespace: 'Microsoft.Insights',
+        disabledForAutogen: true,
+    },
+    {
+        //Disabled until errors are fixed
+        //Remove deprectaed version 2024-01-01-preview from readme
+        basePath: 'monitor/resource-manager',
+        namespace: 'Microsoft.Monitor',
+        disabledForAutogen: true,
+    },
+    {
+        //Disabled until errors are fixed
+        //Password is not a valid format for type array
+        basePath: 'redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise',
+        namespace: 'preview',
+        disabledForAutogen: true,
+    },
+    {
+        //Disabled until errors are fixed
+        //Password is not a valid format for type array
+        basePath: 'redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise',
+        namespace: 'stable',
         disabledForAutogen: true,
     },
 ];

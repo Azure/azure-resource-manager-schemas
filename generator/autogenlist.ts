@@ -928,7 +928,7 @@ const autoGenList: AutoGenConfig[] = [
         ]
     },
     {
-        basePath: 'securityinsights/resource-manager',
+        basePath: 'securityinsights/resource-manager/SecurityInsights',
         namespace: 'Microsoft.SecurityInsights',
         postProcessor: securityInsightsPostProcessor,
     },
@@ -1099,7 +1099,9 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'powerplatform/resource-manager',
         namespace: 'Microsoft.PowerPlatform',
     },
-    {
+    //Disabled until errors are fixed
+    //Remove deprectated version 2024-01-01-preview from readme
+    /*{
         basePath: 'monitor/resource-manager',
         namespace: 'Microsoft.Insights',
         resourceConfig: [
@@ -1116,7 +1118,7 @@ const autoGenList: AutoGenConfig[] = [
                 scopes: ScopeType.Extension,
             },
         ],
-    },
+    },*/
     {
         basePath: 'applicationinsights/resource-manager',
         namespace: 'Microsoft.Insights',

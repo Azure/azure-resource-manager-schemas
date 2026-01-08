@@ -135,6 +135,12 @@ const disabledProviders: AutoGenConfig[] = [
         namespace: 'stable',
         disabledForAutogen: true,
     },
+    {
+        // Disabling as this is superceded by the 'securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights' entry after a repo restructure
+        basePath: 'securityinsights/resource-manager',
+        namespace: 'Microsoft.SecurityInsights',
+        disabledForAutogen: true,
+    },
 ];
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
@@ -928,8 +934,13 @@ const autoGenList: AutoGenConfig[] = [
         ]
     },
     {
-        basePath: 'securityinsights/resource-manager/SecurityInsights',
-        namespace: 'Microsoft.SecurityInsights',
+        basePath: 'securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights',
+        namespace: 'stable',
+        postProcessor: securityInsightsPostProcessor,
+    },
+    {
+        basePath: 'securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights',
+        namespace: 'preview',
         postProcessor: securityInsightsPostProcessor,
     },
     {

@@ -729,7 +729,9 @@ const autoGenList: AutoGenConfig[] = [
     },
     {
         basePath: 'resources/resource-manager/Microsoft.Resources/dataBoundaries',
-        namespace: 'stable',
+        namespace: 'Microsoft.Resources',
+        useNamespaceFromConfig: true,
+        suffix: 'DataBoundaries',
         resourceConfig: [
             {
                 type: 'dataBoundaries',
@@ -739,7 +741,8 @@ const autoGenList: AutoGenConfig[] = [
     },
     {
         basePath: 'resources/resource-manager/Microsoft.Resources/resources',
-        namespace: 'stable',
+        namespace: 'Microsoft.Resources',
+        useNamespaceFromConfig: true,
         resourceConfig: [
             {
                 type: 'tags',

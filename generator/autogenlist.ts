@@ -728,16 +728,22 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.RedHatOpenShift',
     },
     {
-        basePath: 'resources/resource-manager',
-        namespace: 'Microsoft.Resources',
+        basePath: 'resources/resource-manager/Microsoft.Resources/dataBoundaries',
+        namespace: 'stable',
+        resourceConfig: [
+            {
+                type: 'dataBoundaries',
+                scopes: ScopeType.Tenant | ScopeType.Subscription | ScopeType.ResourceGroup,
+            },
+        ],
+    },
+    {
+        basePath: 'resources/resource-manager/Microsoft.Resources/resources',
+        namespace: 'stable',
         resourceConfig: [
             {
                 type: 'tags',
                 scopes: ScopeType.ManagementGroup | ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
-            },
-            {
-                type: 'dataBoundaries',
-                scopes: ScopeType.Tenant | ScopeType.Subscription | ScopeType.ResourceGroup,
             },
         ],
         postProcessor: resourcesPostProcessor,

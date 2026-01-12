@@ -142,6 +142,13 @@ const disabledProviders: AutoGenConfig[] = [
         namespace: 'Microsoft.SecurityInsights',
         disabledForAutogen: true,
     },
+    {
+        //Disabling due to schema gen failure -  Not able to process media type */* at this moment.
+        basePath: 'web/resource-manager/Microsoft.Web/AppService',
+        useNamespaceFromConfig: true,
+        namespace: 'Microsoft.Web',
+        disabledForAutogen: true,
+    },
 ];
 
 // Run "npm run list-basepaths" to discover all the valid readme files to add to this list
@@ -1447,10 +1454,6 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration',
         namespace: 'Microsoft.DomainRegistration',
         useNamespaceFromConfig: true,
-    },
-    {
-        basePath: 'web/resource-manager',
-        namespace: 'Microsoft.Web',
     },
     {
         basePath: 'deviceupdate/resource-manager',

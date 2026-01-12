@@ -337,8 +337,9 @@ const autoGenList: AutoGenConfig[] = [
         useNamespaceFromConfig: true,
     },
     {
-        basePath: 'cosmos-db/resource-manager',
+        basePath: 'cosmos-db/resource-manager/Microsoft.DocumentDB/DocumentDB',
         namespace: 'Microsoft.DocumentDB',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry',
@@ -352,8 +353,9 @@ const autoGenList: AutoGenConfig[] = [
         suffix: 'RegistryTasks',
     },
     {
-        basePath: 'customproviders/resource-manager',
+        basePath: 'customproviders/resource-manager/Microsoft.CustomProviders/CustomProviders',
         namespace: 'Microsoft.CustomProviders',
+        useNamespaceFromConfig: true,
         resourceConfig: [
             {
                 type: 'associations',
@@ -362,8 +364,9 @@ const autoGenList: AutoGenConfig[] = [
         ],
     },
     {
-        basePath: 'databox/resource-manager',
+        basePath: 'databox/resource-manager/Microsoft.DataBox/DataBox',
         namespace: 'Microsoft.DataBox',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'consumption/resource-manager/Microsoft.Consumption/Consumption',
@@ -377,8 +380,9 @@ const autoGenList: AutoGenConfig[] = [
         ],
     },
     {
-        basePath: 'cost-management/resource-manager',
+        basePath: 'cost-management/resource-manager/Microsoft.CostManagement/CostManagement',
         namespace: 'Microsoft.CostManagement',
+        useNamespaceFromConfig: true,
         resourceConfig: [
             {
                 type: 'exports',
@@ -444,44 +448,52 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.Commerce',
     },
     {
-        basePath: 'databoxedge/resource-manager',
+        basePath: 'databoxedge/resource-manager/Microsoft.DataBoxEdge/DataBoxEdge',
         namespace: 'Microsoft.DataBoxEdge',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'databricks/resource-manager',
+        basePath: 'databricks/resource-manager/Microsoft.Databricks/Databricks',
         namespace: 'Microsoft.Databricks',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'datafactory/resource-manager',
+        basePath: 'datafactory/resource-manager/Microsoft.DataFactory/DataFactory',
         namespace: 'Microsoft.DataFactory',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'datacatalog/resource-manager',
+        basePath: 'datacatalog/resource-manager/Microsoft.DataCatalog/DataCatalog',
         namespace: 'Microsoft.DataCatalog',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'datalake-analytics/resource-manager',
         namespace: 'Microsoft.DataLakeAnalytics',
     },
     {
-        basePath: 'datalake-store/resource-manager',
+        basePath: 'datalake-store/resource-manager/Microsoft.DataLakeStore/DataLakeStore',
         namespace: 'Microsoft.DataLakeStore',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'datashare/resource-manager',
+        basePath: 'datashare/resource-manager/Microsoft.DataShare/DataShare',
         namespace: 'Microsoft.DataShare',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'deploymentmanager/resource-manager',
         namespace: 'Microsoft.DeploymentManager',
     },
     {
-        basePath: 'desktopvirtualization/resource-manager',
+        basePath: 'desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization',
         namespace: 'Microsoft.DesktopVirtualization',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'digitaltwins/resource-manager',
+        basePath: 'digitaltwins/resource-manager/Microsoft.DigitalTwins/DigitalTwins',
         namespace: 'Microsoft.DigitalTwins',
+        useNamespaceFromConfig: true,
         resourceConfig: [
             {
                 type: 'integrationResources',
@@ -490,25 +502,30 @@ const autoGenList: AutoGenConfig[] = [
         ]
     },
     {
-        basePath: 'deviceprovisioningservices/resource-manager',
+        basePath: 'deviceprovisioningservices/resource-manager/Microsoft.Devices/DeviceProvisioningServices',
         namespace: 'Microsoft.Devices',
+        useNamespaceFromConfig: true,
         suffix: 'Provisioning',
     },
     {
-        basePath: 'devops/resource-manager',
+        basePath: 'devops/resource-manager/Microsoft.DevOps/DevOps',
         namespace: 'Microsoft.DevOps',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'devspaces/resource-manager',
+        basePath: 'devspaces/resource-manager/Microsoft.DevSpaces/DevSpaces',
         namespace: 'Microsoft.DevSpaces',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'devtestlabs/resource-manager',
+        basePath: 'devtestlabs/resource-manager/Microsoft.DevTestLab/DevTestLabs',
         namespace: 'Microsoft.DevTestLab',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'guestconfiguration/resource-manager',
+        basePath: 'guestconfiguration/resource-manager/Microsoft.GuestConfiguration/Assignments',
         namespace: 'Microsoft.GuestConfiguration',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'resourcegraph/resource-manager',
@@ -524,12 +541,14 @@ const autoGenList: AutoGenConfig[] = [
         suffix: 'Enterprise'
     },
     {
-        basePath: 'hardwaresecuritymodules/resource-manager',
+        basePath: 'hardwaresecuritymodules/resource-manager/Microsoft.HardwareSecurityModules/HardwareSecurityModules',
         namespace: 'Microsoft.HardwareSecurityModules',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'hdinsight/resource-manager',
+        basePath: 'hdinsight/resource-manager/Microsoft.HDInsight/HDInsight',
         namespace: 'Microsoft.HDInsight',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'resourcehealth/resource-manager',
@@ -540,24 +559,29 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.EnterpriseKnowledgeGraph',
     },
     {
-        basePath: 'eventhub/resource-manager',
+        basePath: 'eventhub/resource-manager/Microsoft.EventHub/Eventhub',
         namespace: 'Microsoft.EventHub',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'engagementfabric/resource-manager',
+        basePath: 'engagementfabric/resource-manager/Microsoft.EngagementFabric/EngagementFabric',
         namespace: 'Microsoft.EngagementFabric',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'hanaonazure/resource-manager',
+        basePath: 'hanaonazure/resource-manager/Microsoft.HanaOnAzure/HanaOnAzure',
         namespace: 'Microsoft.HanaOnAzure',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'healthcareapis/resource-manager',
+        basePath: 'healthcareapis/resource-manager/Microsoft.HealthcareApis/HealthcareApis',
         namespace: 'Microsoft.HealthcareApis',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'hybridcompute/resource-manager',
+        basePath: 'hybridcompute/resource-manager/Microsoft.HybridCompute/HybridCompute',
         namespace: 'Microsoft.HybridCompute',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'hybridconnectivity/resource-manager',
@@ -574,12 +598,15 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.HybridData',
     },
     {
-        basePath: 'iotcentral/resource-manager',
+        basePath: 'iotcentral/resource-manager/Microsoft.IoTCentral/IoTCentral',
         namespace: 'Microsoft.IotCentral',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'iothub/resource-manager',
+        basePath: 'iothub/resource-manager/Microsoft.Devices/IoTHub',
         namespace: 'Microsoft.Devices',
+        useNamespaceFromConfig: true,
+        suffix: 'IoTHub',
     },
     {
         basePath: 'iotspaces/resource-manager',
@@ -600,16 +627,19 @@ const autoGenList: AutoGenConfig[] = [
         ]
     },
     {
-        basePath: 'intune/resource-manager',
+        basePath: 'intune/resource-manager/Microsoft.Intune/Intune',
         namespace: 'Microsoft.Intune',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'labservices/resource-manager',
+        basePath: 'labservices/resource-manager/Microsoft.LabServices/LabServices',
         namespace: 'Microsoft.LabServices',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'eventgrid/resource-manager',
+        basePath: 'eventgrid/resource-manager/Microsoft.EventGrid/EventGrid',
         namespace: 'Microsoft.EventGrid',
+        useNamespaceFromConfig: true,
         resourceConfig: [
             {
                 type: 'eventSubscriptions',
@@ -642,8 +672,9 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.MachineLearningExperimentation',
     },
     {
-        basePath: 'maintenance/resource-manager',
+        basePath: 'maintenance/resource-manager/Microsoft.Maintenance/Maintenance',
         namespace: 'Microsoft.Maintenance',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'migrate/resource-manager',
@@ -655,8 +686,9 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.OffAzure',
     },
     {
-        basePath: 'managednetwork/resource-manager',
+        basePath: 'managednetwork/resource-manager/Microsoft.ManagedNetwork/ManagedNetwork',
         namespace: 'Microsoft.ManagedNetwork',
+        useNamespaceFromConfig: true,
         resourceConfig: [
             {
                 type: 'scopeAssignments',
@@ -679,24 +711,28 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.DBforMariaDB',
     },
     {
-        basePath: 'marketplace/resource-manager',
+        basePath: 'marketplace/resource-manager/Microsoft.Marketplace/Marketplace',
         namespace: 'Microsoft.Marketplace',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'mysql/resource-manager',
         namespace: 'Microsoft.DBforMySQL',
     },
     {
-        basePath: 'managementgroups/resource-manager',
+        basePath: 'management/resource-manager/Microsoft.Management/ManagementGroups',
         namespace: 'Microsoft.Management',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'managementpartner/resource-manager',
+        basePath: 'managementpartner/resource-manager/Microsoft.ManagementPartner/ManagementPartner',
         namespace: 'Microsoft.ManagementPartner',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'maps/resource-manager',
+        basePath: 'maps/resource-manager/Microsoft.Maps/Maps',
         namespace: 'Microsoft.Maps',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'mixedreality/resource-manager',
@@ -1082,8 +1118,9 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.TimeSeriesInsights',
     },
     {
-        basePath: 'imagebuilder/resource-manager',
+        basePath: 'imagebuilder/resource-manager/Microsoft.VirtualMachineImages/ImageBuilder',
         namespace: 'Microsoft.VirtualMachineImages',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'vmware/resource-manager',
@@ -1110,8 +1147,9 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.Confluent',
     },
     {
-        basePath: 'datamigration/resource-manager',
+        basePath: 'datamigration/resource-manager/Microsoft.DataMigration/DataMigration',
         namespace: 'Microsoft.DataMigration',
+        useNamespaceFromConfig: true,
         resourceConfig: [
             {
                 type: 'databaseMigrations',
@@ -1203,8 +1241,10 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.Quantum',
     },
     {
-        basePath: 'kubernetesconfiguration/resource-manager',
+        basePath: 'kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensionTypes',
         namespace: 'Microsoft.KubernetesConfiguration',
+        useNamespaceFromConfig: true,
+        suffix: 'ExtensionTypes',
         resourceConfig: [
             {
                 type: 'sourceControlConfigurations',
@@ -1213,13 +1253,32 @@ const autoGenList: AutoGenConfig[] = [
         ]
     },
     {
+        basePath: 'kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/extensions',
+        namespace: 'Microsoft.KubernetesConfiguration',
+        useNamespaceFromConfig: true,
+        suffix: 'Extensions',
+    },
+    {
+        basePath: 'kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/fluxConfigurations',
+        namespace: 'Microsoft.KubernetesConfiguration',
+        useNamespaceFromConfig: true,
+        suffix: 'FluxConfigurations',
+    },
+    {
+        basePath: 'kubernetesconfiguration/resource-manager/Microsoft.KubernetesConfiguration/privateLinkScopes',
+        namespace: 'Microsoft.KubernetesConfiguration',
+        useNamespaceFromConfig: true,
+        suffix: 'PrivateLinkScopes',
+    },
+    {
         basePath: 'certificateregistration/resource-manager/Microsoft.CertificateRegistration/CertificateRegistration',
         namespace: 'Microsoft.CertificateRegistration',
         useNamespaceFromConfig: true,
     },
     {
-        basePath: 'web/resource-manager',
+        basePath: 'domainregistration/resource-manager/Microsoft.DomainRegistration/DomainRegistration',
         namespace: 'Microsoft.DomainRegistration',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'web/resource-manager',
@@ -1246,8 +1305,9 @@ const autoGenList: AutoGenConfig[] = [
         suffix: 'NRP',
     },
     {
-        basePath: 'dnsresolver/resource-manager',
+        basePath: 'dnsresolver/resource-manager/Microsoft.Network/DnsResolver',
         namespace: 'Microsoft.Network',
+        useNamespaceFromConfig: true,
         suffix: 'DnsResolver',
     },
     {
@@ -1256,8 +1316,9 @@ const autoGenList: AutoGenConfig[] = [
         suffix: 'FrontDoor',
     },
     {
-        basePath: 'dns/resource-manager',
+        basePath: 'dns/resource-manager/Microsoft.Network/Dns',
         namespace: 'Microsoft.Network',
+        useNamespaceFromConfig: true,
         suffix: 'DNS',
     },
     {
@@ -1320,12 +1381,14 @@ const autoGenList: AutoGenConfig[] = [
         suffix: 'OnAks',
     },
     {
-        basePath: 'developerhub/resource-manager',
+        basePath: 'developerhub/resource-manager/Microsoft.DevHub/DeveloperHub',
         namespace: 'Microsoft.DevHub',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'domainservices/resource-manager',
+        basePath: 'domainservices/resource-manager/Microsoft.AAD/DomainServices',
         namespace: 'Microsoft.AAD',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'edgeorderpartner/resource-manager',
@@ -1345,8 +1408,9 @@ const autoGenList: AutoGenConfig[] = [
         suffix: 'ServiceMap',
     },
     {
-        basePath: 'managedservices/resource-manager',
+        basePath: 'managedservices/resource-manager/Microsoft.ManagedServices/ManagedServices',
         namespace: 'Microsoft.ManagedServices',
+        useNamespaceFromConfig: true,
         resourceConfig: [
             {
                 type: 'registrationDefinitions',

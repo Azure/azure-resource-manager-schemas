@@ -53,17 +53,34 @@ export async function generateSchemas(readme: string, autoGenConfig: AutoGenConf
     try {
         const generatedSchemas = await runAutorest(readme, tmpFolder);
 
+        console.log(`AutoRest generated ${generatedSchemas.length} schema files for basePath: ${autoGenConfig?.basePath}`);
+        let processedCount = 0;
+        let skippedCount = 0;
+
         for (const schemaPath of generatedSchemas) {
             const contents = await readJsonFile(schemaPath);
             const namespace = contents.title as string;
             if (!lowerCaseEquals(autoGenConfig!.namespace, namespace)) {
+                console.log(`  ⊗ SKIPPED: ${path.basename(schemaPath)} - namespace mismatch (expected="${autoGenConfig!.namespace}", found="${namespace}")`);
+                skippedCount++;
                 continue;
             }
 
+            console.log(`  ✓ PROCESSING: ${path.basename(schemaPath)} - namespace="${namespace}"`);
+            processedCount++;
             const generatedSchemaConfigs = await handleGeneratedSchema(readme, schemaPath, namespace, autoGenConfig);
+
+            if (generatedSchemaConfigs.length === 0) {
+                console.log(`    ⚠ WARNING: No schema configurations generated from this file`);
+            } else {
+                const totalResources = generatedSchemaConfigs.reduce((sum, config) => sum + config.references.length, 0);
+                console.log(`    → Generated ${generatedSchemaConfigs.length} schema config(s) with ${totalResources} resource type(s)`);
+            }
 
             schemaConfigs.push(...generatedSchemaConfigs);
         }
+
+        console.log(`Summary: ${processedCount} processed, ${skippedCount} skipped (namespace mismatch)`);
     }
     finally {
         await rmdirRecursive(tmpFolder);

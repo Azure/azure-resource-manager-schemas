@@ -532,8 +532,9 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.ResourceGraph',
     },
     {
-        basePath: 'redis/resource-manager',
+        basePath: 'redis/resource-manager/Microsoft.Cache/Redis',
         namespace: 'Microsoft.Cache',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'redisenterprise/resource-manager',
@@ -551,8 +552,9 @@ const autoGenList: AutoGenConfig[] = [
         useNamespaceFromConfig: true,
     },
     {
-        basePath: 'resourcehealth/resource-manager',
+        basePath: 'resourcehealth/resource-manager/Microsoft.ResourceHealth/ResourceHealth',
         namespace: 'Microsoft.ResourceHealth',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'EnterpriseKnowledgeGraph/resource-manager',
@@ -677,13 +679,87 @@ const autoGenList: AutoGenConfig[] = [
         useNamespaceFromConfig: true,
     },
     {
-        basePath: 'migrate/resource-manager',
+        basePath: 'migrate/resource-manager/Microsoft.Migrate/AKSAssessments',
         namespace: 'Microsoft.Migrate',
-        suffix: 'Migrate'
+        useNamespaceFromConfig: true,
+        suffix: 'AKSAssessments'
     },
     {
-        basePath: 'migrate/resource-manager',
+        basePath: 'migrate/resource-manager/Microsoft.Migrate/AssessmentProjects',
+        namespace: 'Microsoft.Migrate',
+        useNamespaceFromConfig: true,
+        suffix: 'AssessmentProjects'
+    },
+    {
+        basePath: 'migrate/resource-manager/Microsoft.Migrate/AvsAssessments',
+        namespace: 'Microsoft.Migrate',
+        useNamespaceFromConfig: true,
+        suffix: 'AvsAssessments'
+    },
+    {
+        basePath: 'migrate/resource-manager/Microsoft.Migrate/BusinessCases',
+        namespace: 'Microsoft.Migrate',
+        useNamespaceFromConfig: true,
+        suffix: 'BusinessCases'
+    },
+    {
+        basePath: 'migrate/resource-manager/Microsoft.Migrate/Collectors',
+        namespace: 'Microsoft.Migrate',
+        useNamespaceFromConfig: true,
+        suffix: 'Collectors'
+    },
+    {
+        basePath: 'migrate/resource-manager/Microsoft.Migrate/HeterogenousAssessments',
+        namespace: 'Microsoft.Migrate',
+        useNamespaceFromConfig: true,
+        suffix: 'HeterogenousAssessments'
+    },
+    {
+        basePath: 'migrate/resource-manager/Microsoft.Migrate/MachineAssessments',
+        namespace: 'Microsoft.Migrate',
+        useNamespaceFromConfig: true,
+        suffix: 'MachineAssessments'
+    },
+    {
+        basePath: 'migrate/resource-manager/Microsoft.Migrate/MigrateProjects',
+        namespace: 'Microsoft.Migrate',
+        useNamespaceFromConfig: true,
+        suffix: 'MigrateProjects'
+    },
+    {
+        basePath: 'migrate/resource-manager/Microsoft.Migrate/MordernizeProjects',
+        namespace: 'Microsoft.Migrate',
+        useNamespaceFromConfig: true,
+        suffix: 'MordernizeProjects'
+    },
+    {
+        basePath: 'migrate/resource-manager/Microsoft.Migrate/SqlAssessments',
+        namespace: 'Microsoft.Migrate',
+        useNamespaceFromConfig: true,
+        suffix: 'SqlAssessments'
+    },
+    {
+        basePath: 'migrate/resource-manager/Microsoft.Migrate/Waves',
+        namespace: 'Microsoft.Migrate',
+        useNamespaceFromConfig: true,
+        suffix: 'Waves'
+    },
+    {
+        basePath: 'migrate/resource-manager/Microsoft.Migrate/WebAppAssessments',
+        namespace: 'Microsoft.Migrate',
+        useNamespaceFromConfig: true,
+        suffix: 'WebAppAssessments'
+    },
+    {
+        basePath: 'migrate/resource-manager/Microsoft.Migrate/WebAppCompoundAssessments',
+        namespace: 'Microsoft.Migrate',
+        useNamespaceFromConfig: true,
+        suffix: 'WebAppCompoundAssessments'
+    },
+    {
+        basePath: 'migrate/resource-manager/Microsoft.OffAzure',
         namespace: 'Microsoft.OffAzure',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'managednetwork/resource-manager/Microsoft.ManagedNetwork/ManagedNetwork',
@@ -697,13 +773,15 @@ const autoGenList: AutoGenConfig[] = [
         ],
     },
     {
-        basePath: 'migrateprojects/resource-manager',
+        basePath: 'migrateprojects/resource-manager/Microsoft.Migrate/MigrateProjects',
         namespace: 'Microsoft.Migrate',
+        useNamespaceFromConfig: true,
         suffix: 'MigrateProjects',
     },
     {
-        basePath: 'resourcemover/resource-manager',
+        basePath: 'resourcemover/resource-manager/Microsoft.Migrate/ResourceMover',
         namespace: 'Microsoft.Migrate',
+        useNamespaceFromConfig: true,
         suffix: 'ResourceMover',
     },
     {
@@ -716,8 +794,16 @@ const autoGenList: AutoGenConfig[] = [
         useNamespaceFromConfig: true,
     },
     {
-        basePath: 'mysql/resource-manager',
+        basePath: 'mysql/resource-manager/Microsoft.DBforMySQL/FlexibleServers',
         namespace: 'Microsoft.DBforMySQL',
+        useNamespaceFromConfig: true,
+        suffix: 'FlexibleServers',
+    },
+    {
+        basePath: 'mysql/resource-manager/Microsoft.DBforMySQL/legacy',
+        namespace: 'Microsoft.DBforMySQL',
+        useNamespaceFromConfig: true,
+        suffix: 'Legacy',
     },
     {
         basePath: 'management/resource-manager/Microsoft.Management/ManagementGroups',
@@ -739,12 +825,14 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.MixedReality',
     },
     {
-        basePath: 'netapp/resource-manager',
+        basePath: 'netapp/resource-manager/Microsoft.NetApp/NetApp',
         namespace: 'Microsoft.NetApp',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'notificationhubs/resource-manager',
-        namespace: 'Microsoft.NotificationHubs'
+        basePath: 'notificationhubs/resource-manager/Microsoft.NotificationHubs/NotificationHubs',
+        namespace: 'Microsoft.NotificationHubs',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'policyinsights/resource-manager',
@@ -761,12 +849,14 @@ const autoGenList: AutoGenConfig[] = [
         ]
     },
     {
-        basePath: 'peering/resource-manager',
+        basePath: 'peering/resource-manager/Microsoft.Peering/Peering',
         namespace: 'Microsoft.Peering',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'powerbidedicated/resource-manager',
+        basePath: 'powerbidedicated/resource-manager/Microsoft.PowerBIdedicated/PowerBIDedicated',
         namespace: 'Microsoft.PowerBIDedicated',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'portal/resource-manager',
@@ -783,13 +873,15 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.DBforPostgreSQL',
     },
     {
-        basePath: 'postgresqlhsc/resource-manager',
+        basePath: 'postgresqlhsc/resource-manager/Microsoft.DBforPostgreSQL/PostgresqlHsc',
         namespace: 'Microsoft.DBforPostgreSQL',
+        useNamespaceFromConfig: true,
         suffix: 'Hsc',
     },
     {
-        basePath: 'powerbiembedded/resource-manager',
+        basePath: 'powerbiembedded/resource-manager/Microsoft.PowerBI/PowerbiEmbedded',
         namespace: 'Microsoft.PowerBI',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'providerhub/resource-manager',
@@ -797,8 +889,9 @@ const autoGenList: AutoGenConfig[] = [
         postProcessor: providerHubPostProcessor
     },
     {
-        basePath: 'quota/resource-manager',
+        basePath: 'quota/resource-manager/Microsoft.Quota/Quota',
         namespace: 'Microsoft.Quota',
+        useNamespaceFromConfig: true,
         resourceConfig: [
             {
                 type: 'quotaLimits',
@@ -811,8 +904,9 @@ const autoGenList: AutoGenConfig[] = [
         ],
     },
     {
-        basePath: 'redhatopenshift/resource-manager',
+        basePath: 'redhatopenshift/resource-manager/Microsoft.RedHatOpenShift/OpenShiftClusters',
         namespace: 'Microsoft.RedHatOpenShift',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'resources/resource-manager/Microsoft.Resources/databoundaries',
@@ -902,22 +996,26 @@ const autoGenList: AutoGenConfig[] = [
         postProcessor: policyProcessor
     },
     {
-        basePath: 'relay/resource-manager',
+        basePath: 'relay/resource-manager/Microsoft.Relay/Relay',
         namespace: 'Microsoft.Relay',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'recoveryservicessiterecovery/resource-manager',
+        basePath: 'recoveryservicessiterecovery/resource-manager/Microsoft.RecoveryServices/SiteRecovery',
         namespace: 'Microsoft.RecoveryServices',
+        useNamespaceFromConfig: true,
         suffix: 'SiteRecovery',
     },
     {
-        basePath: 'recoveryservicesbackup/resource-manager',
+        basePath: 'recoveryservicesbackup/resource-manager/Microsoft.RecoveryServices/RecoveryServicesBackup',
         namespace: 'Microsoft.RecoveryServices',
+        useNamespaceFromConfig: true,
         suffix: "Backup",
     },
     {
-        basePath: "recoveryservices/resource-manager",
+        basePath: "recoveryservices/resource-manager/Microsoft.RecoveryServices/RecoveryServices",
         namespace: "Microsoft.RecoveryServices",
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'reservations/resource-manager',
@@ -1207,8 +1305,9 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.HybridNetwork',
     },
     {
-        basePath: 'powerplatform/resource-manager',
+        basePath: 'powerplatform/resource-manager/Microsoft.PowerPlatform/PowerPlatform',
         namespace: 'Microsoft.PowerPlatform',
+        useNamespaceFromConfig: true,
     },
     //Disabled until errors are fixed
     //Remove deprectated version 2024-01-01-preview from readme
@@ -1322,8 +1421,9 @@ const autoGenList: AutoGenConfig[] = [
         suffix: 'DNS',
     },
     {
-        basePath: 'privatedns/resource-manager',
+        basePath: 'privatedns/resource-manager/Microsoft.Network/PrivateDns',
         namespace: 'Microsoft.Network',
+        useNamespaceFromConfig: true,
         suffix: 'privateDns',
     },
     {
@@ -1399,8 +1499,9 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.ServiceFabricMesh',
     },
     {
-        basePath: 'operationalinsights/resource-manager',
+        basePath: 'operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights',
         namespace: 'Microsoft.OperationalInsights',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'service-map/resource-manager',

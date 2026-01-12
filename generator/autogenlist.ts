@@ -291,8 +291,9 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.Blockchain',
     },
     {
-        basePath: 'blueprint/resource-manager',
+        basePath: 'blueprint/resource-manager/Microsoft.Blueprint/Blueprint',
         namespace: 'Microsoft.Blueprint',
+        useNamespaceFromConfig: true,
         resourceConfig: [
             {
                 type: 'blueprintAssignments',
@@ -313,12 +314,14 @@ const autoGenList: AutoGenConfig[] = [
         ]
     },
     {
-        basePath: 'billing/resource-manager',
+        basePath: 'billing/resource-manager/Microsoft.Billing/Billing',
         namespace: 'Microsoft.Billing',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'changeanalysis/resource-manager',
+        basePath: 'changeanalysis/resource-manager/Microsoft.ChangeAnalysis/ChangeAnalysis',
         namespace: 'Microsoft.ChangeAnalysis',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'cognitiveservices/resource-manager',
@@ -329,16 +332,24 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.Communication',
     },
     {
-        basePath: 'containerinstance/resource-manager',
+        basePath: 'containerinstance/resource-manager/Microsoft.ContainerInstance/ContainerInstance',
         namespace: 'Microsoft.ContainerInstance',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'cosmos-db/resource-manager',
         namespace: 'Microsoft.DocumentDB',
     },
     {
-        basePath: 'containerregistry/resource-manager',
+        basePath: 'containerregistry/resource-manager/Microsoft.ContainerRegistry/Registry',
         namespace: 'Microsoft.ContainerRegistry',
+        useNamespaceFromConfig: true,
+    },
+    {
+        basePath: 'containerregistry/resource-manager/Microsoft.ContainerRegistry/RegistryTasks',
+        namespace: 'Microsoft.ContainerRegistry',
+        useNamespaceFromConfig: true,
+        suffix: 'RegistryTasks',
     },
     {
         basePath: 'customproviders/resource-manager',
@@ -355,8 +366,9 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.DataBox',
     },
     {
-        basePath: 'consumption/resource-manager',
+        basePath: 'consumption/resource-manager/Microsoft.Consumption/Consumption',
         namespace: 'Microsoft.Consumption',
+        useNamespaceFromConfig: true,
         resourceConfig: [
             {
                 type: 'budgets',
@@ -725,6 +737,12 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.Portal',
     },
     {
+        basePath: 'cloudshell/resource-manager/Microsoft.Portal/CloudShell',
+        namespace: 'Microsoft.Portal',
+        useNamespaceFromConfig: true,
+        suffix: 'CloudShell',
+    },
+    {
         basePath: 'postgresql/resource-manager',
         namespace: 'Microsoft.DBforPostgreSQL',
     },
@@ -1010,8 +1028,10 @@ const autoGenList: AutoGenConfig[] = [
         postProcessor: storageProcessor,
     },
     {
-        basePath: 'compute/resource-manager',
+        basePath: 'compute/resource-manager/Microsoft.Compute/RecommenderRP',
         namespace: 'Microsoft.Compute',
+        useNamespaceFromConfig: true,
+        suffix: 'RecommenderRP',
         postProcessor: computeProcessor
     },
     {
@@ -1193,8 +1213,9 @@ const autoGenList: AutoGenConfig[] = [
         ]
     },
     {
-        basePath: 'web/resource-manager',
+        basePath: 'certificateregistration/resource-manager/Microsoft.CertificateRegistration/CertificateRegistration',
         namespace: 'Microsoft.CertificateRegistration',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'web/resource-manager',
@@ -1279,6 +1300,18 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.ContainerService',
         useNamespaceFromConfig: true,
         suffix: 'Fleet'
+    },
+    {
+        basePath: 'containerservice/resource-manager/Microsoft.ContainerService/deploymentsafeguards',
+        namespace: 'Microsoft.ContainerService',
+        useNamespaceFromConfig: true,
+        suffix: 'DeploymentSafeguards'
+    },
+    {
+        basePath: 'containerservice/resource-manager/Microsoft.ContainerService/nodecustomization',
+        namespace: 'Microsoft.ContainerService',
+        useNamespaceFromConfig: true,
+        suffix: 'NodeCustomization'
     },
     {
         basePath: 'hdinsight/resource-manager/Microsoft.HDInsight/HDInsightOnAks',

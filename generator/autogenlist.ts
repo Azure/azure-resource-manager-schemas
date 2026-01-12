@@ -101,8 +101,9 @@ const disabledProviders: AutoGenConfig[] = [
     },
     {
         //Disabled until errors are fixed
-        basePath: 'servicefabricmanagedclusters/resource-manager',
+        basePath: 'servicefabricmanagedclusters/resource-manager/Microsoft.ServiceFabric/ServiceFabricManagedClusters',
         namespace: 'Microsoft.ServiceFabric',
+        useNamespaceFromConfig: true,
         postProcessor: serviceFabricPostProcessor,
         suffix: 'ManagedClusters',
         disabledForAutogen: true,
@@ -237,8 +238,9 @@ const autoGenList: AutoGenConfig[] = [
         suffix: 'TenantActivityLogAlerts',
     },
     {
-        basePath: 'workloadmonitor/resource-manager',
+        basePath: 'workloadmonitor/resource-manager/Microsoft.WorkloadMonitor/WorkloadMonitor',
         namespace: 'Microsoft.WorkloadMonitor',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration',
@@ -964,8 +966,35 @@ const autoGenList: AutoGenConfig[] = [
         suffix: 'TemplateSpecs'
     },
     {
-        basePath: 'resources/resource-manager',
+        basePath: 'resources/resource-manager/Microsoft.Resources/changes',
+        namespace: 'Microsoft.Resources',
+        useNamespaceFromConfig: true,
+        suffix: 'Changes'
+    },
+    {
+        basePath: 'resources/resource-manager/Microsoft.Resources/snapshots',
+        namespace: 'Microsoft.Resources',
+        useNamespaceFromConfig: true,
+        suffix: 'Snapshots'
+    },
+    {
+        basePath: 'resources/resource-manager/Microsoft.Authorization/locks',
         namespace: 'Microsoft.Authorization',
+        useNamespaceFromConfig: true,
+        suffix: 'Resources.Locks',
+        resourceConfig: [
+            {
+                type: 'locks',
+                scopes: ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
+            },
+        ],
+        postProcessor: policyProcessor
+    },
+    {
+        basePath: 'resources/resource-manager/Microsoft.Authorization/policy',
+        namespace: 'Microsoft.Authorization',
+        useNamespaceFromConfig: true,
+        suffix: 'Resources.Policy',
         resourceConfig: [
             {
                 type: 'policyDefinitions',
@@ -987,13 +1016,20 @@ const autoGenList: AutoGenConfig[] = [
                 type: 'policyPricings',
                 scopes: ScopeType.ManagementGroup | ScopeType.Subscription,
             },
-            {
-                type: 'locks',
-                scopes: ScopeType.Subscription | ScopeType.ResourceGroup | ScopeType.Extension,
-            },
         ],
-        suffix: 'Resources',
         postProcessor: policyProcessor
+    },
+    {
+        basePath: 'resources/resource-manager/Microsoft.Authorization/privatelinks',
+        namespace: 'Microsoft.Authorization',
+        useNamespaceFromConfig: true,
+        suffix: 'Resources.PrivateLinks',
+        postProcessor: policyProcessor
+    },
+    {
+        basePath: 'resources/resource-manager/Microsoft.Features/features',
+        namespace: 'Microsoft.Features',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'relay/resource-manager/Microsoft.Relay/Relay',
@@ -1022,12 +1058,14 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.Capacity',
     },
     {
-        basePath: 'servicebus/resource-manager',
+        basePath: 'servicebus/resource-manager/Microsoft.ServiceBus/ServiceBus',
         namespace: 'Microsoft.ServiceBus',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'servicefabric/resource-manager',
+        basePath: 'servicefabric/resource-manager/Microsoft.ServiceFabric/ServiceFabric',
         namespace: 'Microsoft.ServiceFabric',
+        useNamespaceFromConfig: true,
         postProcessor: serviceFabricPostProcessor,
     },
     {
@@ -1045,37 +1083,49 @@ const autoGenList: AutoGenConfig[] = [
         ],
     },
     {
-        basePath: 'signalr/resource-manager',
+        basePath: 'signalr/resource-manager/Microsoft.SignalRService/SignalRService',
         namespace: 'Microsoft.SignalRService',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'webpubsub/resource-manager',
+        basePath: 'servicenetworking/resource-manager/Microsoft.ServiceNetworking/ServiceNetworking',
+        namespace: 'Microsoft.ServiceNetworking',
+        useNamespaceFromConfig: true,
+    },
+    {
+        basePath: 'webpubsub/resource-manager/Microsoft.SignalRService/SignalRService',
         namespace: 'Microsoft.SignalRService',
+        useNamespaceFromConfig: true,
         suffix: 'WebPubSub',
     },
     {
-        basePath: 'sqlvirtualmachine/resource-manager',
+        basePath: 'sqlvirtualmachine/resource-manager/Microsoft.SqlVirtualMachine/SqlVirtualMachine',
         namespace: 'Microsoft.SqlVirtualMachine',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'storagecache/resource-manager',
+        basePath: 'storagecache/resource-manager/Microsoft.StorageCache/StorageCache',
         namespace: 'Microsoft.StorageCache',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'storagepool/resource-manager',
+        basePath: 'storagepool/resource-manager/Microsoft.StoragePool/StoragePool',
         namespace: 'Microsoft.StoragePool',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'streamanalytics/resource-manager',
         namespace: 'Microsoft.StreamAnalytics',
     },
     {
-        basePath: 'storagesync/resource-manager',
+        basePath: 'storagesync/resource-manager/Microsoft.StorageSync/StorageSync',
         namespace: 'Microsoft.StorageSync',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'serialconsole/resource-manager',
+        basePath: 'serialconsole/resource-manager/Microsoft.SerialConsole/SerialConsole',
         namespace: 'Microsoft.SerialConsole',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'synapse/resource-manager',
@@ -1129,17 +1179,22 @@ const autoGenList: AutoGenConfig[] = [
     },
     {
         basePath: 'securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights',
-        namespace: 'stable',
+        namespace: 'Microsoft.SecurityInsights',
+        useNamespaceFromConfig: true,
+        suffix: 'Stable',
         postProcessor: securityInsightsPostProcessor,
     },
     {
         basePath: 'securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights',
-        namespace: 'preview',
+        namespace: 'Microsoft.SecurityInsights',
+        useNamespaceFromConfig: true,
+        suffix: 'Preview',
         postProcessor: securityInsightsPostProcessor,
     },
     {
-        basePath: 'storageimportexport/resource-manager',
-        namespace: 'Microsoft.ImportExport'
+        basePath: 'storageimportexport/resource-manager/Microsoft.ImportExport/StorageImportExport',
+        namespace: 'Microsoft.ImportExport',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'storSimple1200Series/resource-manager',
@@ -1150,6 +1205,12 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'resources/resource-manager',
         namespace: 'Microsoft.Solutions',
         suffix: 'resourcesolutions'
+    },
+    {
+        basePath: 'resources/resource-manager/Microsoft.Solutions/managedapplications',
+        namespace: 'Microsoft.Solutions',
+        useNamespaceFromConfig: true,
+        suffix: 'ManagedApplications'
     },
     {
         basePath: 'solutions/resource-manager',
@@ -1169,8 +1230,9 @@ const autoGenList: AutoGenConfig[] = [
         postProcessor: computeProcessor
     },
     {
-        basePath: 'vmwarecloudsimple/resource-manager',
+        basePath: 'vmwarecloudsimple/resource-manager/Microsoft.VMwareCloudSimple/VmwareCloudSimple',
         namespace: 'Microsoft.VMwareCloudSimple',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'visualstudio/resource-manager',
@@ -1181,16 +1243,19 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.Sql',
     },
     {
-        basePath: 'scheduler/resource-manager',
+        basePath: 'scheduler/resource-manager/Microsoft.Scheduler/Scheduler',
         namespace: 'Microsoft.Scheduler',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'search/resource-manager',
+        basePath: 'search/resource-manager/Microsoft.Search/Search',
         namespace: 'Microsoft.Search',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'subscription/resource-manager',
+        basePath: 'subscription/resource-manager/Microsoft.Subscription/Subscription',
         namespace: 'Microsoft.Subscription',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'storsimple8000series/resource-manager',
@@ -1198,12 +1263,14 @@ const autoGenList: AutoGenConfig[] = [
         suffix: '8000',
     },
     {
-        basePath: 'support/resource-manager',
+        basePath: 'support/resource-manager/Microsoft.Support/Support',
         namespace: 'Microsoft.Support',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'softwareplan/resource-manager',
+        basePath: 'softwareplan/resource-manager/Microsoft.SoftwarePlan/SoftwarePlan',
         namespace: 'Microsoft.SoftwarePlan',
+        useNamespaceFromConfig: true,
         resourceConfig: [
             {
                 type: 'hybridUseBenefits',
@@ -1221,16 +1288,18 @@ const autoGenList: AutoGenConfig[] = [
         useNamespaceFromConfig: true,
     },
     {
-        basePath: 'vmware/resource-manager',
+        basePath: 'vmware/resource-manager/Microsoft.AVS/AVS',
         namespace: 'Microsoft.AVS',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'windowsesu/resource-manager',
         namespace: 'Microsoft.WindowsESU',
     },
     {
-        basePath: 'windowsiot/resource-manager',
+        basePath: 'windowsiot/resource-manager/Microsoft.WindowsIoT/WindowsIotServices',
         namespace: 'Microsoft.WindowsIoT',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'adp/resource-manager',
@@ -1393,8 +1462,9 @@ const autoGenList: AutoGenConfig[] = [
         postProcessor: mediaPostProcessor
     },
     {
-        basePath: 'trafficmanager/resource-manager',
+        basePath: 'trafficmanager/resource-manager/Microsoft.Network/TrafficManager',
         namespace: 'Microsoft.Network',
+        useNamespaceFromConfig: true,
         suffix: 'TrafficManager',
     },
     {
@@ -1495,8 +1565,9 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.EdgeOrderPartner',
     },
     {
-        basePath: 'servicefabricmesh/resource-manager',
+        basePath: 'servicefabricmesh/resource-manager/Microsoft.ServiceFabricMesh/ServiceFabricMesh',
         namespace: 'Microsoft.ServiceFabricMesh',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'operationalinsights/resource-manager/Microsoft.OperationalInsights/OperationalInsights',
@@ -1504,8 +1575,9 @@ const autoGenList: AutoGenConfig[] = [
         useNamespaceFromConfig: true,
     },
     {
-        basePath: 'service-map/resource-manager',
+        basePath: 'service-map/resource-manager/Microsoft.OperationalInsights/ServiceMap',
         namespace: 'Microsoft.OperationalInsights',
+        useNamespaceFromConfig: true,
         suffix: 'ServiceMap',
     },
     {

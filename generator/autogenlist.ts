@@ -147,8 +147,9 @@ const disabledProviders: AutoGenConfig[] = [
 const autoGenList: AutoGenConfig[] = [
     ...disabledProviders,
     {
-        basePath: 'addons/resource-manager',
+        basePath: 'addons/resource-manager/Microsoft.Addons/Addons',
         namespace: 'Microsoft.Addons',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'authorization/resource-manager',
@@ -202,32 +203,61 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.AnalysisServices',
     },
     {
-        basePath: 'azureactivedirectory/resource-manager',
+        basePath: 'azureactivedirectory/resource-manager/Microsoft.Aadiam/AzureActiveDirectory',
         namespace: 'Microsoft.Aadiam',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'alertsmanagement/resource-manager',
+        basePath: 'alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertProcessingRules',
         namespace: 'Microsoft.AlertsManagement',
+        useNamespaceFromConfig: true,
+        suffix: 'AlertProcessingRules',
+    },
+    {
+        basePath: 'alertsmanagement/resource-manager/Microsoft.AlertsManagement/AlertsManagement',
+        namespace: 'Microsoft.AlertsManagement',
+        useNamespaceFromConfig: true,
+    },
+    {
+        basePath: 'alertsmanagement/resource-manager/Microsoft.AlertsManagement/Legacy',
+        namespace: 'Microsoft.AlertsManagement',
+        useNamespaceFromConfig: true,
+        suffix: 'Legacy',
+    },
+    {
+        basePath: 'alertsmanagement/resource-manager/Microsoft.AlertsManagement/PrometheusRuleGroups',
+        namespace: 'Microsoft.AlertsManagement',
+        useNamespaceFromConfig: true,
+        suffix: 'PrometheusRuleGroups',
+    },
+    {
+        basePath: 'alertsmanagement/resource-manager/Microsoft.AlertsManagement/TenantActivityLogAlerts',
+        namespace: 'Microsoft.AlertsManagement',
+        useNamespaceFromConfig: true,
+        suffix: 'TenantActivityLogAlerts',
     },
     {
         basePath: 'workloadmonitor/resource-manager',
         namespace: 'Microsoft.WorkloadMonitor',
     },
     {
-        basePath: 'appconfiguration/resource-manager',
+        basePath: 'appconfiguration/resource-manager/Microsoft.AppConfiguration/AppConfiguration',
         namespace: 'Microsoft.AppConfiguration',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'apimanagement/resource-manager',
+        basePath: 'apimanagement/resource-manager/Microsoft.ApiManagement/ApiManagement',
         namespace: 'Microsoft.ApiManagement',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'appplatform/resource-manager',
         namespace: 'Microsoft.AppPlatform',
     },
     {
-        basePath: 'attestation/resource-manager',
+        basePath: 'attestation/resource-manager/Microsoft.Attestation/Attestation',
         namespace: 'Microsoft.Attestation',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'automation/resource-manager',
@@ -243,12 +273,14 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.AzureArcData',
     },
     {
-        basePath: 'azuredata/resource-manager',
+        basePath: 'azuredata/resource-manager/Microsoft.AzureData/AzureData',
         namespace: 'Microsoft.AzureData',
+        useNamespaceFromConfig: true,
     },
     {
-        basePath: 'azurestack/resource-manager',
+        basePath: 'azurestack/resource-manager/Microsoft.AzureStack/AzureStack',
         namespace: 'Microsoft.AzureStack',
+        useNamespaceFromConfig: true,
     },
     {
         basePath: 'batch/resource-manager',
@@ -579,8 +611,9 @@ const autoGenList: AutoGenConfig[] = [
         postProcessor: machineLearningPostProcessor,
     },
     {
-        basePath: 'azure-kusto/resource-manager',
+        basePath: 'azure-kusto/resource-manager/Microsoft.Kusto/Kusto',
         namespace: 'Microsoft.Kusto',
+        useNamespaceFromConfig: true,
         postProcessor: kustoPostProcessor,
     },
     {
@@ -728,7 +761,7 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.RedHatOpenShift',
     },
     {
-        basePath: 'resources/resource-manager/Microsoft.Resources/dataBoundaries',
+        basePath: 'resources/resource-manager/Microsoft.Resources/databoundaries',
         namespace: 'Microsoft.Resources',
         useNamespaceFromConfig: true,
         suffix: 'DataBoundaries',
@@ -1218,8 +1251,16 @@ const autoGenList: AutoGenConfig[] = [
         postProcessor: azureStackHciPostProcessor,
     },
     {
-        basePath: 'advisor/resource-manager',
+        basePath: 'azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCIVM',
+        namespace: 'Microsoft.AzureStackHCI',
+        useNamespaceFromConfig: true,
+        suffix: 'StackHCIVM',
+        postProcessor: azureStackHciPostProcessor,
+    },
+    {
+        basePath: 'advisor/resource-manager/Microsoft.Advisor/Advisor',
         namespace: 'Microsoft.Advisor',
+        useNamespaceFromConfig: true,
         resourceConfig: [
             {
                 type: 'recommendations/suppressions',
@@ -1299,13 +1340,34 @@ export async function findOrGenerateAutogenEntries(basePath: string, readme: str
     const detectedNamespaces = await detectProviderNamespaces(readme);
     entries = entries.filter(e => detectedNamespaces.some(ns => lowerCaseEquals(e.namespace, ns)));
 
-    for (const namespace of detectedNamespaces) {
-        if (!entries.some(e => lowerCaseEquals(e.namespace, namespace))) {
-            // Generate configuration for any RPs not explicitly declared in the autogen list
+    // If no entries found or all filtered out, attempt auto-generation
+    if (entries.length === 0) {
+        // Helper function to extract provider namespace from basePath
+        const extractProviderNamespace = (path: string): string | null => {
+            const parts = path.split('/');
+            const providerPart = parts.find(p => p.startsWith('Microsoft.') || p.startsWith('microsoft.'));
+            return providerPart || null;
+        };
+
+        const actualNamespace = extractProviderNamespace(basePath);
+        
+        if (actualNamespace) {
+            // New structure: auto-generate with extracted provider namespace
             entries.push({
                 basePath,
-                namespace,
+                namespace: actualNamespace,
             });
+        } else {
+            // Fallback to old structure, with logging
+            console.warn(`⚠️  Unable to auto-generate config for old basePath structure: ${basePath}. Consider adding explicit entry to autogenlist.ts`);
+            for (const namespace of detectedNamespaces) {
+                if (!entries.some(e => lowerCaseEquals(e.namespace, namespace))) {
+                    entries.push({
+                        basePath,
+                        namespace,
+                    });
+                }
+            }
         }
     }
 

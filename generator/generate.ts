@@ -61,12 +61,22 @@ export async function generateSchemas(readme: string, autoGenConfig: AutoGenConf
             const contents = await readJsonFile(schemaPath);
             const namespace = contents.title as string;
             if (!lowerCaseEquals(autoGenConfig!.namespace, namespace)) {
+                console.log(`  ⊗ SKIPPED: ${path.basename(schemaPath)} - namespace mismatch (expected="${autoGenConfig!.namespace}", found="${namespace}")`);
                 skippedCount++;
                 continue;
             }
 
+            console.log(`  ✓ PROCESSING: ${path.basename(schemaPath)} - namespace="${namespace}"`);
             processedCount++;
             const generatedSchemaConfigs = await handleGeneratedSchema(readme, schemaPath, namespace, autoGenConfig);
+
+            if (generatedSchemaConfigs.length === 0) {
+                console.log(`    ⚠ WARNING: No schema configurations generated from this file`);
+            } else {
+                const totalResources = generatedSchemaConfigs.reduce((sum, config) => sum + config.references.length, 0);
+                console.log(`    → Generated ${generatedSchemaConfigs.length} schema config(s) with ${totalResources} resource type(s)`);
+            }
+
             schemaConfigs.push(...generatedSchemaConfigs);
         }
 
@@ -160,6 +170,63 @@ function getSchemaConfig(filePath: string, output: any, namespace: string, apiVe
         ...knownReferences,
         ...unknownReferences,
     ];
+
+    const schemaPath = path.join(constants.schemasBasePath, relativePath);
+
+    console.log('================================================================================================================================');
+    console.log('Filename: ' + colors.green(schemaPath));
+    console.log('Provider Namespace: ' + colors.green(namespace));
+    console.log('API Version: ' + colors.green(apiVersion));
+
+    const tenantSchemaRefs = references.filter(x => x.scope & ScopeType.Tenant);
+    if (tenantSchemaRefs.length > 0) {
+        console.log('Resource Types (Tenant Scope):');
+        for (const schemaRef of tenantSchemaRefs) {
+            console.log('- ' + colors.green(schemaRef.type));
+        }
+    }
+
+    const managementGroupSchemaRefs = references.filter(x => x.scope & ScopeType.ManagementGroup);
+    if (managementGroupSchemaRefs.length > 0) {
+        console.log('Resource Types (Management Group Scope):');
+        for (const schemaRef of managementGroupSchemaRefs) {
+            console.log('- ' + colors.green(schemaRef.type));
+        }
+    }
+
+    const subscriptionSchemaRefs = references.filter(x => x.scope & ScopeType.Subscription);
+    if (subscriptionSchemaRefs.length > 0) {
+        console.log('Resource Types (Subscription Scope):');
+        for (const schemaRef of subscriptionSchemaRefs) {
+            console.log('- ' + colors.green(schemaRef.type));
+        }
+    }
+
+    const resourceGroupSchemaRefs = references.filter(x => x.scope & ScopeType.ResourceGroup);
+    if (resourceGroupSchemaRefs.length > 0) {
+        console.log('Resource Types (Resource Group Scope):');
+        for (const schemaRef of resourceGroupSchemaRefs) {
+            console.log('- ' + colors.green(schemaRef.type));
+        }
+    }
+
+    const extensionSchemaRefs = references.filter(x => x.scope & ScopeType.Extension);
+    if (extensionSchemaRefs.length > 0) {
+        console.log('Resource Types (Extension Scope):');
+        for (const schemaRef of extensionSchemaRefs) {
+            console.log('- ' + colors.green(schemaRef.type));
+        }
+    }
+
+    const unknownSchemaRefs = references.filter(x => x.scope & ScopeType.Unknown);
+    if (unknownSchemaRefs.length > 0) {
+        console.log('Resource Types (Unknown Scope):');
+        for (const schemaRef of unknownSchemaRefs) {
+            console.log('- ' + colors.red(schemaRef.type));
+        }
+    }
+
+    console.log('================================================================================================================================');
 
     return {
         references,

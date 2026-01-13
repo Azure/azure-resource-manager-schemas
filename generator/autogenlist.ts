@@ -1631,13 +1631,45 @@ export async function findOrGenerateAutogenEntries(basePath: string, readme: str
             return providerPart || null;
         };
 
+        // Helper function to extract suffix from basePath (the subfolder after the provider namespace)
+        const extractSuffix = (path: string, providerNamespace: string): string | null => {
+            const parts = path.split('/');
+            const providerIndex = parts.findIndex(p => lowerCaseEquals(p, providerNamespace));
+            if (providerIndex >= 0 && providerIndex < parts.length - 1) {
+                // Return the subfolder after the provider namespace
+                return parts[providerIndex + 1];
+            }
+            return null;
+        };
+
+        // Helper function to check if there are other basePaths with the same provider namespace
+        const hasConflictingBasePaths = (providerNamespace: string, currentBasePath: string): boolean => {
+            // Get the parent folder (e.g., "cdn/resource-manager/Microsoft.Cdn" from "cdn/resource-manager/Microsoft.Cdn/Cdn")
+            const pathParts = currentBasePath.split('/');
+            const providerIndex = pathParts.findIndex(p => lowerCaseEquals(p, providerNamespace));
+            if (providerIndex < 0) return false;
+            
+            const parentPath = pathParts.slice(0, providerIndex + 1).join('/');
+            
+            // Check if there are other entries in autoGenList with the same parent path pattern
+            // This indicates multiple subfolders under the same provider namespace
+            return autoGenList.some(entry => {
+                if (lowerCaseEquals(entry.basePath, currentBasePath)) return false; // Skip self
+                return entry.basePath.startsWith(parentPath + '/');
+            });
+        };
+
         const actualNamespace = extractProviderNamespace(basePath);
         
         if (actualNamespace) {
+            const needsSuffix = hasConflictingBasePaths(actualNamespace, basePath);
+            const suffix = needsSuffix ? extractSuffix(basePath, actualNamespace) : null;
+            
             // New structure: auto-generate with extracted provider namespace
             entries.push({
                 basePath,
                 namespace: actualNamespace,
+                ...(suffix && { suffix }), // Only add suffix if there's a conflict
             });
         } else {
             // Fallback to old structure, with logging

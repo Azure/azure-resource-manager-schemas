@@ -119,13 +119,13 @@ executeSynchronous(async () => {
                         `);
                 }
                 packages.push(pkg);
-            }
 
-            // Clear autorest temp directory after processing all readmes for this basePath
-            try {
-                await clearAutorestTempDir();
-            } catch (error) {
-                console.log(colors.yellow(`Warning: Failed to clear autorest temp directory for basePath '${basePath}': ${error}`));
+                // Clear autorest temp directory after processing each readme
+                try {
+                    await clearAutorestTempDir();
+                } catch (error) {
+                    console.log(colors.yellow(`Warning: Failed to clear autorest temp directory for '${autoGenConfig.basePath}': ${error}`));
+                }
             }
         } catch (error) {
             // return a non-zero exit code to mark the process as failed

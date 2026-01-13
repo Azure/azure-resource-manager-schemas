@@ -30,6 +30,14 @@ const disabledProviders: AutoGenConfig[] = [
         disabledForAutogen: true,
     },
     {
+        // NRP generates many files and causes disk space issues during schema generation
+        basePath: 'network/resource-manager',
+        namespace: 'Microsoft.Network',
+        postProcessor: networkPostProcessor,
+        suffix: 'NRP',
+        disabledForAutogen: true,
+    },
+    {
         // Duplicated under 'containerservice/resource-manager/Microsoft.ContainerService/aks'
         basePath: 'compute/resource-manager',
         namespace: 'Microsoft.ContainerService',
@@ -1470,12 +1478,13 @@ const autoGenList: AutoGenConfig[] = [
         useNamespaceFromConfig: true,
         suffix: 'TrafficManager',
     },
-    {
+    /*{
+        //Disabled until a workaround is found
         basePath: 'network/resource-manager',
         namespace: 'Microsoft.Network',
         postProcessor: networkPostProcessor,
         suffix: 'NRP',
-    },
+    },*/
     {
         basePath: 'dnsresolver/resource-manager/Microsoft.Network/DnsResolver',
         namespace: 'Microsoft.Network',

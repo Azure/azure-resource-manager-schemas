@@ -1609,6 +1609,10 @@ const autoGenList: AutoGenConfig[] = [
     },
 ];
 
+export function getFullAutoGenList(): AutoGenConfig[] {
+    return autoGenList;
+}
+
 export function findAutogenEntries(basePath: string): AutoGenConfig[] {
     return autoGenList.filter(w => lowerCaseEquals(w.basePath, basePath));
 }

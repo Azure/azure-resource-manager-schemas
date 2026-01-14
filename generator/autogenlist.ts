@@ -1624,23 +1624,22 @@ export async function findOrGenerateAutogenEntries(basePath: string, readme: str
             const childNamespace = extractChildNamespace(basePath, actualNamespace);
             
             if (childNamespace) {
-                // Check if child namespace matches parent's last segment (e.g., Microsoft.Cdn -> Cdn)
+                // Check if child namespace matches parent's last segment)
                 const parentLastSegment = actualNamespace.split('.').pop()?.toLowerCase();
                 const childLower = childNamespace.toLowerCase();
                 
                 if (parentLastSegment && lowerCaseEquals(parentLastSegment, childLower)) {
-                    // Matching child becomes the primary (no suffix) - overwrites old file
+                    // Matching child becomes the primary
                     entries.push({
                         basePath,
                         namespace: actualNamespace,
-                        // No suffix - this will write to Microsoft.Cdn.json (overwrites old)
                     });
                 } else {
                     // Non-matching child gets suffixed
                     entries.push({
                         basePath,
                         namespace: actualNamespace,
-                        suffix: childNamespace, // e.g., FrontDoor, EdgeOrder
+                        suffix: childNamespace,
                     });
                 }
             } else {

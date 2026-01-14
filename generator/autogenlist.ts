@@ -42,7 +42,8 @@ const disabledProviders: AutoGenConfig[] = [
         //Disabled until errors are fixed
         //'datamanagerforagriculturesolutionproperties.properties.openapispecsdictionary.additionalproperties' - TypeError: Cannot convert undefined or null to object
         basePath: 'agrifood/resource-manager/Microsoft.AgFoodPlatform/AgFoodPlatform',
-        namespace: 'preview',
+        namespace: 'Microsoft.AgFoodPlatform',
+        useNamespaceFromConfig: true,
         disabledForAutogen: true,
     },
     {
@@ -50,49 +51,25 @@ const disabledProviders: AutoGenConfig[] = [
         //Enum 'nextPartitionKey' cannot have a value ' ' that result in an empty name. Use x-ms-enum.values to specify the name of the values.
         //Enum 'nextRowKey' cannot have a value ' ' that result in an empty name. Use x-ms-enum.values to specify the name of the values.
         basePath: 'adhybridhealthservice/resource-manager/Microsoft.ADHybridHealthService/ADHybridHealthService',
-        namespace: 'stable',
+        namespace: 'Microsoft.ADHybridHealthService',
+        useNamespaceFromConfig: true,
         disabledForAutogen: true,
     },
     {
         //Disabled until errors are fixed
         //'specification/common-types/resource-management/v5/types.json' doesn't exists in workspace
         basePath: 'azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI',
-        namespace: 'preview',
-        disabledForAutogen: true,
-    },
-    {
-        //Disabled until errors are fixed
-        //'specification/common-types/resource-management/v5/types.json' doesn't exists in workspace
-        basePath: 'azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI',
-        namespace: 'stable',
-        disabledForAutogen: true,
-    },
-    {
-        //Disabled until errors are fixed
-        //'specification/common-types/resource-management/v5/types.json' doesn't exists in workspace
-        basePath: 'azurestackhci/resource-manager/Microsoft.AzureStackHCI/StackHCI',
-        namespace: 'examples',
+        namespace: 'Microsoft.AzureStackHCI',
+        useNamespaceFromConfig: true,
+        suffix: 'StackHCI',
         disabledForAutogen: true,
     },
     {
         //Disabled until errors are fixed
         //'Microsoft.BotService/preview/2023-09-15-preview/botservice.json:3492:5' - TypeError: Cannot convert undefined or null to object
         basePath: 'botservice/resource-manager/Microsoft.BotService/BotService',
-        namespace: 'examples',
-        disabledForAutogen: true,
-    },
-    {
-        //Disabled until errors are fixed
-        //'Microsoft.BotService/preview/2023-09-15-preview/botservice.json:3492:5' - TypeError: Cannot convert undefined or null to object
-        basePath: 'botservice/resource-manager/Microsoft.BotService/BotService',
-        namespace: 'preview',
-        disabledForAutogen: true,
-    },
-    {
-        //Disabled until errors are fixed
-        //'Microsoft.BotService/preview/2023-09-15-preview/botservice.json:3492:5' - TypeError: Cannot convert undefined or null to object
-        basePath: 'botservice/resource-manager/Microsoft.BotService/BotService',
-        namespace: 'stable',
+        namespace: 'Microsoft.BotService',
+        useNamespaceFromConfig: true,
         disabledForAutogen: true,
     },
     {
@@ -129,14 +106,8 @@ const disabledProviders: AutoGenConfig[] = [
         //Disabled until errors are fixed
         //Password is not a valid format for type array
         basePath: 'redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise',
-        namespace: 'preview',
-        disabledForAutogen: true,
-    },
-    {
-        //Disabled until errors are fixed
-        //Password is not a valid format for type array
-        basePath: 'redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise',
-        namespace: 'stable',
+        namespace: 'Microsoft.Cache',
+        useNamespaceFromConfig: true,
         disabledForAutogen: true,
     },
     {

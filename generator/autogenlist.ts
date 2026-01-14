@@ -1635,8 +1635,8 @@ export async function findOrGenerateAutogenEntries(basePath: string, readme: str
             return providerPart || null;
         };
 
-        // Helper function to extract suffix from basePath (the subfolder after the provider namespace)
-        const extractSuffix = (path: string, providerNamespace: string): string | null => {
+        // Helper function to extract child namespace (subfolder) from basePath
+        const extractChildNamespace = (path: string, providerNamespace: string): string | null => {
             const parts = path.split('/');
             const providerIndex = parts.findIndex(p => lowerCaseEquals(p, providerNamespace));
             if (providerIndex >= 0 && providerIndex < parts.length - 1) {
@@ -1649,16 +1649,35 @@ export async function findOrGenerateAutogenEntries(basePath: string, readme: str
         const actualNamespace = extractProviderNamespace(basePath);
         
         if (actualNamespace) {
-            // Always add suffix for new-style paths with subfolders after provider namespace
-            // This prevents conflicts and clearly identifies the subfolder origin
-            const suffix = extractSuffix(basePath, actualNamespace);
+            const childNamespace = extractChildNamespace(basePath, actualNamespace);
             
-            // New structure: auto-generate with extracted provider namespace
-            entries.push({
-                basePath,
-                namespace: actualNamespace,
-                ...(suffix && { suffix }), // Only add suffix if there's a conflict
-            });
+            if (childNamespace) {
+                // Check if child namespace matches parent's last segment (e.g., Microsoft.Cdn -> Cdn)
+                const parentLastSegment = actualNamespace.split('.').pop()?.toLowerCase();
+                const childLower = childNamespace.toLowerCase();
+                
+                if (parentLastSegment && lowerCaseEquals(parentLastSegment, childLower)) {
+                    // Matching child becomes the primary (no suffix) - overwrites old file
+                    entries.push({
+                        basePath,
+                        namespace: actualNamespace,
+                        // No suffix - this will write to Microsoft.Cdn.json (overwrites old)
+                    });
+                } else {
+                    // Non-matching child gets suffixed
+                    entries.push({
+                        basePath,
+                        namespace: actualNamespace,
+                        suffix: childNamespace, // e.g., FrontDoor, EdgeOrder
+                    });
+                }
+            } else {
+                // No child namespace detected, use parent without suffix
+                entries.push({
+                    basePath,
+                    namespace: actualNamespace,
+                });
+            }
         } else {
             // Fallback to old structure, with logging
             console.warn(`⚠️  Unable to auto-generate config for old basePath structure: ${basePath}. Consider adding explicit entry to autogenlist.ts`);

@@ -27,6 +27,7 @@ const disabledProviders: AutoGenConfig[] = [
         // Need to be very careful - Microsoft.Logic are heavily dependent on Export Template, and are sensitive to properties being removed unintentionally
         basePath: 'logic/resource-manager/Microsoft.Logic/Logic',
         namespace: 'Microsoft.Logic',
+        useNamespaceFromConfig: true,
         disabledForAutogen: true,
     },
     {

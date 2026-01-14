@@ -25,7 +25,7 @@ import { detectProviderNamespaces } from './generate';
 const disabledProviders: AutoGenConfig[] = [
     {
         // Need to be very careful - Microsoft.Logic are heavily dependent on Export Template, and are sensitive to properties being removed unintentionally
-        basePath: 'logic/resource-manager',
+        basePath: 'logic/resource-manager/Microsoft.Logic/Logic',
         namespace: 'Microsoft.Logic',
         disabledForAutogen: true,
     },
@@ -35,12 +35,6 @@ const disabledProviders: AutoGenConfig[] = [
         namespace: 'Microsoft.Network',
         postProcessor: networkPostProcessor,
         suffix: 'NRP',
-        disabledForAutogen: true,
-    },
-    {
-        // Duplicated under 'containerservice/resource-manager/Microsoft.ContainerService/aks'
-        basePath: 'compute/resource-manager',
-        namespace: 'Microsoft.ContainerService',
         disabledForAutogen: true,
     },
     {
@@ -1236,6 +1230,12 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'storage/resource-manager',
         namespace: 'Microsoft.Storage',
         postProcessor: storageProcessor,
+    },
+    {
+        basePath: 'compute/resource-manager',
+        namespace: 'Microsoft.Compute',
+        useNamespaceFromConfig: true,
+        postProcessor: computeProcessor
     },
     {
         basePath: 'compute/resource-manager/Microsoft.Compute/RecommenderRP',

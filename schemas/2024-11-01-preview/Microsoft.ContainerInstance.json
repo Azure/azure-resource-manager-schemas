@@ -355,6 +355,27 @@
       },
       "type": "object"
     },
+    "ConfigMap": {
+      "description": "The container config map.",
+      "properties": {
+        "keyValuePairs": {
+          "description": "The key value pairs dictionary in the config map.",
+          "oneOf": [
+            {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {},
+              "type": "object"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
     "Container": {
       "description": "A container instance.",
       "properties": {
@@ -588,20 +609,6 @@
             }
           ]
         },
-        "registeredRevisions": {
-          "description": "Registered revisions are calculated at request time based off the records in the table logs.",
-          "oneOf": [
-            {
-              "items": {
-                "type": "integer"
-              },
-              "type": "array"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
         "restartPolicy": {
           "description": "Restart policy for all containers within the container group. \n- `Always` Always restart\n- `OnFailure` Restart on failure\n- `Never` Never restart\n",
           "oneOf": [
@@ -612,17 +619,6 @@
                 "Never"
               ],
               "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "revision": {
-          "description": "Container group profile current revision number",
-          "oneOf": [
-            {
-              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -686,6 +682,31 @@
                 "$ref": "#/definitions/Volume"
               },
               "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "containers",
+        "osType"
+      ],
+      "type": "object"
+    },
+    "ContainerGroupProfileReferenceDefinition": {
+      "description": "The container group profile reference.",
+      "properties": {
+        "id": {
+          "description": "The container group profile reference id.This will be an ARM resource id in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerInstance/containerGroupProfiles/{containerGroupProfileName}'.",
+          "type": "string"
+        },
+        "revision": {
+          "description": "The container group profile reference revision.",
+          "oneOf": [
+            {
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -764,6 +785,17 @@
           "oneOf": [
             {
               "$ref": "#/definitions/ConfidentialComputeProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "containerGroupProfile": {
+          "description": "The reference container group profile properties.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ContainerGroupProfileReferenceDefinition"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -958,6 +990,17 @@
             }
           ]
         },
+        "standbyPoolProfile": {
+          "description": "The reference standby pool profile properties.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/StandbyPoolProfileDefinition"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
         "subnetIds": {
           "description": "The subnet resource IDs for a container group.",
           "oneOf": [
@@ -988,8 +1031,7 @@
         }
       },
       "required": [
-        "containers",
-        "osType"
+        "containers"
       ],
       "type": "object"
     },
@@ -1198,6 +1240,17 @@
             }
           ]
         },
+        "configMap": {
+          "description": "The config map.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ConfigMap"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
         "environmentVariables": {
           "description": "The environment variables to set in the container instance.",
           "oneOf": [
@@ -1289,10 +1342,6 @@
           ]
         }
       },
-      "required": [
-        "image",
-        "resources"
-      ],
       "type": "object"
     },
     "DeploymentExtensionSpec": {
@@ -2483,6 +2532,27 @@
         },
         "seccompProfile": {
           "description": "a base64 encoded string containing the contents of the JSON in the seccomp profile",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "StandbyPoolProfileDefinition": {
+      "description": "The standby pool profile reference.",
+      "properties": {
+        "failContainerGroupCreateOnReuseFailure": {
+          "description": "The flag to determine whether ACI should fail the create request if the container group can not be obtained from standby pool.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "id": {
+          "description": "The standby pool profile reference id.This will be an ARM resource id in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StandbyPool/standbyContainerGroupPools/{standbyPoolName}'.",
           "type": "string"
         }
       },

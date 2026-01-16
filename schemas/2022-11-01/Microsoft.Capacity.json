@@ -5,35 +5,40 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "tenant_resourceDefinitions": {
     "reservationOrders": {
-      "description": "Microsoft.Capacity/reservationOrders",
+      "type": "object",
       "properties": {
         "apiVersion": {
+          "type": "string",
           "enum": [
             "2022-11-01"
-          ],
-          "type": "string"
-        },
-        "location": {
-          "description": "The Azure region where the reserved resource lives.",
-          "type": "string"
+          ]
         },
         "name": {
-          "description": "Order Id of the reservation",
-          "type": "string"
+          "type": "string",
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Capacity/reservationOrders"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "The Azure region where the reserved resource lives."
         },
         "properties": {
-          "description": "Properties of reservation purchase request",
           "oneOf": [
             {
-              "$ref": "#/definitions/PurchaseRequestProperties"
+              "$ref": "#/definitions/PurchaseRequestPropertiesOrReservationOrderProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Properties of reservation purchase request"
         },
         "sku": {
-          "description": "The name of sku",
           "oneOf": [
             {
               "$ref": "#/definitions/SkuName"
@@ -41,56 +46,88 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.Capacity/reservationOrders"
           ],
-          "type": "string"
+          "description": "The name of sku"
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/reservationOrders_reservations_childResource"
+              }
+            ]
+          }
         }
       },
       "required": [
         "name",
-        "properties",
+        "apiVersion",
+        "type",
+        "properties"
+      ],
+      "description": "Microsoft.Capacity/reservationOrders"
+    }
+  },
+  "unknown_resourceDefinitions": {
+    "reservationOrders_reservations": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2022-11-01"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Capacity/reservationOrders/reservations"
+          ]
+        }
+      },
+      "required": [
+        "name",
         "apiVersion",
         "type"
       ],
-      "type": "object"
+      "description": "Microsoft.Capacity/reservationOrders/reservations"
     }
   },
   "definitions": {
     "AppliedScopeProperties": {
-      "description": "Properties specific to applied scope type. Not required if not applicable. Required and need to provide tenantId and managementGroupId if AppliedScopeType is ManagementGroup",
+      "type": "object",
       "properties": {
         "displayName": {
-          "description": "Display name",
-          "type": "string"
+          "type": "string",
+          "description": "Display name"
         },
         "managementGroupId": {
-          "description": "Fully-qualified identifier of the management group where the benefit must be applied.",
-          "type": "string"
+          "type": "string",
+          "description": "Fully-qualified identifier of the management group where the benefit must be applied."
         },
         "resourceGroupId": {
-          "description": "Fully-qualified identifier of the resource group.",
-          "type": "string"
+          "type": "string",
+          "description": "Fully-qualified identifier of the resource group."
         },
         "subscriptionId": {
-          "description": "Fully-qualified identifier of the subscription.",
-          "type": "string"
+          "type": "string",
+          "description": "Fully-qualified identifier of the subscription."
         },
         "tenantId": {
-          "description": "Tenant ID where the savings plan should apply benefit.",
-          "type": "string"
+          "type": "string",
+          "description": "Tenant ID where the savings plan should apply benefit."
         }
-      },
-      "type": "object"
+      }
     },
-    "PurchaseRequestProperties": {
-      "description": "Properties of reservation purchase request",
+    "PurchaseRequestPropertiesOrReservationOrderProperties": {
+      "type": "object",
       "properties": {
         "appliedScopeProperties": {
-          "description": "Properties specific to applied scope type. Not required if not applicable. Required and need to provide tenantId and managementGroupId if AppliedScopeType is ManagementGroup",
           "oneOf": [
             {
               "$ref": "#/definitions/AppliedScopeProperties"
@@ -98,63 +135,63 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Properties specific to applied scope type. Not required if not applicable. Required and need to provide tenantId and managementGroupId if AppliedScopeType is ManagementGroup"
         },
-        "appliedScopeType": {
-          "description": "Type of the Applied Scope.",
+        "appliedScopes": {
           "oneOf": [
             {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of the subscriptions that the benefit will be applied. Do not specify if AppliedScopeType is Shared. This property will be deprecated and replaced by appliedScopeProperties instead for Single AppliedScopeType."
+        },
+        "appliedScopeType": {
+          "oneOf": [
+            {
+              "type": "string",
               "enum": [
                 "Single",
                 "Shared",
                 "ManagementGroup"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
-        },
-        "appliedScopes": {
-          "description": "List of the subscriptions that the benefit will be applied. Do not specify if AppliedScopeType is Shared. This property will be deprecated and replaced by appliedScopeProperties instead for Single AppliedScopeType.",
-          "oneOf": [
-            {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
+          ],
+          "description": "Type of the Applied Scope."
         },
         "billingPlan": {
-          "description": "Represent the billing plans.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "Upfront",
                 "Monthly"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Represent the billing plans."
         },
         "billingScopeId": {
-          "description": "Subscription that will be charged for purchasing reservation or savings plan",
-          "type": "string"
+          "type": "string",
+          "description": "Subscription that will be charged for purchasing reservation or savings plan"
         },
         "displayName": {
-          "description": "Friendly name of the reservation",
-          "type": "string"
+          "type": "string",
+          "description": "Friendly name of the reservation"
         },
         "quantity": {
-          "description": "Quantity of the skus that are part of the reservation.",
           "oneOf": [
             {
               "type": "integer"
@@ -162,22 +199,21 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Quantity of the skus that are part of the reservation."
         },
         "renew": {
-          "description": "Setting this to true will automatically purchase a new reservation on the expiration date time.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Setting this to true will automatically purchase a new reservation on the expiration date time."
         },
         "reservedResourceProperties": {
-          "description": "Properties specific to each reserved resource type. Not required if not applicable.",
           "oneOf": [
             {
               "$ref": "#/definitions/PurchaseRequestPropertiesReservedResourceProperties"
@@ -185,12 +221,13 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Properties specific to each reserved resource type. Not required if not applicable."
         },
         "reservedResourceType": {
-          "description": "The type of the resource that is being reserved. In addition to below types we have also added the following: OpenAIPTU, MDC, Sentinel.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "VirtualMachines",
                 "SqlDatabases",
@@ -218,67 +255,90 @@
                 "AzureFiles",
                 "SqlEdge",
                 "VirtualMachineSoftware"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The type of the resource that is being reserved. In addition to below types we have also added the following: OpenAIPTU, MDC, Sentinel."
         },
         "reviewDateTime": {
-          "description": "This is the date-time when the Azure hybrid benefit needs to be reviewed.",
-          "format": "date-time",
-          "type": "string"
+          "type": "string",
+          "description": "This is the date-time when the Azure hybrid benefit needs to be reviewed."
         },
         "term": {
-          "description": "Represent the term of reservation.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "P1Y",
                 "P3Y",
                 "P5Y"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Represent the term of reservation."
         }
-      },
-      "type": "object"
+      }
     },
     "PurchaseRequestPropertiesReservedResourceProperties": {
-      "description": "Properties specific to each reserved resource type. Not required if not applicable.",
+      "type": "object",
       "properties": {
         "instanceFlexibility": {
-          "description": "Turning this on will apply the reservation discount to other VMs in the same VM size group. Only specify for VirtualMachines reserved resource type.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "On",
                 "Off"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Turning this on will apply the reservation discount to other VMs in the same VM size group. Only specify for VirtualMachines reserved resource type."
         }
-      },
-      "type": "object"
+      }
     },
     "SkuName": {
-      "description": "The name of sku",
+      "type": "object",
       "properties": {
         "name": {
           "type": "string"
         }
+      }
+    },
+    "reservationOrders_reservations_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2022-11-01"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "reservations"
+          ]
+        }
       },
-      "type": "object"
+      "required": [
+        "name",
+        "apiVersion",
+        "type"
+      ],
+      "description": "Microsoft.Capacity/reservationOrders/reservations"
     }
   }
 }

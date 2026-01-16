@@ -5,16 +5,33 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "resourceDefinitions": {
     "scheduledQueryRules": {
-      "description": "Microsoft.Insights/scheduledQueryRules",
+      "type": "object",
       "properties": {
         "apiVersion": {
+          "type": "string",
           "enum": [
             "2023-12-01"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[^#<>%&:\\?/{}*]{1,260}$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
           ],
-          "type": "string"
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Insights/scheduledQueryRules"
+          ]
         },
         "identity": {
-          "description": "The identity of the resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/Identity"
@@ -22,41 +39,29 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The identity of the resource."
         },
         "kind": {
-          "description": "Indicates the type of scheduled query rule. The default is LogAlert.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "LogAlert",
                 "LogToMetric"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Indicates the type of scheduled query rule. The default is LogAlert."
         },
         "location": {
-          "description": "The geo-location where the resource lives",
-          "type": "string"
-        },
-        "name": {
-          "description": "The name of the rule.",
-          "oneOf": [
-            {
-              "pattern": "^[^#<>%&:\\?/{}*]{1,260}$",
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
+          "type": "string",
+          "description": "The geo-location where the resource lives"
         },
         "properties": {
-          "description": "The rule properties of the resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/ScheduledQueryRuleProperties"
@@ -64,109 +69,105 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The rule properties of the resource."
         },
         "tags": {
-          "description": "Resource tags.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/ScheduledQueryRuleResourceTags"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.Insights/scheduledQueryRules"
           ],
-          "type": "string"
+          "description": "Resource tags."
         }
       },
       "required": [
         "name",
-        "properties",
         "apiVersion",
-        "type"
+        "type",
+        "location",
+        "properties"
       ],
-      "type": "object"
+      "description": "Microsoft.Insights/scheduledQueryRules"
     }
   },
   "definitions": {
     "Actions": {
-      "description": "Actions to invoke when the alert fires.",
+      "type": "object",
       "properties": {
         "actionGroups": {
-          "description": "Action Group resource Ids to invoke when the alert fires.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "type": "string"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Action Group resource Ids to invoke when the alert fires."
         },
         "actionProperties": {
-          "description": "The properties of an action properties.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/ActionsActionProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The properties of an action properties."
         },
         "customProperties": {
-          "description": "The properties of an alert payload.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/ActionsCustomProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The properties of an alert payload."
         }
-      },
-      "type": "object"
+      }
+    },
+    "ActionsActionProperties": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "ActionsCustomProperties": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "Condition": {
-      "description": "A condition of the scheduled query rule.",
+      "type": "object",
       "properties": {
         "dimensions": {
-          "description": "List of Dimensions conditions",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/Dimension"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "List of Dimensions conditions"
         },
         "failingPeriods": {
-          "description": "The minimum number of violations required within the selected lookback time window required to raise an alert. Relevant only for rules of the kind LogAlert.",
           "oneOf": [
             {
               "$ref": "#/definitions/ConditionFailingPeriods"
@@ -174,193 +175,190 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The minimum number of violations required within the selected lookback time window required to raise an alert. Relevant only for rules of the kind LogAlert."
         },
         "metricMeasureColumn": {
-          "description": "The column containing the metric measure number. Relevant only for rules of the kind LogAlert.",
-          "type": "string"
+          "type": "string",
+          "description": "The column containing the metric measure number. Relevant only for rules of the kind LogAlert."
         },
         "metricName": {
-          "description": "The name of the metric to be sent. Relevant and required only for rules of the kind LogToMetric.",
-          "type": "string"
+          "type": "string",
+          "description": "The name of the metric to be sent. Relevant and required only for rules of the kind LogToMetric."
         },
         "operator": {
-          "description": "The criteria operator. Relevant and required only for rules of the kind LogAlert.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "Equals",
                 "GreaterThan",
                 "GreaterThanOrEqual",
                 "LessThan",
                 "LessThanOrEqual"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The criteria operator. Relevant and required only for rules of the kind LogAlert."
         },
         "query": {
-          "description": "Log query alert",
-          "type": "string"
+          "type": "string",
+          "description": "Log query alert"
         },
         "resourceIdColumn": {
-          "description": "The column containing the resource id. The content of the column must be a uri formatted as resource id. Relevant only for rules of the kind LogAlert.",
-          "type": "string"
+          "type": "string",
+          "description": "The column containing the resource id. The content of the column must be a uri formatted as resource id. Relevant only for rules of the kind LogAlert."
         },
         "threshold": {
-          "description": "the criteria threshold value that activates the alert. Relevant and required only for rules of the kind LogAlert.",
           "oneOf": [
             {
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "the criteria threshold value that activates the alert. Relevant and required only for rules of the kind LogAlert."
         },
         "timeAggregation": {
-          "description": "Aggregation type. Relevant and required only for rules of the kind LogAlert.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "Count",
                 "Average",
                 "Minimum",
                 "Maximum",
                 "Total"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Aggregation type. Relevant and required only for rules of the kind LogAlert."
         }
-      },
-      "type": "object"
+      }
     },
     "ConditionFailingPeriods": {
-      "description": "The minimum number of violations required within the selected lookback time window required to raise an alert. Relevant only for rules of the kind LogAlert.",
+      "type": "object",
       "properties": {
         "minFailingPeriodsToAlert": {
-          "description": "The number of violations to trigger an alert. Should be smaller or equal to numberOfEvaluationPeriods. Default value is 1",
           "oneOf": [
             {
-              "default": 1,
               "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The number of violations to trigger an alert. Should be smaller or equal to numberOfEvaluationPeriods. Default value is 1"
         },
         "numberOfEvaluationPeriods": {
-          "description": "The number of aggregated lookback points. The lookback time window is calculated based on the aggregation granularity (windowSize) and the selected number of aggregated points. Default value is 1",
           "oneOf": [
             {
-              "default": 1,
               "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The number of aggregated lookback points. The lookback time window is calculated based on the aggregation granularity (windowSize) and the selected number of aggregated points. Default value is 1"
         }
-      },
-      "type": "object"
+      }
     },
     "Dimension": {
-      "description": "Dimension splitting and filtering definition",
+      "type": "object",
       "properties": {
         "name": {
-          "description": "Name of the dimension",
-          "type": "string"
+          "type": "string",
+          "description": "Name of the dimension"
         },
         "operator": {
-          "description": "Operator for dimension values",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "Include",
                 "Exclude"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Operator for dimension values"
         },
         "values": {
-          "description": "List of dimension values",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "type": "string"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "List of dimension values"
         }
       },
       "required": [
         "name",
         "operator",
         "values"
-      ],
-      "type": "object"
+      ]
     },
     "Identity": {
-      "description": "Identity for the resource.",
+      "type": "object",
       "properties": {
         "type": {
-          "description": "Type of managed service identity.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "SystemAssigned",
                 "UserAssigned",
                 "None"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Type of managed service identity."
         },
         "userAssignedIdentities": {
-          "description": "The list of user identities associated with the resource. The user identity dictionary key references will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}'.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "$ref": "#/definitions/UserIdentityProperties"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/IdentityUserAssignedIdentities"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The list of user identities associated with the resource. The user identity dictionary key references will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}'."
         }
       },
       "required": [
         "type"
-      ],
-      "type": "object"
+      ]
+    },
+    "IdentityUserAssignedIdentities": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "$ref": "#/definitions/UserIdentityProperties"
+      }
     },
     "RuleResolveConfiguration": {
-      "description": "TBD. Relevant only for rules of the kind LogAlert.",
+      "type": "object",
       "properties": {
         "autoResolved": {
-          "description": "The flag that indicates whether or not to auto resolve a fired alert.",
           "oneOf": [
             {
               "type": "boolean"
@@ -368,40 +366,38 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The flag that indicates whether or not to auto resolve a fired alert."
         },
         "timeToResolve": {
-          "description": "The duration a rule must evaluate as healthy before the fired alert is automatically resolved represented in ISO 8601 duration format.",
-          "type": "string"
+          "type": "string",
+          "description": "The duration a rule must evaluate as healthy before the fired alert is automatically resolved represented in ISO 8601 duration format."
         }
-      },
-      "type": "object"
+      }
     },
     "ScheduledQueryRuleCriteria": {
-      "description": "The rule criteria that defines the conditions of the scheduled query rule.",
+      "type": "object",
       "properties": {
         "allOf": {
-          "description": "A list of conditions to evaluate against the specified scopes",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/Condition"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "A list of conditions to evaluate against the specified scopes"
         }
-      },
-      "type": "object"
+      }
     },
     "ScheduledQueryRuleProperties": {
-      "description": "scheduled query rule Definition",
+      "type": "object",
       "properties": {
         "actions": {
-          "description": "Actions to invoke when the alert fires.",
           "oneOf": [
             {
               "$ref": "#/definitions/Actions"
@@ -409,10 +405,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Actions to invoke when the alert fires."
         },
         "autoMitigate": {
-          "description": "The flag that indicates whether the alert should be automatically resolved or not. The default is true. Relevant only for rules of the kind LogAlert.",
           "oneOf": [
             {
               "type": "boolean"
@@ -420,10 +416,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The flag that indicates whether the alert should be automatically resolved or not. The default is true. Relevant only for rules of the kind LogAlert."
         },
         "checkWorkspaceAlertsStorageConfigured": {
-          "description": "The flag which indicates whether this scheduled query rule should be stored in the customer's storage. The default is false. Relevant only for rules of the kind LogAlert.",
           "oneOf": [
             {
               "type": "boolean"
@@ -431,10 +427,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The flag which indicates whether this scheduled query rule should be stored in the customer's storage. The default is false. Relevant only for rules of the kind LogAlert."
         },
         "criteria": {
-          "description": "The rule criteria that defines the conditions of the scheduled query rule.",
           "oneOf": [
             {
               "$ref": "#/definitions/ScheduledQueryRuleCriteria"
@@ -442,18 +438,18 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The rule criteria that defines the conditions of the scheduled query rule."
         },
         "description": {
-          "description": "The description of the scheduled query rule.",
-          "type": "string"
+          "type": "string",
+          "description": "The description of the scheduled query rule."
         },
         "displayName": {
-          "description": "The display name of the alert rule",
-          "type": "string"
+          "type": "string",
+          "description": "The display name of the alert rule"
         },
         "enabled": {
-          "description": "The flag which indicates whether this scheduled query rule is enabled. Value should be true or false",
           "oneOf": [
             {
               "type": "boolean"
@@ -461,22 +457,22 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The flag which indicates whether this scheduled query rule is enabled. Value should be true or false"
         },
         "evaluationFrequency": {
-          "description": "How often the scheduled query rule is evaluated represented in ISO 8601 duration format. Relevant and required only for rules of the kind LogAlert.",
-          "type": "string"
+          "type": "string",
+          "description": "How often the scheduled query rule is evaluated represented in ISO 8601 duration format. Relevant and required only for rules of the kind LogAlert."
         },
         "muteActionsDuration": {
-          "description": "Mute actions for the chosen period of time (in ISO 8601 duration format) after the alert is fired. Relevant only for rules of the kind LogAlert.",
-          "type": "string"
+          "type": "string",
+          "description": "Mute actions for the chosen period of time (in ISO 8601 duration format) after the alert is fired. Relevant only for rules of the kind LogAlert."
         },
         "overrideQueryTimeRange": {
-          "description": "If specified then overrides the query time range (default is WindowSize*NumberOfEvaluationPeriods). Relevant only for rules of the kind LogAlert.",
-          "type": "string"
+          "type": "string",
+          "description": "If specified then overrides the query time range (default is WindowSize*NumberOfEvaluationPeriods). Relevant only for rules of the kind LogAlert."
         },
         "resolveConfiguration": {
-          "description": "Defines the configuration for resolving fired alerts. Relevant only for rules of the kind LogAlert.",
           "oneOf": [
             {
               "$ref": "#/definitions/RuleResolveConfiguration"
@@ -484,42 +480,35 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Defines the configuration for resolving fired alerts. Relevant only for rules of the kind LogAlert."
         },
         "scopes": {
-          "description": "The list of resource id's that this scheduled query rule is scoped to.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "type": "string"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The list of resource id's that this scheduled query rule is scoped to."
         },
         "severity": {
-          "description": "Severity of the alert. Should be an integer between [0-4]. Value of 0 is severest. Relevant and required only for rules of the kind LogAlert.",
           "oneOf": [
             {
-              "oneOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Severity of the alert. Should be an integer between [0-4]. Value of 0 is severest. Relevant and required only for rules of the kind LogAlert."
         },
         "skipQueryValidation": {
-          "description": "The flag which indicates whether the provided query should be validated or not. The default is false. Relevant only for rules of the kind LogAlert.",
           "oneOf": [
             {
               "type": "boolean"
@@ -527,33 +516,39 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The flag which indicates whether the provided query should be validated or not. The default is false. Relevant only for rules of the kind LogAlert."
         },
         "targetResourceTypes": {
-          "description": "List of resource type of the target resource(s) on which the alert is created/updated. For example if the scope is a resource group and targetResourceTypes is Microsoft.Compute/virtualMachines, then a different alert will be fired for each virtual machine in the resource group which meet the alert criteria. Relevant only for rules of the kind LogAlert",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "type": "string"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "List of resource type of the target resource(s) on which the alert is created/updated. For example if the scope is a resource group and targetResourceTypes is Microsoft.Compute/virtualMachines, then a different alert will be fired for each virtual machine in the resource group which meet the alert criteria. Relevant only for rules of the kind LogAlert"
         },
         "windowSize": {
-          "description": "The period of time (in ISO 8601 duration format) on which the Alert query will be executed (bin size). Relevant and required only for rules of the kind LogAlert.",
-          "type": "string"
+          "type": "string",
+          "description": "The period of time (in ISO 8601 duration format) on which the Alert query will be executed (bin size). Relevant and required only for rules of the kind LogAlert."
         }
-      },
-      "type": "object"
+      }
+    },
+    "ScheduledQueryRuleResourceTags": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "UserIdentityProperties": {
-      "description": "User assigned identity properties.",
-      "properties": {},
-      "type": "object"
+      "type": "object",
+      "properties": {}
     }
   }
 }

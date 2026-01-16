@@ -3,100 +3,35 @@
   "title": "Microsoft.Security",
   "description": "Microsoft Security Resource Types",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "resourceDefinitions": {
-    "automations": {
-      "description": "Microsoft.Security/automations",
-      "properties": {
-        "apiVersion": {
-          "enum": [
-            "2023-12-01-preview"
-          ],
-          "type": "string"
-        },
-        "etag": {
-          "description": "Entity tag is used for comparing two or more entities from the same requested resource.",
-          "type": "string"
-        },
-        "kind": {
-          "description": "Kind of the resource",
-          "type": "string"
-        },
-        "location": {
-          "description": "Location where the resource is stored",
-          "type": "string"
-        },
-        "name": {
-          "description": "The security automation name.",
-          "type": "string"
-        },
-        "properties": {
-          "description": "Security automation data",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/AutomationProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "tags": {
-          "description": "A list of key value pairs that describe the resource.",
-          "oneOf": [
-            {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.Security/automations"
-          ],
-          "type": "string"
-        }
-      },
-      "required": [
-        "name",
-        "properties",
-        "apiVersion",
-        "type"
-      ],
-      "type": "object"
-    }
-  },
   "subscription_resourceDefinitions": {
     "securityContacts": {
-      "description": "Microsoft.Security/securityContacts",
+      "type": "object",
       "properties": {
         "apiVersion": {
+          "type": "string",
           "enum": [
             "2023-12-01-preview"
-          ],
-          "type": "string"
+          ]
         },
         "name": {
-          "description": "Name of the security contact object",
           "oneOf": [
             {
-              "enum": [
-                "default"
-              ],
-              "type": "string"
+              "type": "string",
+              "pattern": "^.*/default$"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
+          ],
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Security/securityContacts"
           ]
         },
         "properties": {
-          "description": "Security contact data",
           "oneOf": [
             {
               "$ref": "#/definitions/SecurityContactProperties"
@@ -104,131 +39,189 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.Security/securityContacts"
           ],
-          "type": "string"
+          "description": "Security contact data"
         }
       },
       "required": [
         "name",
-        "properties",
         "apiVersion",
-        "type"
+        "type",
+        "properties"
       ],
-      "type": "object"
+      "description": "Microsoft.Security/securityContacts"
+    }
+  },
+  "resourceDefinitions": {
+    "automations": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2023-12-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Security/automations"
+          ]
+        },
+        "etag": {
+          "type": "string",
+          "description": "Entity tag is used for comparing two or more entities from the same requested resource."
+        },
+        "kind": {
+          "type": "string",
+          "description": "Kind of the resource"
+        },
+        "location": {
+          "type": "string",
+          "description": "Location where the resource is stored"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AutomationProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Security automation data"
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Tags"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A list of key value pairs that describe the resource."
+        }
+      },
+      "required": [
+        "name",
+        "apiVersion",
+        "type",
+        "properties"
+      ],
+      "description": "Microsoft.Security/automations"
     }
   },
   "definitions": {
     "AutomationAction": {
-      "description": "The action that should be triggered.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "The target Event Hub to which event data will be exported. To learn more about Microsoft Defender for Cloud continuous export capabilities, visit https://aka.ms/ASCExportLearnMore",
+          "type": "object",
           "properties": {
             "actionType": {
+              "type": "string",
               "enum": [
-                "EventHub"
-              ],
-              "type": "string"
-            },
-            "connectionString": {
-              "description": "The target Event Hub connection string (it will not be included in any response).",
-              "type": "string"
-            },
-            "eventHubResourceId": {
-              "description": "The target Event Hub Azure Resource ID.",
-              "type": "string"
-            },
-            "isTrustedServiceEnabled": {
-              "description": "Indicates whether the trusted service is enabled or not.",
-              "oneOf": [
-                {
-                  "type": "boolean"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
+                "EventHub",
+                "LogicApp",
+                "Workspace"
               ]
             }
           },
           "required": [
             "actionType"
           ],
-          "type": "object"
+          "additionalProperties": false
         },
         {
-          "description": "The logic app action that should be triggered. To learn more about Microsoft Defender for Cloud's Workflow Automation capabilities, visit https://aka.ms/ASCWorkflowAutomationLearnMore",
-          "properties": {
-            "actionType": {
-              "enum": [
-                "LogicApp"
-              ],
-              "type": "string"
-            },
-            "logicAppResourceId": {
-              "description": "The triggered Logic App Azure Resource ID. This can also reside on other subscriptions, given that you have permissions to trigger the Logic App",
-              "type": "string"
-            },
-            "uri": {
-              "description": "The Logic App trigger URI endpoint (it will not be included in any response).",
-              "type": "string"
-            }
-          },
-          "required": [
-            "actionType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "The Log Analytics Workspace to which event data will be exported. Security alerts data will reside in the 'SecurityAlert' table and the assessments data will reside in the 'SecurityRecommendation' table (under the 'Security'/'SecurityCenterFree' solutions). Note that in order to view the data in the workspace, the Security Center Log Analytics free/standard solution needs to be enabled on that workspace. To learn more about Microsoft Defender for Cloud continuous export capabilities, visit https://aka.ms/ASCExportLearnMore",
-          "properties": {
-            "actionType": {
-              "enum": [
-                "Workspace"
-              ],
-              "type": "string"
-            },
-            "workspaceResourceId": {
-              "description": "The fully qualified Log Analytics Workspace Azure Resource ID.",
-              "type": "string"
-            }
-          },
-          "required": [
-            "actionType"
-          ],
-          "type": "object"
-        }
-      ],
-      "properties": {},
-      "type": "object"
-    },
-    "AutomationProperties": {
-      "description": "A set of properties that defines the behavior of the automation configuration. To learn more about the supported security events data models schemas - please visit https://aka.ms/ASCAutomationSchemas.",
-      "properties": {
-        "actions": {
-          "description": "A collection of the actions which are triggered if all the configured rules evaluations, within at least one rule set, are true.",
           "oneOf": [
             {
-              "items": {
-                "$ref": "#/definitions/AutomationAction"
-              },
-              "type": "array"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/AutomationActionEventHub"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "actionType": {
+                      "const": "EventHub"
+                    }
+                  },
+                  "required": [
+                    "actionType"
+                  ]
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/AutomationActionLogicApp"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "actionType": {
+                      "const": "LogicApp"
+                    }
+                  },
+                  "required": [
+                    "actionType"
+                  ]
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/AutomationActionWorkspace"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "actionType": {
+                      "const": "Workspace"
+                    }
+                  },
+                  "required": [
+                    "actionType"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "AutomationActionEventHub": {
+      "type": "object",
+      "properties": {
+        "actionType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "EventHub"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The type of the action that will be triggered by the Automation"
         },
-        "description": {
-          "description": "The security automation description.",
-          "type": "string"
+        "connectionString": {
+          "type": "string",
+          "description": "The target Event Hub connection string (it will not be included in any response)."
         },
-        "isEnabled": {
-          "description": "Indicates whether the security automation is enabled.",
+        "eventHubResourceId": {
+          "type": "string",
+          "description": "The target Event Hub Azure Resource ID."
+        },
+        "isTrustedServiceEnabled": {
           "oneOf": [
             {
               "type": "boolean"
@@ -236,80 +229,170 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Indicates whether the trusted service is enabled or not."
+        }
+      },
+      "required": [
+        "actionType"
+      ]
+    },
+    "AutomationActionLogicApp": {
+      "type": "object",
+      "properties": {
+        "actionType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "LogicApp"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The type of the action that will be triggered by the Automation"
+        },
+        "logicAppResourceId": {
+          "type": "string",
+          "description": "The triggered Logic App Azure Resource ID. This can also reside on other subscriptions, given that you have permissions to trigger the Logic App"
+        },
+        "uri": {
+          "type": "string",
+          "description": "The Logic App trigger URI endpoint (it will not be included in any response)."
+        }
+      },
+      "required": [
+        "actionType"
+      ]
+    },
+    "AutomationActionWorkspace": {
+      "type": "object",
+      "properties": {
+        "actionType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Workspace"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The type of the action that will be triggered by the Automation"
+        },
+        "workspaceResourceId": {
+          "type": "string",
+          "description": "The fully qualified Log Analytics Workspace Azure Resource ID."
+        }
+      },
+      "required": [
+        "actionType"
+      ]
+    },
+    "AutomationProperties": {
+      "type": "object",
+      "properties": {
+        "actions": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AutomationAction"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A collection of the actions which are triggered if all the configured rules evaluations, within at least one rule set, are true."
+        },
+        "description": {
+          "type": "string",
+          "description": "The security automation description."
+        },
+        "isEnabled": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Indicates whether the security automation is enabled."
         },
         "scopes": {
-          "description": "A collection of scopes on which the security automations logic is applied. Supported scopes are the subscription itself or a resource group under that subscription. The automation will only apply on defined scopes.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/AutomationScope"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "A collection of scopes on which the security automations logic is applied. Supported scopes are the subscription itself or a resource group under that subscription. The automation will only apply on defined scopes."
         },
         "sources": {
-          "description": "A collection of the source event types which evaluate the security automation set of rules.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/AutomationSource"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "A collection of the source event types which evaluate the security automation set of rules."
         }
-      },
-      "type": "object"
+      }
     },
     "AutomationRuleSet": {
-      "description": "A rule set which evaluates all its rules upon an event interception. Only when all the included rules in the rule set will be evaluated as 'true', will the event trigger the defined actions. ",
+      "type": "object",
       "properties": {
         "rules": {
-          "description": "Array of AutomationTriggeringRule",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/AutomationTriggeringRule"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
         }
-      },
-      "type": "object"
+      }
     },
     "AutomationScope": {
-      "description": "A single automation scope.",
+      "type": "object",
       "properties": {
         "description": {
-          "description": "The resources scope description.",
-          "type": "string"
+          "type": "string",
+          "description": "The resources scope description."
         },
         "scopePath": {
-          "description": "The resources scope path. Can be the subscription on which the automation is defined on or a resource group under that subscription (fully qualified Azure resource IDs).",
-          "type": "string"
+          "type": "string",
+          "description": "The resources scope path. Can be the subscription on which the automation is defined on or a resource group under that subscription (fully qualified Azure resource IDs)."
         }
-      },
-      "type": "object"
+      }
     },
     "AutomationSource": {
-      "description": "The source event types which evaluate the security automation set of rules. For example - security alerts and security assessments. To learn more about the supported security events data models schemas - please visit https://aka.ms/ASCAutomationSchemas.",
+      "type": "object",
       "properties": {
         "eventSource": {
-          "description": "A valid event source type.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "Assessments",
                 "AssessmentsSnapshot",
@@ -324,42 +407,41 @@
                 "RegulatoryComplianceAssessmentSnapshot",
                 "AttackPaths",
                 "AttackPathsSnapshot"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "A valid event source type."
         },
         "ruleSets": {
-          "description": "A set of rules which evaluate upon event interception. A logical disjunction is applied between defined rule sets (logical 'or').",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/AutomationRuleSet"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "A set of rules which evaluate upon event interception. A logical disjunction is applied between defined rule sets (logical 'or')."
         }
-      },
-      "type": "object"
+      }
     },
     "AutomationTriggeringRule": {
-      "description": "A rule which is evaluated upon event interception. The rule is configured by comparing a specific value from the event model to an expected value. This comparison is done by using one of the supported operators set.",
+      "type": "object",
       "properties": {
         "expectedValue": {
-          "description": "The expected value.",
-          "type": "string"
+          "type": "string",
+          "description": "The expected value."
         },
         "operator": {
-          "description": "A valid comparer operator to use. A case-insensitive comparison will be applied for String PropertyType.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "Equals",
                 "GreaterThan",
@@ -370,117 +452,182 @@
                 "Contains",
                 "StartsWith",
                 "EndsWith"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "A valid comparer operator to use. A case-insensitive comparison will be applied for String PropertyType."
         },
         "propertyJPath": {
-          "description": "The JPath of the entity model property that should be checked.",
-          "type": "string"
+          "type": "string",
+          "description": "The JPath of the entity model property that should be checked."
         },
         "propertyType": {
-          "description": "The data type of the compared operands (string, integer, floating point number or a boolean [true/false]]",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "String",
                 "Integer",
                 "Number",
                 "Boolean"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The data type of the compared operands (string, integer, floating point number or a boolean [true/false]]"
         }
-      },
-      "type": "object"
+      }
     },
     "NotificationsSource": {
-      "description": "A valid notification source type",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Alert notification source",
+          "type": "object",
           "properties": {
-            "minimalSeverity": {
-              "description": "Defines the minimal alert severity which will be sent as email notifications",
-              "oneOf": [
+            "sourceType": {
+              "type": "string",
+              "enum": [
+                "Alert",
+                "AttackPath"
+              ]
+            }
+          },
+          "required": [
+            "sourceType"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
                 {
-                  "enum": [
-                    "High",
-                    "Medium",
-                    "Low"
-                  ],
-                  "type": "string"
+                  "$ref": "#/definitions/NotificationsSourceAlert"
                 },
                 {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                  "type": "object",
+                  "properties": {
+                    "sourceType": {
+                      "const": "Alert"
+                    }
+                  },
+                  "required": [
+                    "sourceType"
+                  ]
                 }
               ]
             },
-            "sourceType": {
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/NotificationsSourceAttackPath"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "sourceType": {
+                      "const": "AttackPath"
+                    }
+                  },
+                  "required": [
+                    "sourceType"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "NotificationsSourceAlert": {
+      "type": "object",
+      "properties": {
+        "minimalSeverity": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "High",
+                "Medium",
+                "Low"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Defines the minimal alert severity which will be sent as email notifications"
+        },
+        "sourceType": {
+          "oneOf": [
+            {
+              "type": "string",
               "enum": [
                 "Alert"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "sourceType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Attack path notification source",
-          "properties": {
-            "minimalRiskLevel": {
-              "description": "Defines the minimal attach path risk level which will be sent as email notifications",
-              "oneOf": [
-                {
-                  "enum": [
-                    "Critical",
-                    "High",
-                    "Medium",
-                    "Low"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
               ]
             },
-            "sourceType": {
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The source type that will trigger the notification"
+        }
+      },
+      "required": [
+        "sourceType"
+      ]
+    },
+    "NotificationsSourceAttackPath": {
+      "type": "object",
+      "properties": {
+        "minimalRiskLevel": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Critical",
+                "High",
+                "Medium",
+                "Low"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Defines the minimal attach path risk level which will be sent as email notifications"
+        },
+        "sourceType": {
+          "oneOf": [
+            {
+              "type": "string",
               "enum": [
                 "AttackPath"
-              ],
-              "type": "string"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "sourceType"
           ],
-          "type": "object"
+          "description": "The source type that will trigger the notification"
         }
-      ],
-      "properties": {},
-      "type": "object"
+      },
+      "required": [
+        "sourceType"
+      ]
     },
     "SecurityContactProperties": {
-      "description": "Describes security contact properties",
+      "type": "object",
       "properties": {
         "emails": {
-          "description": "List of email addresses which will get notifications from Microsoft Defender for Cloud by the configurations defined in this security contact.",
-          "type": "string"
+          "type": "string",
+          "description": "List of email addresses which will get notifications from Microsoft Defender for Cloud by the configurations defined in this security contact."
         },
         "isEnabled": {
-          "description": "Indicates whether the security contact is enabled.",
           "oneOf": [
             {
               "type": "boolean"
@@ -488,10 +635,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Indicates whether the security contact is enabled."
         },
         "notificationsByRole": {
-          "description": "Defines whether to send email notifications from Microsoft Defender for Cloud to persons with specific RBAC roles on the subscription.",
           "oneOf": [
             {
               "$ref": "#/definitions/SecurityContactPropertiesNotificationsByRole"
@@ -499,69 +646,75 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Defines whether to send email notifications from Microsoft Defender for Cloud to persons with specific RBAC roles on the subscription."
         },
         "notificationsSources": {
-          "description": "A collection of sources types which evaluate the email notification.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/NotificationsSource"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "A collection of sources types which evaluate the email notification."
         },
         "phone": {
-          "description": "The security contact's phone number",
-          "type": "string"
+          "type": "string",
+          "description": "The security contact's phone number"
         }
-      },
-      "type": "object"
+      }
     },
     "SecurityContactPropertiesNotificationsByRole": {
-      "description": "Defines whether to send email notifications from Microsoft Defender for Cloud to persons with specific RBAC roles on the subscription.",
+      "type": "object",
       "properties": {
         "roles": {
-          "description": "Defines which RBAC roles will get email notifications from Microsoft Defender for Cloud. List of allowed RBAC roles: ",
           "oneOf": [
             {
+              "type": "array",
               "items": {
+                "type": "string",
                 "enum": [
                   "AccountAdmin",
                   "ServiceAdmin",
                   "Owner",
                   "Contributor"
-                ],
-                "type": "string"
-              },
-              "type": "array"
+                ]
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Defines which RBAC roles will get email notifications from Microsoft Defender for Cloud. List of allowed RBAC roles:"
         },
         "state": {
-          "description": "Defines whether to send email notifications from AMicrosoft Defender for Cloud to persons with specific RBAC roles on the subscription.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "On",
                 "Off"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Defines whether to send email notifications from AMicrosoft Defender for Cloud to persons with specific RBAC roles on the subscription."
         }
-      },
-      "type": "object"
+      }
+    },
+    "Tags": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
     }
   }
 }

@@ -3,88 +3,110 @@
   "title": "Microsoft.Resources",
   "description": "Microsoft Resources Resource Types",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "subscription_resourceDefinitions": {
-    "resourceGroups": {
+  "tenant_resourceDefinitions": {
+    "deployments": {
       "type": "object",
       "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2025-04-01"
+          ]
+        },
         "name": {
           "oneOf": [
             {
               "type": "string",
               "pattern": "^[-\\w\\._\\(\\)]+$",
-              "maxLength": 90,
-              "description": "the resource group name"
+              "minLength": 1,
+              "maxLength": 64
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The resource name"
         },
         "type": {
           "type": "string",
           "enum": [
-            "Microsoft.Resources/resourceGroups"
+            "Microsoft.Resources/deployments"
           ]
         },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2025-04-01"
-          ]
+        "identity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DeploymentIdentity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Managed Identity configuration for a deployment."
         },
         "location": {
           "type": "string",
-          "description": "the resource group location"
+          "description": "The location to store the deployment data."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DeploymentPropertiesOrDeploymentPropertiesExtended"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The deployment properties."
         },
         "tags": {
           "oneOf": [
             {
-              "type": "object",
-              "additionalProperties": {
-                "type": "string"
-              }
+              "$ref": "#/definitions/DeploymentTags"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ],
-          "description": "The resource group tags."
+          "description": "Deployment tags"
         }
       },
       "required": [
         "name",
-        "type",
         "apiVersion",
-        "location"
+        "type",
+        "properties"
       ],
-      "description": "Microsoft.Resources/resourceGroups"
-    }
-  },
-  "unknown_resourceDefinitions": {
+      "description": "Microsoft.Resources/deployments"
+    },
     "tags": {
-      "description": "Microsoft.Resources/tags",
+      "type": "object",
       "properties": {
         "apiVersion": {
+          "type": "string",
           "enum": [
             "2025-04-01"
-          ],
-          "type": "string"
+          ]
         },
         "name": {
           "oneOf": [
             {
-              "enum": [
-                "default"
-              ],
-              "type": "string"
+              "type": "string",
+              "pattern": "^.*/default$"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
+          ],
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Resources/tags"
           ]
         },
         "properties": {
-          "description": "The set of tags.",
           "oneOf": [
             {
               "$ref": "#/definitions/Tags"
@@ -92,50 +114,939 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.Resources/tags"
           ],
-          "type": "string"
+          "description": "The set of tags."
         }
       },
       "required": [
         "name",
-        "properties",
         "apiVersion",
-        "type"
+        "type",
+        "properties"
       ],
-      "type": "object"
+      "description": "Microsoft.Resources/tags"
     }
   },
-  "definitions": {
-    "ResourceGroupProperties": {
-      "description": "The resource group properties.",
-      "properties": {},
-      "type": "object"
-    },
-    "Tags": {
-      "description": "A dictionary of name and value pairs.",
+  "managementGroup_resourceDefinitions": {
+    "deployments": {
+      "type": "object",
       "properties": {
-        "tags": {
-          "description": "Dictionary of <string>",
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2025-04-01"
+          ]
+        },
+        "name": {
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "type": "string",
+              "pattern": "^[-\\w\\._\\(\\)]+$",
+              "minLength": 1,
+              "maxLength": 64
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
+          ],
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Resources/deployments"
           ]
+        },
+        "identity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DeploymentIdentity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Managed Identity configuration for a deployment."
+        },
+        "location": {
+          "type": "string",
+          "description": "The location to store the deployment data."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DeploymentPropertiesOrDeploymentPropertiesExtended"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The deployment properties."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DeploymentTags"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Deployment tags"
         }
       },
-      "type": "object"
+      "required": [
+        "name",
+        "apiVersion",
+        "type",
+        "properties"
+      ],
+      "description": "Microsoft.Resources/deployments"
+    },
+    "tags": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2025-04-01"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^.*/default$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Resources/tags"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Tags"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The set of tags."
+        }
+      },
+      "required": [
+        "name",
+        "apiVersion",
+        "type",
+        "properties"
+      ],
+      "description": "Microsoft.Resources/tags"
+    }
+  },
+  "subscription_resourceDefinitions": {
+    "deployments": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2025-04-01"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[-\\w\\._\\(\\)]+$",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Resources/deployments"
+          ]
+        },
+        "identity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DeploymentIdentity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Managed Identity configuration for a deployment."
+        },
+        "location": {
+          "type": "string",
+          "description": "The location to store the deployment data."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DeploymentPropertiesOrDeploymentPropertiesExtended"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The deployment properties."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DeploymentTags"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Deployment tags"
+        }
+      },
+      "required": [
+        "name",
+        "apiVersion",
+        "type",
+        "properties"
+      ],
+      "description": "Microsoft.Resources/deployments"
+    },
+    "resourceGroups": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2025-04-01"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[-\\w\\._\\(\\)]+$",
+              "minLength": 1,
+              "maxLength": 90
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Resources/resourceGroups"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "The location of the resource group. It cannot be changed after the resource group has been created. It must be one of the supported Azure locations."
+        },
+        "managedBy": {
+          "type": "string",
+          "description": "The ID of the resource that manages this resource group."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ResourceGroupProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The resource group properties."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ResourceGroupTags"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The tags attached to the resource group."
+        }
+      },
+      "required": [
+        "name",
+        "apiVersion",
+        "type",
+        "location",
+        "properties"
+      ],
+      "description": "Microsoft.Resources/resourceGroups"
+    },
+    "tags": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2025-04-01"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^.*/default$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Resources/tags"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Tags"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The set of tags."
+        }
+      },
+      "required": [
+        "name",
+        "apiVersion",
+        "type",
+        "properties"
+      ],
+      "description": "Microsoft.Resources/tags"
+    }
+  },
+  "resourceDefinitions": {
+    "deployments": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2025-04-01"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[-\\w\\._\\(\\)]+$",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Resources/deployments"
+          ]
+        },
+        "identity": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DeploymentIdentity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Managed Identity configuration for a deployment."
+        },
+        "location": {
+          "type": "string",
+          "description": "The location to store the deployment data."
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DeploymentPropertiesOrDeploymentPropertiesExtended"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The deployment properties."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DeploymentTags"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Deployment tags"
+        }
+      },
+      "required": [
+        "name",
+        "apiVersion",
+        "type",
+        "properties"
+      ],
+      "description": "Microsoft.Resources/deployments"
+    },
+    "tags": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2025-04-01"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^.*/default$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Resources/tags"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Tags"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The set of tags."
+        }
+      },
+      "required": [
+        "name",
+        "apiVersion",
+        "type",
+        "properties"
+      ],
+      "description": "Microsoft.Resources/tags"
+    }
+  },
+  "definitions": {
+    "DebugSetting": {
+      "type": "object",
+      "properties": {
+        "detailLevel": {
+          "type": "string",
+          "description": "Specifies the type of information to log for debugging. The permitted values are none, requestContent, responseContent, or both requestContent and responseContent separated by a comma. The default is none. When setting this value, carefully consider the type of information you are passing in during deployment. By logging information about the request or response, you could potentially expose sensitive data that is retrieved through the deployment operations."
+        }
+      }
+    },
+    "DeploymentExtensionConfig": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "$ref": "#/definitions/DeploymentExtensionConfigItem"
+      }
+    },
+    "DeploymentExtensionConfigItem": {
+      "type": "object",
+      "properties": {
+        "keyVaultReference": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/KeyVaultParameterReference"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Azure Key Vault reference used to retrieve the secret value of the extension config property."
+        },
+        "value": {
+          "oneOf": [
+            {},
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The value of the extension config property."
+        }
+      }
+    },
+    "DeploymentExternalInput": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "oneOf": [
+            {},
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "External input value."
+        }
+      },
+      "required": [
+        "value"
+      ]
+    },
+    "DeploymentExternalInputDefinition": {
+      "type": "object",
+      "properties": {
+        "config": {
+          "oneOf": [
+            {},
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Configuration for the external input."
+        },
+        "kind": {
+          "type": "string",
+          "description": "The kind of external input."
+        }
+      },
+      "required": [
+        "kind"
+      ]
+    },
+    "DeploymentIdentity": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "None",
+                "UserAssigned"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The identity type."
+        },
+        "userAssignedIdentities": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DeploymentIdentityUserAssignedIdentities"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The set of user assigned identities associated with the resource."
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "DeploymentIdentityUserAssignedIdentities": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "$ref": "#/definitions/UserAssignedIdentity"
+      }
+    },
+    "DeploymentParameter": {
+      "type": "object",
+      "properties": {
+        "expression": {
+          "type": "string",
+          "description": "Input expression to the parameter."
+        },
+        "reference": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/KeyVaultParameterReference"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Azure Key Vault parameter reference."
+        },
+        "value": {
+          "oneOf": [
+            {},
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Input value to the parameter ."
+        }
+      }
+    },
+    "DeploymentPropertiesExtensionConfigs": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "$ref": "#/definitions/DeploymentExtensionConfig"
+      }
+    },
+    "DeploymentPropertiesExternalInputDefinitions": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "$ref": "#/definitions/DeploymentExternalInputDefinition"
+      }
+    },
+    "DeploymentPropertiesExternalInputs": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "$ref": "#/definitions/DeploymentExternalInput"
+      }
+    },
+    "DeploymentPropertiesOrDeploymentPropertiesExtended": {
+      "type": "object",
+      "properties": {
+        "debugSetting": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DebugSetting"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The debug setting of the deployment."
+        },
+        "expressionEvaluationOptions": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ExpressionEvaluationOptions"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies whether template expressions are evaluated within the scope of the parent template or nested template. Only applicable to nested templates. If not specified, default value is outer."
+        },
+        "extensionConfigs": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DeploymentPropertiesExtensionConfigs"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The configurations to use for deployment extensions. The keys of this object are deployment extension aliases as defined in the deployment template."
+        },
+        "externalInputDefinitions": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DeploymentPropertiesExternalInputDefinitions"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "External input definitions, used by external tooling to define expected external input values."
+        },
+        "externalInputs": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DeploymentPropertiesExternalInputs"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "External input values, used by external tooling for parameter evaluation."
+        },
+        "mode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Incremental",
+                "Complete"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The mode that is used to deploy resources. This value can be either Incremental or Complete. In Incremental mode, resources are deployed without deleting existing resources that are not included in the template. In Complete mode, resources are deployed and existing resources in the resource group that are not included in the template are deleted. Be careful when using Complete mode as you may unintentionally delete resources."
+        },
+        "onErrorDeployment": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/OnErrorDeploymentOrOnErrorDeploymentExtended"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The deployment on error behavior."
+        },
+        "parameters": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DeploymentPropertiesParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Name and value pairs that define the deployment parameters for the template. You use this element when you want to provide the parameter values directly in the request rather than link to an existing parameter file. Use either the parametersLink property or the parameters property, but not both. It can be a JObject or a well formed JSON string."
+        },
+        "parametersLink": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ParametersLink"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The URI of parameters file. You use this element to link to an existing parameters file. Use either the parametersLink property or the parameters property, but not both."
+        },
+        "template": {
+          "oneOf": [
+            {},
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The template content. You use this element when you want to pass the template syntax directly in the request rather than link to an existing template. It can be a JObject or well-formed JSON string. Use either the templateLink property or the template property, but not both."
+        },
+        "templateLink": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/TemplateLink"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The URI of the template. Use either the templateLink property or the template property, but not both."
+        },
+        "validationLevel": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Template",
+                "Provider",
+                "ProviderNoRbac"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The validation level of the deployment"
+        }
+      },
+      "required": [
+        "mode"
+      ]
+    },
+    "DeploymentPropertiesParameters": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "$ref": "#/definitions/DeploymentParameter"
+      }
+    },
+    "DeploymentTags": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "ExpressionEvaluationOptions": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "NotSpecified",
+                "Outer",
+                "Inner"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The scope to be used for evaluation of parameters, variables and functions in a nested template."
+        }
+      }
+    },
+    "KeyVaultParameterReference": {
+      "type": "object",
+      "properties": {
+        "keyVault": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/KeyVaultReference"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Azure Key Vault reference."
+        },
+        "secretName": {
+          "type": "string",
+          "description": "Azure Key Vault secret name."
+        },
+        "secretVersion": {
+          "type": "string",
+          "description": "Azure Key Vault secret version."
+        }
+      },
+      "required": [
+        "keyVault",
+        "secretName"
+      ]
+    },
+    "KeyVaultReference": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Azure Key Vault resource id."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "OnErrorDeploymentOrOnErrorDeploymentExtended": {
+      "type": "object",
+      "properties": {
+        "deploymentName": {
+          "type": "string",
+          "description": "The deployment to be used on error case."
+        },
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "LastSuccessful",
+                "SpecificDeployment"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The deployment on error behavior type. Possible values are LastSuccessful and SpecificDeployment."
+        }
+      }
+    },
+    "ParametersLink": {
+      "type": "object",
+      "properties": {
+        "contentVersion": {
+          "type": "string",
+          "description": "If included, must match the ContentVersion in the template."
+        },
+        "uri": {
+          "type": "string",
+          "description": "The URI of the parameters file."
+        }
+      },
+      "required": [
+        "uri"
+      ]
+    },
+    "ResourceGroupProperties": {
+      "type": "object",
+      "properties": {}
+    },
+    "ResourceGroupTags": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "Tags": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "TemplateLink": {
+      "type": "object",
+      "properties": {
+        "contentVersion": {
+          "type": "string",
+          "description": "If included, must match the ContentVersion in the template."
+        },
+        "id": {
+          "type": "string",
+          "description": "The resource id of a Template Spec. Use either the id or uri property, but not both."
+        },
+        "queryString": {
+          "type": "string",
+          "description": "The query string (for example, a SAS token) to be used with the templateLink URI."
+        },
+        "relativePath": {
+          "type": "string",
+          "description": "The relativePath property can be used to deploy a linked template at a location relative to the parent. If the parent template was linked with a TemplateSpec, this will reference an artifact in the TemplateSpec.  If the parent was linked with a URI, the child deployment will be a combination of the parent and relativePath URIs"
+        },
+        "uri": {
+          "type": "string",
+          "description": "The URI of the template to deploy. Use either the uri or id property, but not both."
+        }
+      }
+    },
+    "UserAssignedIdentity": {
+      "type": "object",
+      "properties": {}
     }
   }
 }

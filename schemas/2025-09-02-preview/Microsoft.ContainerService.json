@@ -1,0 +1,284 @@
+{
+  "id": "https://schema.management.azure.com/schemas/2025-09-02-preview/Microsoft.ContainerService.json#",
+  "title": "Microsoft.ContainerService",
+  "description": "Microsoft ContainerService Resource Types",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "resourceDefinitions": {
+    "nodeCustomizations": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2025-09-02-preview"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$",
+              "minLength": 1,
+              "maxLength": 63
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ContainerService/nodeCustomizations"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "The geo-location where the resource lives"
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/NodeCustomizationProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The resource-specific properties for this resource."
+        },
+        "tags": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/TrackedResourceTags"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Resource tags."
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/nodeCustomizations_versions_childResource"
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "name",
+        "apiVersion",
+        "type",
+        "location",
+        "properties"
+      ],
+      "description": "Microsoft.ContainerService/nodeCustomizations"
+    }
+  },
+  "unknown_resourceDefinitions": {
+    "nodeCustomizations_versions": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2025-09-02-preview"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[\\w\\-\\.]+$",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ContainerService/nodeCustomizations/versions"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "apiVersion",
+        "type"
+      ],
+      "description": "Microsoft.ContainerService/nodeCustomizations/versions"
+    }
+  },
+  "definitions": {
+    "NodeCustomizationProperties": {
+      "type": "object",
+      "properties": {
+        "containerImages": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of container images to cache on nodes. See https://kubernetes.io/docs/concepts/containers/images/#image-names"
+        },
+        "customizationScripts": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/NodeCustomizationScript"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The scripts to customize the node before or after image capture."
+        },
+        "identityProfile": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/UserAssignedIdentity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The identity used to execute node customization tasks during image build time and provisioning time. \nIf not specified the default agentpool identity will be used.\nThis does not affect provisioned nodes."
+        }
+      }
+    },
+    "NodeCustomizationScript": {
+      "type": "object",
+      "properties": {
+        "executionPoint": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "NodeImageBuildTime",
+                "NodeProvisionTime"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The stage at which the script is executed.\nSpecifying `NodeImageBuildTime` will ensure changes are persisted into the node image."
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z0-9]([a-z0-9\\.\\-]*[a-z0-9])?$",
+              "maxLength": 263
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The name for the customization script. \nMust be unique within the node customization resource.\nCan only contain lowercase alphanumeric,'-' or '.' characters."
+        },
+        "rebootAfter": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Whether the node should reboot after successful script execution."
+        },
+        "script": {
+          "type": "string",
+          "description": "The script content to be executed in plain text. Do not include secrets."
+        },
+        "scriptType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Bash",
+                "PowerShell"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The runtime environment for the script (e.g. Bash)."
+        }
+      },
+      "required": [
+        "executionPoint",
+        "name",
+        "scriptType"
+      ]
+    },
+    "TrackedResourceTags": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "UserAssignedIdentity": {
+      "type": "object",
+      "properties": {}
+    },
+    "nodeCustomizations_versions_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2025-09-02-preview"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[\\w\\-\\.]+$",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "versions"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "apiVersion",
+        "type"
+      ],
+      "description": "Microsoft.ContainerService/nodeCustomizations/versions"
+    }
+  }
+}

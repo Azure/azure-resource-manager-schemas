@@ -5,16 +5,33 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "resourceDefinitions": {
     "workspaces": {
-      "description": "Microsoft.Quantum/workspaces",
+      "type": "object",
       "properties": {
         "apiVersion": {
+          "type": "string",
           "enum": [
             "2025-08-11-preview"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9]+(-*[a-zA-Z0-9])*$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
           ],
-          "type": "string"
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Quantum/workspaces"
+          ]
         },
         "identity": {
-          "description": "The managed service identities assigned to this resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/ManagedServiceIdentity"
@@ -22,26 +39,14 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The managed service identities assigned to this resource."
         },
         "location": {
-          "description": "The geo-location where the resource lives",
-          "type": "string"
-        },
-        "name": {
-          "description": "The name of the quantum workspace resource.",
-          "oneOf": [
-            {
-              "pattern": "^[a-zA-Z0-9]+(-*[a-zA-Z0-9])*$",
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
+          "type": "string",
+          "description": "The geo-location where the resource lives"
         },
         "properties": {
-          "description": "Gets or sets the properties. Define quantum workspace's specific properties.",
           "oneOf": [
             {
               "$ref": "#/definitions/WorkspaceResourceProperties"
@@ -49,104 +54,91 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Gets or sets the properties. Define quantum workspace's specific properties."
         },
         "tags": {
-          "description": "Resource tags.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/TrackedResourceTags"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.Quantum/workspaces"
           ],
-          "type": "string"
+          "description": "Resource tags."
         }
       },
       "required": [
         "name",
-        "properties",
         "apiVersion",
-        "type"
+        "type",
+        "location",
+        "properties"
       ],
-      "type": "object"
+      "description": "Microsoft.Quantum/workspaces"
     }
   },
   "definitions": {
     "ManagedServiceIdentity": {
-      "description": "Managed service identity (system assigned and/or user assigned identities)",
+      "type": "object",
       "properties": {
         "type": {
-          "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "None",
                 "SystemAssigned",
                 "UserAssigned",
                 "SystemAssigned,UserAssigned"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed)."
         },
         "userAssignedIdentities": {
-          "description": "The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "$ref": "#/definitions/UserAssignedIdentity"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/UserAssignedIdentities"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests."
         }
       },
       "required": [
         "type"
-      ],
-      "type": "object"
+      ]
     },
     "Provider": {
-      "description": "Information about a Provider. A Provider is an entity that offers Targets to run Azure Quantum Jobs.",
+      "type": "object",
       "properties": {
         "applicationName": {
-          "description": "The provider's marketplace application display name.",
-          "type": "string"
+          "type": "string",
+          "description": "The provider's marketplace application display name."
         },
         "instanceUri": {
-          "description": "A Uri identifying the specific instance of this provider.",
-          "type": "string"
+          "type": "string",
+          "description": "A Uri identifying the specific instance of this provider."
         },
         "providerId": {
-          "description": "Unique id of this provider.",
-          "type": "string"
+          "type": "string",
+          "description": "Unique id of this provider."
         },
         "providerSku": {
-          "description": "The sku associated with pricing information for this provider.",
-          "type": "string"
+          "type": "string",
+          "description": "The sku associated with pricing information for this provider."
         },
         "provisioningState": {
-          "description": "Provisioning status field",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "Succeeded",
                 "Launching",
@@ -154,64 +146,74 @@
                 "Deleting",
                 "Deleted",
                 "Failed"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Provisioning status field"
         },
         "resourceUsageId": {
-          "description": "Id to track resource usage for the provider.",
-          "type": "string"
+          "type": "string",
+          "description": "Id to track resource usage for the provider."
         }
-      },
-      "type": "object"
+      }
     },
     "QuotaAllocations": {
-      "description": "Quota allocations with each field representing different quota type.",
+      "type": "object",
       "properties": {
         "highMinutesLifetime": {
-          "description": "Lifetime limit for high priority jobs execution in minutes.",
           "oneOf": [
             {
-              "minimum": 0,
-              "type": "integer"
+              "type": "integer",
+              "minimum": 0
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Lifetime limit for high priority jobs execution in minutes."
         },
         "standardMinutesLifetime": {
-          "description": "Lifetime limit for standard priority jobs execution in minutes.",
           "oneOf": [
             {
-              "minimum": 0,
-              "type": "integer"
+              "type": "integer",
+              "minimum": 0
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Lifetime limit for standard priority jobs execution in minutes."
         }
       },
       "required": [
         "standardMinutesLifetime"
-      ],
-      "type": "object"
+      ]
+    },
+    "TrackedResourceTags": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "UserAssignedIdentities": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "$ref": "#/definitions/UserAssignedIdentity"
+      }
     },
     "UserAssignedIdentity": {
-      "description": "User assigned identity properties",
-      "properties": {},
-      "type": "object"
+      "type": "object",
+      "properties": {}
     },
     "WorkspaceResourceProperties": {
-      "description": "Properties of a Workspace",
+      "type": "object",
       "properties": {
         "apiKeyEnabled": {
-          "description": "Indicator of enablement of the Quantum workspace Api keys.",
           "oneOf": [
             {
               "type": "boolean"
@@ -219,24 +221,24 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Indicator of enablement of the Quantum workspace Api keys."
         },
         "providers": {
-          "description": "List of Providers selected for this Workspace",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/Provider"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "List of Providers selected for this Workspace"
         },
         "quotas": {
-          "description": "DEPRECATED: This field is deprecated and will be removed in future versions. Please use the quotas under providers instead.",
           "oneOf": [
             {
               "$ref": "#/definitions/QuotaAllocations"
@@ -244,14 +246,14 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Quota allocations associated with this workspace. Available only for special providers."
         },
         "storageAccount": {
-          "description": "ARM Resource Id of the storage account associated with this workspace.",
-          "type": "string"
+          "type": "string",
+          "description": "ARM Resource Id of the storage account associated with this workspace."
         }
-      },
-      "type": "object"
+      }
     }
   }
 }

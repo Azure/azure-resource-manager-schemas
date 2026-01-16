@@ -5,16 +5,35 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "resourceDefinitions": {
     "appliances": {
-      "description": "Microsoft.ResourceConnector/appliances",
+      "type": "object",
       "properties": {
         "apiVersion": {
+          "type": "string",
           "enum": [
             "2021-10-31-preview"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9]$|^[a-zA-Z0-9][-_a-zA-Z0-9]{0,61}[a-zA-Z0-9]$",
+              "minLength": 1,
+              "maxLength": 63
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
           ],
-          "type": "string"
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ResourceConnector/appliances"
+          ]
         },
         "identity": {
-          "description": "Identity for the resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/Identity"
@@ -22,28 +41,14 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Identity for the resource."
         },
         "location": {
-          "description": "The geo-location where the resource lives",
-          "type": "string"
-        },
-        "name": {
-          "description": "Appliances name.",
-          "oneOf": [
-            {
-              "maxLength": 63,
-              "minLength": 1,
-              "pattern": "^[a-zA-Z0-9]$|^[a-zA-Z0-9][-_a-zA-Z0-9]{0,61}[a-zA-Z0-9]$",
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
+          "type": "string",
+          "description": "The geo-location where the resource lives"
         },
         "properties": {
-          "description": "The set of properties specific to an Appliance",
           "oneOf": [
             {
               "$ref": "#/definitions/ApplianceProperties"
@@ -51,59 +56,50 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The set of properties specific to an Appliance"
         },
         "tags": {
-          "description": "Resource tags.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/TrackedResourceTags"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.ResourceConnector/appliances"
           ],
-          "type": "string"
+          "description": "Resource tags."
         }
       },
       "required": [
         "name",
-        "properties",
         "apiVersion",
-        "type"
+        "type",
+        "location",
+        "properties"
       ],
-      "type": "object"
+      "description": "Microsoft.ResourceConnector/appliances"
     }
   },
   "definitions": {
     "ApplianceProperties": {
-      "description": "Properties for an appliance.",
+      "type": "object",
       "properties": {
         "distro": {
-          "description": "Represents a supported Fabric/Infra. (AKSEdge etc...).",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "AKSEdge"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Represents a supported Fabric/Infra. (AKSEdge etc...)."
         },
         "infrastructureConfig": {
-          "description": "Contains infrastructure information about the Appliance",
           "oneOf": [
             {
               "$ref": "#/definitions/AppliancePropertiesInfrastructureConfig"
@@ -111,57 +107,62 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Contains infrastructure information about the Appliance"
         },
         "publicKey": {
-          "description": "Certificates pair used to download MSI certificate from HIS",
-          "type": "string"
+          "type": "string",
+          "description": "Certificates pair used to download MSI certificate from HIS"
         }
-      },
-      "type": "object"
+      }
     },
     "AppliancePropertiesInfrastructureConfig": {
-      "description": "Contains infrastructure information about the Appliance",
+      "type": "object",
       "properties": {
         "provider": {
-          "description": "Information about the connected appliance.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "VMWare",
                 "HCI",
                 "SCVMM"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Information about the connected appliance."
         }
-      },
-      "type": "object"
+      }
     },
     "Identity": {
-      "description": "Identity for the resource.",
+      "type": "object",
       "properties": {
         "type": {
-          "description": "The identity type.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "SystemAssigned",
                 "None"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The identity type."
         }
-      },
-      "type": "object"
+      }
+    },
+    "TrackedResourceTags": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
     }
   }
 }

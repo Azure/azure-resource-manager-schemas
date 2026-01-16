@@ -14,16 +14,6 @@
       "description": "Additional unstructured metadata to include with the template deployment.",
       "additionalProperties": true
     },
-    "apiProfile": {
-      "type": "string",
-      "enum": [
-        "2017-03-09-profile",
-        "2018-03-01-hybrid",
-        "2018-06-01-profile",
-        "2019-03-01-hybrid"
-      ],
-      "description": "The apiProfile to use for all resources in the template."
-    },
     "contentVersion": {
       "type": "string",
       "pattern": "(^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$)",
@@ -40,21 +30,14 @@
         "$ref": "#/definitions/parameter"
       }
     },
-    "functions": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/functionNamespace"
-      },
-      "description": "User defined functions"
-    },
     "resources": {
       "description": "Collection of resources to be deployed",
       "oneOf":[
         {
-          "$ref": "#/definitions/resourcesWithoutSymbolicName"
+          "$ref": "#/definitions/resourcesWithoutSymbolicNames"
         },
         {
-          "$ref": "#/definitions/resourcesWithSymbolicName"
+          "$ref": "#/definitions/resourcesWithSymbolicNames"
         }
       ]
     },
@@ -73,31 +56,12 @@
     "resources"
   ],
   "definitions": {
-    "ARMResourceBase": {
+    "resourceBase": {
       "type": "object",
       "properties": {
         "name": {
           "type": "string",
           "description": "Name of the resource"
-        },
-        "type": {
-          "type": "string",
-          "description": "Resource type"
-        },
-        "condition": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Condition of the resource"
-        },
-        "apiVersion": {
-          "type": "string",
-          "description": "API Version of the resource type, optional when apiProfile is used on the template"
         },
         "dependsOn": {
           "type": "array",
@@ -105,272 +69,257 @@
             "type": "string"
           },
           "description": "Collection of resources this resource depends on"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "enum": [
+                "East Asia",
+                "Southeast Asia",
+                "Central US",
+                "East US",
+                "East US 2",
+                "West US",
+                "North Central US",
+                "South Central US",
+                "North Europe",
+                "West Europe",
+                "Japan West",
+                "Japan East",
+                "Brazil South",
+                "Australia East",
+                "Australia Southeast",
+                "global"
+              ]
+            }
+          ],
+          "description": "Location to deploy resource to"
+        },
+        "tags": {
+          "type": "object",
+          "description": "Name-value pairs to add to the resource"
+        },
+        "scope": {
+          "type": "string",
+          "description": "Scope for the resource or deployment. Today, this works for two cases: 1) setting the scope for extension resources 2) deploying resources to the tenant scope in non-tenant scope deployments"
         }
       },
       "required": [
         "name",
-        "type"
+        "type",
+        "apiVersion"
       ]
     },
-    "proxyResourceBase": {
-      "allOf": [
-        {
-          "$ref": "#/definitions/ARMResourceBase"
+    "resourceGeneric": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "UnknownResource"
+          ],
+          "description": "Resource type"
         },
-        {
-          "properties": {
-            "location": {
-              "$ref": "#/definitions/resourceLocations",
-              "description": "Location to deploy resource to"
-            }
-          }
+        "apiVersion": {
+          "type": "string",
+          "pattern": "(^((\\d\\d\\d\\d-\\d\\d-\\d\\d)|([0-9]+(\\.[0-9]+)?))(-[a-zA-Z][a-zA-Z0-9]*)?$)",
+          "description": "API version of the resource type"
         }
-      ]
-    },
-    "resourceBase": {
-      "allOf": [
-        {
-          "$ref": "#/definitions/ARMResourceBase"
-        },
-        {
-          "properties": {
-            "location": {
-              "$ref": "#/definitions/resourceLocations",
-              "description": "Location to deploy resource to"
-            },
-            "tags": {
-              "type": "object",
-              "description": "Name-value pairs to add to the resource"
-            },
-            "copy": {
-              "$ref": "#/definitions/resourceCopy"
-            },
-            "scope": {
-              "type": "string",
-              "description": "Scope for the resource or deployment. Today, this works for two cases: 1) setting the scope for extension resources 2) deploying resources to the tenant scope in non-tenant scope deployments"
-            },
-            "comments": {
-              "type": "string"
-            }
-          }
-        }
+      },
+      "required": [
+        "name",
+        "type",
+        "apiVersion"
       ]
     },
     "resourceBaseExternal": {
-      "$ref": "#/definitions/resourceBase",
-      "required": [
-        "plan"
-      ]
-    },
-    "resourceSku": {
       "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Name of the sku"
-        },
-        "tier": {
-          "type": "string",
-          "description": "Tier of the sku"
-        },
-        "size": {
-          "type": "string",
-          "description": "Size of the sku"
-        },
-        "family": {
-          "type": "string",
-          "description": "Family of the sku"
-        },
-        "capacity": {
-          "type": "integer",
-          "description": "Capacity of the sku"
-        }
-      },
-      "required": [
-        "name"
-      ]
-    },
-    "resourceCopy": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Name of the copy"
-        },
-        "count": {
-          "oneOf": [
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            },
-            {
-              "type": "integer"
-            }
-          ],
-          "description": "Count of the copy"
-        },
-        "mode": {
-          "type": "string",
-          "enum": [
-            "Parallel",
-            "Serial"
-          ],
-          "description": "The copy mode"
-        },
-        "batchSize": {
-          "oneOf": [
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            },
-            {
-              "type": "integer"
-            }
-          ],
-          "description": "The serial copy batch size"
-        }
-      }
-    },
-    "resourceKind": {
-      "type": "string",
-      "maxLength": 64,
-      "pattern": "(^[a-zA-Z0-9_.()-]+$)",
-      "description": "Kind of resource"
-    },
-    "resourcePlan": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Name of the plan"
-        },
-        "promotionCode": {
-          "type": "string",
-          "description": "Plan promotion code"
-        },
-        "publisher": {
-          "type": "string",
-          "description": "Name of the publisher"
-        },
-        "product": {
-          "type": "string",
-          "description": "Name of the product"
-        },
-        "version": {
-          "type": "string",
-          "description": "Version of the product"
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "description": "Plan of the resource"
-    },
-    "resourceLocations": {
-      "anyOf": [
+      "allOf": [
         {
-          "type": "string"
+          "$ref": "#/definitions/resourceBase"
         },
         {
-          "enum": [
-            "East Asia",
-            "Southeast Asia",
-            "Central US",
-            "East US",
-            "East US 2",
-            "West US",
-            "North Central US",
-            "South Central US",
-            "North Europe",
-            "West Europe",
-            "Japan West",
-            "Japan East",
-            "Brazil South",
-            "Australia East",
-            "Australia Southeast",
-            "Central India",
-            "West India",
-            "South India",
-            "Canada Central",
-            "Canada East",
-            "West Central US",
-            "West US 2",
-            "UK South",
-            "UK West",
-            "Korea Central",
-            "Korea South",
-            "global"
+          "properties": {
+            "plan": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Name of the plan"
+                },
+                "promotionCode": {
+                  "type": "string",
+                  "description": "Plan promotion code"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "name"
+              ],
+              "description": "3rd party plan"
+            }
+          },
+          "required": [
+            "plan"
           ]
         }
-      ]
+      ],
+      "additionalProperties": false
     },
-    "functionNamespace": {
+    "deployments": {
       "type": "object",
       "properties": {
-        "namespace": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Function namespace"
+        "type": {
+          "enum": [
+            "Microsoft.Resources/deployments"
+          ]
         },
-        "members": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/functionMember"
-          },
-          "description": "Function members"
-        }
-      }
-    },
-    "functionMember": {
-      "type": "object",
-      "properties": {
-        "parameters": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/functionParameter"
-          },
-          "description": "Function parameters"
+        "apiVersion": {
+          "enum": [
+            "2014-04-01-preview"
+          ]
         },
-        "output": {
-          "$ref": "#/definitions/functionOutput",
-          "description": "Function output"
-        }
-      }
-    },
-    "functionParameter": {
-      "type": "object",
-      "properties": {
         "name": {
           "type": "string",
-          "minLength": 1,
-          "description": "Function parameter name"
+          "description": "Name of the deployment"
         },
-        "type": {
-          "$ref": "#/definitions/parameterTypes",
-          "description": "Type of function parameter value"
+        "dependsOn": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Collection of resources this deployment depends on"
+        },
+        "properties": {
+          "allOf": [
+            {
+              "type": "object",
+              "properties": {
+                "mode": {
+                  "enum": [
+                    "Incremental"
+                  ],
+                  "description": "Deployment mode"
+                }
+              },
+              "required": [
+                "mode"
+              ]
+            },
+            {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "templateLink": {
+                      "$ref": "#/definitions/templateLink"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "template": {
+                      "type": "object"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "parametersLink": {
+                      "$ref": "#/definitions/parametersLink"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "parameters": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "$ref": "#/definitions/parameter"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          ]
         }
-      }
+      },
+      "required": [
+        "type",
+        "apiVersion",
+        "name",
+        "properties"
+      ]
     },
-    "functionOutput": {
+    "templateLink": {
       "type": "object",
       "properties": {
-        "type": {
-          "$ref": "#/definitions/parameterTypes",
-          "description": "Type of function output value"
+        "uri": {
+          "type": "string",
+          "description": "URI referencing the deployment template"
         },
-        "value": {
-          "$ref": "#/definitions/parameterValueTypes",
-          "description": "Value assigned for function output"
+        "contentVersion": {
+          "type": "string",
+          "pattern": "(^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$)",
+          "description": "If included it must match the contentVersion in the template"
         }
-      }
+      },
+      "required": [
+        "uri"
+      ],
+      "description": "Template file reference in a deployment"
+    },
+    "parametersLink": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "URI referencing the deployment template parameters"
+        },
+        "contentVersion": {
+          "type": "string",
+          "pattern": "(^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$)",
+          "description": "If included it must match the contentVersion in the parameters file"
+        }
+      },
+      "required": [
+        "uri"
+      ],
+      "description": "Parameter file reference in a deployment"
     },
     "parameter": {
       "type": "object",
       "properties": {
         "type": {
-          "$ref": "#/definitions/parameterTypes",
-          "description": "Type of input parameter"
+          "enum": [
+            "string",
+            "securestring",
+            "int",
+            "bool",
+            "object",
+            "array"
+          ]
         },
         "defaultValue": {
-          "$ref": "#/definitions/parameterValueTypes",
+          "type": [
+            "string",
+            "boolean",
+            "integer",
+            "number",
+            "object",
+            "array",
+            "null"
+          ],
           "description": "Default value to be used if one is not provided"
         },
         "allowedValues": {
@@ -379,23 +328,7 @@
         },
         "metadata": {
           "type": "object",
-          "description": "Metadata for the parameter, can be any valid JSON object"
-        },
-        "minValue": {
-          "type": "integer",
-          "description": "Minimum value for the int type parameter"
-        },
-        "maxValue": {
-          "type": "integer",
-          "description": "Maximum value for the int type parameter"
-        },
-        "minLength": {
-          "type": "integer",
-          "description": "Minimum length for the string or array type parameter"
-        },
-        "maxLength": {
-          "type": "integer",
-          "description": "Maximum length for the string or array type parameter"
+          "description": "Metadata for the parameter"
         }
       },
       "required": [
@@ -406,23 +339,25 @@
     "output": {
       "type": "object",
       "properties": {
-        "condition": {
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Condition of the output"
-        },
         "type": {
-          "$ref": "#/definitions/parameterTypes",
-          "description": "Type of output value"
+          "enum": [
+            "string",
+            "securestring",
+            "int",
+            "bool",
+            "object",
+            "array"
+          ]
         },
         "value": {
-          "$ref": "#/definitions/parameterValueTypes",
+          "type": [
+            "string",
+            "boolean",
+            "integer",
+            "array",
+            "object",
+            "null"
+          ],
           "description": "Value assigned for output"
         },
         "copy": {
@@ -434,59 +369,6 @@
         "type"
       ],
       "description": "Set of output parameters"
-    },
-    "parameterTypes": {
-      "enum": [
-        "string",
-        "securestring",
-        "int",
-        "bool",
-        "object",
-        "secureObject",
-        "array"
-      ]
-    },
-    "parameterValueTypes": {
-      "type": [
-        "string",
-        "boolean",
-        "integer",
-        "number",
-        "object",
-        "array",
-        "null"
-      ]
-    },
-    "keyVaultReference": {
-      "type": "object",
-      "properties": {
-        "keyVault": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "minLength": 1
-            }
-          },
-          "required": [
-            "id"
-          ],
-          "additionalProperties": false
-        },
-        "secretName": {
-          "type": "string",
-          "minLength": 1
-        },
-        "secretVersion": {
-          "type": "string",
-          "minLength": 1
-        }
-      },
-      "required": [
-        "keyVault",
-        "secretName"
-      ],
-      "additionalProperties": false
     },
     "outputCopy": {
       "type": "object",
@@ -531,73 +413,21 @@
       "description": "Collection of resource schemas",
       "oneOf": [
         {
-          "allOf": [
-            {
-              "$ref": "#/definitions/resourceBase"
-            },
-            {
-              "oneOf": [
-                { "$ref": "https://schema.management.azure.com/schemas/2017-09-07-privatepreview/Microsoft.Kusto.json#/resourceDefinitions/clusters" },
-                { "$ref": "https://schema.management.azure.com/schemas/2017-09-07-privatepreview/Microsoft.Kusto.json#/resourceDefinitions/clusters_databases" },
-                { "$ref": "https://schema.management.azure.com/schemas/2015-02-01-preview/Microsoft.Logic.json#/resourceDefinitions/workflows" },
-                { "$ref": "https://schema.management.azure.com/schemas/2016-06-01/Microsoft.Logic.json#/resourceDefinitions/workflows" },
-                { "$ref": "https://schema.management.azure.com/schemas/2016-06-01/Microsoft.Logic.json#/resourceDefinitions/integrationAccounts" },
-                { "$ref": "https://schema.management.azure.com/schemas/2016-06-01/Microsoft.Logic.json#/resourceDefinitions/integrationAccounts_agreements" },
-                { "$ref": "https://schema.management.azure.com/schemas/2016-06-01/Microsoft.Logic.json#/resourceDefinitions/integrationAccounts_certificates" },
-                { "$ref": "https://schema.management.azure.com/schemas/2016-06-01/Microsoft.Logic.json#/resourceDefinitions/integrationAccounts_maps" },
-                { "$ref": "https://schema.management.azure.com/schemas/2016-06-01/Microsoft.Logic.json#/resourceDefinitions/integrationAccounts_partners" },
-                { "$ref": "https://schema.management.azure.com/schemas/2016-06-01/Microsoft.Logic.json#/resourceDefinitions/integrationAccounts_schemas" },
-                { "$ref": "https://schema.management.azure.com/schemas/2016-06-01/Microsoft.Logic.json#/resourceDefinitions/integrationAccounts_assemblies" },
-                { "$ref": "https://schema.management.azure.com/schemas/2016-06-01/Microsoft.Logic.json#/resourceDefinitions/integrationAccounts_batchConfigurations" },
-                { "$ref": "https://schema.management.azure.com/schemas/2016-10-01/Microsoft.Logic.json#/resourceDefinitions/workflows" },
-                { "$ref": "https://schema.management.azure.com/schemas/2017-07-01/Microsoft.Logic.json#/resourceDefinitions/workflows" },
-                { "$ref": "https://schema.management.azure.com/schemas/2015-10-01/Microsoft.Media.json#/resourceDefinitions/mediaservices" },
-                { "$ref": "https://schema.management.azure.com/schemas/2018-07-01/Microsoft.Media.json#/resourceDefinitions/mediaservices" },
-                { "$ref": "https://schema.management.azure.com/schemas/2018-07-01/Microsoft.Media.json#/resourceDefinitions/mediaServices_accountFilters" },
-                { "$ref": "https://schema.management.azure.com/schemas/2018-07-01/Microsoft.Media.json#/resourceDefinitions/mediaServices_assets" },
-                { "$ref": "https://schema.management.azure.com/schemas/2018-07-01/Microsoft.Media.json#/resourceDefinitions/mediaServices_assets_assetFilters" },
-                { "$ref": "https://schema.management.azure.com/schemas/2018-07-01/Microsoft.Media.json#/resourceDefinitions/mediaServices_contentKeyPolicies" },
-                { "$ref": "https://schema.management.azure.com/schemas/2018-07-01/Microsoft.Media.json#/resourceDefinitions/mediaServices_streamingLocators" },
-                { "$ref": "https://schema.management.azure.com/schemas/2018-07-01/Microsoft.Media.json#/resourceDefinitions/mediaServices_streamingPolicies" },
-                { "$ref": "https://schema.management.azure.com/schemas/2018-07-01/Microsoft.Media.json#/resourceDefinitions/mediaServices_transforms" },
-                { "$ref": "https://schema.management.azure.com/schemas/2018-07-01/Microsoft.Media.json#/resourceDefinitions/mediaServices_transforms_jobs" },
-                { "$ref": "https://schema.management.azure.com/schemas/2015-11-01-preview/Microsoft.OperationsManagement.json#/resourceDefinitions/ManagementConfigurations" },
-                { "$ref": "https://schema.management.azure.com/schemas/2015-11-01-preview/Microsoft.OperationsManagement.json#/resourceDefinitions/solutions" },
-                { "$ref": "https://schema.management.azure.com/schemas/2018-06-01-preview/Microsoft.ManagedServices.json#/unknown_resourceDefinitions/registrationAssignments" },
-                { "$ref": "https://schema.management.azure.com/schemas/2018-06-01-preview/Microsoft.ManagedServices.json#/unknown_resourceDefinitions/registrationDefinitions" },
-                { "$ref": "https://schema.management.azure.com/schemas/2019-06-01/Microsoft.ManagedServices.json#/unknown_resourceDefinitions/registrationAssignments" },
-                { "$ref": "https://schema.management.azure.com/schemas/2019-06-01/Microsoft.ManagedServices.json#/unknown_resourceDefinitions/registrationDefinitions" }
-              ]
-            }
-          ]
+          "$ref": "https://schema.management.azure.com/schemas/common/autogeneratedResources.json#resourceGroup"
         },
         {
-          "allOf": [
-            {
-              "$ref": "#/definitions/resourceBaseExternal"
-            },
-            {
-              "oneOf": [
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/2015-01-01/Sendgrid.Email.json#/resourceDefinitions/accounts"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "$ref": "https://schema.management.azure.com/schemas/common/autogeneratedResources.json"
+          "$ref": "https://schema.management.azure.com/schemas/common/autogeneratedResources.json#unknown"
         }
       ]
     },
-    "resourcesWithSymbolicName":{
+    "resourcesWithSymbolicNames":{
       "type": "object",
       "description": "Resources with symbolic names",
       "additionalProperties": {
         "$ref": "#/definitions/resource"
       }
     },
-    "resourcesWithoutSymbolicName":{
+    "resourcesWithoutSymbolicNames":{
       "type": "array",
       "description": "Resources without symbolic names",
       "items": {

@@ -5,16 +5,35 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "resourceDefinitions": {
     "healthBots": {
-      "description": "Microsoft.HealthBot/healthBots",
+      "type": "object",
       "properties": {
         "apiVersion": {
+          "type": "string",
           "enum": [
             "2023-05-01"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$",
+              "minLength": 2,
+              "maxLength": 64
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
           ],
-          "type": "string"
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.HealthBot/healthBots"
+          ]
         },
         "identity": {
-          "description": "The identity of the Azure Health Bot.",
           "oneOf": [
             {
               "$ref": "#/definitions/Identity"
@@ -22,28 +41,14 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The identity of the Azure Health Bot."
         },
         "location": {
-          "description": "The geo-location where the resource lives",
-          "type": "string"
-        },
-        "name": {
-          "description": "The name of the Bot resource.",
-          "oneOf": [
-            {
-              "maxLength": 64,
-              "minLength": 2,
-              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_.-]*$",
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
+          "type": "string",
+          "description": "The geo-location where the resource lives"
         },
         "properties": {
-          "description": "The set of properties specific to Azure Health Bot resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/HealthBotProperties"
@@ -51,10 +56,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The set of properties specific to Azure Health Bot resource."
         },
         "sku": {
-          "description": "SKU of the Azure Health Bot.",
           "oneOf": [
             {
               "$ref": "#/definitions/Sku"
@@ -62,45 +67,37 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "SKU of the Azure Health Bot."
         },
         "tags": {
-          "description": "Resource tags.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/TrackedResourceTags"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.HealthBot/healthBots"
           ],
-          "type": "string"
+          "description": "Resource tags."
         }
       },
       "required": [
         "name",
-        "properties",
         "apiVersion",
-        "type"
+        "type",
+        "location",
+        "sku",
+        "properties"
       ],
-      "type": "object"
+      "description": "Microsoft.HealthBot/healthBots"
     }
   },
   "definitions": {
     "HealthBotProperties": {
-      "description": "The properties of a Azure Health Bot. The Health Bot Service is a cloud platform that empowers developers in Healthcare organizations to build and deploy their compliant, AI-powered virtual health assistants and health bots, that help them improve processes and reduce costs.",
+      "type": "object",
       "properties": {
         "keyVaultProperties": {
-          "description": "KeyVault properties for the resource encryption.",
           "oneOf": [
             {
               "$ref": "#/definitions/KeyVaultProperties"
@@ -108,105 +105,111 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "KeyVault properties for the resource encryption."
         }
-      },
-      "type": "object"
+      }
     },
     "Identity": {
-      "description": "Identity for the resource.",
+      "type": "object",
       "properties": {
         "type": {
-          "description": "The identity type. The type 'SystemAssigned, UserAssigned' includes both an implicitly created identity and a set of user assigned identities. The type 'None' will remove any identities from the Azure Health Bot",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "SystemAssigned",
                 "UserAssigned",
                 "SystemAssigned, UserAssigned",
                 "None"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The identity type. The type 'SystemAssigned, UserAssigned' includes both an implicitly created identity and a set of user assigned identities. The type 'None' will remove any identities from the Azure Health Bot"
         },
         "userAssignedIdentities": {
-          "description": "The list of user identities associated with the resource. The user identity dictionary key references will be ARM resource ids in the form:\n'/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}'.\n",
           "oneOf": [
             {
-              "additionalProperties": {
-                "$ref": "#/definitions/UserAssignedIdentity"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/UserAssignedIdentityMap"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The list of user identities associated with the resource. The user identity dictionary key references will be ARM resource ids in the form:\n'/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}'."
         }
-      },
-      "type": "object"
+      }
     },
     "KeyVaultProperties": {
-      "description": "Properties of the key vault.",
+      "type": "object",
       "properties": {
         "keyName": {
-          "description": "The name of the key vault key.",
-          "type": "string"
+          "type": "string",
+          "description": "The name of the key vault key."
         },
         "keyVaultUri": {
-          "description": "The Uri of the key vault.",
-          "type": "string"
+          "type": "string",
+          "description": "The Uri of the key vault."
         },
         "keyVersion": {
-          "description": "The version of the key vault key.",
-          "type": "string"
+          "type": "string",
+          "description": "The version of the key vault key."
         },
         "userIdentity": {
-          "description": "The user assigned identity (ARM resource id) that has access to the key.",
-          "type": "string"
+          "type": "string",
+          "description": "The user assigned identity (ARM resource id) that has access to the key."
         }
       },
       "required": [
         "keyName",
         "keyVaultUri"
-      ],
-      "type": "object"
+      ]
     },
     "Sku": {
-      "description": "The resource model definition representing SKU",
+      "type": "object",
       "properties": {
         "name": {
-          "description": "The name of the Azure Health Bot SKU",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "F0",
                 "S1",
                 "C0",
                 "PES"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The name of the Azure Health Bot SKU"
         }
       },
       "required": [
         "name"
-      ],
-      "type": "object"
+      ]
+    },
+    "TrackedResourceTags": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "UserAssignedIdentity": {
-      "description": "The details of the user assigned managed identity used by the Video Analyzer resource.",
+      "type": "object",
+      "properties": {}
+    },
+    "UserAssignedIdentityMap": {
+      "type": "object",
       "properties": {},
-      "type": "object"
+      "additionalProperties": {
+        "$ref": "#/definitions/UserAssignedIdentity"
+      }
     }
   }
 }

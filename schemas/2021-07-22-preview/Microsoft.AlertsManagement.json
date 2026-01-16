@@ -5,24 +5,29 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "resourceDefinitions": {
     "prometheusRuleGroups": {
-      "description": "Microsoft.AlertsManagement/prometheusRuleGroups",
+      "type": "object",
       "properties": {
         "apiVersion": {
+          "type": "string",
           "enum": [
             "2021-07-22-preview"
-          ],
-          "type": "string"
-        },
-        "location": {
-          "description": "The geo-location where the resource lives",
-          "type": "string"
+          ]
         },
         "name": {
-          "description": "The name of the rule group.",
-          "type": "string"
+          "type": "string",
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.AlertsManagement/prometheusRuleGroups"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "The geo-location where the resource lives"
         },
         "properties": {
-          "description": "The Prometheus rule group properties of the resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/PrometheusRuleGroupProperties"
@@ -30,77 +35,65 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The Prometheus rule group properties of the resource."
         },
         "tags": {
-          "description": "Resource tags.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/TrackedResourceTags"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.AlertsManagement/prometheusRuleGroups"
           ],
-          "type": "string"
+          "description": "Resource tags."
         }
       },
       "required": [
         "name",
-        "properties",
         "apiVersion",
-        "type"
+        "type",
+        "location",
+        "properties"
       ],
-      "type": "object"
+      "description": "Microsoft.AlertsManagement/prometheusRuleGroups"
     }
   },
   "definitions": {
     "PrometheusRule": {
+      "type": "object",
       "properties": {
         "actions": {
-          "description": "The array of actions that are performed when the alert rule becomes active, and when an alert condition is resolved. Only relevant for alerts.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/PrometheusRuleGroupAction"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The array of actions that are performed when the alert rule becomes active, and when an alert condition is resolved. Only relevant for alerts."
         },
         "alert": {
-          "description": "the name of the alert rule.",
-          "type": "string"
+          "type": "string",
+          "description": "the name of the alert rule."
         },
         "annotations": {
-          "description": "annotations for rule group. Only relevant for alerts.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/PrometheusRuleAnnotations"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "annotations for rule group. Only relevant for alerts."
         },
         "enabled": {
-          "description": "the flag that indicates whether the Prometheus rule is enabled.",
           "oneOf": [
             {
               "type": "boolean"
@@ -108,37 +101,33 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "the flag that indicates whether the Prometheus rule is enabled."
         },
         "expression": {
-          "description": "the expression to run for the rule.",
-          "type": "string"
+          "type": "string",
+          "description": "the expression to run for the rule."
         },
         "for": {
-          "description": "the amount of time alert must be active before firing. Only relevant for alerts.",
-          "type": "string"
+          "type": "string",
+          "description": "the amount of time alert must be active before firing. Only relevant for alerts."
         },
         "labels": {
-          "description": "labels for rule group. Only relevant for alerts.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/PrometheusRuleLabels"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "labels for rule group. Only relevant for alerts."
         },
         "record": {
-          "description": "the name of the recording rule.",
-          "type": "string"
+          "type": "string",
+          "description": "the name of the recording rule."
         },
         "resolveConfiguration": {
-          "description": "defines the configuration for resolving fired alerts. Only relevant for alerts.",
           "oneOf": [
             {
               "$ref": "#/definitions/PrometheusRuleResolveConfiguration"
@@ -146,10 +135,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "defines the configuration for resolving fired alerts. Only relevant for alerts."
         },
         "severity": {
-          "description": "the severity of the alerts fired by the rule. Only relevant for alerts.",
           "oneOf": [
             {
               "type": "integer"
@@ -157,52 +146,60 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "the severity of the alerts fired by the rule. Only relevant for alerts."
         }
       },
       "required": [
         "expression"
-      ],
-      "type": "object"
+      ]
+    },
+    "PrometheusRuleAnnotations": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "PrometheusRuleGroupAction": {
-      "description": "An alert action. Only relevant for alerts.",
+      "type": "object",
       "properties": {
         "actionGroupId": {
-          "description": "The resource id of the action group to use.",
-          "type": "string"
+          "type": "string",
+          "description": "The resource id of the action group to use."
         },
         "actionProperties": {
-          "description": "The properties of an action group object.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/PrometheusRuleGroupActionProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The properties of an action group object."
         }
-      },
-      "type": "object"
+      }
+    },
+    "PrometheusRuleGroupActionProperties": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "PrometheusRuleGroupProperties": {
-      "description": "An alert rule.",
+      "type": "object",
       "properties": {
         "clusterName": {
-          "description": "the cluster name of the rule group evaluation.",
-          "type": "string"
+          "type": "string",
+          "description": "the cluster name of the rule group evaluation."
         },
         "description": {
-          "description": "the description of the Prometheus rule group that will be included in the alert email.",
-          "type": "string"
+          "type": "string",
+          "description": "the description of the Prometheus rule group that will be included in the alert email."
         },
         "enabled": {
-          "description": "the flag that indicates whether the Prometheus rule group is enabled.",
           "oneOf": [
             {
               "type": "boolean"
@@ -210,52 +207,58 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "the flag that indicates whether the Prometheus rule group is enabled."
         },
         "interval": {
-          "description": "the interval in which to run the Prometheus rule group represented in ISO 8601 duration format. Should be between 1 and 15 minutes",
-          "type": "string"
+          "type": "string",
+          "description": "the interval in which to run the Prometheus rule group represented in ISO 8601 duration format. Should be between 1 and 15 minutes"
         },
         "rules": {
-          "description": "defines the rules in the Prometheus rule group.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/PrometheusRule"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "defines the rules in the Prometheus rule group."
         },
         "scopes": {
-          "description": "the list of resource id's that this rule group is scoped to.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "type": "string"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "the list of resource id's that this rule group is scoped to."
         }
       },
       "required": [
-        "scopes",
-        "rules"
-      ],
-      "type": "object"
+        "rules",
+        "scopes"
+      ]
+    },
+    "PrometheusRuleLabels": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "PrometheusRuleResolveConfiguration": {
-      "description": "Specifies the Prometheus alert rule configuration.",
+      "type": "object",
       "properties": {
         "autoResolved": {
-          "description": "the flag that indicates whether or not to auto resolve a fired alert.",
           "oneOf": [
             {
               "type": "boolean"
@@ -263,14 +266,21 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "the flag that indicates whether or not to auto resolve a fired alert."
         },
         "timeToResolve": {
-          "description": "the duration a rule must evaluate as healthy before the fired alert is automatically resolved represented in ISO 8601 duration format. Should be between 1 and 15 minutes",
-          "type": "string"
+          "type": "string",
+          "description": "the duration a rule must evaluate as healthy before the fired alert is automatically resolved represented in ISO 8601 duration format. Should be between 1 and 15 minutes"
         }
-      },
-      "type": "object"
+      }
+    },
+    "TrackedResourceTags": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
     }
   }
 }

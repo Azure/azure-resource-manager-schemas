@@ -5,16 +5,33 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "resourceDefinitions": {
     "pools": {
-      "description": "Microsoft.DevOpsInfrastructure/pools",
+      "type": "object",
       "properties": {
         "apiVersion": {
+          "type": "string",
           "enum": [
             "2024-10-19"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-.]*$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
           ],
-          "type": "string"
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.DevOpsInfrastructure/pools"
+          ]
         },
         "identity": {
-          "description": "The managed service identities assigned to this resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/ManagedServiceIdentity"
@@ -22,26 +39,14 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The managed service identities assigned to this resource."
         },
         "location": {
-          "description": "The geo-location where the resource lives",
-          "type": "string"
-        },
-        "name": {
-          "description": "Name of the pool. It needs to be globally unique.",
-          "oneOf": [
-            {
-              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-.]*$",
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
+          "type": "string",
+          "description": "The geo-location where the resource lives"
         },
         "properties": {
-          "description": "The resource-specific properties for this resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/PoolProperties"
@@ -49,182 +54,272 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The resource-specific properties for this resource."
         },
         "tags": {
-          "description": "Resource tags.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/TrackedResourceTags"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.DevOpsInfrastructure/pools"
           ],
-          "type": "string"
+          "description": "Resource tags."
         }
       },
       "required": [
         "name",
-        "properties",
         "apiVersion",
-        "type"
+        "type",
+        "location",
+        "properties"
       ],
-      "type": "object"
+      "description": "Microsoft.DevOpsInfrastructure/pools"
     }
   },
   "definitions": {
     "AgentProfile": {
-      "description": "The agent profile of the machines in the pool.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Stateful profile meaning that the machines will be returned to the pool after running a job.",
+          "type": "object",
           "properties": {
-            "gracePeriodTimeSpan": {
-              "description": "How long should the machine be kept around after it ran a workload when there are no stand-by agents. The maximum is one week.",
-              "type": "string"
-            },
-            "kind": {
-              "enum": [
-                "Stateful"
+            "resourcePredictions": {
+              "oneOf": [
+                {},
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
               ],
-              "type": "string"
+              "description": "Defines pool buffer/stand-by agents."
             },
-            "maxAgentLifetime": {
-              "description": "How long should stateful machines be kept around. The maximum is one week.",
-              "type": "string"
-            }
-          },
-          "required": [
-            "kind"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Stateless profile meaning that the machines will be cleaned up after running a job.",
-          "properties": {
+            "resourcePredictionsProfile": {
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/ResourcePredictionsProfile"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ],
+              "description": "Defines how the pool buffer/stand-by agents is provided."
+            },
             "kind": {
+              "type": "string",
               "enum": [
+                "Stateful",
                 "Stateless"
-              ],
-              "type": "string"
+              ]
             }
           },
           "required": [
             "kind"
           ],
-          "type": "object"
-        }
-      ],
-      "properties": {
-        "resourcePredictions": {
-          "description": "Defines pool buffer/stand-by agents.",
-          "oneOf": [
-            {
-              "type": "object"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
+          "additionalProperties": false
         },
-        "resourcePredictionsProfile": {
-          "description": "Defines how the pool buffer/stand-by agents is provided.",
+        {
           "oneOf": [
             {
-              "$ref": "#/definitions/ResourcePredictionsProfile"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/Stateful"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "const": "Stateful"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ]
+                }
+              ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/StatelessAgentProfile"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "const": "Stateless"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ]
+                }
+              ]
             }
           ]
         }
-      },
-      "type": "object"
+      ]
     },
-    "AzureDevOpsPermissionProfile": {
-      "description": "Defines the type of Azure DevOps pool permission.",
+    "AutomaticResourcePredictionsProfile": {
+      "type": "object",
       "properties": {
-        "groups": {
-          "description": "Group email addresses",
-          "oneOf": [
-            {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
         "kind": {
-          "description": "Determines who has admin permissions to the Azure DevOps pool.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
-                "Inherit",
-                "CreatorOnly",
-                "SpecificAccounts"
-              ],
-              "type": "string"
+                "Automatic"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Determines how the stand-by scheme should be provided."
         },
-        "users": {
-          "description": "User email addresses",
+        "predictionPreference": {
           "oneOf": [
             {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
+              "type": "string",
+              "enum": [
+                "Balanced",
+                "MostCostEffective",
+                "MoreCostEffective",
+                "MorePerformance",
+                "BestPerformance"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Determines the balance between cost and performance."
         }
       },
       "required": [
         "kind"
-      ],
-      "type": "object"
+      ]
     },
-    "DataDisk": {
-      "description": "The data disk of the VMSS.",
+    "AzureDevOpsOrganizationProfile": {
+      "type": "object",
       "properties": {
-        "caching": {
-          "description": "The type of caching to be enabled for the data disks. The default value for caching is readwrite. For information about the caching options see: https://blogs.msdn.microsoft.com/windowsazurestorage/2012/06/27/exploring-windows-azure-drives-disks-and-images/.",
+        "kind": {
           "oneOf": [
             {
+              "type": "string",
               "enum": [
-                "None",
-                "ReadOnly",
-                "ReadWrite"
-              ],
-              "type": "string"
+                "AzureDevOps"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Discriminator property for OrganizationProfile."
+        },
+        "organizations": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Organization"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of Azure DevOps organizations the pool should be present in."
+        },
+        "permissionProfile": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AzureDevOpsPermissionProfile"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The type of permission which determines which accounts are admins on the Azure DevOps pool."
+        }
+      },
+      "required": [
+        "kind",
+        "organizations"
+      ]
+    },
+    "AzureDevOpsPermissionProfile": {
+      "type": "object",
+      "properties": {
+        "groups": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Group email addresses"
+        },
+        "kind": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Inherit",
+                "CreatorOnly",
+                "SpecificAccounts"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Determines who has admin permissions to the Azure DevOps pool."
+        },
+        "users": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "User email addresses"
+        }
+      },
+      "required": [
+        "kind"
+      ]
+    },
+    "DataDisk": {
+      "type": "object",
+      "properties": {
+        "caching": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "None",
+                "ReadOnly",
+                "ReadWrite"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The type of caching to be enabled for the data disks. The default value for caching is readwrite. For information about the caching options see: https://blogs.msdn.microsoft.com/windowsazurestorage/2012/06/27/exploring-windows-azure-drives-disks-and-images/."
         },
         "diskSizeGiB": {
-          "description": "The initial disk size in gigabytes.",
           "oneOf": [
             {
               "type": "integer"
@@ -232,214 +327,223 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The initial disk size in gigabytes."
         },
         "driveLetter": {
-          "description": "The drive letter for the empty data disk. If not specified, it will be the first available letter.",
-          "type": "string"
+          "type": "string",
+          "description": "The drive letter for the empty data disk. If not specified, it will be the first available letter."
         },
         "storageAccountType": {
-          "description": "The storage Account type to be used for the data disk. If omitted, the default is \"standard_lrs\".",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "Standard_LRS",
                 "Premium_LRS",
                 "StandardSSD_LRS",
                 "Premium_ZRS",
                 "StandardSSD_ZRS"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The storage Account type to be used for the data disk. If omitted, the default is \"standard_lrs\"."
         }
-      },
-      "type": "object"
+      }
     },
     "DevOpsAzureSku": {
-      "description": "The Azure SKU of the machines in the pool.",
+      "type": "object",
       "properties": {
         "name": {
-          "description": "The Azure SKU name of the machines in the pool.",
-          "type": "string"
+          "type": "string",
+          "description": "The Azure SKU name of the machines in the pool."
         }
       },
       "required": [
         "name"
-      ],
-      "type": "object"
+      ]
     },
     "FabricProfile": {
-      "description": "Defines the type of fabric the agent will run on.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "The agents will run on Virtual Machine Scale Sets.",
+          "type": "object",
           "properties": {
-            "images": {
-              "description": "The VM images of the machines in the pool.",
-              "oneOf": [
-                {
-                  "items": {
-                    "$ref": "#/definitions/PoolImage"
-                  },
-                  "type": "array"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
             "kind": {
+              "type": "string",
               "enum": [
                 "Vmss"
-              ],
-              "type": "string"
-            },
-            "networkProfile": {
-              "description": "The network profile of the machines in the pool.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/NetworkProfile"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "osProfile": {
-              "description": "The OS profile of the machines in the pool.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/OsProfile"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "sku": {
-              "description": "The Azure SKU of the machines in the pool.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/DevOpsAzureSku"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "storageProfile": {
-              "description": "The storage profile of the machines in the pool.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/StorageProfile"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
               ]
             }
           },
           "required": [
-            "sku",
-            "images",
             "kind"
           ],
-          "type": "object"
-        }
-      ],
-      "properties": {},
-      "type": "object"
-    },
-    "GitHubOrganization": {
-      "description": "Defines a GitHub organization",
-      "properties": {
-        "repositories": {
-          "description": "Optional list of repositories in which the pool should be created.",
+          "additionalProperties": false
+        },
+        {
           "oneOf": [
             {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/VmssFabricProfile"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "const": "Vmss"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "GitHubOrganization": {
+      "type": "object",
+      "properties": {
+        "repositories": {
+          "oneOf": [
+            {
+              "type": "array",
               "items": {
                 "type": "string"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Optional list of repositories in which the pool should be created."
         },
         "url": {
-          "description": "The GitHub organization URL in which the pool should be created.",
-          "type": "string"
+          "type": "string",
+          "description": "The GitHub organization URL in which the pool should be created."
         }
       },
       "required": [
         "url"
-      ],
-      "type": "object"
+      ]
     },
-    "ManagedServiceIdentity": {
-      "description": "Managed service identity (system assigned and/or user assigned identities)",
+    "GitHubOrganizationProfile": {
+      "type": "object",
       "properties": {
-        "type": {
-          "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).",
+        "kind": {
           "oneOf": [
             {
+              "type": "string",
+              "enum": [
+                "GitHub"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Discriminator property for OrganizationProfile."
+        },
+        "organizations": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/GitHubOrganization"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The list of GitHub organizations/repositories the pool should be present in."
+        }
+      },
+      "required": [
+        "kind",
+        "organizations"
+      ]
+    },
+    "ManagedServiceIdentity": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "oneOf": [
+            {
+              "type": "string",
               "enum": [
                 "None",
                 "SystemAssigned",
                 "UserAssigned",
                 "SystemAssigned,UserAssigned"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed)."
         },
         "userAssignedIdentities": {
-          "description": "The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "$ref": "#/definitions/UserAssignedIdentity"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/UserAssignedIdentities"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests."
         }
       },
       "required": [
         "type"
-      ],
-      "type": "object"
+      ]
+    },
+    "ManualResourcePredictionsProfile": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Manual"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Determines how the stand-by scheme should be provided."
+        }
+      },
+      "required": [
+        "kind"
+      ]
     },
     "NetworkProfile": {
-      "description": "The network profile of the machines in the pool.",
+      "type": "object",
       "properties": {
         "subnetId": {
-          "description": "The subnet id on which to put all machines created in the pool.",
-          "type": "string"
+          "type": "string",
+          "description": "The subnet id on which to put all machines created in the pool."
         }
       },
       "required": [
         "subnetId"
-      ],
-      "type": "object"
+      ]
     },
     "Organization": {
-      "description": "Defines an Azure DevOps organization.",
+      "type": "object",
       "properties": {
         "parallelism": {
-          "description": "How many machines can be created at maximum in this organization out of the maximumConcurrency of the pool.",
           "oneOf": [
             {
               "type": "integer"
@@ -447,130 +551,111 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "How many machines can be created at maximum in this organization out of the maximumConcurrency of the pool."
         },
         "projects": {
-          "description": "Optional list of projects in which the pool should be created.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "type": "string"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Optional list of projects in which the pool should be created."
         },
         "url": {
-          "description": "The Azure DevOps organization URL in which the pool should be created.",
-          "type": "string"
+          "type": "string",
+          "description": "The Azure DevOps organization URL in which the pool should be created."
         }
       },
       "required": [
         "url"
-      ],
-      "type": "object"
+      ]
     },
     "OrganizationProfile": {
-      "description": "Defines the organization in which the pool will be used.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Azure DevOps organization profile",
+          "type": "object",
           "properties": {
             "kind": {
+              "type": "string",
               "enum": [
-                "AzureDevOps"
-              ],
-              "type": "string"
-            },
-            "organizations": {
-              "description": "The list of Azure DevOps organizations the pool should be present in.",
-              "oneOf": [
-                {
-                  "items": {
-                    "$ref": "#/definitions/Organization"
-                  },
-                  "type": "array"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "permissionProfile": {
-              "description": "The type of permission which determines which accounts are admins on the Azure DevOps pool.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/AzureDevOpsPermissionProfile"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
+                "AzureDevOps",
+                "GitHub"
               ]
             }
           },
           "required": [
-            "organizations",
             "kind"
           ],
-          "type": "object"
+          "additionalProperties": false
         },
         {
-          "description": "GitHub organization profile",
-          "properties": {
-            "kind": {
-              "enum": [
-                "GitHub"
-              ],
-              "type": "string"
-            },
-            "organizations": {
-              "description": "The list of GitHub organizations/repositories the pool should be present in.",
-              "oneOf": [
+          "oneOf": [
+            {
+              "allOf": [
                 {
-                  "items": {
-                    "$ref": "#/definitions/GitHubOrganization"
-                  },
-                  "type": "array"
+                  "$ref": "#/definitions/AzureDevOpsOrganizationProfile"
                 },
                 {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "const": "AzureDevOps"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ]
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/GitHubOrganizationProfile"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "const": "GitHub"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ]
                 }
               ]
             }
-          },
-          "required": [
-            "organizations",
-            "kind"
-          ],
-          "type": "object"
+          ]
         }
-      ],
-      "properties": {},
-      "type": "object"
+      ]
     },
     "OsProfile": {
-      "description": "The OS profile of the machines in the pool.",
+      "type": "object",
       "properties": {
         "logonType": {
-          "description": "Determines how the service should be run. By default, this will be set to Service.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "Service",
                 "Interactive"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Determines how the service should be run. By default, this will be set to Service."
         },
         "secretsManagementSettings": {
-          "description": "The secret management settings of the machines in the pool.",
           "oneOf": [
             {
               "$ref": "#/definitions/SecretsManagementSettings"
@@ -578,49 +663,46 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The secret management settings of the machines in the pool."
         }
-      },
-      "type": "object"
+      }
     },
     "PoolImage": {
-      "description": "The VM image of the machines in the pool.",
+      "type": "object",
       "properties": {
         "aliases": {
-          "description": "List of aliases to reference the image by.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "type": "string"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "List of aliases to reference the image by."
         },
         "buffer": {
-          "default": "*",
-          "description": "The percentage of the buffer to be allocated to this image.",
-          "type": "string"
+          "type": "string",
+          "description": "The percentage of the buffer to be allocated to this image."
         },
         "resourceId": {
-          "description": "The resource id of the image.",
-          "type": "string"
+          "type": "string",
+          "description": "The resource id of the image."
         },
         "wellKnownImageName": {
-          "description": "The image to use from a well-known set of images made available to customers.",
-          "type": "string"
+          "type": "string",
+          "description": "The image to use from a well-known set of images made available to customers."
         }
-      },
-      "type": "object"
+      }
     },
     "PoolProperties": {
-      "description": "Pool properties",
+      "type": "object",
       "properties": {
         "agentProfile": {
-          "description": "Defines how the machine will be handled once it executed a job.",
           "oneOf": [
             {
               "$ref": "#/definitions/AgentProfile"
@@ -628,14 +710,14 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Defines how the machine will be handled once it executed a job."
         },
         "devCenterProjectResourceId": {
-          "description": "The resource id of the DevCenter Project the pool belongs to.",
-          "type": "string"
+          "type": "string",
+          "description": "The resource id of the DevCenter Project the pool belongs to."
         },
         "fabricProfile": {
-          "description": "Defines the type of fabric the agent will run on.",
           "oneOf": [
             {
               "$ref": "#/definitions/FabricProfile"
@@ -643,23 +725,23 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Defines the type of fabric the agent will run on."
         },
         "maximumConcurrency": {
-          "description": "Defines how many resources can there be created at any given time.",
           "oneOf": [
             {
-              "maximum": 10000,
+              "type": "integer",
               "minimum": 1,
-              "type": "integer"
+              "maximum": 10000
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Defines how many resources can there be created at any given time."
         },
         "organizationProfile": {
-          "description": "Defines the organization in which the pool will be used.",
           "oneOf": [
             {
               "$ref": "#/definitions/OrganizationProfile"
@@ -667,12 +749,13 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Defines the organization in which the pool will be used."
         },
         "provisioningState": {
-          "description": "The status of the current operation.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "Succeeded",
                 "Failed",
@@ -681,88 +764,91 @@
                 "Updating",
                 "Deleting",
                 "Accepted"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The status of the current operation."
         }
       },
       "required": [
-        "maximumConcurrency",
-        "organizationProfile",
         "agentProfile",
+        "devCenterProjectResourceId",
         "fabricProfile",
-        "devCenterProjectResourceId"
-      ],
-      "type": "object"
+        "maximumConcurrency",
+        "organizationProfile"
+      ]
     },
     "ResourcePredictionsProfile": {
-      "description": "Determines how the stand-by scheme should be provided.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "The stand-by agent scheme is determined based on historical demand.",
+          "type": "object",
           "properties": {
             "kind": {
+              "type": "string",
               "enum": [
-                "Automatic"
-              ],
-              "type": "string"
-            },
-            "predictionPreference": {
-              "description": "Determines the balance between cost and performance.",
-              "oneOf": [
-                {
-                  "enum": [
-                    "Balanced",
-                    "MostCostEffective",
-                    "MoreCostEffective",
-                    "MorePerformance",
-                    "BestPerformance"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
+                "Automatic",
+                "Manual"
               ]
             }
           },
           "required": [
             "kind"
           ],
-          "type": "object"
+          "additionalProperties": false
         },
         {
-          "description": "Customer provides the stand-by agent scheme.",
-          "properties": {
-            "kind": {
-              "enum": [
-                "Manual"
-              ],
-              "type": "string"
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/AutomaticResourcePredictionsProfile"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "const": "Automatic"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ]
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ManualResourcePredictionsProfile"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "const": "Manual"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ]
+                }
+              ]
             }
-          },
-          "required": [
-            "kind"
-          ],
-          "type": "object"
+          ]
         }
-      ],
-      "properties": {},
-      "type": "object"
+      ]
     },
     "SecretsManagementSettings": {
-      "description": "The secret management settings of the machines in the pool.",
+      "type": "object",
       "properties": {
         "certificateStoreLocation": {
-          "description": "Where to store certificates on the machine.",
-          "type": "string"
+          "type": "string",
+          "description": "Where to store certificates on the machine."
         },
         "keyExportable": {
-          "description": "Defines if the key of the certificates should be exportable.",
           "oneOf": [
             {
               "type": "boolean"
@@ -770,69 +856,215 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Defines if the key of the certificates should be exportable."
         },
         "observedCertificates": {
-          "description": "The list of certificates to install on all machines in the pool.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "type": "string"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The list of certificates to install on all machines in the pool."
         }
       },
       "required": [
-        "observedCertificates",
-        "keyExportable"
-      ],
-      "type": "object"
+        "keyExportable",
+        "observedCertificates"
+      ]
     },
-    "StorageProfile": {
-      "description": "The storage profile of the VMSS.",
+    "Stateful": {
+      "type": "object",
       "properties": {
-        "dataDisks": {
-          "description": "A list of empty data disks to attach.",
+        "gracePeriodTimeSpan": {
+          "type": "string",
+          "description": "How long should the machine be kept around after it ran a workload when there are no stand-by agents. The maximum is one week."
+        },
+        "kind": {
           "oneOf": [
             {
-              "items": {
-                "$ref": "#/definitions/DataDisk"
-              },
-              "type": "array"
+              "type": "string",
+              "enum": [
+                "Stateful"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Discriminator property for AgentProfile."
         },
-        "osDiskStorageAccountType": {
-          "description": "The Azure SKU name of the machines in the pool.",
+        "maxAgentLifetime": {
+          "type": "string",
+          "description": "How long should stateful machines be kept around. The maximum is one week."
+        }
+      },
+      "required": [
+        "kind"
+      ]
+    },
+    "StatelessAgentProfile": {
+      "type": "object",
+      "properties": {
+        "kind": {
           "oneOf": [
             {
+              "type": "string",
+              "enum": [
+                "Stateless"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Discriminator property for AgentProfile."
+        }
+      },
+      "required": [
+        "kind"
+      ]
+    },
+    "StorageProfile": {
+      "type": "object",
+      "properties": {
+        "dataDisks": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DataDisk"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "A list of empty data disks to attach."
+        },
+        "osDiskStorageAccountType": {
+          "oneOf": [
+            {
+              "type": "string",
               "enum": [
                 "Standard",
                 "Premium",
                 "StandardSSD"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The Azure SKU name of the machines in the pool."
         }
-      },
-      "type": "object"
+      }
+    },
+    "TrackedResourceTags": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "UserAssignedIdentities": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "$ref": "#/definitions/UserAssignedIdentity"
+      }
     },
     "UserAssignedIdentity": {
-      "description": "User assigned identity properties",
-      "properties": {},
-      "type": "object"
+      "type": "object",
+      "properties": {}
+    },
+    "VmssFabricProfile": {
+      "type": "object",
+      "properties": {
+        "images": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PoolImage"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The VM images of the machines in the pool."
+        },
+        "kind": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Vmss"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Discriminator property for FabricProfile."
+        },
+        "networkProfile": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/NetworkProfile"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The network profile of the machines in the pool."
+        },
+        "osProfile": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/OsProfile"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The OS profile of the machines in the pool."
+        },
+        "sku": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DevOpsAzureSku"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The Azure SKU of the machines in the pool."
+        },
+        "storageProfile": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/StorageProfile"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The storage profile of the machines in the pool."
+        }
+      },
+      "required": [
+        "images",
+        "kind",
+        "sku"
+      ]
     }
   }
 }

@@ -5,16 +5,33 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "resourceDefinitions": {
     "manufacturingDataServices": {
-      "description": "Microsoft.ManufacturingPlatform/manufacturingDataServices",
+      "type": "object",
       "properties": {
         "apiVersion": {
+          "type": "string",
           "enum": [
             "2025-03-01"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9-]{3,23}$"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
           ],
-          "type": "string"
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.ManufacturingPlatform/manufacturingDataServices"
+          ]
         },
         "identity": {
-          "description": "The managed service identities assigned to this resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/ManagedServiceIdentity"
@@ -22,26 +39,14 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The managed service identities assigned to this resource."
         },
         "location": {
-          "description": "The geo-location where the resource lives",
-          "type": "string"
-        },
-        "name": {
-          "description": "Name.",
-          "oneOf": [
-            {
-              "pattern": "^[a-zA-Z0-9-]{3,23}$",
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
+          "type": "string",
+          "description": "The geo-location where the resource lives"
         },
         "properties": {
-          "description": "The resource-specific properties for this resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/MdsResourceProperties"
@@ -49,10 +54,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The resource-specific properties for this resource."
         },
         "sku": {
-          "description": "The SKU (Stock Keeping Unit) assigned to this resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/Sku"
@@ -60,165 +65,147 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The SKU (Stock Keeping Unit) assigned to this resource."
         },
         "tags": {
-          "description": "Resource tags.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/TrackedResourceTags"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.ManufacturingPlatform/manufacturingDataServices"
           ],
-          "type": "string"
+          "description": "Resource tags."
         }
       },
       "required": [
         "name",
-        "properties",
         "apiVersion",
-        "type"
+        "type",
+        "location",
+        "properties"
       ],
-      "type": "object"
+      "description": "Microsoft.ManufacturingPlatform/manufacturingDataServices"
     }
   },
   "definitions": {
     "CmkProfile": {
-      "description": "The properties related to CMK",
+      "type": "object",
       "properties": {
         "keyUri": {
-          "description": "URI of Key in AKV",
-          "type": "string"
+          "type": "string",
+          "description": "URI of Key in AKV"
         }
       },
       "required": [
         "keyUri"
-      ],
-      "type": "object"
+      ]
     },
     "DenyAssignmentExclusion": {
-      "description": "The properties related to Deny Assignment Exclusions",
+      "type": "object",
       "properties": {
         "id": {
-          "description": "Object Id of Identity",
-          "type": "string"
+          "type": "string",
+          "description": "Object Id of Identity"
         },
         "type": {
-          "description": "Type of Identity",
-          "type": "string"
+          "type": "string",
+          "description": "Type of Identity"
         }
       },
       "required": [
         "id",
         "type"
-      ],
-      "type": "object"
+      ]
     },
     "FabricProfile": {
-      "description": "The properties related to Fabric",
+      "type": "object",
       "properties": {
         "keyUri": {
-          "description": "Azure Key Vault Uri",
-          "type": "string"
+          "type": "string",
+          "description": "Azure Key Vault Uri"
         },
         "oneLakePath": {
-          "description": "One Lake Path",
-          "type": "string"
+          "type": "string",
+          "description": "One Lake Path"
         },
         "oneLakeUri": {
-          "description": "URI of One Lake",
-          "type": "string"
+          "type": "string",
+          "description": "URI of One Lake"
         }
       },
       "required": [
         "keyUri",
-        "oneLakeUri",
-        "oneLakePath"
-      ],
-      "type": "object"
+        "oneLakePath",
+        "oneLakeUri"
+      ]
     },
     "ManagedServiceIdentity": {
-      "description": "Managed service identity (system assigned and/or user assigned identities)",
+      "type": "object",
       "properties": {
         "type": {
-          "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "None",
                 "SystemAssigned",
                 "UserAssigned",
                 "SystemAssigned,UserAssigned"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed)."
         },
         "userAssignedIdentities": {
-          "description": "The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "$ref": "#/definitions/UserAssignedIdentity"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/UserAssignedIdentities"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests."
         }
       },
       "required": [
         "type"
-      ],
-      "type": "object"
+      ]
     },
     "MdsResourceProperties": {
-      "description": "Details of the ManufacturingPlatform MdsResource.",
+      "type": "object",
       "properties": {
         "aadApplicationId": {
-          "description": "AAD Application Id.",
           "oneOf": [
             {
-              "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
-              "type": "string"
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "AAD Application Id."
         },
         "aksAdminGroupId": {
-          "description": "AKS Admin Group Id.",
           "oneOf": [
             {
-              "default": "00000000-0000-0000-0000-000000000000",
-              "pattern": "^[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$|^$",
-              "type": "string"
+              "type": "string",
+              "pattern": "^[{]?[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}[}]?$|^$"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "AKS Admin Group Id."
         },
         "cmkProfile": {
-          "description": "Profile of CMK Settings.",
           "oneOf": [
             {
               "$ref": "#/definitions/CmkProfile"
@@ -226,24 +213,24 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Profile of CMK Settings."
         },
         "denyAssignmentExclusions": {
-          "description": "Deny Assignments exclusion list.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/DenyAssignmentExclusion"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Deny Assignments exclusion list."
         },
         "enableCopilot": {
-          "description": "Enable Copilot.",
           "oneOf": [
             {
               "type": "boolean"
@@ -251,10 +238,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Enable Copilot."
         },
         "enableDiagnosticSettings": {
-          "description": "Enable Diagnostic Settings.",
           "oneOf": [
             {
               "type": "boolean"
@@ -262,10 +249,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Enable Diagnostic Settings."
         },
         "fabricProfile": {
-          "description": "Profile of Fabric resources.",
           "oneOf": [
             {
               "$ref": "#/definitions/FabricProfile"
@@ -273,10 +260,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Profile of Fabric resources."
         },
         "openAIProfile": {
-          "description": "Profile of OpenAI Resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/OpenAIProfile"
@@ -284,40 +271,40 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Profile of OpenAI Resource."
         },
         "redundancyState": {
-          "description": "Zone redundancy state for resources",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "Zonal",
                 "None"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Zone redundancy state for resources"
         },
         "resourceState": {
-          "description": "State of the resource",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "Active",
                 "Inactive"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "State of the resource"
         },
         "userManagedOpenAIProfile": {
-          "description": "Profile of User Managed OpenAI Resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/UserManagedOpenAIProfile"
@@ -325,23 +312,22 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Profile of User Managed OpenAI Resource."
         },
         "version": {
-          "description": "Mds Resource Version.",
-          "type": "string"
+          "type": "string",
+          "description": "Mds Resource Version."
         }
       },
       "required": [
         "aadApplicationId"
-      ],
-      "type": "object"
+      ]
     },
     "OpenAIProfile": {
-      "description": "The properties related to OpenAI Resource",
+      "type": "object",
       "properties": {
         "embeddingModelCapacity": {
-          "description": "Embedding Model Capacity",
           "oneOf": [
             {
               "type": "integer"
@@ -349,22 +335,22 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Embedding Model Capacity"
         },
         "embeddingModelName": {
-          "description": "Embedding Model Name",
-          "type": "string"
+          "type": "string",
+          "description": "Embedding Model Name"
         },
         "embeddingModelSkuName": {
-          "description": "Embedding Model SKU Name",
-          "type": "string"
+          "type": "string",
+          "description": "Embedding Model SKU Name"
         },
         "embeddingModelVersion": {
-          "description": "Embedding Model Version",
-          "type": "string"
+          "type": "string",
+          "description": "Embedding Model Version"
         },
         "gptModelCapacity": {
-          "description": "GPT Model Capacity",
           "oneOf": [
             {
               "type": "integer"
@@ -372,28 +358,27 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "GPT Model Capacity"
         },
         "gptModelName": {
-          "description": "GPT Model Name",
-          "type": "string"
+          "type": "string",
+          "description": "GPT Model Name"
         },
         "gptModelSkuName": {
-          "description": "GPT Model SKU Name",
-          "type": "string"
+          "type": "string",
+          "description": "GPT Model SKU Name"
         },
         "gptModelVersion": {
-          "description": "GPT Model Version",
-          "type": "string"
+          "type": "string",
+          "description": "GPT Model Version"
         }
-      },
-      "type": "object"
+      }
     },
     "Sku": {
-      "description": "The resource model definition representing SKU",
+      "type": "object",
       "properties": {
         "capacity": {
-          "description": "If the SKU supports scale out/in then the capacity integer should be included. If scale out/in is not possible for the resource this may be omitted.",
           "oneOf": [
             {
               "type": "integer"
@@ -401,70 +386,82 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "If the SKU supports scale out/in then the capacity integer should be included. If scale out/in is not possible for the resource this may be omitted."
         },
         "family": {
-          "description": "If the service has different generations of hardware, for the same SKU, then that can be captured here.",
-          "type": "string"
+          "type": "string",
+          "description": "If the service has different generations of hardware, for the same SKU, then that can be captured here."
         },
         "name": {
-          "description": "The name of the SKU. E.g. P3. It is typically a letter+number code",
-          "type": "string"
+          "type": "string",
+          "description": "The name of the SKU. E.g. P3. It is typically a letter+number code"
         },
         "size": {
-          "description": "The SKU size. When the name field is the combination of tier and some other value, this would be the standalone code. ",
-          "type": "string"
+          "type": "string",
+          "description": "The SKU size. When the name field is the combination of tier and some other value, this would be the standalone code."
         },
         "tier": {
-          "description": "This field is required to be implemented by the Resource Provider if the service has more than one tier, but is not required on a PUT.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "Free",
                 "Basic",
                 "Standard",
                 "Premium"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "This field is required to be implemented by the Resource Provider if the service has more than one tier, but is not required on a PUT."
         }
       },
       "required": [
         "name"
-      ],
-      "type": "object"
+      ]
+    },
+    "TrackedResourceTags": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "UserAssignedIdentities": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "$ref": "#/definitions/UserAssignedIdentity"
+      }
     },
     "UserAssignedIdentity": {
-      "description": "User assigned identity properties",
-      "properties": {},
-      "type": "object"
+      "type": "object",
+      "properties": {}
     },
     "UserManagedOpenAIProfile": {
-      "description": "The properties related to User Managed OpenAI Resource",
+      "type": "object",
       "properties": {
         "embeddingModelDeploymentName": {
-          "description": "Embedding Model Deployment Name",
-          "type": "string"
+          "type": "string",
+          "description": "Embedding Model Deployment Name"
         },
         "gptModelDeploymentName": {
-          "description": "GPT Model Deployment Name",
-          "type": "string"
+          "type": "string",
+          "description": "GPT Model Deployment Name"
         },
         "id": {
-          "description": "Resource Id of OpenAI Resource",
-          "type": "string"
+          "type": "string",
+          "description": "Resource Id of OpenAI Resource"
         }
       },
       "required": [
-        "id",
+        "embeddingModelDeploymentName",
         "gptModelDeploymentName",
-        "embeddingModelDeploymentName"
-      ],
-      "type": "object"
+        "id"
+      ]
     }
   }
 }

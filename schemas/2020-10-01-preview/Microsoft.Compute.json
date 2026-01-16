@@ -4,25 +4,64 @@
   "description": "Microsoft Compute Resource Types",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "resourceDefinitions": {
-    "cloudServices": {
-      "description": "Microsoft.Compute/cloudServices",
+    "cloudServices_updateDomains": {
+      "type": "object",
       "properties": {
         "apiVersion": {
+          "type": "string",
           "enum": [
             "2020-10-01-preview"
-          ],
-          "type": "string"
-        },
-        "location": {
-          "description": "Resource location.",
-          "type": "string"
+          ]
         },
         "name": {
-          "description": "Name of the cloud service.",
-          "type": "string"
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Compute/cloudServices/updateDomains"
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "apiVersion",
+        "type"
+      ],
+      "description": "Microsoft.Compute/cloudServices/updateDomains"
+    },
+    "cloudServices": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-10-01-preview"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Compute/cloudServices"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Resource location."
         },
         "properties": {
-          "description": "Cloud service properties",
           "oneOf": [
             {
               "$ref": "#/definitions/CloudServiceProperties"
@@ -30,65 +69,65 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Cloud service properties"
         },
         "tags": {
-          "description": "Resource tags.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/CloudServiceTags"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.Compute/cloudServices"
           ],
-          "type": "string"
+          "description": "Resource tags."
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/definitions/cloudServices_updateDomains_childResource"
+              }
+            ]
+          }
         }
       },
       "required": [
         "name",
-        "properties",
         "apiVersion",
-        "type"
+        "type",
+        "location",
+        "properties"
       ],
-      "type": "object"
+      "description": "Microsoft.Compute/cloudServices"
     }
   },
   "definitions": {
     "CloudServiceExtensionProfile": {
-      "description": "Describes a cloud service extension profile.",
+      "type": "object",
       "properties": {
         "extensions": {
-          "description": "List of extensions for the cloud service.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/Extension"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "List of extensions for the cloud service."
         }
-      },
-      "type": "object"
+      }
     },
     "CloudServiceExtensionProperties": {
-      "description": "Extension Properties.",
+      "type": "object",
       "properties": {
         "autoUpgradeMinorVersion": {
-          "description": "Explicitly specify whether platform can automatically upgrade typeHandlerVersion to higher minor versions when they become available.",
           "oneOf": [
             {
               "type": "boolean"
@@ -96,15 +135,16 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Explicitly specify whether platform can automatically upgrade typeHandlerVersion to higher minor versions when they become available."
         },
         "forceUpdateTag": {
-          "description": "Tag to force apply the provided public and protected settings.\r\nChanging the tag value allows for re-running the extension without changing any of the public or protected settings.\r\nIf forceUpdateTag is not changed, updates to public or protected settings would still be applied by the handler.\r\nIf neither forceUpdateTag nor any of public or protected settings change, extension would flow to the role instance with the same sequence-number, and\r\nit is up to handler implementation whether to re-run it or not",
-          "type": "string"
+          "type": "string",
+          "description": "Tag to force apply the provided public and protected settings.\r\nChanging the tag value allows for re-running the extension without changing any of the public or protected settings.\r\nIf forceUpdateTag is not changed, updates to public or protected settings would still be applied by the handler.\r\nIf neither forceUpdateTag nor any of public or protected settings change, extension would flow to the role instance with the same sequence-number, and\r\nit is up to handler implementation whether to re-run it or not"
         },
         "protectedSettings": {
-          "description": "Protected settings for the extension which are encrypted before sent to the role instance.",
-          "type": "string"
+          "type": "string",
+          "description": "Protected settings for the extension which are encrypted before sent to the role instance."
         },
         "protectedSettingsFromKeyVault": {
           "oneOf": [
@@ -117,54 +157,53 @@
           ]
         },
         "publisher": {
-          "description": "The name of the extension handler publisher.",
-          "type": "string"
+          "type": "string",
+          "description": "The name of the extension handler publisher."
         },
         "rolesAppliedTo": {
-          "description": "Optional list of roles to apply this extension. If property is not specified or '*' is specified, extension is applied to all roles in the cloud service.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "type": "string"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Optional list of roles to apply this extension. If property is not specified or '*' is specified, extension is applied to all roles in the cloud service."
         },
         "settings": {
-          "description": "Public settings for the extension. For JSON extensions, this is the JSON settings for the extension. For XML Extension (like RDP), this is the XML setting for the extension.",
-          "type": "string"
+          "type": "string",
+          "description": "Public settings for the extension. For JSON extensions, this is the JSON settings for the extension. For XML Extension (like RDP), this is the XML setting for the extension."
         },
         "type": {
-          "description": "Specifies the type of the extension.",
-          "type": "string"
+          "type": "string",
+          "description": "Specifies the type of the extension."
         },
         "typeHandlerVersion": {
-          "description": "Specifies the version of the extension. Specifies the version of the extension. If this element is not specified or an asterisk (*) is used as the value, the latest version of the extension is used. If the value is specified with a major version number and an asterisk as the minor version number (X.), the latest minor version of the specified major version is selected. If a major version number and a minor version number are specified (X.Y), the specific extension version is selected. If a version is specified, an auto-upgrade is performed on the role instance.",
-          "type": "string"
+          "type": "string",
+          "description": "Specifies the version of the extension. Specifies the version of the extension. If this element is not specified or an asterisk (*) is used as the value, the latest version of the extension is used. If the value is specified with a major version number and an asterisk as the minor version number (X.), the latest minor version of the specified major version is selected. If a major version number and a minor version number are specified (X.Y), the specific extension version is selected. If a version is specified, an auto-upgrade is performed on the role instance."
         }
-      },
-      "type": "object"
+      }
     },
     "CloudServiceNetworkProfile": {
-      "description": "Network Profile for the cloud service.",
+      "type": "object",
       "properties": {
         "loadBalancerConfigurations": {
-          "description": "The list of load balancer configurations for the cloud service.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/LoadBalancerConfiguration"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The list of load balancer configurations for the cloud service."
         },
         "swappableCloudService": {
           "oneOf": [
@@ -176,42 +215,39 @@
             }
           ]
         }
-      },
-      "type": "object"
+      }
     },
     "CloudServiceOsProfile": {
-      "description": "Describes the OS profile for the cloud service.",
+      "type": "object",
       "properties": {
         "secrets": {
-          "description": "Specifies set of certificates that should be installed onto the role instances.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/CloudServiceVaultSecretGroup"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Specifies set of certificates that should be installed onto the role instances."
         }
-      },
-      "type": "object"
+      }
     },
     "CloudServiceProperties": {
-      "description": "Cloud service properties",
+      "type": "object",
       "properties": {
         "configuration": {
-          "description": "Specifies the XML service configuration (.cscfg) for the cloud service.",
-          "type": "string"
+          "type": "string",
+          "description": "Specifies the XML service configuration (.cscfg) for the cloud service."
         },
         "configurationUrl": {
-          "description": "Specifies a URL that refers to the location of the service configuration in the Blob service. The service package URL  can be Shared Access Signature (SAS) URI from any storage account.\r\nThis is a write-only property and is not returned in GET calls.",
-          "type": "string"
+          "type": "string",
+          "description": "Specifies a URL that refers to the location of the service configuration in the Blob service. The service package URL  can be Shared Access Signature (SAS) URI from any storage account.\r\nThis is a write-only property and is not returned in GET calls."
         },
         "extensionProfile": {
-          "description": "Describes a cloud service extension profile.",
           "oneOf": [
             {
               "$ref": "#/definitions/CloudServiceExtensionProfile"
@@ -219,10 +255,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Describes a cloud service extension profile."
         },
         "networkProfile": {
-          "description": "Network Profile for the cloud service.",
           "oneOf": [
             {
               "$ref": "#/definitions/CloudServiceNetworkProfile"
@@ -230,10 +266,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Network Profile for the cloud service."
         },
         "osProfile": {
-          "description": "Describes the OS profile for the cloud service.",
           "oneOf": [
             {
               "$ref": "#/definitions/CloudServiceOsProfile"
@@ -241,14 +277,14 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Describes the OS profile for the cloud service."
         },
         "packageUrl": {
-          "description": "Specifies a URL that refers to the location of the service package in the Blob service. The service package URL can be Shared Access Signature (SAS) URI from any storage account.\r\nThis is a write-only property and is not returned in GET calls.",
-          "type": "string"
+          "type": "string",
+          "description": "Specifies a URL that refers to the location of the service package in the Blob service. The service package URL can be Shared Access Signature (SAS) URI from any storage account.\r\nThis is a write-only property and is not returned in GET calls."
         },
         "roleProfile": {
-          "description": "Describes the role profile for the cloud service.",
           "oneOf": [
             {
               "$ref": "#/definitions/CloudServiceRoleProfile"
@@ -256,10 +292,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Describes the role profile for the cloud service."
         },
         "startCloudService": {
-          "description": "(Optional) Indicates whether to start the cloud service immediately after it is created. The default value is `true`.\r\nIf false, the service model is still deployed, but the code is not run immediately. Instead, the service is PoweredOff until you call Start, at which time the service will be started. A deployed service still incurs charges, even if it is poweredoff.",
           "oneOf": [
             {
               "type": "boolean"
@@ -267,56 +303,54 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "(Optional) Indicates whether to start the cloud service immediately after it is created. The default value is `true`.\r\nIf false, the service model is still deployed, but the code is not run immediately. Instead, the service is PoweredOff until you call Start, at which time the service will be started. A deployed service still incurs charges, even if it is poweredoff."
         },
         "upgradeMode": {
-          "description": "Update mode for the cloud service. Role instances are allocated to update domains when the service is deployed. Updates can be initiated manually in each update domain or initiated automatically in all update domains.\r\nPossible Values are <br /><br />**Auto**<br /><br />**Manual** <br /><br />**Simultaneous**<br /><br />\r\nIf not specified, the default value is Auto. If set to Manual, PUT UpdateDomain must be called to apply the update. If set to Auto, the update is automatically applied to each update domain in sequence.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "Auto",
                 "Manual",
                 "Simultaneous"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Update mode for the cloud service. Role instances are allocated to update domains when the service is deployed. Updates can be initiated manually in each update domain or initiated automatically in all update domains.\r\nPossible Values are <br /><br />**Auto**<br /><br />**Manual** <br /><br />**Simultaneous**<br /><br />\r\nIf not specified, the default value is Auto. If set to Manual, PUT UpdateDomain must be called to apply the update. If set to Auto, the update is automatically applied to each update domain in sequence."
         }
-      },
-      "type": "object"
+      }
     },
     "CloudServiceRoleProfile": {
-      "description": "Describes the role profile for the cloud service.",
+      "type": "object",
       "properties": {
         "roles": {
-          "description": "List of roles for the cloud service.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/CloudServiceRoleProfileProperties"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "List of roles for the cloud service."
         }
-      },
-      "type": "object"
+      }
     },
     "CloudServiceRoleProfileProperties": {
-      "description": "Describes the role properties.",
+      "type": "object",
       "properties": {
         "name": {
-          "description": "Resource name.",
-          "type": "string"
+          "type": "string",
+          "description": "Resource name."
         },
         "sku": {
-          "description": "Describes the cloud service role sku.",
           "oneOf": [
             {
               "$ref": "#/definitions/CloudServiceRoleSku"
@@ -324,16 +358,15 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Describes the cloud service role sku."
         }
-      },
-      "type": "object"
+      }
     },
     "CloudServiceRoleSku": {
-      "description": "Describes the cloud service role sku.",
+      "type": "object",
       "properties": {
         "capacity": {
-          "description": "Specifies the number of role instances in the cloud service.",
           "oneOf": [
             {
               "type": "integer"
@@ -341,20 +374,28 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Specifies the number of role instances in the cloud service."
         },
         "name": {
-          "description": "The sku name. NOTE: If the new SKU is not supported on the hardware the cloud service is currently on, you need to delete and recreate the cloud service or move back to the old sku.",
-          "type": "string"
+          "type": "string",
+          "description": "The sku name. NOTE: If the new SKU is not supported on the hardware the cloud service is currently on, you need to delete and recreate the cloud service or move back to the old sku."
         },
         "tier": {
-          "description": "Specifies the tier of the cloud service. Possible Values are <br /><br /> **Standard** <br /><br /> **Basic**",
-          "type": "string"
+          "type": "string",
+          "description": "Specifies the tier of the cloud service. Possible Values are <br /><br /> **Standard** <br /><br /> **Basic**"
         }
-      },
-      "type": "object"
+      }
+    },
+    "CloudServiceTags": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "CloudServiceVaultAndSecretReference": {
+      "type": "object",
       "properties": {
         "secretUrl": {
           "type": "string"
@@ -369,24 +410,21 @@
             }
           ]
         }
-      },
-      "type": "object"
+      }
     },
     "CloudServiceVaultCertificate": {
-      "description": "Describes a single certificate reference in a Key Vault, and where the certificate should reside on the role instance.",
+      "type": "object",
       "properties": {
         "certificateUrl": {
-          "description": "This is the URL of a certificate that has been uploaded to Key Vault as a secret.",
-          "type": "string"
+          "type": "string",
+          "description": "This is the URL of a certificate that has been uploaded to Key Vault as a secret."
         }
-      },
-      "type": "object"
+      }
     },
     "CloudServiceVaultSecretGroup": {
-      "description": "Describes a set of certificates which are all in the same Key Vault.",
+      "type": "object",
       "properties": {
         "sourceVault": {
-          "description": "The relative URL of the Key Vault containing all of the certificates in VaultCertificates.",
           "oneOf": [
             {
               "$ref": "#/definitions/SubResource"
@@ -394,34 +432,33 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The relative URL of the Key Vault containing all of the certificates in VaultCertificates."
         },
         "vaultCertificates": {
-          "description": "The list of key vault references in SourceVault which contain certificates.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/CloudServiceVaultCertificate"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The list of key vault references in SourceVault which contain certificates."
         }
-      },
-      "type": "object"
+      }
     },
     "Extension": {
-      "description": "Describes a cloud service Extension.",
+      "type": "object",
       "properties": {
         "name": {
-          "description": "The name of the extension.",
-          "type": "string"
+          "type": "string",
+          "description": "The name of the extension."
         },
         "properties": {
-          "description": "Extension Properties.",
           "oneOf": [
             {
               "$ref": "#/definitions/CloudServiceExtensionProperties"
@@ -429,17 +466,17 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Extension Properties."
         }
-      },
-      "type": "object"
+      }
     },
     "LoadBalancerConfiguration": {
-      "description": "Describes the load balancer configuration.",
+      "type": "object",
       "properties": {
         "name": {
-          "description": "Resource Name",
-          "type": "string"
+          "type": "string",
+          "description": "Resource Name"
         },
         "properties": {
           "oneOf": [
@@ -451,35 +488,34 @@
             }
           ]
         }
-      },
-      "type": "object"
+      }
     },
     "LoadBalancerConfigurationProperties": {
+      "type": "object",
       "properties": {
         "frontendIPConfigurations": {
-          "description": "List of IP",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/LoadBalancerFrontendIPConfiguration"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "List of IP"
         }
-      },
-      "type": "object"
+      }
     },
     "LoadBalancerFrontendIPConfiguration": {
+      "type": "object",
       "properties": {
         "name": {
           "type": "string"
         },
         "properties": {
-          "description": "Describes a cloud service IP Configuration",
           "oneOf": [
             {
               "$ref": "#/definitions/LoadBalancerFrontendIPConfigurationProperties"
@@ -487,17 +523,17 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Describes a cloud service IP Configuration"
         }
-      },
-      "type": "object"
+      }
     },
     "LoadBalancerFrontendIPConfigurationProperties": {
-      "description": "Describes a cloud service IP Configuration",
+      "type": "object",
       "properties": {
         "privateIPAddress": {
-          "description": "The private IP address referenced by the cloud service.",
-          "type": "string"
+          "type": "string",
+          "description": "The private IP address referenced by the cloud service."
         },
         "publicIPAddress": {
           "oneOf": [
@@ -519,17 +555,50 @@
             }
           ]
         }
-      },
-      "type": "object"
+      }
     },
     "SubResource": {
+      "type": "object",
       "properties": {
         "id": {
-          "description": "Resource Id",
-          "type": "string"
+          "type": "string",
+          "description": "Resource Id"
+        }
+      }
+    },
+    "cloudServices_updateDomains_childResource": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2020-10-01-preview"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "updateDomains"
+          ]
         }
       },
-      "type": "object"
+      "required": [
+        "name",
+        "apiVersion",
+        "type"
+      ],
+      "description": "Microsoft.Compute/cloudServices/updateDomains"
     }
   }
 }

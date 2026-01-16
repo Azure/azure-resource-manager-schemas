@@ -1,57 +1,59 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "List basepaths",
-      "type": "node",
-      "request": "launch",
-      "runtimeExecutable": "npm",
-      "args": [
-        "run",
-        "list-basepaths",
-        "--",
-        "--specs-dir",
-        "${workspaceFolder}/../azure-rest-api-specs"
-      ],
-      "cwd": "${workspaceFolder}/generator"
-    },
-    {
-      "name": "Generate Single",
-      "type": "node",
-      "request": "launch",
-      "runtimeExecutable": "npm",
-      "args": [
-        "run",
-        "generate-single",
-        "--",
-        "--specs-dir",
-        "${workspaceFolder}/../azure-rest-api-specs",
-        "--base-path",
-        "${input:basePath}"
-      ],
-      "cwd": "${workspaceFolder}/generator"
-    },
-    {
-      "name": "Generate All",
-      "type": "node",
-      "request": "launch",
-      "runtimeExecutable": "npm",
-      "args": [
-        "run",
-        "generate-all",
-        "--",
-        "--specs-dir",
-        "${workspaceFolder}/../azure-rest-api-specs"
-      ],
-      "cwd": "${workspaceFolder}/generator"
-    }
-  ],
-  "inputs": [
-    {
-      "id": "basePath",
-      "type": "promptString",
-      "default": "alertsmanagement/resource-manager",
-      "description": "The path to generate types for (e.g. \"compute/resource-manager\", or \"keyvault/resource-manager\")."
-    }
-  ]
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch CLI",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceFolder}/src/TemplateSchemaGenerator/bin/Debug/net9.0/TemplateSchemaGenerator",
+            "args": [
+                "--source-folder",
+                "../../../bicep-types-az/generated",
+                "--output-folder",
+                "../../schemas",
+                "--verbose"
+            ],
+            "cwd": "${workspaceFolder}/src/TemplateSchemaGenerator",
+            // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Launch CLI (Single Provider)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceFolder}/src/TemplateSchemaGenerator/bin/Debug/net9.0/TemplateSchemaGenerator",
+            "args": [
+                "--source-folder",
+                "../../../bicep-types-az/generated",
+                "--output-folder",
+                "../../schemas",
+                "--provider-namespace",
+                "${input:providerNamespace}",
+                "--verbose"
+            ],
+            "cwd": "${workspaceFolder}/src/TemplateSchemaGenerator",
+            // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Attach",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}"
+        }
+    ],
+    "inputs": [
+        {
+            "id": "providerNamespace",
+            "default": "Microsoft.Compute",
+            "type": "promptString",
+            "description": "Pick a Provider Namespace to generate docs for"
+        }
+    ]
 }

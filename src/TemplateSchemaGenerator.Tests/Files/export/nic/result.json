@@ -1,0 +1,966 @@
+{
+  "value": {
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "routeTables_my_rt_name": {
+        "type": "String"
+      },
+      "virtualNetworks_VNet1_name": {
+        "type": "String"
+      },
+      "networkInterfaces_my_nic_name": {
+        "type": "String"
+      },
+      "virtualNetworks_aci_vnet_name": {
+        "type": "String"
+      },
+      "virtualNetworks_foovnet_0_name": {
+        "type": "String"
+      },
+      "virtualNetworks_foovnet_1_name": {
+        "type": "String"
+      },
+      "virtualNetworks_foovnetbar_name": {
+        "type": "String"
+      },
+      "virtualNetworks_foovnetba_0_name": {
+        "type": "String"
+      },
+      "virtualNetworks_foovnetba_1_name": {
+        "type": "String"
+      },
+      "networkSecurityGroups_my_nsg_name": {
+        "type": "String"
+      },
+      "virtualNetworks_cuseuap_vnet_name": {
+        "type": "String"
+      },
+      "virtualNetworks_foovnetbaz_0_name": {
+        "type": "String"
+      },
+      "virtualNetworks_foovnetbaz_1_name": {
+        "type": "String"
+      },
+      "networkProfiles_aci_networkProfile_name": {
+        "type": "String"
+      },
+      "networkSecurityGroups_my_second_nsg_name": {
+        "type": "String"
+      }
+    },
+    "variables": {},
+    "resources": [
+      {
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "apiVersion": "2021-08-01",
+        "name": "[parameters('networkSecurityGroups_my_nsg_name')]",
+        "location": "westus2",
+        "tags": {
+          "myTag": "myValue"
+        },
+        "properties": {
+          "securityRules": []
+        }
+      },
+      {
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "apiVersion": "2021-08-01",
+        "name": "[parameters('networkSecurityGroups_my_second_nsg_name')]",
+        "location": "eastus2",
+        "tags": {
+          "myTag": "myValue"
+        },
+        "properties": {
+          "securityRules": [
+            {
+              "name": "AllowAnyCustom8080Inbound",
+              "id": "[resourceId('Microsoft.Network/networkSecurityGroups/securityRules', parameters('networkSecurityGroups_my_second_nsg_name'), 'AllowAnyCustom8080Inbound')]",
+              "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+              "properties": {
+                "protocol": "*",
+                "sourcePortRange": "*",
+                "destinationPortRange": "8080",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 100,
+                "direction": "Inbound",
+                "sourcePortRanges": [],
+                "destinationPortRanges": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": []
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "Microsoft.Network/routeTables",
+        "apiVersion": "2021-08-01",
+        "name": "[parameters('routeTables_my_rt_name')]",
+        "location": "westus2",
+        "tags": {
+          "myTag": "myValue"
+        },
+        "properties": {
+          "disableBgpRoutePropagation": true,
+          "routes": [
+            {
+              "name": "my-route",
+              "id": "[resourceId('Microsoft.Network/routeTables/routes', parameters('routeTables_my_rt_name'), 'my-route')]",
+              "properties": {
+                "addressPrefix": "10.0.0.0/24",
+                "nextHopType": "None"
+              },
+              "type": "Microsoft.Network/routeTables/routes"
+            }
+          ]
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks",
+        "apiVersion": "2021-08-01",
+        "name": "[parameters('virtualNetworks_aci_vnet_name')]",
+        "location": "westus",
+        "tags": {
+          "expiredOn": "2020-07-08T17:16:31.8025710Z",
+          "myTag": "myValue"
+        },
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": [
+              "172.18.0.0/16"
+            ]
+          },
+          "subnets": [
+            {
+              "name": "default",
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_aci_vnet_name'), 'default')]",
+              "properties": {
+                "addressPrefix": "172.18.0.0/24",
+                "serviceEndpoints": [
+                  {
+                    "service": "Microsoft.Storage",
+                    "locations": [
+                      "westus",
+                      "eastus"
+                    ]
+                  }
+                ],
+                "delegations": [
+                  {
+                    "name": "ee39d1f6cf2a4b6eaa653c229b74dd66",
+                    "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_aci_vnet_name'), 'default'), '/delegations/ee39d1f6cf2a4b6eaa653c229b74dd66')]",
+                    "properties": {
+                      "serviceName": "Microsoft.ContainerInstance/containerGroups"
+                    },
+                    "type": "Microsoft.Network/virtualNetworks/subnets/delegations"
+                  }
+                ],
+                "privateEndpointNetworkPolicies": "Enabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+              },
+              "type": "Microsoft.Network/virtualNetworks/subnets"
+            },
+            {
+              "name": "aci",
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_aci_vnet_name'), 'aci')]",
+              "properties": {
+                "addressPrefix": "172.18.1.0/28",
+                "serviceEndpoints": [
+                  {
+                    "service": "Microsoft.Storage",
+                    "locations": [
+                      "westus",
+                      "eastus"
+                    ]
+                  }
+                ],
+                "delegations": [
+                  {
+                    "name": "95ac3e5bd31847ec93b89f82e971f47a",
+                    "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_aci_vnet_name'), 'aci'), '/delegations/95ac3e5bd31847ec93b89f82e971f47a')]",
+                    "properties": {
+                      "serviceName": "Microsoft.ContainerInstance/containerGroups"
+                    },
+                    "type": "Microsoft.Network/virtualNetworks/subnets/delegations"
+                  }
+                ],
+                "privateEndpointNetworkPolicies": "Enabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+              },
+              "type": "Microsoft.Network/virtualNetworks/subnets"
+            },
+            {
+              "name": "shared",
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_aci_vnet_name'), 'shared')]",
+              "properties": {
+                "addressPrefix": "172.18.1.16/28",
+                "serviceEndpoints": [
+                  {
+                    "service": "Microsoft.Storage",
+                    "locations": [
+                      "westus",
+                      "eastus"
+                    ]
+                  }
+                ],
+                "delegations": [
+                  {
+                    "name": "4c05f867729f4330985850936e4322e8",
+                    "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_aci_vnet_name'), 'shared'), '/delegations/4c05f867729f4330985850936e4322e8')]",
+                    "properties": {
+                      "serviceName": "Microsoft.ContainerInstance/containerGroups"
+                    },
+                    "type": "Microsoft.Network/virtualNetworks/subnets/delegations"
+                  }
+                ],
+                "privateEndpointNetworkPolicies": "Enabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+              },
+              "type": "Microsoft.Network/virtualNetworks/subnets"
+            },
+            {
+              "name": "shared2",
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_aci_vnet_name'), 'shared2')]",
+              "properties": {
+                "addressPrefix": "172.18.2.0/24",
+                "serviceEndpoints": [
+                  {
+                    "service": "Microsoft.Storage",
+                    "locations": [
+                      "westus",
+                      "eastus"
+                    ]
+                  }
+                ],
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Enabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+              },
+              "type": "Microsoft.Network/virtualNetworks/subnets"
+            }
+          ],
+          "virtualNetworkPeerings": [],
+          "enableDdosProtection": false
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks",
+        "apiVersion": "2021-08-01",
+        "name": "[parameters('virtualNetworks_cuseuap_vnet_name')]",
+        "location": "centraluseuap",
+        "tags": {
+          "myTag": "myValue"
+        },
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": [
+              "10.0.0.0/16"
+            ]
+          },
+          "subnets": [
+            {
+              "name": "aci-vnet",
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_cuseuap_vnet_name'), 'aci-vnet')]",
+              "properties": {
+                "addressPrefix": "10.0.0.0/24",
+                "serviceEndpoints": [
+                  {
+                    "service": "Microsoft.Storage",
+                    "locations": [
+                      "centraluseuap",
+                      "eastus2euap"
+                    ]
+                  }
+                ],
+                "delegations": [
+                  {
+                    "name": "Microsoft.ContainerInstance.containerGroups",
+                    "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_cuseuap_vnet_name'), 'aci-vnet'), '/delegations/Microsoft.ContainerInstance.containerGroups')]",
+                    "properties": {
+                      "serviceName": "Microsoft.ContainerInstance/containerGroups"
+                    },
+                    "type": "Microsoft.Network/virtualNetworks/subnets/delegations"
+                  }
+                ],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+              },
+              "type": "Microsoft.Network/virtualNetworks/subnets"
+            }
+          ],
+          "virtualNetworkPeerings": [],
+          "enableDdosProtection": false
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks",
+        "apiVersion": "2021-08-01",
+        "name": "[parameters('virtualNetworks_foovnet_0_name')]",
+        "location": "eastus2",
+        "tags": {
+          "myTag": "myValue"
+        },
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": [
+              "10.0.0.0/16"
+            ]
+          },
+          "subnets": [
+            {
+              "name": "foosubnet-0",
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_foovnet_0_name'), 'foosubnet-0')]",
+              "properties": {
+                "addressPrefix": "10.0.0.0/24",
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+              },
+              "type": "Microsoft.Network/virtualNetworks/subnets"
+            },
+            {
+              "name": "test",
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_foovnet_0_name'), 'test')]",
+              "properties": {
+                "addressPrefix": "10.0.1.0/29",
+                "serviceEndpoints": [],
+                "delegations": [
+                  {
+                    "name": "Microsoft.ContainerInstance.containerGroups",
+                    "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_foovnet_0_name'), 'test'), '/delegations/Microsoft.ContainerInstance.containerGroups')]",
+                    "properties": {
+                      "serviceName": "Microsoft.ContainerInstance/containerGroups"
+                    },
+                    "type": "Microsoft.Network/virtualNetworks/subnets/delegations"
+                  }
+                ],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+              },
+              "type": "Microsoft.Network/virtualNetworks/subnets"
+            }
+          ],
+          "virtualNetworkPeerings": [],
+          "enableDdosProtection": false
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks",
+        "apiVersion": "2021-08-01",
+        "name": "[parameters('virtualNetworks_foovnet_1_name')]",
+        "location": "eastus2",
+        "tags": {
+          "myTag": "myValue"
+        },
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": [
+              "10.0.0.0/16"
+            ]
+          },
+          "subnets": [
+            {
+              "name": "foosubnet-1",
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_foovnet_1_name'), 'foosubnet-1')]",
+              "properties": {
+                "addressPrefix": "10.0.0.0/24",
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+              },
+              "type": "Microsoft.Network/virtualNetworks/subnets"
+            }
+          ],
+          "virtualNetworkPeerings": [],
+          "enableDdosProtection": false
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks",
+        "apiVersion": "2021-08-01",
+        "name": "[parameters('virtualNetworks_foovnetba_0_name')]",
+        "location": "eastus2",
+        "tags": {
+          "myTag": "myValue"
+        },
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": [
+              "10.0.0.0/16"
+            ]
+          },
+          "subnets": [
+            {
+              "name": "foosubnetba-0",
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_foovnetba_0_name'), 'foosubnetba-0')]",
+              "properties": {
+                "addressPrefix": "10.0.0.0/24",
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+              },
+              "type": "Microsoft.Network/virtualNetworks/subnets"
+            }
+          ],
+          "virtualNetworkPeerings": [],
+          "enableDdosProtection": false
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks",
+        "apiVersion": "2021-08-01",
+        "name": "[parameters('virtualNetworks_foovnetba_1_name')]",
+        "location": "eastus2",
+        "tags": {
+          "myTag": "myValue"
+        },
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": [
+              "10.0.0.0/16"
+            ]
+          },
+          "subnets": [
+            {
+              "name": "foosubnetba-1",
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_foovnetba_1_name'), 'foosubnetba-1')]",
+              "properties": {
+                "addressPrefix": "10.0.0.0/24",
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+              },
+              "type": "Microsoft.Network/virtualNetworks/subnets"
+            }
+          ],
+          "virtualNetworkPeerings": [],
+          "enableDdosProtection": false
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks",
+        "apiVersion": "2021-08-01",
+        "name": "[parameters('virtualNetworks_foovnetbar_name')]",
+        "location": "eastus2",
+        "tags": {
+          "myTag": "myValue"
+        },
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": [
+              "10.0.0.0/16"
+            ]
+          },
+          "subnets": [
+            {
+              "name": "foosubnetbar",
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_foovnetbar_name'), 'foosubnetbar')]",
+              "properties": {
+                "addressPrefix": "10.0.0.0/24",
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+              },
+              "type": "Microsoft.Network/virtualNetworks/subnets"
+            }
+          ],
+          "virtualNetworkPeerings": [],
+          "enableDdosProtection": false
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks",
+        "apiVersion": "2021-08-01",
+        "name": "[parameters('virtualNetworks_foovnetbaz_0_name')]",
+        "location": "eastus2",
+        "tags": {
+          "myTag": "myValue"
+        },
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": [
+              "10.0.0.0/16"
+            ]
+          },
+          "subnets": [
+            {
+              "name": "foosubnetbaz-0",
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_foovnetbaz_0_name'), 'foosubnetbaz-0')]",
+              "properties": {
+                "addressPrefix": "10.0.0.0/24",
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+              },
+              "type": "Microsoft.Network/virtualNetworks/subnets"
+            }
+          ],
+          "virtualNetworkPeerings": [],
+          "enableDdosProtection": false
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks",
+        "apiVersion": "2021-08-01",
+        "name": "[parameters('virtualNetworks_foovnetbaz_1_name')]",
+        "location": "eastus2",
+        "tags": {
+          "myTag": "myValue"
+        },
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": [
+              "10.0.0.0/16"
+            ]
+          },
+          "subnets": [
+            {
+              "name": "foosubnetbaz-1",
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_foovnetbaz_1_name'), 'foosubnetbaz-1')]",
+              "properties": {
+                "addressPrefix": "10.0.0.0/24",
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+              },
+              "type": "Microsoft.Network/virtualNetworks/subnets"
+            }
+          ],
+          "virtualNetworkPeerings": [],
+          "enableDdosProtection": false
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks",
+        "apiVersion": "2021-08-01",
+        "name": "[parameters('virtualNetworks_VNet1_name')]",
+        "location": "eastus2",
+        "tags": {
+          "myTag": "myValue"
+        },
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": [
+              "10.0.0.0/16"
+            ]
+          },
+          "subnets": [
+            {
+              "name": "Subnet1",
+              "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_VNet1_name'), 'Subnet1')]",
+              "properties": {
+                "addressPrefix": "10.0.0.0/24",
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Disabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+              },
+              "type": "Microsoft.Network/virtualNetworks/subnets"
+            }
+          ],
+          "virtualNetworkPeerings": [],
+          "enableDdosProtection": false
+        }
+      },
+      {
+        "type": "Microsoft.Network/networkProfiles",
+        "apiVersion": "2021-08-01",
+        "name": "[parameters('networkProfiles_aci_networkProfile_name')]",
+        "location": "westus",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_aci_vnet_name'), 'default')]"
+        ],
+        "tags": {
+          "expiredOn": "2020-11-18T22:16:12.3190515Z",
+          "myTag": "myValue"
+        },
+        "properties": {
+          "containerNetworkInterfaceConfigurations": [
+            {
+              "name": "eth0",
+              "id": "[concat(resourceId('Microsoft.Network/networkProfiles', parameters('networkProfiles_aci_networkProfile_name')), '/containerNetworkInterfaceConfigurations/eth0')]",
+              "properties": {
+                "ipConfigurations": [
+                  {
+                    "name": "ipconfigprofile1",
+                    "id": "[concat(resourceId('Microsoft.Network/networkProfiles', parameters('networkProfiles_aci_networkProfile_name')), '/containerNetworkInterfaceConfigurations/eth0/ipConfigurations/ipconfigprofile1')]",
+                    "properties": {
+                      "subnet": {
+                        "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_aci_vnet_name'), 'default')]"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+        "apiVersion": "2021-08-01",
+        "name": "[concat(parameters('networkSecurityGroups_my_second_nsg_name'), '/AllowAnyCustom8080Inbound')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_my_second_nsg_name'))]"
+        ],
+        "properties": {
+          "protocol": "*",
+          "sourcePortRange": "*",
+          "destinationPortRange": "8080",
+          "sourceAddressPrefix": "*",
+          "destinationAddressPrefix": "*",
+          "access": "Allow",
+          "priority": 100,
+          "direction": "Inbound",
+          "sourcePortRanges": [],
+          "destinationPortRanges": [],
+          "sourceAddressPrefixes": [],
+          "destinationAddressPrefixes": []
+        }
+      },
+      {
+        "type": "Microsoft.Network/routeTables/routes",
+        "apiVersion": "2021-08-01",
+        "name": "[concat(parameters('routeTables_my_rt_name'), '/my-route')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/routeTables', parameters('routeTables_my_rt_name'))]"
+        ],
+        "properties": {
+          "addressPrefix": "10.0.0.0/24",
+          "nextHopType": "None"
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks/subnets",
+        "apiVersion": "2021-08-01",
+        "name": "[concat(parameters('virtualNetworks_aci_vnet_name'), '/aci')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_aci_vnet_name'))]"
+        ],
+        "properties": {
+          "addressPrefix": "172.18.1.0/28",
+          "serviceEndpoints": [
+            {
+              "service": "Microsoft.Storage",
+              "locations": [
+                "westus",
+                "eastus"
+              ]
+            }
+          ],
+          "delegations": [
+            {
+              "name": "95ac3e5bd31847ec93b89f82e971f47a",
+              "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_aci_vnet_name'), 'aci'), '/delegations/95ac3e5bd31847ec93b89f82e971f47a')]",
+              "properties": {
+                "serviceName": "Microsoft.ContainerInstance/containerGroups"
+              },
+              "type": "Microsoft.Network/virtualNetworks/subnets/delegations"
+            }
+          ],
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled"
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks/subnets",
+        "apiVersion": "2021-08-01",
+        "name": "[concat(parameters('virtualNetworks_cuseuap_vnet_name'), '/aci-vnet')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_cuseuap_vnet_name'))]"
+        ],
+        "properties": {
+          "addressPrefix": "10.0.0.0/24",
+          "serviceEndpoints": [
+            {
+              "service": "Microsoft.Storage",
+              "locations": [
+                "centraluseuap",
+                "eastus2euap"
+              ]
+            }
+          ],
+          "delegations": [
+            {
+              "name": "Microsoft.ContainerInstance.containerGroups",
+              "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_cuseuap_vnet_name'), 'aci-vnet'), '/delegations/Microsoft.ContainerInstance.containerGroups')]",
+              "properties": {
+                "serviceName": "Microsoft.ContainerInstance/containerGroups"
+              },
+              "type": "Microsoft.Network/virtualNetworks/subnets/delegations"
+            }
+          ],
+          "privateEndpointNetworkPolicies": "Disabled",
+          "privateLinkServiceNetworkPolicies": "Enabled"
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks/subnets",
+        "apiVersion": "2021-08-01",
+        "name": "[concat(parameters('virtualNetworks_aci_vnet_name'), '/default')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_aci_vnet_name'))]"
+        ],
+        "properties": {
+          "addressPrefix": "172.18.0.0/24",
+          "serviceEndpoints": [
+            {
+              "service": "Microsoft.Storage",
+              "locations": [
+                "westus",
+                "eastus"
+              ]
+            }
+          ],
+          "delegations": [
+            {
+              "name": "ee39d1f6cf2a4b6eaa653c229b74dd66",
+              "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_aci_vnet_name'), 'default'), '/delegations/ee39d1f6cf2a4b6eaa653c229b74dd66')]",
+              "properties": {
+                "serviceName": "Microsoft.ContainerInstance/containerGroups"
+              },
+              "type": "Microsoft.Network/virtualNetworks/subnets/delegations"
+            }
+          ],
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled"
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks/subnets",
+        "apiVersion": "2021-08-01",
+        "name": "[concat(parameters('virtualNetworks_foovnet_0_name'), '/foosubnet-0')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_foovnet_0_name'))]"
+        ],
+        "properties": {
+          "addressPrefix": "10.0.0.0/24",
+          "delegations": [],
+          "privateEndpointNetworkPolicies": "Disabled",
+          "privateLinkServiceNetworkPolicies": "Enabled"
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks/subnets",
+        "apiVersion": "2021-08-01",
+        "name": "[concat(parameters('virtualNetworks_foovnet_1_name'), '/foosubnet-1')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_foovnet_1_name'))]"
+        ],
+        "properties": {
+          "addressPrefix": "10.0.0.0/24",
+          "delegations": [],
+          "privateEndpointNetworkPolicies": "Disabled",
+          "privateLinkServiceNetworkPolicies": "Enabled"
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks/subnets",
+        "apiVersion": "2021-08-01",
+        "name": "[concat(parameters('virtualNetworks_foovnetba_0_name'), '/foosubnetba-0')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_foovnetba_0_name'))]"
+        ],
+        "properties": {
+          "addressPrefix": "10.0.0.0/24",
+          "delegations": [],
+          "privateEndpointNetworkPolicies": "Disabled",
+          "privateLinkServiceNetworkPolicies": "Enabled"
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks/subnets",
+        "apiVersion": "2021-08-01",
+        "name": "[concat(parameters('virtualNetworks_foovnetba_1_name'), '/foosubnetba-1')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_foovnetba_1_name'))]"
+        ],
+        "properties": {
+          "addressPrefix": "10.0.0.0/24",
+          "delegations": [],
+          "privateEndpointNetworkPolicies": "Disabled",
+          "privateLinkServiceNetworkPolicies": "Enabled"
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks/subnets",
+        "apiVersion": "2021-08-01",
+        "name": "[concat(parameters('virtualNetworks_foovnetbar_name'), '/foosubnetbar')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_foovnetbar_name'))]"
+        ],
+        "properties": {
+          "addressPrefix": "10.0.0.0/24",
+          "delegations": [],
+          "privateEndpointNetworkPolicies": "Disabled",
+          "privateLinkServiceNetworkPolicies": "Enabled"
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks/subnets",
+        "apiVersion": "2021-08-01",
+        "name": "[concat(parameters('virtualNetworks_foovnetbaz_0_name'), '/foosubnetbaz-0')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_foovnetbaz_0_name'))]"
+        ],
+        "properties": {
+          "addressPrefix": "10.0.0.0/24",
+          "delegations": [],
+          "privateEndpointNetworkPolicies": "Disabled",
+          "privateLinkServiceNetworkPolicies": "Enabled"
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks/subnets",
+        "apiVersion": "2021-08-01",
+        "name": "[concat(parameters('virtualNetworks_foovnetbaz_1_name'), '/foosubnetbaz-1')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_foovnetbaz_1_name'))]"
+        ],
+        "properties": {
+          "addressPrefix": "10.0.0.0/24",
+          "delegations": [],
+          "privateEndpointNetworkPolicies": "Disabled",
+          "privateLinkServiceNetworkPolicies": "Enabled"
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks/subnets",
+        "apiVersion": "2021-08-01",
+        "name": "[concat(parameters('virtualNetworks_aci_vnet_name'), '/shared')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_aci_vnet_name'))]"
+        ],
+        "properties": {
+          "addressPrefix": "172.18.1.16/28",
+          "serviceEndpoints": [
+            {
+              "service": "Microsoft.Storage",
+              "locations": [
+                "westus",
+                "eastus"
+              ]
+            }
+          ],
+          "delegations": [
+            {
+              "name": "4c05f867729f4330985850936e4322e8",
+              "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_aci_vnet_name'), 'shared'), '/delegations/4c05f867729f4330985850936e4322e8')]",
+              "properties": {
+                "serviceName": "Microsoft.ContainerInstance/containerGroups"
+              },
+              "type": "Microsoft.Network/virtualNetworks/subnets/delegations"
+            }
+          ],
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled"
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks/subnets",
+        "apiVersion": "2021-08-01",
+        "name": "[concat(parameters('virtualNetworks_aci_vnet_name'), '/shared2')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_aci_vnet_name'))]"
+        ],
+        "properties": {
+          "addressPrefix": "172.18.2.0/24",
+          "serviceEndpoints": [
+            {
+              "service": "Microsoft.Storage",
+              "locations": [
+                "westus",
+                "eastus"
+              ]
+            }
+          ],
+          "delegations": [],
+          "privateEndpointNetworkPolicies": "Enabled",
+          "privateLinkServiceNetworkPolicies": "Enabled"
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks/subnets",
+        "apiVersion": "2021-08-01",
+        "name": "[concat(parameters('virtualNetworks_VNet1_name'), '/Subnet1')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_VNet1_name'))]"
+        ],
+        "properties": {
+          "addressPrefix": "10.0.0.0/24",
+          "delegations": [],
+          "privateEndpointNetworkPolicies": "Disabled",
+          "privateLinkServiceNetworkPolicies": "Enabled"
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks/subnets",
+        "apiVersion": "2021-08-01",
+        "name": "[concat(parameters('virtualNetworks_foovnet_0_name'), '/test')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_foovnet_0_name'))]"
+        ],
+        "properties": {
+          "addressPrefix": "10.0.1.0/29",
+          "serviceEndpoints": [],
+          "delegations": [
+            {
+              "name": "Microsoft.ContainerInstance.containerGroups",
+              "id": "[concat(resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_foovnet_0_name'), 'test'), '/delegations/Microsoft.ContainerInstance.containerGroups')]",
+              "properties": {
+                "serviceName": "Microsoft.ContainerInstance/containerGroups"
+              },
+              "type": "Microsoft.Network/virtualNetworks/subnets/delegations"
+            }
+          ],
+          "privateEndpointNetworkPolicies": "Disabled",
+          "privateLinkServiceNetworkPolicies": "Enabled"
+        }
+      },
+      {
+        "type": "Microsoft.Network/networkInterfaces",
+        "apiVersion": "2021-08-01",
+        "name": "[parameters('networkInterfaces_my_nic_name')]",
+        "location": "eastus2",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_foovnet_0_name'), 'foosubnet-0')]",
+          "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_my_second_nsg_name'))]"
+        ],
+        "tags": {
+          "myTag": "myValue"
+        },
+        "kind": "Regular",
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "Ipv4config",
+              "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_my_nic_name')), '/ipConfigurations/Ipv4config')]",
+              "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
+              "properties": {
+                "privateIPAddress": "10.0.0.4",
+                "privateIPAllocationMethod": "Dynamic",
+                "subnet": {
+                  "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_foovnet_0_name'), 'foosubnet-0')]"
+                },
+                "primary": true,
+                "privateIPAddressVersion": "IPv4"
+              }
+            }
+          ],
+          "dnsSettings": {
+            "dnsServers": []
+          },
+          "enableAcceleratedNetworking": false,
+          "enableIPForwarding": false,
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_my_second_nsg_name'))]"
+          },
+          "nicType": "Standard"
+        }
+      }
+    ]
+  },
+  "errors": []
+}

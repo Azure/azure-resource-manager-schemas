@@ -5,7 +5,6 @@ using System.Collections.Immutable;
 using System.Text.Json.Nodes;
 using Azure.Bicep.Types.Concrete;
 using System.Text.RegularExpressions;
-using Microsoft.WindowsAzure.ResourceStack.Common.Collections;
 
 namespace TemplateSchemaGenerator;
 
@@ -387,7 +386,7 @@ public static class JsonSchemaGenerator
                 nameSchema["description"] = nameDescription;
             }
 
-            OrdinalInsensitiveHashSet excludedProperties = ["name", "type", "apiVersion"];
+            HashSet<string> excludedProperties = new(StringComparer.OrdinalIgnoreCase) { "name", "type", "apiVersion" };
             var bodyProperties = bodyType.Properties.Where(p =>  !excludedProperties.Contains(p.Key));
             var (properties, required) = ConvertWritableProperties(bodyProperties, []);
 
@@ -436,7 +435,7 @@ public static class JsonSchemaGenerator
                     throw new InvalidOperationException($"Expected discriminated element to be ObjectType, got {element.Type.GetType().Name}");
                 }
 
-                OrdinalInsensitiveHashSet excludedProperties = ["name", "type", "apiVersion"];
+                HashSet<string> excludedProperties = new(StringComparer.OrdinalIgnoreCase) { "name", "type", "apiVersion" };
                 var bodyProperties = discriminatedBody.BaseProperties.Concat(elementObjectType.Properties).Where(p =>  !excludedProperties.Contains(p.Key));
                 var (properties, required) = ConvertWritableProperties(bodyProperties, []);
 

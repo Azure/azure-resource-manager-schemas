@@ -1,0 +1,240 @@
+{
+  "value": {
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "networkInterfaces_nic_1_name": {
+        "type": "String"
+      },
+      "networkInterfaces_nic_2_name": {
+        "type": "String"
+      },
+      "networkSecurityGroups_NSG_name": {
+        "type": "String"
+      },
+      "publicIPAddresses_publicIp_name": {
+        "type": "String"
+      },
+      "virtualNetworks_virtualNetwork_name": {
+        "type": "String"
+      },
+      "networkSecurityGroups_subnet_2_nsg_name": {
+        "type": "String"
+      }
+    },
+    "variables": {},
+    "resources": [
+      {
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "apiVersion": "2017-10-01",
+        "name": "[parameters('networkSecurityGroups_NSG_name')]",
+        "location": "westus",
+        "properties": {
+          "securityRules": [
+            {
+              "name": "default-allow-rdp",
+              "id": "[resourceId('Microsoft.Network/networkSecurityGroups/securityRules', parameters('networkSecurityGroups_NSG_name'), 'default-allow-rdp')]",
+              "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+              "properties": {
+                "protocol": "Tcp",
+                "sourcePortRange": "*",
+                "destinationPortRange": "3389",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 1000,
+                "direction": "Inbound",
+                "sourcePortRanges": [],
+                "destinationPortRanges": [],
+                "sourceAddressPrefixes": [],
+                "destinationAddressPrefixes": []
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "apiVersion": "2017-10-01",
+        "name": "[parameters('networkSecurityGroups_subnet_2_nsg_name')]",
+        "location": "westus",
+        "properties": {
+          "securityRules": []
+        }
+      },
+      {
+        "type": "Microsoft.Network/publicIPAddresses",
+        "apiVersion": "2017-10-01",
+        "name": "[parameters('publicIPAddresses_publicIp_name')]",
+        "location": "westus",
+        "sku": {
+          "name": "Basic"
+        },
+        "properties": {
+          "publicIPAddressVersion": "IPv4",
+          "publicIPAllocationMethod": "Dynamic",
+          "idleTimeoutInMinutes": 4,
+          "ipTags": []
+        }
+      },
+      {
+        "type": "Microsoft.Network/networkInterfaces",
+        "apiVersion": "2017-10-01",
+        "name": "[parameters('networkInterfaces_nic_2_name')]",
+        "location": "westus",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_virtualNetwork_name'), 'subnet-2')]"
+        ],
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "ipconfig1",
+              "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_nic_2_name')), '/ipConfigurations/ipconfig1')]",
+              "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
+              "properties": {
+                "privateIPAddress": "10.0.1.4",
+                "privateIPAllocationMethod": "Dynamic",
+                "subnet": {
+                  "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_virtualNetwork_name'), 'subnet-2')]"
+                },
+                "primary": true,
+                "privateIPAddressVersion": "IPv4"
+              }
+            }
+          ],
+          "dnsSettings": {
+            "dnsServers": []
+          },
+          "enableIPForwarding": false
+        }
+      },
+      {
+        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+        "apiVersion": "2017-10-01",
+        "name": "[concat(parameters('networkSecurityGroups_NSG_name'), '/default-allow-rdp')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_NSG_name'))]"
+        ],
+        "properties": {
+          "protocol": "Tcp",
+          "sourcePortRange": "*",
+          "destinationPortRange": "3389",
+          "sourceAddressPrefix": "*",
+          "destinationAddressPrefix": "*",
+          "access": "Allow",
+          "priority": 1000,
+          "direction": "Inbound",
+          "sourcePortRanges": [],
+          "destinationPortRanges": [],
+          "sourceAddressPrefixes": [],
+          "destinationAddressPrefixes": []
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks",
+        "apiVersion": "2017-10-01",
+        "name": "[parameters('virtualNetworks_virtualNetwork_name')]",
+        "location": "westus",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_subnet_2_nsg_name'))]"
+        ],
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": [
+              "10.0.0.0/16"
+            ]
+          },
+          "subnets": [
+            {
+              "name": "subnet-1",
+              "id": "[resourceId(concat('Microsoft.Network/', parameters('virtualNetworks_virtualNetwork_name'), 's/subnets'), parameters('virtualNetworks_virtualNetwork_name'), 'subnet-1')]",
+              "properties": {
+                "addressPrefix": "10.0.0.0/24"
+              },
+              "type": "[concat('Microsoft.Network/', parameters('virtualNetworks_virtualNetwork_name'), 's/subnets')]"
+            },
+            {
+              "name": "subnet-2",
+              "id": "[resourceId(concat('Microsoft.Network/', parameters('virtualNetworks_virtualNetwork_name'), 's/subnets'), parameters('virtualNetworks_virtualNetwork_name'), 'subnet-2')]",
+              "properties": {
+                "addressPrefix": "10.0.1.0/24",
+                "networkSecurityGroup": {
+                  "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_subnet_2_nsg_name'))]"
+                }
+              },
+              "type": "[concat('Microsoft.Network/', parameters('virtualNetworks_virtualNetwork_name'), 's/subnets')]"
+            }
+          ],
+          "virtualNetworkPeerings": [],
+          "enableDdosProtection": false
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks/subnets",
+        "apiVersion": "2017-10-01",
+        "name": "[concat(parameters('virtualNetworks_virtualNetwork_name'), '/subnet-1')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_virtualNetwork_name'))]"
+        ],
+        "properties": {
+          "addressPrefix": "10.0.0.0/24"
+        }
+      },
+      {
+        "type": "Microsoft.Network/virtualNetworks/subnets",
+        "apiVersion": "2017-10-01",
+        "name": "[concat(parameters('virtualNetworks_virtualNetwork_name'), '/subnet-2')]",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_virtualNetwork_name'))]",
+          "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_subnet_2_nsg_name'))]"
+        ],
+        "properties": {
+          "addressPrefix": "10.0.1.0/24",
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_subnet_2_nsg_name'))]"
+          }
+        }
+      },
+      {
+        "type": "Microsoft.Network/networkInterfaces",
+        "apiVersion": "2017-10-01",
+        "name": "[parameters('networkInterfaces_nic_1_name')]",
+        "location": "westus",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddresses_publicIp_name'))]",
+          "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_virtualNetwork_name'), 'subnet-1')]",
+          "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_NSG_name'))]"
+        ],
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "ipconfig1",
+              "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_nic_1_name')), '/ipConfigurations/ipconfig1')]",
+              "type": "Microsoft.Network/networkInterfaces/ipConfigurations",
+              "properties": {
+                "privateIPAddress": "10.0.0.4",
+                "privateIPAllocationMethod": "Dynamic",
+                "publicIPAddress": {
+                  "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddresses_publicIp_name'))]"
+                },
+                "subnet": {
+                  "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_virtualNetwork_name'), 'subnet-1')]"
+                },
+                "primary": true,
+                "privateIPAddressVersion": "IPv4"
+              }
+            }
+          ],
+          "dnsSettings": {
+            "dnsServers": []
+          },
+          "enableIPForwarding": false,
+          "networkSecurityGroup": {
+            "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_NSG_name'))]"
+          }
+        }
+      }
+    ]
+  },
+  "errors": []
+}

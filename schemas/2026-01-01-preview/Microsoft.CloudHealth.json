@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2025-05-01-preview/Microsoft.CloudHealth.json#",
+  "id": "https://schema.management.azure.com/schemas/2026-01-01-preview/Microsoft.CloudHealth.json#",
   "title": "Microsoft.CloudHealth",
   "description": "Microsoft CloudHealth Resource Types",
   "$schema": "http://json-schema.org/draft-04/schema#",
@@ -9,7 +9,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2025-05-01-preview"
+            "2026-01-01-preview"
           ],
           "type": "string"
         },
@@ -108,7 +108,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2025-05-01-preview"
+            "2026-01-01-preview"
           ],
           "type": "string"
         },
@@ -155,7 +155,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2025-05-01-preview"
+            "2026-01-01-preview"
           ],
           "type": "string"
         },
@@ -202,7 +202,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2025-05-01-preview"
+            "2026-01-01-preview"
           ],
           "type": "string"
         },
@@ -249,7 +249,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2025-05-01-preview"
+            "2026-01-01-preview"
           ],
           "type": "string"
         },
@@ -296,7 +296,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2025-05-01-preview"
+            "2026-01-01-preview"
           ],
           "type": "string"
         },
@@ -423,11 +423,11 @@
       },
       "type": "object"
     },
-    "AzureMonitorWorkspaceSignalGroup": {
-      "description": "A grouping of signal assignments for a Azure Monitor Workspace",
+    "AzureMonitorWorkspaceSignals": {
+      "description": "A grouping of Azure Monitor workspace signals.",
       "properties": {
         "authenticationSetting": {
-          "description": "Reference to the name of the authentication setting which is used for querying the data source",
+          "description": "Reference to the name of the authentication setting which is used for querying the data source.",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",
@@ -439,15 +439,15 @@
           ]
         },
         "azureMonitorWorkspaceResourceId": {
-          "description": "Azure Monitor workspace resource ID",
+          "description": "Azure Monitor workspace resource ID.",
           "type": "string"
         },
-        "signalAssignments": {
-          "description": "Signal definitions which are assigned to this signal group. All assignments are combined with an OR operator.",
+        "signals": {
+          "description": "Signals assigned to this signal group.",
           "oneOf": [
             {
               "items": {
-                "$ref": "#/definitions/SignalAssignment"
+                "$ref": "#/definitions/PrometheusMetricsSignal"
               },
               "type": "array"
             },
@@ -463,11 +463,152 @@
       ],
       "type": "object"
     },
-    "AzureResourceSignalGroup": {
-      "description": "A grouping of signal assignments for an Azure resource",
+    "AzureResourceSignal": {
+      "description": "An Azure Resource Metric signal instance assigned to an entity.",
+      "properties": {
+        "aggregationType": {
+          "description": "Type of aggregation to apply to the metric",
+          "oneOf": [
+            {
+              "enum": [
+                "None",
+                "Average",
+                "Count",
+                "Minimum",
+                "Maximum",
+                "Total"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "dataUnit": {
+          "description": "Unit of the signal result (e.g. Bytes, MilliSeconds, Percent, Count))",
+          "maxLength": 100,
+          "minLength": 1,
+          "type": "string"
+        },
+        "dimension": {
+          "description": "Optional: Dimension to split by",
+          "maxLength": 256,
+          "minLength": 1,
+          "type": "string"
+        },
+        "dimensionFilter": {
+          "description": "Optional: Dimension filter to apply to the dimension. Must only be set if also Dimension is set.",
+          "maxLength": 256,
+          "minLength": 1,
+          "type": "string"
+        },
+        "displayName": {
+          "description": "Display name",
+          "maxLength": 260,
+          "minLength": 1,
+          "type": "string"
+        },
+        "evaluationRules": {
+          "description": "Evaluation rules for the signal definition",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EvaluationRule"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "metricName": {
+          "description": "Name of the metric",
+          "maxLength": 256,
+          "minLength": 1,
+          "type": "string"
+        },
+        "metricNamespace": {
+          "description": "Metric namespace",
+          "maxLength": 256,
+          "minLength": 1,
+          "type": "string"
+        },
+        "name": {
+          "description": "Unique name of the signal within the entity.",
+          "oneOf": [
+            {
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "refreshInterval": {
+          "description": "Interval in which the signal is being evaluated. Defaults to PT1M (1 minute).",
+          "oneOf": [
+            {
+              "enum": [
+                "PT1M",
+                "PT5M",
+                "PT10M",
+                "PT30M",
+                "PT1H",
+                "PT2H"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "signalDefinitionName": {
+          "description": "Optional reference to a signal definition that provides default values.",
+          "oneOf": [
+            {
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "signalKind": {
+          "description": "Kind of the signal instance",
+          "oneOf": [
+            {
+              "enum": [
+                "AzureResourceMetric",
+                "LogAnalyticsQuery",
+                "PrometheusMetricsQuery"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "timeGrain": {
+          "description": "Time range of signal. ISO duration format like PT10M.",
+          "maxLength": 100,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "signalKind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "AzureResourceSignals": {
+      "description": "A grouping of Azure resource signals",
       "properties": {
         "authenticationSetting": {
-          "description": "Reference to the name of the authentication setting which is used for querying the data source",
+          "description": "Reference to the name of the authentication setting which is used for querying the data source.",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",
@@ -482,12 +623,17 @@
           "description": "Azure resource ID",
           "type": "string"
         },
-        "signalAssignments": {
-          "description": "Signal definitions which are assigned to this signal group. All assignments are combined with an OR operator.",
+        "azureResourceKind": {
+          "description": "Azure resource kind (e.g., 'functionapp'). Populated by the UI for icon rendering. Can be null if not populated.",
+          "maxLength": 256,
+          "type": "string"
+        },
+        "signals": {
+          "description": "Signals assigned to this group.",
           "oneOf": [
             {
               "items": {
-                "$ref": "#/definitions/SignalAssignment"
+                "$ref": "#/definitions/AzureResourceSignal"
               },
               "type": "array"
             },
@@ -586,78 +732,73 @@
           "minLength": 1,
           "type": "string"
         },
-        "resourceGraphQuery": {
-          "description": "Azure Resource Graph query text in KQL syntax. The query must return at least a column named 'id' which contains the resource ID of the discovered resources.",
-          "maxLength": 5000,
-          "minLength": 1,
-          "type": "string"
+        "specification": {
+          "description": "Specification of the discovery rule defining how entities are discovered.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DiscoveryRuleSpecification"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "required": [
-        "resourceGraphQuery",
         "authenticationSetting",
         "discoverRelationships",
-        "addRecommendedSignals"
+        "addRecommendedSignals",
+        "specification"
       ],
       "type": "object"
     },
-    "DynamicDetectionRule": {
-      "description": "ML-based evaluation rule for a signal definition",
-      "properties": {
-        "dynamicThresholdDirection": {
-          "description": "Threshold direction",
-          "oneOf": [
-            {
+    "DiscoveryRuleSpecification": {
+      "description": "Base model for discovery rule specifications",
+      "oneOf": [
+        {
+          "description": "Discovery rule specification for an Application Insights topology query",
+          "properties": {
+            "applicationInsightsResourceId": {
+              "description": "Application Insights resource ID",
+              "type": "string"
+            },
+            "kind": {
               "enum": [
-                "LowerThan",
-                "GreaterThan",
-                "GreaterOrLowerThan"
+                "ApplicationInsightsTopology"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "applicationInsightsResourceId",
+            "kind"
+          ],
+          "type": "object"
+        },
+        {
+          "description": "Discovery rule specification for an Azure Resource Graph query",
+          "properties": {
+            "kind": {
+              "enum": [
+                "ResourceGraphQuery"
               ],
               "type": "string"
             },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "dynamicThresholdModel": {
-          "description": "ML model to use for dynamic thresholds",
-          "oneOf": [
-            {
-              "enum": [
-                "AnomalyDetection"
-              ],
+            "resourceGraphQuery": {
+              "description": "Azure Resource Graph query text in KQL syntax. The query must return at least a column named 'id' which contains the resource ID of the discovered resources.",
+              "maxLength": 5000,
+              "minLength": 1,
               "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
-        },
-        "modelSensitivity": {
-          "description": "ML model sensitivity. Lowest value = high sensitivity. Supported step size = 0.5",
-          "oneOf": [
-            {
-              "maximum": 5,
-              "minimum": 0,
-              "type": "number"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "trainingStartTime": {
-          "description": "Start time of the training in UTC.",
-          "format": "date-time",
-          "type": "string"
+          },
+          "required": [
+            "resourceGraphQuery",
+            "kind"
+          ],
+          "type": "object"
         }
-      },
-      "required": [
-        "dynamicThresholdModel",
-        "modelSensitivity",
-        "dynamicThresholdDirection"
       ],
+      "properties": {},
       "type": "object"
     },
     "EntityAlerts": {
@@ -798,8 +939,19 @@
           "minLength": 1,
           "type": "string"
         },
-        "labels": {
-          "description": "Optional set of labels (key-value pairs)",
+        "signalGroups": {
+          "description": "Signal groups which are assigned to this entity",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SignalGroups"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "tags": {
+          "description": "Optional set of tags (key-value pairs)",
           "oneOf": [
             {
               "additionalProperties": {
@@ -808,17 +960,6 @@
               },
               "properties": {},
               "type": "object"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "signals": {
-          "description": "Signal groups which are assigned to this entity",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/SignalGroup"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -835,18 +976,7 @@
           "description": "Degraded rule with static threshold.",
           "oneOf": [
             {
-              "$ref": "#/definitions/ThresholdRule"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "dynamicDetectionRule": {
-          "description": "Configure to use ML-based dynamic thresholds. When used, degradedRule and unhealthyRule must not be set.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DynamicDetectionRule"
+              "$ref": "#/definitions/ThresholdRuleV2"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -857,7 +987,7 @@
           "description": "Unhealthy rule with static threshold.",
           "oneOf": [
             {
-              "$ref": "#/definitions/ThresholdRule"
+              "$ref": "#/definitions/ThresholdRuleV2"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -865,6 +995,9 @@
           ]
         }
       },
+      "required": [
+        "unhealthyRule"
+      ],
       "type": "object"
     },
     "HealthModelProperties": {
@@ -905,11 +1038,121 @@
       ],
       "type": "object"
     },
-    "LogAnalyticsSignalGroup": {
-      "description": "A grouping of signal assignments for a Log Analytics Workspace",
+    "LogAnalyticsSignal": {
+      "description": "A Log Analytics Query signal instance assigned to an entity.",
+      "properties": {
+        "dataUnit": {
+          "description": "Unit of the signal result (e.g. Bytes, MilliSeconds, Percent, Count))",
+          "maxLength": 100,
+          "minLength": 1,
+          "type": "string"
+        },
+        "displayName": {
+          "description": "Display name",
+          "maxLength": 260,
+          "minLength": 1,
+          "type": "string"
+        },
+        "evaluationRules": {
+          "description": "Evaluation rules for the signal definition",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EvaluationRule"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "name": {
+          "description": "Unique name of the signal within the entity.",
+          "oneOf": [
+            {
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "queryText": {
+          "description": "Query text in KQL syntax",
+          "maxLength": 5000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "refreshInterval": {
+          "description": "Interval in which the signal is being evaluated. Defaults to PT1M (1 minute).",
+          "oneOf": [
+            {
+              "enum": [
+                "PT1M",
+                "PT5M",
+                "PT10M",
+                "PT30M",
+                "PT1H",
+                "PT2H"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "signalDefinitionName": {
+          "description": "Optional reference to a signal definition that provides default values.",
+          "oneOf": [
+            {
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "signalKind": {
+          "description": "Kind of the signal instance",
+          "oneOf": [
+            {
+              "enum": [
+                "AzureResourceMetric",
+                "LogAnalyticsQuery",
+                "PrometheusMetricsQuery"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "timeGrain": {
+          "description": "Time range of signal. ISO duration format like PT10M. If not specified, the KQL query must define a time range.",
+          "maxLength": 100,
+          "minLength": 1,
+          "type": "string"
+        },
+        "valueColumnName": {
+          "description": "Name of the column in the result set to evaluate against the thresholds. Defaults to the first column in the result set if not specified. The column must be numeric.",
+          "maxLength": 100,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "signalKind",
+        "name"
+      ],
+      "type": "object"
+    },
+    "LogAnalyticsSignals": {
+      "description": "A grouping of Log Analytics workspace signals.",
       "properties": {
         "authenticationSetting": {
-          "description": "Reference to the name of the authentication setting which is used for querying the data source",
+          "description": "Reference to the name of the authentication setting which is used for querying the data source.",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",
@@ -921,15 +1164,15 @@
           ]
         },
         "logAnalyticsWorkspaceResourceId": {
-          "description": "Log Analytics Workspace resource ID",
+          "description": "Log Analytics workspace resource ID.",
           "type": "string"
         },
-        "signalAssignments": {
-          "description": "Signal definitions which are assigned to this signal group. All assignments are combined with an OR operator.",
+        "signals": {
+          "description": "Signals assigned to this group.",
           "oneOf": [
             {
               "items": {
-                "$ref": "#/definitions/SignalAssignment"
+                "$ref": "#/definitions/LogAnalyticsSignal"
               },
               "type": "array"
             },
@@ -1021,6 +1264,110 @@
       ],
       "type": "object"
     },
+    "PrometheusMetricsSignal": {
+      "description": "A Prometheus Metrics Query signal instance assigned to an entity.",
+      "properties": {
+        "dataUnit": {
+          "description": "Unit of the signal result (e.g. Bytes, MilliSeconds, Percent, Count))",
+          "maxLength": 100,
+          "minLength": 1,
+          "type": "string"
+        },
+        "displayName": {
+          "description": "Display name",
+          "maxLength": 260,
+          "minLength": 1,
+          "type": "string"
+        },
+        "evaluationRules": {
+          "description": "Evaluation rules for the signal definition",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EvaluationRule"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "name": {
+          "description": "Unique name of the signal within the entity.",
+          "oneOf": [
+            {
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "queryText": {
+          "description": "Query text in PromQL syntax",
+          "maxLength": 5000,
+          "minLength": 1,
+          "type": "string"
+        },
+        "refreshInterval": {
+          "description": "Interval in which the signal is being evaluated. Defaults to PT1M (1 minute).",
+          "oneOf": [
+            {
+              "enum": [
+                "PT1M",
+                "PT5M",
+                "PT10M",
+                "PT30M",
+                "PT1H",
+                "PT2H"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "signalDefinitionName": {
+          "description": "Optional reference to a signal definition that provides default values.",
+          "oneOf": [
+            {
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "signalKind": {
+          "description": "Kind of the signal instance",
+          "oneOf": [
+            {
+              "enum": [
+                "AzureResourceMetric",
+                "LogAnalyticsQuery",
+                "PrometheusMetricsQuery"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "timeGrain": {
+          "description": "Time range of signal. ISO duration format like PT10M.",
+          "maxLength": 100,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "signalKind",
+        "name"
+      ],
+      "type": "object"
+    },
     "RelationshipProperties": {
       "description": "Relationship properties",
       "properties": {
@@ -1042,8 +1389,20 @@
           "minLength": 1,
           "type": "string"
         },
-        "labels": {
-          "description": "Optional set of labels (key-value pairs)",
+        "parentEntityName": {
+          "description": "Resource name of the parent entity",
+          "oneOf": [
+            {
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "tags": {
+          "description": "Optional set of tags (key-value pairs)",
           "oneOf": [
             {
               "additionalProperties": {
@@ -1057,47 +1416,11 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
-        },
-        "parentEntityName": {
-          "description": "Resource name of the parent entity",
-          "oneOf": [
-            {
-              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
         }
       },
       "required": [
         "parentEntityName",
         "childEntityName"
-      ],
-      "type": "object"
-    },
-    "SignalAssignment": {
-      "description": "Group of signal definition assignments",
-      "properties": {
-        "signalDefinitions": {
-          "description": "Signal definitions referenced by their names. All definitions are combined with an AND operator.",
-          "oneOf": [
-            {
-              "items": {
-                "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",
-                "type": "string"
-              },
-              "type": "array"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "required": [
-        "signalDefinitions"
       ],
       "type": "object"
     },
@@ -1259,22 +1582,6 @@
             }
           ]
         },
-        "labels": {
-          "description": "Optional set of labels (key-value pairs)",
-          "oneOf": [
-            {
-              "additionalProperties": {
-                "maxLength": 4096,
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
         "refreshInterval": {
           "description": "Interval in which the signal is being evaluated. Defaults to PT1M (1 minute).",
           "oneOf": [
@@ -1293,6 +1600,22 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
+        },
+        "tags": {
+          "description": "Optional set of tags (key-value pairs)",
+          "oneOf": [
+            {
+              "additionalProperties": {
+                "maxLength": 4096,
+                "type": "string"
+              },
+              "properties": {},
+              "type": "object"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "required": [
@@ -1300,14 +1623,14 @@
       ],
       "type": "object"
     },
-    "SignalGroup": {
+    "SignalGroups": {
       "description": "Contains various signal groups that can be assigned to an entity",
       "properties": {
         "azureLogAnalytics": {
           "description": "Log Analytics Signal Group",
           "oneOf": [
             {
-              "$ref": "#/definitions/LogAnalyticsSignalGroup"
+              "$ref": "#/definitions/LogAnalyticsSignals"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -1318,7 +1641,7 @@
           "description": "Azure Monitor Workspace Signal Group",
           "oneOf": [
             {
-              "$ref": "#/definitions/AzureMonitorWorkspaceSignalGroup"
+              "$ref": "#/definitions/AzureMonitorWorkspaceSignals"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -1329,7 +1652,7 @@
           "description": "Azure Resource Signal Group",
           "oneOf": [
             {
-              "$ref": "#/definitions/AzureResourceSignalGroup"
+              "$ref": "#/definitions/AzureResourceSignals"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -1350,7 +1673,7 @@
       },
       "type": "object"
     },
-    "ThresholdRule": {
+    "ThresholdRuleV2": {
       "description": "Threshold-based evaluation rule for a signal definition",
       "properties": {
         "operator": {
@@ -1358,11 +1681,12 @@
           "oneOf": [
             {
               "enum": [
-                "LowerThan",
-                "LowerOrEquals",
                 "GreaterThan",
-                "GreaterOrEquals",
-                "Equals"
+                "LessThan",
+                "LessThanOrEqual",
+                "GreaterThanOrEqual",
+                "Equal",
+                "NotEqual"
               ],
               "type": "string"
             },
@@ -1373,9 +1697,14 @@
         },
         "threshold": {
           "description": "Threshold value",
-          "maxLength": 100,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "required": [
@@ -1394,7 +1723,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2025-05-01-preview"
+            "2026-01-01-preview"
           ],
           "type": "string"
         },
@@ -1441,7 +1770,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2025-05-01-preview"
+            "2026-01-01-preview"
           ],
           "type": "string"
         },
@@ -1488,7 +1817,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2025-05-01-preview"
+            "2026-01-01-preview"
           ],
           "type": "string"
         },
@@ -1535,7 +1864,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2025-05-01-preview"
+            "2026-01-01-preview"
           ],
           "type": "string"
         },
@@ -1582,7 +1911,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2025-05-01-preview"
+            "2026-01-01-preview"
           ],
           "type": "string"
         },

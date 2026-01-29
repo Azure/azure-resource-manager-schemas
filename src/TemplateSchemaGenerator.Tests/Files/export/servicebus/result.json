@@ -1,0 +1,110 @@
+{
+  "value": {
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "namespaces_testscriptsb_name": {
+        "type": "String"
+      },
+      "namespaces_lasttestscriptsb_name": {
+        "type": "String"
+      }
+    },
+    "variables": {},
+    "resources": [
+      {
+        "type": "Microsoft.ServiceBus/namespaces",
+        "apiVersion": "2021-11-01",
+        "name": "[parameters('namespaces_lasttestscriptsb_name')]",
+        "location": "West US",
+        "sku": {
+          "name": "Standard",
+          "tier": "Standard"
+        },
+        "properties": {
+          "disableLocalAuth": false,
+          "zoneRedundant": false
+        }
+      },
+      {
+        "type": "Microsoft.ServiceBus/namespaces",
+        "apiVersion": "2021-11-01",
+        "name": "[parameters('namespaces_testscriptsb_name')]",
+        "location": "West US",
+        "sku": {
+          "name": "Standard",
+          "tier": "Standard"
+        },
+        "properties": {
+          "disableLocalAuth": false,
+          "zoneRedundant": false
+        }
+      },
+      {
+        "type": "Microsoft.ServiceBus/namespaces/AuthorizationRules",
+        "apiVersion": "2021-11-01",
+        "name": "[concat(parameters('namespaces_lasttestscriptsb_name'), '/RootManageSharedAccessKey')]",
+        "location": "westus",
+        "dependsOn": [
+          "[resourceId('Microsoft.ServiceBus/namespaces', parameters('namespaces_lasttestscriptsb_name'))]"
+        ],
+        "properties": {
+          "rights": [
+            "Listen",
+            "Manage",
+            "Send"
+          ]
+        }
+      },
+      {
+        "type": "Microsoft.ServiceBus/namespaces/AuthorizationRules",
+        "apiVersion": "2021-11-01",
+        "name": "[concat(parameters('namespaces_testscriptsb_name'), '/RootManageSharedAccessKey')]",
+        "location": "westus",
+        "dependsOn": [
+          "[resourceId('Microsoft.ServiceBus/namespaces', parameters('namespaces_testscriptsb_name'))]"
+        ],
+        "properties": {
+          "rights": [
+            "Listen",
+            "Manage",
+            "Send"
+          ]
+        }
+      },
+      {
+        "type": "Microsoft.ServiceBus/namespaces/networkRuleSets",
+        "apiVersion": "2021-11-01",
+        "name": "[concat(parameters('namespaces_lasttestscriptsb_name'), '/default')]",
+        "location": "westus",
+        "dependsOn": [
+          "[resourceId('Microsoft.ServiceBus/namespaces', parameters('namespaces_lasttestscriptsb_name'))]"
+        ],
+        "properties": {
+          "publicNetworkAccess": "Enabled",
+          "defaultAction": "Allow",
+          "virtualNetworkRules": [],
+          "ipRules": [],
+          "trustedServiceAccessEnabled": false
+        }
+      },
+      {
+        "type": "Microsoft.ServiceBus/namespaces/networkRuleSets",
+        "apiVersion": "2021-11-01",
+        "name": "[concat(parameters('namespaces_testscriptsb_name'), '/default')]",
+        "location": "westus",
+        "dependsOn": [
+          "[resourceId('Microsoft.ServiceBus/namespaces', parameters('namespaces_testscriptsb_name'))]"
+        ],
+        "properties": {
+          "publicNetworkAccess": "Enabled",
+          "defaultAction": "Allow",
+          "virtualNetworkRules": [],
+          "ipRules": [],
+          "trustedServiceAccessEnabled": false
+        }
+      }
+    ]
+  },
+  "errors": []
+}

@@ -5,38 +5,43 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "subscription_resourceDefinitions": {
     "resourceGroups": {
-      "description": "Microsoft.Resources/resourceGroups",
+      "type": "object",
       "properties": {
         "apiVersion": {
+          "type": "string",
           "enum": [
             "2017-05-10"
-          ],
-          "type": "string"
-        },
-        "location": {
-          "description": "The location of the resource group. It cannot be changed after the resource group has been created. It must be one of the supported Azure locations.",
-          "type": "string"
-        },
-        "managedBy": {
-          "description": "The ID of the resource that manages this resource group.",
-          "type": "string"
+          ]
         },
         "name": {
-          "description": "The name of the resource group to create or update.",
           "oneOf": [
             {
-              "maxLength": 90,
-              "minLength": 1,
+              "type": "string",
               "pattern": "^[-\\w\\._\\(\\)]+$",
-              "type": "string"
+              "minLength": 1,
+              "maxLength": 90
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
+          ],
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Resources/resourceGroups"
           ]
         },
+        "location": {
+          "type": "string",
+          "description": "The location of the resource group. It cannot be changed after the resource group has been created. It must be one of the supported Azure locations."
+        },
+        "managedBy": {
+          "type": "string",
+          "description": "The ID of the resource that manages this resource group."
+        },
         "properties": {
-          "description": "The resource group properties.",
           "oneOf": [
             {
               "$ref": "#/definitions/ResourceGroupProperties"
@@ -44,44 +49,208 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The resource group properties."
         },
         "tags": {
-          "description": "The tags attached to the resource group.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/ResourceGroupTags"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.Resources/resourceGroups"
           ],
-          "type": "string"
+          "description": "The tags attached to the resource group."
         }
       },
       "required": [
         "name",
-        "properties",
         "apiVersion",
-        "type"
+        "type",
+        "location",
+        "properties"
       ],
-      "type": "object"
+      "description": "Microsoft.Resources/resourceGroups"
+    }
+  },
+  "resourceDefinitions": {
+    "deployments": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2017-05-10"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[-\\w\\._\\(\\)]+$",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Resources/deployments"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DeploymentPropertiesOrDeploymentPropertiesExtended"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The deployment properties."
+        }
+      },
+      "required": [
+        "name",
+        "apiVersion",
+        "type",
+        "properties"
+      ],
+      "description": "Microsoft.Resources/deployments"
     }
   },
   "definitions": {
+    "DebugSetting": {
+      "type": "object",
+      "properties": {
+        "detailLevel": {
+          "type": "string",
+          "description": "Specifies the type of information to log for debugging. The permitted values are none, requestContent, responseContent, or both requestContent and responseContent separated by a comma. The default is none. When setting this value, carefully consider the type of information you are passing in during deployment. By logging information about the request or response, you could potentially expose sensitive data that is retrieved through the deployment operations."
+        }
+      }
+    },
+    "DeploymentPropertiesOrDeploymentPropertiesExtended": {
+      "type": "object",
+      "properties": {
+        "debugSetting": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DebugSetting"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The debug setting of the deployment."
+        },
+        "mode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Incremental",
+                "Complete"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The mode that is used to deploy resources. This value can be either Incremental or Complete. In Incremental mode, resources are deployed without deleting existing resources that are not included in the template. In Complete mode, resources are deployed and existing resources in the resource group that are not included in the template are deleted. Be careful when using Complete mode as you may unintentionally delete resources."
+        },
+        "parameters": {
+          "oneOf": [
+            {},
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Name and value pairs that define the deployment parameters for the template. You use this element when you want to provide the parameter values directly in the request rather than link to an existing parameter file. Use either the parametersLink property or the parameters property, but not both. It can be a JObject or a well formed JSON string."
+        },
+        "parametersLink": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ParametersLink"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The URI of parameters file. You use this element to link to an existing parameters file. Use either the parametersLink property or the parameters property, but not both."
+        },
+        "template": {
+          "oneOf": [
+            {},
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The template content. You use this element when you want to pass the template syntax directly in the request rather than link to an existing template. It can be a JObject or well-formed JSON string. Use either the templateLink property or the template property, but not both."
+        },
+        "templateLink": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/TemplateLink"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The URI of the template. Use either the templateLink property or the template property, but not both."
+        }
+      },
+      "required": [
+        "mode"
+      ]
+    },
+    "ParametersLink": {
+      "type": "object",
+      "properties": {
+        "contentVersion": {
+          "type": "string",
+          "description": "If included, must match the ContentVersion in the template."
+        },
+        "uri": {
+          "type": "string",
+          "description": "The URI of the parameters file."
+        }
+      },
+      "required": [
+        "uri"
+      ]
+    },
     "ResourceGroupProperties": {
-      "description": "The resource group properties.",
+      "type": "object",
+      "properties": {}
+    },
+    "ResourceGroupTags": {
+      "type": "object",
       "properties": {},
-      "type": "object"
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "TemplateLink": {
+      "type": "object",
+      "properties": {
+        "contentVersion": {
+          "type": "string",
+          "description": "If included, must match the ContentVersion in the template."
+        },
+        "uri": {
+          "type": "string",
+          "description": "The URI of the template to deploy."
+        }
+      },
+      "required": [
+        "uri"
+      ]
     }
   }
 }

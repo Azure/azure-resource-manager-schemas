@@ -5,34 +5,39 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "subscription_resourceDefinitions": {
     "resourceGroups": {
-      "description": "Microsoft.Resources/resourceGroups",
+      "type": "object",
       "properties": {
         "apiVersion": {
+          "type": "string",
           "enum": [
             "2016-07-01"
-          ],
-          "type": "string"
-        },
-        "location": {
-          "description": "The location of the resource group. It cannot be changed after the resource group has been created. Has to be one of the supported Azure Locations, such as West US, East US, West Europe, East Asia, etc.",
-          "type": "string"
+          ]
         },
         "name": {
-          "description": "The name of the resource group to be created or updated.",
           "oneOf": [
             {
-              "maxLength": 90,
-              "minLength": 1,
+              "type": "string",
               "pattern": "^[-\\w\\._\\(\\)]+$",
-              "type": "string"
+              "minLength": 1,
+              "maxLength": 90
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
+          ],
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Resources/resourceGroups"
           ]
         },
+        "location": {
+          "type": "string",
+          "description": "The location of the resource group. It cannot be changed after the resource group has been created. Has to be one of the supported Azure Locations, such as West US, East US, West Europe, East Asia, etc."
+        },
         "properties": {
-          "description": "The resource group properties.",
           "oneOf": [
             {
               "$ref": "#/definitions/ResourceGroupProperties"
@@ -40,44 +45,198 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The resource group properties."
         },
         "tags": {
-          "description": "The tags attached to the resource group.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/ResourceGroupTags"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.Resources/resourceGroups"
           ],
-          "type": "string"
+          "description": "The tags attached to the resource group."
         }
       },
       "required": [
         "name",
-        "properties",
         "apiVersion",
-        "type"
+        "type",
+        "location",
+        "properties"
       ],
-      "type": "object"
+      "description": "Microsoft.Resources/resourceGroups"
+    }
+  },
+  "resourceDefinitions": {
+    "deployments": {
+      "type": "object",
+      "properties": {
+        "apiVersion": {
+          "type": "string",
+          "enum": [
+            "2016-07-01"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.Resources/deployments"
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DeploymentPropertiesOrDeploymentPropertiesExtended"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The deployment properties."
+        }
+      },
+      "required": [
+        "name",
+        "apiVersion",
+        "type",
+        "properties"
+      ],
+      "description": "Microsoft.Resources/deployments"
     }
   },
   "definitions": {
+    "DebugSetting": {
+      "type": "object",
+      "properties": {
+        "detailLevel": {
+          "type": "string",
+          "description": "The debug detail level."
+        }
+      }
+    },
+    "DeploymentPropertiesOrDeploymentPropertiesExtended": {
+      "type": "object",
+      "properties": {
+        "debugSetting": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DebugSetting"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The debug setting of the deployment."
+        },
+        "mode": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Incremental",
+                "Complete"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The deployment mode."
+        },
+        "parameters": {
+          "oneOf": [
+            {},
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Deployment parameters. It can be a JObject or a well formed JSON string. Use only one of Parameters or ParametersLink."
+        },
+        "parametersLink": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ParametersLink"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The parameters URI. Use only one of Parameters or ParametersLink."
+        },
+        "template": {
+          "oneOf": [
+            {},
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The template content. It can be a JObject or a well formed JSON string. Use only one of Template or TemplateLink."
+        },
+        "templateLink": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/TemplateLink"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "The template URI. Use only one of Template or TemplateLink."
+        }
+      },
+      "required": [
+        "mode"
+      ]
+    },
+    "ParametersLink": {
+      "type": "object",
+      "properties": {
+        "contentVersion": {
+          "type": "string",
+          "description": "If included it must match the ContentVersion in the template."
+        },
+        "uri": {
+          "type": "string",
+          "description": "URI referencing the template."
+        }
+      },
+      "required": [
+        "uri"
+      ]
+    },
     "ResourceGroupProperties": {
-      "description": "The resource group properties.",
+      "type": "object",
+      "properties": {}
+    },
+    "ResourceGroupTags": {
+      "type": "object",
       "properties": {},
-      "type": "object"
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "TemplateLink": {
+      "type": "object",
+      "properties": {
+        "contentVersion": {
+          "type": "string",
+          "description": "If included it must match the ContentVersion in the template."
+        },
+        "uri": {
+          "type": "string",
+          "description": "URI referencing the template."
+        }
+      },
+      "required": [
+        "uri"
+      ]
     }
   }
 }

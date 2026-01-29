@@ -5,24 +5,29 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "resourceDefinitions": {
     "actionRules": {
-      "description": "Microsoft.AlertsManagement/actionRules",
+      "type": "object",
       "properties": {
         "apiVersion": {
+          "type": "string",
           "enum": [
             "2021-08-08"
-          ],
-          "type": "string"
-        },
-        "location": {
-          "description": "Resource location",
-          "type": "string"
+          ]
         },
         "name": {
-          "description": "The name of the alert processing rule that needs to be created/updated.",
-          "type": "string"
+          "type": "string",
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.AlertsManagement/actionRules"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "description": "Resource location"
         },
         "properties": {
-          "description": "Alert processing rule properties.",
           "oneOf": [
             {
               "$ref": "#/definitions/AlertProcessingRuleProperties"
@@ -30,141 +35,176 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Alert processing rule properties."
         },
         "tags": {
-          "description": "Resource tags",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/ManagedResourceTags"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.AlertsManagement/actionRules"
           ],
-          "type": "string"
+          "description": "Resource tags"
         }
       },
       "required": [
         "name",
-        "properties",
         "apiVersion",
-        "type"
+        "type",
+        "location",
+        "properties"
       ],
-      "type": "object"
+      "description": "Microsoft.AlertsManagement/actionRules"
     }
   },
   "definitions": {
     "Action": {
-      "description": "Action to be applied.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Add action groups to alert processing rule.",
+          "type": "object",
           "properties": {
-            "actionGroupIds": {
-              "description": "List of action group Ids to add to alert processing rule.",
-              "oneOf": [
+            "actionType": {
+              "type": "string",
+              "enum": [
+                "AddActionGroups",
+                "RemoveAllActionGroups"
+              ]
+            }
+          },
+          "required": [
+            "actionType"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
                 {
-                  "items": {
-                    "type": "string"
-                  },
-                  "type": "array"
+                  "$ref": "#/definitions/AddActionGroups"
                 },
                 {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                  "type": "object",
+                  "properties": {
+                    "actionType": {
+                      "const": "AddActionGroups"
+                    }
+                  },
+                  "required": [
+                    "actionType"
+                  ]
                 }
               ]
             },
-            "actionType": {
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/RemoveAllActionGroups"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "actionType": {
+                      "const": "RemoveAllActionGroups"
+                    }
+                  },
+                  "required": [
+                    "actionType"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "AddActionGroups": {
+      "type": "object",
+      "properties": {
+        "actionGroupIds": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "List of action group Ids to add to alert processing rule."
+        },
+        "actionType": {
+          "oneOf": [
+            {
+              "type": "string",
               "enum": [
                 "AddActionGroups"
-              ],
-              "type": "string"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "actionGroupIds",
-            "actionType"
           ],
-          "type": "object"
-        },
-        {
-          "description": "Indicates if all action groups should be removed.",
-          "properties": {
-            "actionType": {
-              "enum": [
-                "RemoveAllActionGroups"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "actionType"
-          ],
-          "type": "object"
+          "description": "Action that should be applied."
         }
-      ],
-      "properties": {},
-      "type": "object"
+      },
+      "required": [
+        "actionGroupIds",
+        "actionType"
+      ]
     },
     "AlertProcessingRuleProperties": {
-      "description": "Alert processing rule properties defining scopes, conditions and scheduling logic for alert processing rule.",
+      "type": "object",
       "properties": {
         "actions": {
-          "description": "Actions to be applied.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/Action"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Actions to be applied."
         },
         "conditions": {
-          "description": "Conditions on which alerts will be filtered.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/Condition"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Conditions on which alerts will be filtered."
         },
         "description": {
-          "description": "Description of alert processing rule.",
-          "type": "string"
+          "type": "string",
+          "description": "Description of alert processing rule."
         },
         "enabled": {
-          "description": "Indicates if the given alert processing rule is enabled or disabled.",
           "oneOf": [
             {
-              "default": true,
               "type": "boolean"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Indicates if the given alert processing rule is enabled or disabled."
         },
         "schedule": {
-          "description": "Scheduling for alert processing rule.",
           "oneOf": [
             {
               "$ref": "#/definitions/Schedule"
@@ -172,36 +212,36 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Scheduling for alert processing rule."
         },
         "scopes": {
-          "description": "Scopes on which alert processing rule will apply.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "type": "string"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Scopes on which alert processing rule will apply."
         }
       },
       "required": [
-        "scopes",
-        "actions"
-      ],
-      "type": "object"
+        "actions",
+        "scopes"
+      ]
     },
     "Condition": {
-      "description": "Condition to trigger an alert processing rule.",
+      "type": "object",
       "properties": {
         "field": {
-          "description": "Field for a given condition.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "Severity",
                 "MonitorService",
@@ -214,195 +254,314 @@
                 "AlertRuleName",
                 "Description",
                 "AlertContext"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Field for a given condition."
         },
         "operator": {
-          "description": "Operator for a given condition.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "Equals",
                 "NotEquals",
                 "Contains",
                 "DoesNotContain"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Operator for a given condition."
         },
         "values": {
-          "description": "List of values to match for a given condition.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "type": "string"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "List of values to match for a given condition."
         }
-      },
-      "type": "object"
+      }
     },
-    "Recurrence": {
-      "description": "Recurrence object.",
-      "oneOf": [
-        {
-          "description": "Daily recurrence object.",
-          "properties": {
-            "recurrenceType": {
+    "DailyRecurrence": {
+      "type": "object",
+      "properties": {
+        "recurrenceType": {
+          "oneOf": [
+            {
+              "type": "string",
               "enum": [
                 "Daily"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "recurrenceType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Monthly recurrence object.",
-          "properties": {
-            "daysOfMonth": {
-              "description": "Specifies the values for monthly recurrence pattern.",
-              "oneOf": [
-                {
-                  "items": {
-                    "type": "integer"
-                  },
-                  "type": "array"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
               ]
             },
-            "recurrenceType": {
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies when the recurrence should be applied."
+        }
+      },
+      "required": [
+        "recurrenceType"
+      ]
+    },
+    "ManagedResourceTags": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "MonthlyRecurrence": {
+      "type": "object",
+      "properties": {
+        "daysOfMonth": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies the values for monthly recurrence pattern."
+        },
+        "recurrenceType": {
+          "oneOf": [
+            {
+              "type": "string",
               "enum": [
                 "Monthly"
-              ],
-              "type": "string"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies when the recurrence should be applied."
+        }
+      },
+      "required": [
+        "daysOfMonth",
+        "recurrenceType"
+      ]
+    },
+    "Recurrence": {
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "endTime": {
+              "type": "string",
+              "description": "End time for recurrence."
+            },
+            "startTime": {
+              "type": "string",
+              "description": "Start time for recurrence."
+            },
+            "recurrenceType": {
+              "type": "string",
+              "enum": [
+                "Daily",
+                "Monthly",
+                "Weekly"
+              ]
             }
           },
           "required": [
-            "daysOfMonth",
             "recurrenceType"
           ],
-          "type": "object"
+          "additionalProperties": false
         },
         {
-          "description": "Weekly recurrence object.",
-          "properties": {
-            "daysOfWeek": {
-              "description": "Specifies the values for weekly recurrence pattern.",
-              "oneOf": [
+          "oneOf": [
+            {
+              "allOf": [
                 {
-                  "items": {
-                    "enum": [
-                      "Sunday",
-                      "Monday",
-                      "Tuesday",
-                      "Wednesday",
-                      "Thursday",
-                      "Friday",
-                      "Saturday"
-                    ],
-                    "type": "string"
-                  },
-                  "type": "array"
+                  "$ref": "#/definitions/DailyRecurrence"
                 },
                 {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                  "type": "object",
+                  "properties": {
+                    "recurrenceType": {
+                      "const": "Daily"
+                    }
+                  },
+                  "required": [
+                    "recurrenceType"
+                  ]
                 }
               ]
             },
-            "recurrenceType": {
-              "enum": [
-                "Weekly"
-              ],
-              "type": "string"
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/MonthlyRecurrence"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "recurrenceType": {
+                      "const": "Monthly"
+                    }
+                  },
+                  "required": [
+                    "recurrenceType"
+                  ]
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/WeeklyRecurrence"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "recurrenceType": {
+                      "const": "Weekly"
+                    }
+                  },
+                  "required": [
+                    "recurrenceType"
+                  ]
+                }
+              ]
             }
-          },
-          "required": [
-            "daysOfWeek",
-            "recurrenceType"
-          ],
-          "type": "object"
+          ]
         }
-      ],
+      ]
+    },
+    "RemoveAllActionGroups": {
+      "type": "object",
       "properties": {
-        "endTime": {
-          "description": "End time for recurrence.",
-          "type": "string"
-        },
-        "startTime": {
-          "description": "Start time for recurrence.",
-          "type": "string"
+        "actionType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "RemoveAllActionGroups"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Action that should be applied."
         }
       },
-      "type": "object"
+      "required": [
+        "actionType"
+      ]
     },
     "Schedule": {
-      "description": "Scheduling configuration for a given alert processing rule.",
+      "type": "object",
       "properties": {
         "effectiveFrom": {
-          "description": "Scheduling effective from time. Date-Time in ISO-8601 format without timezone suffix.",
           "oneOf": [
             {
-              "pattern": "^(?:(\\d{4}-\\d{2}-\\d{2})T(\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?))$",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(?:(\\d{4}-\\d{2}-\\d{2})T(\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?))$"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Scheduling effective from time. Date-Time in ISO-8601 format without timezone suffix."
         },
         "effectiveUntil": {
-          "description": "Scheduling effective until time. Date-Time in ISO-8601 format without timezone suffix.",
           "oneOf": [
             {
-              "pattern": "^(?:(\\d{4}-\\d{2}-\\d{2})T(\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?))$",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(?:(\\d{4}-\\d{2}-\\d{2})T(\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?))$"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Scheduling effective until time. Date-Time in ISO-8601 format without timezone suffix."
         },
         "recurrences": {
-          "description": "List of recurrences.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/Recurrence"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "List of recurrences."
         },
         "timeZone": {
-          "description": "Scheduling time zone.",
-          "type": "string"
+          "type": "string",
+          "description": "Scheduling time zone."
+        }
+      }
+    },
+    "WeeklyRecurrence": {
+      "type": "object",
+      "properties": {
+        "daysOfWeek": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Sunday",
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday"
+                ]
+              }
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies the values for weekly recurrence pattern."
+        },
+        "recurrenceType": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "Weekly"
+              ]
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ],
+          "description": "Specifies when the recurrence should be applied."
         }
       },
-      "type": "object"
+      "required": [
+        "daysOfWeek",
+        "recurrenceType"
+      ]
     }
   }
 }

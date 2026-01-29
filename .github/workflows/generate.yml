@@ -1,0 +1,57 @@
+name: Generate Schemas
+
+on:
+  schedule:
+    - cron: '0 9 * * SUN'
+  workflow_dispatch:
+    inputs:
+      types_az_ref:
+        description: 'Git ref or full SHA for https://github.com/Azure/bicep-types-az.'
+        required: true
+        default: autogenerate
+
+jobs:
+  generate:
+    name: Generate
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
+          submodules: true
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v5
+
+      - name: Clone bicep-types-az
+        uses: actions/checkout@v5
+        with:
+          repository: Azure/bicep-types-az
+          path: workflow-temp/bicep-types-az
+          ref: ${{ github.event.inputs.types_az_ref || 'autogenerate' }}
+
+      - id: get_types_az_gh_uri
+        name: Get GitHub URI for bicep-types-az
+        run: |
+          git_sha=`git rev-parse --short HEAD`
+          echo "gh_uri=https://github.com/Azure/bicep-types-az/tree/$git_sha" >> $GITHUB_OUTPUT
+        working-directory: workflow-temp/bicep-types-az
+
+      - name: Run Generation
+        run: |
+          dotnet run --configuration Release --project ./src/TemplateSchemaGenerator \
+            --source-folder workflow-temp/bicep-types-az/generated \
+            --output-folder "schemas" \
+            --verbose
+
+      - name: Commit and push
+        uses: stefanzweifel/git-auto-commit-action@v6
+        with:
+          commit_message: |
+            Generated schemas from ${{ steps.get_types_az_gh_uri.outputs.gh_uri }}
+          branch: autogenerate
+          push_options: '--force'
+          create_branch: true

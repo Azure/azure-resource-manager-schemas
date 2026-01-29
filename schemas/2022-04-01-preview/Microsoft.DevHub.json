@@ -5,34 +5,39 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "resourceDefinitions": {
     "workflows": {
-      "description": "Microsoft.DevHub/workflows",
+      "type": "object",
       "properties": {
         "apiVersion": {
+          "type": "string",
           "enum": [
             "2022-04-01-preview"
-          ],
-          "type": "string"
-        },
-        "location": {
-          "description": "The geo-location where the resource lives",
-          "type": "string"
+          ]
         },
         "name": {
-          "description": "The name of the workflow resource.",
           "oneOf": [
             {
-              "maxLength": 63,
-              "minLength": 1,
+              "type": "string",
               "pattern": "^[a-zA-Z0-9]$|^[a-zA-Z0-9][-_a-zA-Z0-9]{0,61}[a-zA-Z0-9]$",
-              "type": "string"
+              "minLength": 1,
+              "maxLength": 63
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
+          ],
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.DevHub/workflows"
           ]
         },
+        "location": {
+          "type": "string",
+          "description": "The geo-location where the resource lives"
+        },
         "properties": {
-          "description": "Properties of a workflow.",
           "oneOf": [
             {
               "$ref": "#/definitions/WorkflowProperties"
@@ -40,80 +45,71 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Properties of a workflow."
         },
         "tags": {
-          "description": "Resource tags.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/TrackedResourceTags"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.DevHub/workflows"
           ],
-          "type": "string"
+          "description": "Resource tags."
         }
       },
       "required": [
         "name",
-        "properties",
         "apiVersion",
-        "type"
+        "type",
+        "location",
+        "properties"
       ],
-      "type": "object"
+      "description": "Microsoft.DevHub/workflows"
     }
   },
   "definitions": {
     "ACR": {
-      "description": "Information on the azure container registry",
+      "type": "object",
       "properties": {
         "acrRegistryName": {
-          "description": "ACR registry",
-          "type": "string"
+          "type": "string",
+          "description": "ACR registry"
         },
         "acrRepositoryName": {
-          "description": "ACR repository",
-          "type": "string"
+          "type": "string",
+          "description": "ACR repository"
         },
         "acrResourceGroup": {
-          "description": "ACR resource group",
-          "type": "string"
+          "type": "string",
+          "description": "ACR resource group"
         },
         "acrSubscriptionId": {
-          "description": "ACR subscription id",
-          "type": "string"
+          "type": "string",
+          "description": "ACR subscription id"
         }
-      },
-      "type": "object"
+      }
     },
     "DeploymentProperties": {
+      "type": "object",
       "properties": {
         "helmChartPath": {
-          "description": "Helm chart directory path in repository.",
-          "type": "string"
+          "type": "string",
+          "description": "Helm chart directory path in repository."
         },
         "helmValues": {
-          "description": "Helm Values.yaml file location in repository.",
-          "type": "string"
+          "type": "string",
+          "description": "Helm Values.yaml file location in repository."
         },
         "kubeManifestLocations": {
-          "description": "Array of DeploymentPropertiesKubeManifestLocationsItem",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "type": "string"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -121,43 +117,44 @@
           ]
         },
         "manifestType": {
-          "description": "Determines the type of manifests within the repository.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "helm",
                 "kube"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Determines the type of manifests within the repository."
         },
         "overrides": {
-          "description": "Manifest override values.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/DeploymentPropertiesOverrides"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Manifest override values."
         }
-      },
-      "type": "object"
+      }
+    },
+    "DeploymentPropertiesOverrides": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "GitHubWorkflowProfile": {
-      "description": "GitHub Workflow Profile",
+      "type": "object",
       "properties": {
         "acr": {
-          "description": "Information on the azure container registry",
           "oneOf": [
             {
               "$ref": "#/definitions/ACR"
@@ -165,15 +162,16 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Information on the azure container registry"
         },
         "aksResourceId": {
-          "description": "The Azure Kubernetes Cluster Resource the application will be deployed to.",
-          "type": "string"
+          "type": "string",
+          "description": "The Azure Kubernetes Cluster Resource the application will be deployed to."
         },
         "branchName": {
-          "description": "Repository Branch Name",
-          "type": "string"
+          "type": "string",
+          "description": "Repository Branch Name"
         },
         "deploymentProperties": {
           "oneOf": [
@@ -186,12 +184,12 @@
           ]
         },
         "dockerBuildContext": {
-          "description": "Path to Dockerfile Build Context within the repository.",
-          "type": "string"
+          "type": "string",
+          "description": "Path to Dockerfile Build Context within the repository."
         },
         "dockerfile": {
-          "description": "Path to the Dockerfile within the repository.",
-          "type": "string"
+          "type": "string",
+          "description": "Path to the Dockerfile within the repository."
         },
         "lastWorkflowRun": {
           "oneOf": [
@@ -204,11 +202,10 @@
           ]
         },
         "namespace": {
-          "description": "Kubernetes namespace the application is deployed to.",
-          "type": "string"
+          "type": "string",
+          "description": "Kubernetes namespace the application is deployed to."
         },
         "oidcCredentials": {
-          "description": "The fields needed for OIDC with GitHub.",
           "oneOf": [
             {
               "$ref": "#/definitions/GitHubWorkflowProfileOidcCredentials"
@@ -216,38 +213,43 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The fields needed for OIDC with GitHub."
         },
         "repositoryName": {
-          "description": "Repository Name",
-          "type": "string"
+          "type": "string",
+          "description": "Repository Name"
         },
         "repositoryOwner": {
-          "description": "Repository Owner",
-          "type": "string"
+          "type": "string",
+          "description": "Repository Owner"
         }
-      },
-      "type": "object"
+      }
     },
     "GitHubWorkflowProfileOidcCredentials": {
-      "description": "The fields needed for OIDC with GitHub.",
+      "type": "object",
       "properties": {
         "azureClientId": {
-          "description": "Azure Application Client ID",
-          "type": "string"
+          "type": "string",
+          "description": "Azure Application Client ID"
         },
         "azureTenantId": {
-          "description": "Azure Directory (tenant) ID",
-          "type": "string"
+          "type": "string",
+          "description": "Azure Directory (tenant) ID"
         }
-      },
-      "type": "object"
+      }
+    },
+    "TrackedResourceTags": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "WorkflowProperties": {
-      "description": "Workflow properties",
+      "type": "object",
       "properties": {
         "githubWorkflowProfile": {
-          "description": "Profile of a github workflow.",
           "oneOf": [
             {
               "$ref": "#/definitions/GitHubWorkflowProfile"
@@ -255,14 +257,14 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Profile of a github workflow."
         }
-      },
-      "type": "object"
+      }
     },
     "WorkflowRun": {
-      "properties": {},
-      "type": "object"
+      "type": "object",
+      "properties": {}
     }
   }
 }

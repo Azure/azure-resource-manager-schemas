@@ -5,16 +5,35 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "resourceDefinitions": {
     "storageTasks": {
-      "description": "Microsoft.StorageActions/storageTasks",
+      "type": "object",
       "properties": {
         "apiVersion": {
+          "type": "string",
           "enum": [
             "2023-01-01"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z0-9]{3,18}$",
+              "minLength": 3,
+              "maxLength": 18
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
           ],
-          "type": "string"
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.StorageActions/storageTasks"
+          ]
         },
         "identity": {
-          "description": "The managed service identity of the resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/ManagedServiceIdentity"
@@ -22,28 +41,14 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The managed service identity of the resource."
         },
         "location": {
-          "description": "The geo-location where the resource lives",
-          "type": "string"
-        },
-        "name": {
-          "description": "The name of the storage task within the specified resource group. Storage task names must be between 3 and 18 characters in length and use numbers and lower-case letters only.",
-          "oneOf": [
-            {
-              "maxLength": 18,
-              "minLength": 3,
-              "pattern": "^[a-z0-9]{3,18}$",
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
+          "type": "string",
+          "description": "The geo-location where the resource lives"
         },
         "properties": {
-          "description": "Properties of the storage task.",
           "oneOf": [
             {
               "$ref": "#/definitions/StorageTaskProperties"
@@ -51,137 +56,122 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Properties of the storage task."
         },
         "tags": {
-          "description": "Resource tags.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/TrackedResourceTags"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.StorageActions/storageTasks"
           ],
-          "type": "string"
+          "description": "Resource tags."
         }
       },
       "required": [
         "name",
-        "properties",
         "apiVersion",
-        "type"
+        "type",
+        "identity",
+        "location",
+        "properties"
       ],
-      "type": "object"
+      "description": "Microsoft.StorageActions/storageTasks"
     }
   },
   "definitions": {
     "ElseCondition": {
-      "description": "The else block of storage task operation",
+      "type": "object",
       "properties": {
         "operations": {
-          "description": "List of operations to execute in the else block",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/StorageTaskOperation"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "List of operations to execute in the else block"
         }
       },
       "required": [
         "operations"
-      ],
-      "type": "object"
+      ]
     },
     "IfCondition": {
-      "description": "The if block of storage task operation",
+      "type": "object",
       "properties": {
         "condition": {
-          "description": "Condition predicate to evaluate each object. See https://aka.ms/storagetaskconditions for valid properties and operators.",
-          "type": "string"
+          "type": "string",
+          "description": "Condition predicate to evaluate each object. See https://aka.ms/storagetaskconditions for valid properties and operators."
         },
         "operations": {
-          "description": "List of operations to execute when the condition predicate satisfies.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/StorageTaskOperation"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "List of operations to execute when the condition predicate satisfies."
         }
       },
       "required": [
         "condition",
         "operations"
-      ],
-      "type": "object"
+      ]
     },
     "ManagedServiceIdentity": {
-      "description": "Managed service identity (system assigned and/or user assigned identities)",
+      "type": "object",
       "properties": {
         "type": {
-          "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "None",
                 "SystemAssigned",
                 "UserAssigned",
                 "SystemAssigned,UserAssigned"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed)."
         },
         "userAssignedIdentities": {
-          "description": "The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "$ref": "#/definitions/UserAssignedIdentity"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/UserAssignedIdentities"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests."
         }
       },
       "required": [
         "type"
-      ],
-      "type": "object"
+      ]
     },
     "StorageTaskAction": {
-      "description": "The storage task action represents conditional statements and operations to be performed on target objects.",
+      "type": "object",
       "properties": {
         "else": {
-          "description": "The else block of storage task operation",
           "oneOf": [
             {
               "$ref": "#/definitions/ElseCondition"
@@ -189,10 +179,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The else block of storage task operation"
         },
         "if": {
-          "description": "The if block of storage task operation",
           "oneOf": [
             {
               "$ref": "#/definitions/IfCondition"
@@ -200,21 +190,21 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The if block of storage task operation"
         }
       },
       "required": [
         "if"
-      ],
-      "type": "object"
+      ]
     },
     "StorageTaskOperation": {
-      "description": "Represents an operation to be performed on the object",
+      "type": "object",
       "properties": {
         "name": {
-          "description": "The operation to be performed on the object.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "SetBlobTier",
                 "SetBlobTags",
@@ -223,68 +213,69 @@
                 "SetBlobExpiry",
                 "DeleteBlob",
                 "UndeleteBlob"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The operation to be performed on the object."
         },
         "onFailure": {
-          "description": "Action to be taken when the operation fails for a object.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "break"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Action to be taken when the operation fails for a object."
         },
         "onSuccess": {
-          "description": "Action to be taken when the operation is successful for a object.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "continue"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Action to be taken when the operation is successful for a object."
         },
         "parameters": {
-          "description": "Key-value parameters for the operation.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/StorageTaskOperationParameters"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Key-value parameters for the operation."
         }
       },
       "required": [
         "name"
-      ],
-      "type": "object"
+      ]
+    },
+    "StorageTaskOperationParameters": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "StorageTaskProperties": {
-      "description": "Properties of the storage task.",
+      "type": "object",
       "properties": {
         "action": {
-          "description": "The storage task action that is executed",
           "oneOf": [
             {
               "$ref": "#/definitions/StorageTaskAction"
@@ -292,14 +283,14 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The storage task action that is executed"
         },
         "description": {
-          "description": "Text that describes the purpose of the storage task",
-          "type": "string"
+          "type": "string",
+          "description": "Text that describes the purpose of the storage task"
         },
         "enabled": {
-          "description": "Storage Task is enabled when set to true and disabled when set to false",
           "oneOf": [
             {
               "type": "boolean"
@@ -307,20 +298,33 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Storage Task is enabled when set to true and disabled when set to false"
         }
       },
       "required": [
-        "enabled",
+        "action",
         "description",
-        "action"
-      ],
-      "type": "object"
+        "enabled"
+      ]
+    },
+    "TrackedResourceTags": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "UserAssignedIdentities": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "$ref": "#/definitions/UserAssignedIdentity"
+      }
     },
     "UserAssignedIdentity": {
-      "description": "User assigned identity properties",
-      "properties": {},
-      "type": "object"
+      "type": "object",
+      "properties": {}
     }
   }
 }

@@ -5,16 +5,33 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "resourceDefinitions": {
     "workspaces": {
-      "description": "Microsoft.OnlineExperimentation/workspaces",
+      "type": "object",
       "properties": {
         "apiVersion": {
+          "type": "string",
           "enum": [
             "2025-05-31-preview"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z0-9](?!.*---)[a-z0-9-]{1,53}[a-z0-9]"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
           ],
-          "type": "string"
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.OnlineExperimentation/workspaces"
+          ]
         },
         "identity": {
-          "description": "The managed service identities assigned to this resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/ManagedServiceIdentity"
@@ -22,26 +39,14 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The managed service identities assigned to this resource."
         },
         "location": {
-          "description": "The geo-location where the resource lives",
-          "type": "string"
-        },
-        "name": {
-          "description": "The name of the OnlineExperimentationWorkspace",
-          "oneOf": [
-            {
-              "pattern": "^[a-z0-9](?!.*---)[a-z0-9-]{1,53}[a-z0-9]",
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
+          "type": "string",
+          "description": "The geo-location where the resource lives"
         },
         "properties": {
-          "description": "The resource-specific properties for this resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/OnlineExperimentationWorkspaceProperties"
@@ -49,10 +54,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The resource-specific properties for this resource."
         },
         "sku": {
-          "description": "The SKU (Stock Keeping Unit) assigned to this resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/OnlineExperimentationWorkspaceSku"
@@ -60,45 +65,36 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The SKU (Stock Keeping Unit) assigned to this resource."
         },
         "tags": {
-          "description": "Resource tags.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/TrackedResourceTags"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.OnlineExperimentation/workspaces"
           ],
-          "type": "string"
+          "description": "Resource tags."
         }
       },
       "required": [
         "name",
-        "properties",
         "apiVersion",
-        "type"
+        "type",
+        "location",
+        "properties"
       ],
-      "type": "object"
+      "description": "Microsoft.OnlineExperimentation/workspaces"
     }
   },
   "definitions": {
     "CustomerManagedKeyEncryption": {
-      "description": "Customer-managed key encryption properties for the resource.",
+      "type": "object",
       "properties": {
         "keyEncryptionKeyIdentity": {
-          "description": "All identity configuration for Customer-managed key settings defining which identity should be used to auth to Key Vault.",
           "oneOf": [
             {
               "$ref": "#/definitions/KeyEncryptionKeyIdentity"
@@ -106,102 +102,104 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "All identity configuration for Customer-managed key settings defining which identity should be used to auth to Key Vault."
         },
         "keyEncryptionKeyUrl": {
-          "description": "key encryption key Url, versioned or non-versioned. Ex: https://contosovault.vault.azure.net/keys/contosokek/562a4bb76b524a1493a6afe8e536ee78 or https://contosovault.vault.azure.net/keys/contosokek.",
-          "type": "string"
+          "type": "string",
+          "description": "key encryption key Url, versioned or non-versioned. Ex: https://contosovault.vault.azure.net/keys/contosokek/562a4bb76b524a1493a6afe8e536ee78 or https://contosovault.vault.azure.net/keys/contosokek."
         }
-      },
-      "type": "object"
+      }
     },
     "KeyEncryptionKeyIdentity": {
-      "description": "All identity configuration for Customer-managed key settings defining which identity should be used to auth to Key Vault.",
+      "type": "object",
       "properties": {
         "federatedClientId": {
-          "description": "application client identity to use for accessing key encryption key Url in a different tenant. Ex: f83c6b1b-4d34-47e4-bb34-9d83df58b540",
           "oneOf": [
             {
-              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
-              "type": "string"
+              "type": "string",
+              "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
+              "minLength": 36,
+              "maxLength": 36
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "application client identity to use for accessing key encryption key Url in a different tenant. Ex: f83c6b1b-4d34-47e4-bb34-9d83df58b540"
         },
         "identityType": {
-          "description": "The type of identity to use. Values can be systemAssignedIdentity, userAssignedIdentity, or delegatedResourceIdentity.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "SystemAssignedIdentity",
                 "UserAssignedIdentity"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The type of identity to use. Values can be systemAssignedIdentity, userAssignedIdentity, or delegatedResourceIdentity."
         },
         "userAssignedIdentityResourceId": {
-          "description": "User assigned identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity.",
-          "type": "string"
+          "type": "string",
+          "description": "User assigned identity to use for accessing key encryption key Url. Ex: /subscriptions/fa5fc227-a624-475e-b696-cdd604c735bc/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId. Mutually exclusive with identityType systemAssignedIdentity."
         }
-      },
-      "type": "object"
+      }
     },
     "ManagedServiceIdentity": {
-      "description": "Managed service identity (system assigned and/or user assigned identities)",
+      "type": "object",
       "properties": {
         "type": {
-          "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "None",
                 "SystemAssigned",
                 "UserAssigned",
                 "SystemAssigned,UserAssigned"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed)."
         },
         "userAssignedIdentities": {
-          "description": "The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "$ref": "#/definitions/UserAssignedIdentity"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/ManagedServiceIdentityUserAssignedIdentities"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests."
         }
       },
       "required": [
         "type"
-      ],
-      "type": "object"
+      ]
+    },
+    "ManagedServiceIdentityUserAssignedIdentities": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "$ref": "#/definitions/UserAssignedIdentity"
+      }
     },
     "OnlineExperimentationWorkspaceProperties": {
-      "description": "The properties of an online experimentation workspace.",
+      "type": "object",
       "properties": {
         "appConfigurationResourceId": {
-          "description": "The resource identifier of App Configuration with which this online experimentation workspace is tied for experimentation. This is a required field for creating an online experimentation workspace.",
-          "type": "string"
+          "type": "string",
+          "description": "The resource identifier of App Configuration with which this online experimentation workspace is tied for experimentation. This is a required field for creating an online experimentation workspace."
         },
         "encryption": {
-          "description": "The encryption configuration for the online experimentation workspace resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/ResourceEncryptionConfiguration"
@@ -209,55 +207,53 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The encryption configuration for the online experimentation workspace resource."
         },
         "logAnalyticsWorkspaceResourceId": {
-          "description": "The resource identifier of the Log Analytics workspace which online experimentation workspace uses for generating experiment analysis results.",
-          "type": "string"
+          "type": "string",
+          "description": "The resource identifier of the Log Analytics workspace which online experimentation workspace uses for generating experiment analysis results."
         },
         "logsExporterStorageAccountResourceId": {
-          "description": "The resource identifier of storage account where logs are exported from Log Analytics workspace. online experimentation workspace uses it generating experiment analysis results.",
-          "type": "string"
+          "type": "string",
+          "description": "The resource identifier of storage account where logs are exported from Log Analytics workspace. online experimentation workspace uses it generating experiment analysis results."
         }
       },
       "required": [
+        "appConfigurationResourceId",
         "logAnalyticsWorkspaceResourceId",
-        "logsExporterStorageAccountResourceId",
-        "appConfigurationResourceId"
-      ],
-      "type": "object"
+        "logsExporterStorageAccountResourceId"
+      ]
     },
     "OnlineExperimentationWorkspaceSku": {
-      "description": "The SKU (Stock Keeping Unit) assigned to this resource.",
+      "type": "object",
       "properties": {
         "name": {
-          "description": "The name of the SKU. Ex - F0, P0. It is typically a letter+number code",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "F0",
                 "S0",
                 "P0",
                 "D0"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The name of the SKU. Ex - F0, P0. It is typically a letter+number code"
         }
       },
       "required": [
         "name"
-      ],
-      "type": "object"
+      ]
     },
     "ResourceEncryptionConfiguration": {
-      "description": "The encryption configuration for the online experimentation workspace resource.",
+      "type": "object",
       "properties": {
         "customerManagedKeyEncryption": {
-          "description": "All Customer-managed key encryption properties for the resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/CustomerManagedKeyEncryption"
@@ -265,15 +261,21 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "All Customer-managed key encryption properties for the resource."
         }
-      },
-      "type": "object"
+      }
+    },
+    "TrackedResourceTags": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "UserAssignedIdentity": {
-      "description": "User assigned identity properties",
-      "properties": {},
-      "type": "object"
+      "type": "object",
+      "properties": {}
     }
   }
 }

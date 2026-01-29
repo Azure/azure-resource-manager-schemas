@@ -5,20 +5,38 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "resourceDefinitions": {
     "services": {
-      "description": "Microsoft.HealthcareApis/services",
+      "type": "object",
       "properties": {
         "apiVersion": {
+          "type": "string",
           "enum": [
             "2019-09-16"
+          ]
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 24
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
           ],
-          "type": "string"
+          "description": "The resource name"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "Microsoft.HealthcareApis/services"
+          ]
         },
         "etag": {
-          "description": "An etag associated with the resource, used for optimistic concurrency when editing it.",
-          "type": "string"
+          "type": "string",
+          "description": "An etag associated with the resource, used for optimistic concurrency when editing it."
         },
         "identity": {
-          "description": "Setting indicating whether the service has a managed identity associated with it.",
           "oneOf": [
             {
               "$ref": "#/definitions/ResourceIdentity"
@@ -26,36 +44,30 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Setting indicating whether the service has a managed identity associated with it."
         },
         "kind": {
-          "description": "The kind of the service.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "fhir",
                 "fhir-Stu3",
                 "fhir-R4"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The kind of the service."
         },
         "location": {
-          "description": "The resource location.",
-          "type": "string"
-        },
-        "name": {
-          "description": "The name of the service instance.",
-          "maxLength": 24,
-          "minLength": 3,
-          "type": "string"
+          "type": "string",
+          "description": "The resource location."
         },
         "properties": {
-          "description": "The common properties of a service.",
           "oneOf": [
             {
               "$ref": "#/definitions/ServicesProperties"
@@ -63,95 +75,92 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The common properties of a service."
         },
         "tags": {
-          "description": "The resource tags.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "$ref": "#/definitions/ResourceTags"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.HealthcareApis/services"
           ],
-          "type": "string"
+          "description": "The resource tags."
         }
       },
       "required": [
         "name",
-        "properties",
         "apiVersion",
-        "type"
+        "type",
+        "kind",
+        "location",
+        "properties"
       ],
-      "type": "object"
+      "description": "Microsoft.HealthcareApis/services"
     }
   },
   "definitions": {
     "ResourceIdentity": {
-      "description": "Setting indicating whether the service has a managed identity associated with it.",
+      "type": "object",
       "properties": {
         "type": {
-          "description": "Type of identity being specified, currently SystemAssigned and None are allowed.",
           "oneOf": [
             {
+              "type": "string",
               "enum": [
                 "SystemAssigned",
                 "None"
-              ],
-              "type": "string"
+              ]
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "Type of identity being specified, currently SystemAssigned and None are allowed."
         }
-      },
-      "type": "object"
+      }
+    },
+    "ResourceTags": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": {
+        "type": "string"
+      }
     },
     "ServiceAccessPolicyEntry": {
-      "description": "An access policy entry.",
+      "type": "object",
       "properties": {
         "objectId": {
-          "description": "An Azure AD object ID (User or Apps) that is allowed access to the FHIR service.",
           "oneOf": [
             {
-              "pattern": "^(([0-9A-Fa-f]{8}[-]?(?:[0-9A-Fa-f]{4}[-]?){3}[0-9A-Fa-f]{12}){1})+$",
-              "type": "string"
+              "type": "string",
+              "pattern": "^(([0-9A-Fa-f]{8}[-]?(?:[0-9A-Fa-f]{4}[-]?){3}[0-9A-Fa-f]{12}){1})+$"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "An Azure AD object ID (User or Apps) that is allowed access to the FHIR service."
         }
       },
       "required": [
         "objectId"
-      ],
-      "type": "object"
+      ]
     },
     "ServiceAuthenticationConfigurationInfo": {
-      "description": "Authentication configuration information",
+      "type": "object",
       "properties": {
         "audience": {
-          "description": "The audience url for the service",
-          "type": "string"
+          "type": "string",
+          "description": "The audience url for the service"
         },
         "authority": {
-          "description": "The authority url for the service",
-          "type": "string"
+          "type": "string",
+          "description": "The authority url for the service"
         },
         "smartProxyEnabled": {
-          "description": "If the SMART on FHIR proxy is enabled",
           "oneOf": [
             {
               "type": "boolean"
@@ -159,16 +168,15 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "If the SMART on FHIR proxy is enabled"
         }
-      },
-      "type": "object"
+      }
     },
     "ServiceCorsConfigurationInfo": {
-      "description": "The settings for the CORS configuration of the service instance.",
+      "type": "object",
       "properties": {
         "allowCredentials": {
-          "description": "If credentials are allowed via CORS.",
           "oneOf": [
             {
               "type": "boolean"
@@ -176,114 +184,111 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "If credentials are allowed via CORS."
         },
         "headers": {
-          "description": "The headers to be allowed via CORS.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "type": "string"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The headers to be allowed via CORS."
         },
         "maxAge": {
-          "description": "The max age to be allowed via CORS.",
           "oneOf": [
             {
-              "maximum": 99999,
+              "type": "integer",
               "minimum": 0,
-              "type": "integer"
+              "maximum": 99999
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The max age to be allowed via CORS."
         },
         "methods": {
-          "description": "The methods to be allowed via CORS.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "type": "string"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The methods to be allowed via CORS."
         },
         "origins": {
-          "description": "The origins to be allowed via CORS.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
-                "pattern": "^(?:(?:(?:[hH][tT][tT][pP](?:[sS]|))\\:\\/\\/(?:[a-zA-Z0-9-]+[.]?)+(?:\\:[0-9]{1,5})?|[*]))$",
-                "type": "string"
-              },
-              "type": "array"
+                "type": "string",
+                "pattern": "^(?:(?:(?:[hH][tT][tT][pP](?:[sS]|))\\:\\/\\/(?:[a-zA-Z0-9-]+[.]?)+(?:\\:[0-9]{1,5})?|[*]))$"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The origins to be allowed via CORS."
         }
-      },
-      "type": "object"
+      }
     },
     "ServiceCosmosDbConfigurationInfo": {
-      "description": "The settings for the Cosmos DB database backing the service.",
+      "type": "object",
       "properties": {
         "offerThroughput": {
-          "description": "The provisioned throughput for the backing database.",
           "oneOf": [
             {
-              "minimum": 400,
-              "type": "integer"
+              "type": "integer",
+              "minimum": 400
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The provisioned throughput for the backing database."
         }
-      },
-      "type": "object"
+      }
     },
     "ServiceExportConfigurationInfo": {
-      "description": "Export operation configuration information",
+      "type": "object",
       "properties": {
         "storageAccountName": {
-          "description": "The name of the default export storage account.",
-          "type": "string"
+          "type": "string",
+          "description": "The name of the default export storage account."
         }
-      },
-      "type": "object"
+      }
     },
     "ServicesProperties": {
-      "description": "The properties of a service instance.",
+      "type": "object",
       "properties": {
         "accessPolicies": {
-          "description": "The access policies of the service instance.",
           "oneOf": [
             {
+              "type": "array",
               "items": {
                 "$ref": "#/definitions/ServiceAccessPolicyEntry"
-              },
-              "type": "array"
+              }
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The access policies of the service instance."
         },
         "authenticationConfiguration": {
-          "description": "The authentication configuration for the service instance.",
           "oneOf": [
             {
               "$ref": "#/definitions/ServiceAuthenticationConfigurationInfo"
@@ -291,10 +296,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The authentication configuration for the service instance."
         },
         "corsConfiguration": {
-          "description": "The settings for the CORS configuration of the service instance.",
           "oneOf": [
             {
               "$ref": "#/definitions/ServiceCorsConfigurationInfo"
@@ -302,10 +307,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The settings for the CORS configuration of the service instance."
         },
         "cosmosDbConfiguration": {
-          "description": "The settings for the Cosmos DB database backing the service.",
           "oneOf": [
             {
               "$ref": "#/definitions/ServiceCosmosDbConfigurationInfo"
@@ -313,10 +318,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The settings for the Cosmos DB database backing the service."
         },
         "exportConfiguration": {
-          "description": "The settings for the export operation of the service instance.",
           "oneOf": [
             {
               "$ref": "#/definitions/ServiceExportConfigurationInfo"
@@ -324,10 +329,10 @@
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          ]
+          ],
+          "description": "The settings for the export operation of the service instance."
         }
-      },
-      "type": "object"
+      }
     }
   }
 }

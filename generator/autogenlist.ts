@@ -102,14 +102,14 @@ const disabledProviders: AutoGenConfig[] = [
         namespace: 'Microsoft.Monitor',
         disabledForAutogen: true,
     },
-    {
+/*    {
         //Disabled until errors are fixed
         //Password is not a valid format for type array
         basePath: 'redisenterprise/resource-manager/Microsoft.Cache/RedisEnterprise',
         namespace: 'Microsoft.Cache',
         useNamespaceFromConfig: true,
         disabledForAutogen: true,
-    },
+    },*/
     {
         // Disabling as this is superceded by the 'securityinsights/resource-manager/Microsoft.SecurityInsights/SecurityInsights' entry after a repo restructure
         basePath: 'securityinsights/resource-manager',

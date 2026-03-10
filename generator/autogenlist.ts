@@ -62,7 +62,6 @@ const disabledProviders: AutoGenConfig[] = [
         basePath: 'botservice/resource-manager/Microsoft.BotService/BotService',
         namespace: 'Microsoft.BotService',
         useNamespaceFromConfig: true,
-        disabledForAutogen: true,
     },
     {
         //Disabled until errors are fixed

@@ -111,7 +111,7 @@ public class MainGenerator(
     private static bool ShouldPreserveFile(string filePath)
     {
         var fileName = Path.GetFileName(filePath);
-        if (filePath.StartsWith("common/", StringComparison.OrdinalIgnoreCase))
+        if (filePath.Equals("common/definitions.json", StringComparison.OrdinalIgnoreCase))
         {
             return true;
         }

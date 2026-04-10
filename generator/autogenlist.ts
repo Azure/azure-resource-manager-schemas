@@ -22,7 +22,22 @@ import { lowerCaseEquals } from './utils';
 import { detectProviderNamespaces } from './generate';
 
 // Providers that have been onboarded to the C# generator. Any provider in this list must be be excluded from autogenList.
-export const csharpGeneratorEnabledProviders: string[] = [];
+export const csharpGeneratorEnabledProviders: string[] = [
+    'Microsoft.Addons',
+    'Microsoft.AnalysisServices',
+    'Microsoft.Aadiam',
+    'Microsoft.WorkloadMonitor',
+    'Microsoft.AppPlatform',
+    'Microsoft.Attestation',
+    'Microsoft.Automation',
+    'Microsoft.AzureArcData',
+    'Microsoft.AzureData',
+    'Microsoft.AzureStack',
+    'Microsoft.Blockchain',
+    'Microsoft.Blueprint',
+    'Microsoft.Billing',
+    'Microsoft.ChangeAnalysis',
+];
 
 // New providers are onboarded by default. The providers listed here are the only ones **not** onboarded.
 const disabledProviders: AutoGenConfig[] = [

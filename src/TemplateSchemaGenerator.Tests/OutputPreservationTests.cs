@@ -61,6 +61,8 @@ public class OutputPreservationTests
 
         public ResourceFunctionType LoadResourceFunctionType(CrossFileTypeReference reference) => throw new NotSupportedException();
 
+        public NamespaceFunctionType LoadNamespaceFunctionType(CrossFileTypeReference reference) => throw new NotSupportedException();
+
         public TypeIndex LoadTypeIndex()
         {
             var dummyRef = new CrossFileTypeReference("dummy", 0);
@@ -69,6 +71,7 @@ public class OutputPreservationTests
             return new TypeIndex(
                 resources: new Dictionary<string, CrossFileTypeReference>(StringComparer.OrdinalIgnoreCase),
                 resourceFunctions: new Dictionary<string, IReadOnlyDictionary<string, IReadOnlyList<CrossFileTypeReference>>>(StringComparer.OrdinalIgnoreCase),
+                namespaceFunctions: new List<CrossFileTypeReference>(),
                 settings: dummySettings,
                 fallbackResourceType: dummyRef);
         }

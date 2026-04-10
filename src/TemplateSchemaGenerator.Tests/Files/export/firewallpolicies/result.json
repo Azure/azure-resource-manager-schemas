@@ -1,0 +1,74 @@
+{
+  "value": {
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "firewallPolicies_Export4Test_name": {
+        "type": "String"
+      }
+    },
+    "variables": {},
+    "resources": [
+      {
+        "type": "Microsoft.Network/FirewallPolicies",
+        "apiVersion": "2020-04-01",
+        "name": "[parameters('firewallPolicies_Export4Test_name')]",
+        "location": "westcentralus",
+        "properties": {
+          "threatIntelMode": "Alert",
+          "threatIntelWhitelist": {
+            "ipAddresses": []
+          },
+          "dnsSettings": {
+            "servers": [],
+            "enableProxy": true
+          }
+        }
+      },
+      {
+        "type": "Microsoft.Network/FirewallPolicies/ruleCollectionGroups",
+        "apiVersion": "2020-04-01",
+        "name": "DefaultDnatRuleCollectionGroup",
+        "location": "westcentralus",
+        "dependsOn": [
+          "[resourceId('Microsoft.Network/firewallPolicies', parameters('firewallPolicies_Export4Test_name'))]"
+        ],
+        "properties": {
+          "priority": 100,
+          "ruleCollections": [
+            {
+              "ruleCollectionType": "FirewallPolicyNatRuleCollection",
+              "action": {
+                "type": "Dnat"
+              },
+              "rules": [
+                {
+                  "ruleType": "NatRule",
+                  "name": "AllowRDP",
+                  "translatedAddress": "10.9.1.4",
+                  "translatedPort": "3389",
+                  "ipProtocols": [
+                    "TCP"
+                  ],
+                  "sourceAddresses": [
+                    "*"
+                  ],
+                  "sourceIpGroups": [],
+                  "destinationAddresses": [
+                    "52.179.115.142"
+                  ],
+                  "destinationPorts": [
+                    "3389"
+                  ]
+                }
+              ],
+              "name": "NATRULE",
+              "priority": 100
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "errors": []
+}

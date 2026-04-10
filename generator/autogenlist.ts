@@ -21,6 +21,9 @@ import { postProcessor as awsConnectorPostProcessor } from './processors/Microso
 import { lowerCaseEquals } from './utils';
 import { detectProviderNamespaces } from './generate';
 
+// Providers that have been onboarded to the C# generator. Any provider in this list must be be excluded from autogenList.
+export const csharpGeneratorEnabledProviders: string[] = [];
+
 // New providers are onboarded by default. The providers listed here are the only ones **not** onboarded.
 const disabledProviders: AutoGenConfig[] = [
     {
@@ -57,11 +60,30 @@ const disabledProviders: AutoGenConfig[] = [
         disabledForAutogen: true,
     },
     {
-        //Disabled until errors are fixed
-        //'Microsoft.BotService/preview/2023-09-15-preview/botservice.json:3492:5' - TypeError: Cannot convert undefined or null to object
         basePath: 'botservice/resource-manager/Microsoft.BotService/BotService',
         namespace: 'Microsoft.BotService',
         useNamespaceFromConfig: true,
+    },
+    {
+        // Duplicated under 'containerservice/resource-manager/Microsoft.ContainerService/aks'
+        basePath: 'compute/resource-manager/Microsoft.ContainerService/ContainerService',
+        namespace: 'Microsoft.ContainerService',
+        useNamespaceFromConfig: true,
+        disabledForAutogen: true,
+    },
+    {
+        //Disabled until errors are fixed
+        //Unrecognized schema type:'boolean'. Boolean schema 'type·for·isSecret' with unknown format: 'password' is not vali
+        basePath: 'eventgrid/resource-manager/Microsoft.EventGrid/EventGrid',
+        namespace: 'Microsoft.EventGrid',
+        useNamespaceFromConfig: true,
+        resourceConfig: [
+            {
+                type: 'eventSubscriptions',
+                scopes: ScopeType.Extension | ScopeType.Subscription | ScopeType.ResourceGroup,
+            },
+        ],
+        disabledForAutogen: true,
     },
     {
         //Disabled until errors are fixed
@@ -77,20 +99,6 @@ const disabledProviders: AutoGenConfig[] = [
         useNamespaceFromConfig: true,
         postProcessor: serviceFabricPostProcessor,
         suffix: 'ManagedClusters',
-        disabledForAutogen: true,
-    },
-    {
-        //Disabled until errors are fixed
-        //Remove deprectaed version 2024-01-01-preview from readme
-        basePath: 'monitor/resource-manager',
-        namespace: 'Microsoft.Insights',
-        disabledForAutogen: true,
-    },
-    {
-        //Disabled until errors are fixed
-        //Remove deprectaed version 2024-01-01-preview from readme
-        basePath: 'monitor/resource-manager',
-        namespace: 'Microsoft.Monitor',
         disabledForAutogen: true,
     },
     {
@@ -605,17 +613,6 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'labservices/resource-manager/Microsoft.LabServices/LabServices',
         namespace: 'Microsoft.LabServices',
         useNamespaceFromConfig: true,
-    },
-    {
-        basePath: 'eventgrid/resource-manager/Microsoft.EventGrid/EventGrid',
-        namespace: 'Microsoft.EventGrid',
-        useNamespaceFromConfig: true,
-        resourceConfig: [
-            {
-                type: 'eventSubscriptions',
-                scopes: ScopeType.Extension | ScopeType.Subscription | ScopeType.ResourceGroup,
-            },
-        ],
     },
     {
         basePath: 'machinelearning/resource-manager',
@@ -1191,13 +1188,27 @@ const autoGenList: AutoGenConfig[] = [
         postProcessor: storageProcessor,
     },
     {
-        basePath: 'compute/resource-manager',
+        basePath: 'compute/resource-manager/Microsoft.Compute/Bulkactions',
+        namespace: 'Microsoft.Compute',
+        useNamespaceFromConfig: true,
+        suffix: 'BulkActions',
+        postProcessor: computeProcessor
+    },
+    {
+        basePath: 'compute/resource-manager/Microsoft.Compute/Compute',
         namespace: 'Microsoft.Compute',
         useNamespaceFromConfig: true,
         postProcessor: computeProcessor
     },
     {
-        basePath: 'compute/resource-manager/Microsoft.Compute/RecommenderRP',
+        basePath: 'compute/resource-manager/Microsoft.Compute/Diagnostic',
+        namespace: 'Microsoft.Compute',
+        useNamespaceFromConfig: true,
+        suffix: 'Diagnostic',
+        postProcessor: computeProcessor
+    },
+    {
+        basePath: 'compute/resource-manager/Microsoft.Compute/Recommender',
         namespace: 'Microsoft.Compute',
         useNamespaceFromConfig: true,
         suffix: 'RecommenderRP',
@@ -1320,8 +1331,9 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.HealthBot',
     },
     {
-        basePath: 'keyvault/resource-manager',
+        basePath: 'keyvault/resource-manager/Microsoft.KeyVault/KeyVault',
         namespace: 'Microsoft.KeyVault',
+        useNamespaceFromConfig: true,
         readmeTag: {
             '2016-10-01': [
                 'Microsoft.KeyVault/stable/2016-10-01/keyvault.json',
@@ -1353,11 +1365,10 @@ const autoGenList: AutoGenConfig[] = [
         namespace: 'Microsoft.PowerPlatform',
         useNamespaceFromConfig: true,
     },
-    //Disabled until errors are fixed
-    //Remove deprectated version 2024-01-01-preview from readme
-    /*{
-        basePath: 'monitor/resource-manager',
+    {
+        basePath: 'monitor/resource-manager/Microsoft.Insights/Insights',
         namespace: 'Microsoft.Insights',
+        useNamespaceFromConfig: true,
         resourceConfig: [
             {
                 type: 'diagnosticSettings',
@@ -1372,7 +1383,7 @@ const autoGenList: AutoGenConfig[] = [
                 scopes: ScopeType.Extension,
             },
         ],
-    },*/
+    },
     {
         basePath: 'applicationinsights/resource-manager/Microsoft.Insights/ApplicationInsights',
         namespace: 'Microsoft.Insights',

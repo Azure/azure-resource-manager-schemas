@@ -39,6 +39,9 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 20.x
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v5
       
       - name: Install generator npm packages
         run: npm ci
@@ -55,6 +58,10 @@ jobs:
           npm ci
           npm run build
         working-directory: bicep-types-az/src/autorest.bicep
+
+      - name: .NET Publish
+        run: |
+          dotnet publish
 
       - name: Run generator
         run: |
@@ -76,14 +83,14 @@ jobs:
         run: cat summary.log >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Schemas
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: batch-${{ matrix.batch }}-schemas
           path: schemas
           if-no-files-found: error
 
       - name: Upload summary log
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: batch-${{ matrix.batch }}-summary
           path: summary.log

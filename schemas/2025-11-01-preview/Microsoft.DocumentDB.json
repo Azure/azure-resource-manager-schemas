@@ -25,7 +25,7 @@
           ]
         },
         "location": {
-          "description": "The location of the resource group to which the resource belongs.",
+          "description": "The geo-location where the resource lives",
           "type": "string"
         },
         "name": {
@@ -64,7 +64,7 @@
           "type": "array"
         },
         "tags": {
-          "description": "Tags are a list of key-value pairs that describe the resource. These tags can be used in viewing and grouping this resource (across resource groups). A maximum of 15 tags can be provided for a resource. Each tag must have a key no greater than 128 characters and value no greater than 256 characters. For example, the default experience for a template type is set with \"defaultExperience\": \"Cassandra\". Current \"defaultExperience\" values also include \"Table\", \"Graph\", \"DocumentDB\", and \"MongoDB\".",
+          "description": "Resource tags.",
           "oneOf": [
             {
               "additionalProperties": {
@@ -229,31 +229,43 @@
                 "$ref": "#/definitions/databaseAccounts_sqlDatabases_childResource"
               },
               {
-                "$ref": "#/definitions/databaseAccounts_mongodbDatabases_childResource"
+                "$ref": "#/definitions/databaseAccounts_dataTransferJobs_childResource"
               },
               {
                 "$ref": "#/definitions/databaseAccounts_gremlinDatabases_childResource"
               },
               {
-                "$ref": "#/definitions/databaseAccounts_dataTransferJobs_childResource"
+                "$ref": "#/definitions/databaseAccounts_mongodbDatabases_childResource"
               },
               {
                 "$ref": "#/definitions/databaseAccounts_cassandraKeyspaces_childResource"
               },
               {
-                "$ref": "#/definitions/databaseAccounts_sqlRoleDefinitions_childResource"
+                "$ref": "#/definitions/databaseAccounts_notebookWorkspaces_childResource"
               },
               {
                 "$ref": "#/definitions/databaseAccounts_sqlRoleAssignments_childResource"
               },
               {
-                "$ref": "#/definitions/databaseAccounts_notebookWorkspaces_childResource"
+                "$ref": "#/definitions/databaseAccounts_sqlRoleDefinitions_childResource"
+              },
+              {
+                "$ref": "#/definitions/databaseAccounts_tableRoleAssignments_childResource"
               },
               {
                 "$ref": "#/definitions/databaseAccounts_tableRoleDefinitions_childResource"
               },
               {
-                "$ref": "#/definitions/databaseAccounts_tableRoleAssignments_childResource"
+                "$ref": "#/definitions/databaseAccounts_gremlinRoleAssignments_childResource"
+              },
+              {
+                "$ref": "#/definitions/databaseAccounts_gremlinRoleDefinitions_childResource"
+              },
+              {
+                "$ref": "#/definitions/databaseAccounts_mongoMIRoleAssignments_childResource"
+              },
+              {
+                "$ref": "#/definitions/databaseAccounts_mongoMIRoleDefinitions_childResource"
               },
               {
                 "$ref": "#/definitions/databaseAccounts_mongodbRoleDefinitions_childResource"
@@ -262,22 +274,10 @@
                 "$ref": "#/definitions/databaseAccounts_mongodbUserDefinitions_childResource"
               },
               {
-                "$ref": "#/definitions/databaseAccounts_gremlinRoleDefinitions_childResource"
-              },
-              {
-                "$ref": "#/definitions/databaseAccounts_gremlinRoleAssignments_childResource"
-              },
-              {
-                "$ref": "#/definitions/databaseAccounts_mongoMIRoleDefinitions_childResource"
-              },
-              {
-                "$ref": "#/definitions/databaseAccounts_mongoMIRoleAssignments_childResource"
+                "$ref": "#/definitions/databaseAccounts_cassandraRoleAssignments_childResource"
               },
               {
                 "$ref": "#/definitions/databaseAccounts_cassandraRoleDefinitions_childResource"
-              },
-              {
-                "$ref": "#/definitions/databaseAccounts_cassandraRoleAssignments_childResource"
               },
               {
                 "$ref": "#/definitions/databaseAccounts_privateEndpointConnections_childResource"
@@ -962,7 +962,15 @@
         },
         "name": {
           "description": "Name of the Data Transfer Job",
-          "type": "string"
+          "oneOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "properties": {
           "description": "Data Transfer Create Job Properties",
@@ -3162,12 +3170,23 @@
           ],
           "type": "string"
         },
+        "identity": {
+          "description": "Identity for the resource.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ManagedCassandraManagedServiceIdentity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
         "location": {
           "description": "The geo-location where the resource lives",
           "type": "string"
         },
         "name": {
-          "description": "Garnet cache cluster name.",
+          "description": "The name of the GarnetClusterResource",
           "oneOf": [
             {
               "maxLength": 100,
@@ -3181,7 +3200,7 @@
           ]
         },
         "properties": {
-          "description": "Properties of a Garnet cache cluster.",
+          "description": "The resource-specific properties for this resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/GarnetClusterResourceProperties"
@@ -4597,7 +4616,7 @@
           ]
         },
         "policyFormatVersion": {
-          "description": "Version of the client encryption policy definition. Supported versions are 1 and 2. Version 2 supports id and partition key path encryption. ",
+          "description": "Version of the client encryption policy definition. Supported versions are 1 and 2. Version 2 supports id and partition key path encryption.",
           "oneOf": [
             {
               "maximum": 2,
@@ -4915,10 +4934,6 @@
           "type": "string"
         }
       },
-      "type": "object"
-    },
-    "Components1Jq1T4ISchemasManagedserviceidentityPropertiesUserassignedidentitiesAdditionalproperties": {
-      "properties": {},
       "type": "object"
     },
     "CompositePath": {
@@ -5475,6 +5490,7 @@
       "type": "object"
     },
     "DataMaskingPolicyExcludedPathsItem": {
+      "description": "JSON path to exclude from masking.",
       "properties": {
         "path": {
           "description": "The JSON path to exclude from masking (e.g. \"/id\").",
@@ -5487,6 +5503,7 @@
       "type": "object"
     },
     "DataMaskingPolicyIncludedPathsItem": {
+      "description": "JSON path to include in the masking policy.",
       "properties": {
         "length": {
           "description": "Length of substring to mask (when applicable).",
@@ -5855,7 +5872,7 @@
           "type": "string"
         },
         "databaseAccountOfferType": {
-          "description": "The offer type for the database",
+          "description": "The offer type for the Cosmos DB database account.",
           "oneOf": [
             {
               "enum": [
@@ -6223,7 +6240,7 @@
       },
       "type": "object"
     },
-    "ErrorDetailAutoGenerated": {
+    "ErrorDetail": {
       "description": "The error detail.",
       "properties": {},
       "type": "object"
@@ -6239,29 +6256,6 @@
     },
     "FleetAnalyticsProperties": {
       "properties": {
-        "provisioningState": {
-          "description": "A provisioning state of the FleetAnalytics.",
-          "oneOf": [
-            {
-              "enum": [
-                "Uninitialized",
-                "Initializing",
-                "InternallyReady",
-                "Online",
-                "Deleting",
-                "Creating",
-                "Succeeded",
-                "Failed",
-                "Canceled",
-                "Updating"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
         "storageLocationType": {
           "description": "The type of the fleet analytics resource.",
           "oneOf": [
@@ -6286,31 +6280,7 @@
     },
     "FleetResourceProperties": {
       "description": "Properties to update Azure Cosmos DB fleet resource.",
-      "properties": {
-        "provisioningState": {
-          "description": "A provisioning state of the Fleet.",
-          "oneOf": [
-            {
-              "enum": [
-                "Uninitialized",
-                "Initializing",
-                "InternallyReady",
-                "Online",
-                "Deleting",
-                "Creating",
-                "Succeeded",
-                "Failed",
-                "Canceled",
-                "Updating"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
+      "properties": {},
       "type": "object"
     },
     "FleetspaceAccountProperties": {
@@ -6321,29 +6291,6 @@
           "oneOf": [
             {
               "$ref": "#/definitions/FleetspaceAccountPropertiesGlobalDatabaseAccountProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "provisioningState": {
-          "description": "A provisioning state of the Fleetspace Account.",
-          "oneOf": [
-            {
-              "enum": [
-                "Uninitialized",
-                "Initializing",
-                "InternallyReady",
-                "Online",
-                "Deleting",
-                "Creating",
-                "Succeeded",
-                "Failed",
-                "Canceled",
-                "Updating"
-              ],
-              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -6390,29 +6337,6 @@
             {
               "enum": [
                 "NoSQL"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "provisioningState": {
-          "description": "A provisioning state of the Fleetspace.",
-          "oneOf": [
-            {
-              "enum": [
-                "Uninitialized",
-                "Initializing",
-                "InternallyReady",
-                "Online",
-                "Deleting",
-                "Creating",
-                "Succeeded",
-                "Failed",
-                "Canceled",
-                "Updating"
               ],
               "type": "string"
             },
@@ -6613,7 +6537,7 @@
           ]
         },
         "nodeCount": {
-          "description": "Number of nodes",
+          "description": "Number of nodes.",
           "oneOf": [
             {
               "type": "integer"
@@ -6624,14 +6548,14 @@
           ]
         },
         "nodeSku": {
-          "description": "Virtual Machine SKU used for clusters. Default value is Standard_DS14_v2",
+          "description": "Virtual Machine SKU used for clusters. Default value is Standard_DS14_v2.",
           "type": "string"
         },
         "provisionError": {
           "description": "Error related to resource provisioning.",
           "oneOf": [
             {
-              "$ref": "#/definitions/ErrorDetailAutoGenerated"
+              "$ref": "#/definitions/ErrorDetail"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -6639,7 +6563,7 @@
           ]
         },
         "replicationFactor": {
-          "description": "Number of copies of data maintained by the cluster",
+          "description": "Number of copies of data maintained by the cluster.",
           "oneOf": [
             {
               "type": "integer"
@@ -7312,7 +7236,7 @@
           "oneOf": [
             {
               "additionalProperties": {
-                "$ref": "#/definitions/Components1Jq1T4ISchemasManagedserviceidentityPropertiesUserassignedidentitiesAdditionalproperties"
+                "$ref": "#/definitions/ManagedServiceIdentityUserAssignedIdentities"
               },
               "properties": {},
               "type": "object"
@@ -7323,6 +7247,10 @@
           ]
         }
       },
+      "type": "object"
+    },
+    "ManagedServiceIdentityUserAssignedIdentities": {
+      "properties": {},
       "type": "object"
     },
     "MaterializedViewDefinition": {
@@ -7530,7 +7458,7 @@
       "description": "Cosmos DB MongoDB database resource object",
       "properties": {
         "createMode": {
-          "description": "Enum to indicate the mode of resource creation.",
+          "description": "Enum to indicate the mode of account creation.",
           "oneOf": [
             {
               "enum": [
@@ -8011,40 +7939,6 @@
       },
       "type": "object"
     },
-    "PermissionAutoGenerated": {
-      "description": "The set of data plane operations permitted through this Role Definition.",
-      "properties": {
-        "dataActions": {
-          "description": "An array of data actions that are allowed.",
-          "oneOf": [
-            {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "notDataActions": {
-          "description": "An array of data actions that are denied.",
-          "oneOf": [
-            {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "type": "object"
-    },
     "PrivateEndpointConnectionProperties": {
       "description": "Properties of a private endpoint connection.",
       "properties": {
@@ -8507,7 +8401,7 @@
           ]
         },
         "createMode": {
-          "description": "Enum to indicate the mode of resource creation.",
+          "description": "Enum to indicate the mode of account creation.",
           "oneOf": [
             {
               "enum": [
@@ -8690,7 +8584,7 @@
       "description": "Cosmos DB SQL database resource object",
       "properties": {
         "createMode": {
-          "description": "Enum to indicate the mode of resource creation.",
+          "description": "Enum to indicate the mode of account creation.",
           "oneOf": [
             {
               "enum": [
@@ -8765,7 +8659,7 @@
           "oneOf": [
             {
               "items": {
-                "$ref": "#/definitions/PermissionAutoGenerated"
+                "$ref": "#/definitions/Permission"
               },
               "type": "array"
             },
@@ -9008,7 +8902,7 @@
       "description": "Cosmos DB table resource object",
       "properties": {
         "createMode": {
-          "description": "Enum to indicate the mode of resource creation.",
+          "description": "Enum to indicate the mode of account creation.",
           "oneOf": [
             {
               "enum": [
@@ -9199,29 +9093,6 @@
         "accountResourceIdentifier": {
           "description": "The resource identifier of global database account in the throughputPool.",
           "type": "string"
-        },
-        "provisioningState": {
-          "description": "A provisioning state of the ThroughputPool Account.",
-          "oneOf": [
-            {
-              "enum": [
-                "Uninitialized",
-                "Initializing",
-                "InternallyReady",
-                "Online",
-                "Deleting",
-                "Creating",
-                "Succeeded",
-                "Failed",
-                "Canceled",
-                "Updating"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
         }
       },
       "type": "object"
@@ -9250,11 +9121,11 @@
                 "InternallyReady",
                 "Online",
                 "Deleting",
-                "Creating",
                 "Succeeded",
                 "Failed",
                 "Canceled",
-                "Updating"
+                "Updating",
+                "Creating"
               ],
               "type": "string"
             },
@@ -10203,7 +10074,15 @@
         },
         "name": {
           "description": "Name of the Data Transfer Job",
-          "type": "string"
+          "oneOf": [
+            {
+              "pattern": "^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "properties": {
           "description": "Data Transfer Create Job Properties",

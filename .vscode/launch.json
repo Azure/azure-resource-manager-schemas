@@ -32,6 +32,22 @@
       "cwd": "${workspaceFolder}/generator"
     },
     {
+      "name": "Generate Single (C#)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "args": [
+        "run",
+        "generate-single",
+        "--",
+        "--specs-dir",
+        "${workspaceFolder}/../azure-rest-api-specs",
+        "--provider-namespace",
+        "${input:providerNamespace}"
+      ],
+      "cwd": "${workspaceFolder}/generator"
+    },
+    {
       "name": "Generate All",
       "type": "node",
       "request": "launch",
@@ -43,7 +59,54 @@
         "--specs-dir",
         "${workspaceFolder}/../azure-rest-api-specs"
       ],
-      "cwd": "${workspaceFolder}/generator"
+      "cwd": "${workspaceFolder}/generator",
+      "preLaunchTask": "publish"
+    },
+    {
+      "name": "Launch CLI",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      // If you have changed target frameworks, make sure to update the program path.
+      "program": "${workspaceFolder}/src/TemplateSchemaGenerator/bin/Debug/net10.0/TemplateSchemaGenerator",
+      "args": [
+        "--source-folder",
+        "../../../bicep-types-az/generated",
+        "--output-folder",
+        "../../schemas",
+        "--verbose"
+      ],
+      "cwd": "${workspaceFolder}/src/TemplateSchemaGenerator",
+      // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "Launch CLI (Single Provider)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      // If you have changed target frameworks, make sure to update the program path.
+      "program": "${workspaceFolder}/src/TemplateSchemaGenerator/bin/Debug/net10.0/TemplateSchemaGenerator",
+      "args": [
+        "--source-folder",
+        "../../../bicep-types-az/generated",
+        "--output-folder",
+        "../../schemas",
+        "--provider-namespace",
+        "${input:providerNamespace}",
+        "--verbose"
+      ],
+      "cwd": "${workspaceFolder}/src/TemplateSchemaGenerator",
+      // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "Attach",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickProcess}"
     }
   ],
   "inputs": [
@@ -52,6 +115,12 @@
       "type": "promptString",
       "default": "alertsmanagement/resource-manager",
       "description": "The path to generate types for (e.g. \"compute/resource-manager\", or \"keyvault/resource-manager\")."
+    },
+    {
+      "id": "providerNamespace",
+      "default": "Microsoft.Compute",
+      "type": "promptString",
+      "description": "Pick a Provider Namespace to generate docs for"
     }
   ]
 }

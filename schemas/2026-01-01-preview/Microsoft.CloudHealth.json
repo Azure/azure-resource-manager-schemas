@@ -650,7 +650,7 @@
       ],
       "type": "object"
     },
-    "DependenciesSignalGroup": {
+    "DependenciesSignalGroupV2": {
       "description": "Properties for dependent entities, i.e. child entities",
       "properties": {
         "aggregationType": {
@@ -659,7 +659,8 @@
             {
               "enum": [
                 "WorstOf",
-                "Thresholds"
+                "MinHealthy",
+                "MaxNotHealthy"
               ],
               "type": "string"
             },
@@ -669,12 +670,55 @@
           ]
         },
         "degradedThreshold": {
-          "description": "Degraded threshold for aggregating the propagated health state of child dependencies. Can be either an absolute number that is greater than 0, or a percentage between 1-100%. The entity will be considered degraded when the number of not healthy child dependents (unhealthy, degraded, unknown) is equal to or above the threshold value. Must only be set when AggregationType is 'Thresholds'.",
-          "type": "string"
+          "description": "Degraded threshold for aggregation. For MinHealthy: parent is degraded when healthy count/percentage falls to or below this value. For MaxNotHealthy: parent is degraded when not-healthy count/percentage reaches or exceeds this value. Optional — if not set, there is no degraded state (transitions directly from Healthy to Unhealthy).",
+          "oneOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "ignoreUnknown": {
+          "description": "If true, children with Unknown health state are excluded from aggregation calculations. Defaults to true.",
+          "oneOf": [
+            {
+              "default": true,
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "unhealthyThreshold": {
-          "description": "Unhealthy threshold for aggregating the propagated health state of child dependencies. Can be either an absolute number that is greater than 0, or a percentage between 1-100%. The entity will be considered unhealthy when the number of not healthy child dependents (unhealthy, degraded, unknown) is equal to or above the threshold value. Must only be set when AggregationType is 'Thresholds'.",
-          "type": "string"
+          "description": "Unhealthy threshold for aggregation. For MinHealthy: parent is unhealthy when healthy count/percentage falls to or below this value. For MaxNotHealthy: parent is unhealthy when not-healthy count/percentage reaches or exceeds this value. Required when aggregationType is MinHealthy or MaxNotHealthy.",
+          "oneOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "unit": {
+          "description": "Unit type for the aggregation thresholds. Required when aggregationType is MinHealthy or MaxNotHealthy.",
+          "oneOf": [
+            {
+              "enum": [
+                "Absolute",
+                "Percentage"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "required": [
@@ -1612,7 +1656,7 @@
           "description": "Settings for dependency signals to control how the health state of child entities influences the health state of the parent entity.",
           "oneOf": [
             {
-              "$ref": "#/definitions/DependenciesSignalGroup"
+              "$ref": "#/definitions/DependenciesSignalGroupV2"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"

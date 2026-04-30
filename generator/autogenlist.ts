@@ -11,7 +11,6 @@ import { postProcessor as policyProcessor } from './processors/Microsoft.Authori
 import { postProcessor as securityInsightsPostProcessor } from './processors/Microsoft.SecurityInsights';
 import { postProcessor as costManagementPostProcessor } from './processors/Microsoft.CostManagement';
 import { postProcessor as providerHubPostProcessor } from './processors/Microsoft.ProviderHub';
-import { postProcessor as mediaPostProcessor } from './processors/Microsoft.Media';
 import { postProcessor as networkPostProcessor } from './processors/Microsoft.Network';
 import { postProcessor as azureStackHciPostProcessor } from './processors/Microsoft.AzureStackHCI';
 import { postProcessor as resourcesPostProcessor } from './processors/Microsoft.Resources';
@@ -85,7 +84,6 @@ const csharpGeneratorProviders: CsharpGeneratorConfig[] = [
     { namespace: 'Microsoft.DBforMariaDB', enabled: true },
     { namespace: 'Microsoft.DBforMySQL', enabled: false },
     { namespace: 'Microsoft.DBforPostgreSQL', enabled: false },
-    { namespace: 'Microsoft.DeploymentManager', enabled: true },
     { namespace: 'Microsoft.DesktopVirtualization', enabled: false },
     { namespace: 'Microsoft.DevHub', enabled: true },
     { namespace: 'Microsoft.Devices', enabled: true },
@@ -137,7 +135,6 @@ const csharpGeneratorProviders: CsharpGeneratorConfig[] = [
     { namespace: 'Microsoft.ManagementPartner', enabled: true },
     { namespace: 'Microsoft.Maps', enabled: true },
     { namespace: 'Microsoft.Marketplace', enabled: true },
-    { namespace: 'Microsoft.Media', enabled: true },
     { namespace: 'Microsoft.Migrate', enabled: false },
     { namespace: 'Microsoft.MixedReality', enabled: true },
     { namespace: 'Microsoft.NetApp', enabled: false },
@@ -637,10 +634,6 @@ const autoGenList: AutoGenConfig[] = [
         basePath: 'datashare/resource-manager/Microsoft.DataShare/DataShare',
         namespace: 'Microsoft.DataShare',
         useNamespaceFromConfig: true,
-    },
-    {
-        basePath: 'deploymentmanager/resource-manager',
-        namespace: 'Microsoft.DeploymentManager',
     },
     {
         basePath: 'desktopvirtualization/resource-manager/Microsoft.DesktopVirtualization/DesktopVirtualization',
@@ -1613,11 +1606,6 @@ const autoGenList: AutoGenConfig[] = [
     {
         basePath: 'deviceupdate/resource-manager',
         namespace: 'Microsoft.DeviceUpdate',
-    },
-    {
-        basePath: 'mediaservices/resource-manager',
-        namespace: 'Microsoft.Media',
-        postProcessor: mediaPostProcessor
     },
     {
         basePath: 'trafficmanager/resource-manager/Microsoft.Network/TrafficManager',

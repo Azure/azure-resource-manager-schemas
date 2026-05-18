@@ -90,7 +90,6 @@ const metaSchemaPaths = [
 const schemasToSkipForCyclicValidation = new Set([
   '2017-09-01-preview/Microsoft.DataFactory.json',
   '2018-06-01/Microsoft.DataFactory.json',
-  '2018-07-01/Microsoft.Media.json',
   '2018-11-01-preview/Microsoft.Billing.json',
 ].map(p => path.resolve(`${schemasFolder}/${p}`)));
 

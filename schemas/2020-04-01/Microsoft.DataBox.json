@@ -29,7 +29,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the job Resource within the specified resource group. job names must be between 3 and 24 characters in length and use any alphanumeric and underscore only",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 24,
@@ -87,8 +87,10 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
+        "sku",
         "apiVersion",
         "type"
       ],
@@ -97,7 +99,6 @@
   },
   "definitions": {
     "AzureFileFilterDetails": {
-      "description": "Filter details to transfer Azure files",
       "properties": {
         "filePathList": {
           "description": "List of full path of the files to be transferred.",
@@ -145,7 +146,6 @@
       "type": "object"
     },
     "BlobFilterDetails": {
-      "description": "Filter details to transfer Azure Blobs",
       "properties": {
         "blobPathList": {
           "description": "List of full path of the blobs to be transferred.",
@@ -193,7 +193,6 @@
       "type": "object"
     },
     "ContactDetails": {
-      "description": "Contact Details.",
       "properties": {
         "contactName": {
           "description": "Contact name of the person.",
@@ -242,70 +241,176 @@
       },
       "required": [
         "contactName",
-        "phone",
-        "emailList"
+        "emailList",
+        "phone"
       ],
       "type": "object"
     },
     "DataAccountDetails": {
-      "description": "Account details of the data to be transferred",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Details of the managed disks.",
+          "additionalProperties": false,
           "properties": {
             "dataAccountType": {
               "enum": [
-                "ManagedDisk"
+                "ManagedDisk",
+                "StorageAccount"
               ],
               "type": "string"
             },
-            "resourceGroupId": {
-              "description": "Resource Group Id of the compute disks.",
-              "type": "string"
-            },
-            "stagingStorageAccountId": {
-              "description": "Resource Id of the storage account that can be used to copy the vhd for staging.",
+            "sharePassword": {
+              "description": "Password for all the shares to be created on the device. Should not be passed for TransferType:ExportFromAzure jobs. If this is not passed, the service will generate password itself. This will not be returned in Get Call. Password Requirements :  Password must be minimum of 12 and maximum of 64 characters. Password must have at least one uppercase alphabet, one number and one special character. Password cannot have the following characters : IilLoO0 Password can have only alphabets, numbers and these characters : @#\\-$%^!+=;:_()]+",
               "type": "string"
             }
           },
           "required": [
-            "resourceGroupId",
-            "stagingStorageAccountId",
             "dataAccountType"
           ],
           "type": "object"
         },
         {
-          "description": "Details for the storage account.",
-          "properties": {
-            "dataAccountType": {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ManagedDiskDetails"
+                },
+                {
+                  "properties": {
+                    "dataAccountType": {
+                      "const": "ManagedDisk"
+                    }
+                  },
+                  "required": [
+                    "dataAccountType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/StorageAccountDetails"
+                },
+                {
+                  "properties": {
+                    "dataAccountType": {
+                      "const": "StorageAccount"
+                    }
+                  },
+                  "required": [
+                    "dataAccountType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "DataBoxDiskJobDetails": {
+      "properties": {
+        "jobDetailsType": {
+          "description": "Indicates the type of job details.",
+          "oneOf": [
+            {
               "enum": [
-                "StorageAccount"
+                "DataBoxDisk"
               ],
               "type": "string"
             },
-            "storageAccountId": {
-              "description": "Storage Account Resource Id.",
-              "type": "string"
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "storageAccountId",
-            "dataAccountType"
-          ],
-          "type": "object"
-        }
-      ],
-      "properties": {
-        "sharePassword": {
-          "description": "Password for all the shares to be created on the device. Should not be passed for TransferType:ExportFromAzure jobs. If this is not passed, the service will generate password itself. This will not be returned in Get Call. Password Requirements :  Password must be minimum of 12 and maximum of 64 characters. Password must have at least one uppercase alphabet, one number and one special character. Password cannot have the following characters : IilLoO0 Password can have only alphabets, numbers and these characters : @#\\-$%^!+=;:_()]+",
+          ]
+        },
+        "passkey": {
+          "description": "User entered passkey for DataBox Disk job.",
           "type": "string"
+        },
+        "preferredDisks": {
+          "description": "User preference on what size disks are needed for the job. The map is from the disk size in TB to the count. Eg. {2,5} means 5 disks of 2 TB size. Key is string but will be checked against an int.",
+          "oneOf": [
+            {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "properties": {},
+              "type": "object"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
+      "required": [
+        "jobDetailsType"
+      ],
+      "type": "object"
+    },
+    "DataBoxDiskJobDetailsPreferredDisks": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "DataBoxHeavyJobDetails": {
+      "properties": {
+        "devicePassword": {
+          "description": "Set Device password for unlocking Databox Heavy. Should not be passed for TransferType:ExportFromAzure jobs. If this is not passed, the service will generate password itself. This will not be returned in Get Call. Password Requirements :  Password must be minimum of 12 and maximum of 64 characters. Password must have at least one uppercase alphabet, one number and one special character. Password cannot have the following characters : IilLoO0 Password can have only alphabets, numbers and these characters : @#\\-$%^!+=;:_()]+",
+          "type": "string"
+        },
+        "jobDetailsType": {
+          "description": "Indicates the type of job details.",
+          "oneOf": [
+            {
+              "enum": [
+                "DataBoxHeavy"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "jobDetailsType"
+      ],
+      "type": "object"
+    },
+    "DataBoxJobDetails": {
+      "properties": {
+        "devicePassword": {
+          "description": "Set Device password for unlocking Databox. Should not be passed for TransferType:ExportFromAzure jobs. If this is not passed, the service will generate password itself. This will not be returned in Get Call. Password Requirements :  Password must be minimum of 12 and maximum of 64 characters. Password must have at least one uppercase alphabet, one number and one special character. Password cannot have the following characters : IilLoO0 Password can have only alphabets, numbers and these characters : @#\\-$%^!+=;:_()]+",
+          "type": "string"
+        },
+        "jobDetailsType": {
+          "description": "Indicates the type of job details.",
+          "oneOf": [
+            {
+              "enum": [
+                "DataBox"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "jobDetailsType"
+      ],
       "type": "object"
     },
     "DataExportDetails": {
-      "description": "Details of the data to be used for exporting data from azure.",
       "properties": {
         "accountDetails": {
           "description": "Account details of the data to be transferred",
@@ -346,13 +451,12 @@
         }
       },
       "required": [
-        "transferConfiguration",
-        "accountDetails"
+        "accountDetails",
+        "transferConfiguration"
       ],
       "type": "object"
     },
     "DataImportDetails": {
-      "description": "Details of the data to be used for importing data to azure.",
       "properties": {
         "accountDetails": {
           "description": "Account details of the data to be transferred",
@@ -372,7 +476,6 @@
       "type": "object"
     },
     "FilterFileDetails": {
-      "description": "Details of the filter files to be used for data transfer.",
       "properties": {
         "filterFilePath": {
           "description": "Path of the file that contains the details of all items to transfer.",
@@ -395,66 +498,99 @@
         }
       },
       "required": [
-        "filterFileType",
-        "filterFilePath"
+        "filterFilePath",
+        "filterFileType"
       ],
       "type": "object"
     },
     "JobDeliveryInfo": {
-      "description": "Additional delivery info.",
       "properties": {
         "scheduledDateTime": {
           "description": "Scheduled date time.",
-          "format": "date-time",
           "type": "string"
         }
       },
       "type": "object"
     },
     "JobDetails": {
-      "description": "Job details.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Databox Job Details",
+          "additionalProperties": false,
           "properties": {
-            "devicePassword": {
-              "description": "Set Device password for unlocking Databox. Should not be passed for TransferType:ExportFromAzure jobs. If this is not passed, the service will generate password itself. This will not be returned in Get Call. Password Requirements :  Password must be minimum of 12 and maximum of 64 characters. Password must have at least one uppercase alphabet, one number and one special character. Password cannot have the following characters : IilLoO0 Password can have only alphabets, numbers and these characters : @#\\-$%^!+=;:_()]+",
-              "type": "string"
-            },
-            "jobDetailsType": {
-              "enum": [
-                "DataBox"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "jobDetailsType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "DataBox Disk Job Details.",
-          "properties": {
-            "jobDetailsType": {
-              "enum": [
-                "DataBoxDisk"
-              ],
-              "type": "string"
-            },
-            "passkey": {
-              "description": "User entered passkey for DataBox Disk job.",
-              "type": "string"
-            },
-            "preferredDisks": {
-              "description": "User preference on what size disks are needed for the job. The map is from the disk size in TB to the count. Eg. {2,5} means 5 disks of 2 TB size. Key is string but will be checked against an int.",
+            "contactDetails": {
+              "description": "Contact details for notification and shipping.",
               "oneOf": [
                 {
-                  "additionalProperties": {
-                    "type": "integer"
+                  "$ref": "#/definitions/ContactDetails"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "dataExportDetails": {
+              "description": "Details of the data to be exported from azure.",
+              "oneOf": [
+                {
+                  "items": {
+                    "$ref": "#/definitions/DataExportDetails"
                   },
-                  "properties": {},
-                  "type": "object"
+                  "type": "array"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "dataImportDetails": {
+              "description": "Details of the data to be imported into azure.",
+              "oneOf": [
+                {
+                  "items": {
+                    "$ref": "#/definitions/DataImportDetails"
+                  },
+                  "type": "array"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "expectedDataSizeInTeraBytes": {
+              "description": "The expected size of the data, which needs to be transferred in this job, in terabytes.",
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "jobDetailsType": {
+              "enum": [
+                "DataBox",
+                "DataBoxDisk",
+                "DataBoxHeavy"
+              ],
+              "type": "string"
+            },
+            "preferences": {
+              "description": "Preferences for the order.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/Preferences"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "shippingAddress": {
+              "description": "Shipping address of the customer.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/ShippingAddress"
                 },
                 {
                   "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -463,111 +599,72 @@
             }
           },
           "required": [
+            "contactDetails",
             "jobDetailsType"
           ],
           "type": "object"
         },
         {
-          "description": "Databox Heavy Device Job Details",
-          "properties": {
-            "devicePassword": {
-              "description": "Set Device password for unlocking Databox Heavy. Should not be passed for TransferType:ExportFromAzure jobs. If this is not passed, the service will generate password itself. This will not be returned in Get Call. Password Requirements :  Password must be minimum of 12 and maximum of 64 characters. Password must have at least one uppercase alphabet, one number and one special character. Password cannot have the following characters : IilLoO0 Password can have only alphabets, numbers and these characters : @#\\-$%^!+=;:_()]+",
-              "type": "string"
-            },
-            "jobDetailsType": {
-              "enum": [
-                "DataBoxHeavy"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "jobDetailsType"
-          ],
-          "type": "object"
-        }
-      ],
-      "properties": {
-        "contactDetails": {
-          "description": "Contact details for notification and shipping.",
           "oneOf": [
             {
-              "$ref": "#/definitions/ContactDetails"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DataBoxJobDetails"
+                },
+                {
+                  "properties": {
+                    "jobDetailsType": {
+                      "const": "DataBox"
+                    }
+                  },
+                  "required": [
+                    "jobDetailsType"
+                  ],
+                  "type": "object"
+                }
+              ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "dataExportDetails": {
-          "description": "Details of the data to be exported from azure.",
-          "oneOf": [
-            {
-              "items": {
-                "$ref": "#/definitions/DataExportDetails"
-              },
-              "type": "array"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DataBoxDiskJobDetails"
+                },
+                {
+                  "properties": {
+                    "jobDetailsType": {
+                      "const": "DataBoxDisk"
+                    }
+                  },
+                  "required": [
+                    "jobDetailsType"
+                  ],
+                  "type": "object"
+                }
+              ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "dataImportDetails": {
-          "description": "Details of the data to be imported into azure.",
-          "oneOf": [
-            {
-              "items": {
-                "$ref": "#/definitions/DataImportDetails"
-              },
-              "type": "array"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "expectedDataSizeInTeraBytes": {
-          "description": "The expected size of the data, which needs to be transferred in this job, in terabytes.",
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "preferences": {
-          "description": "Preferences for the order.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/Preferences"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "shippingAddress": {
-          "description": "Shipping address of the customer.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ShippingAddress"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DataBoxHeavyJobDetails"
+                },
+                {
+                  "properties": {
+                    "jobDetailsType": {
+                      "const": "DataBoxHeavy"
+                    }
+                  },
+                  "required": [
+                    "jobDetailsType"
+                  ],
+                  "type": "object"
+                }
+              ]
             }
           ]
         }
-      },
-      "required": [
-        "contactDetails"
-      ],
-      "type": "object"
+      ]
     },
     "JobProperties": {
-      "description": "Job Properties",
       "properties": {
         "deliveryInfo": {
           "description": "Delivery Info of Job.",
@@ -627,14 +724,44 @@
       ],
       "type": "object"
     },
+    "ManagedDiskDetails": {
+      "properties": {
+        "dataAccountType": {
+          "description": "Account Type of the data to be transferred.",
+          "oneOf": [
+            {
+              "enum": [
+                "ManagedDisk"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "resourceGroupId": {
+          "description": "Resource Group Id of the compute disks.",
+          "type": "string"
+        },
+        "stagingStorageAccountId": {
+          "description": "Resource Id of the storage account that can be used to copy the vhd for staging.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dataAccountType",
+        "resourceGroupId",
+        "stagingStorageAccountId"
+      ],
+      "type": "object"
+    },
     "NotificationPreference": {
-      "description": "Notification preference for a job stage.",
       "properties": {
         "sendNotification": {
           "description": "Notification is required or not.",
           "oneOf": [
             {
-              "default": true,
               "type": "boolean"
             },
             {
@@ -663,13 +790,12 @@
         }
       },
       "required": [
-        "stageName",
-        "sendNotification"
+        "sendNotification",
+        "stageName"
       ],
       "type": "object"
     },
     "Preferences": {
-      "description": "Preferences related to the order",
       "properties": {
         "preferredDataCenterRegion": {
           "description": "Preferred data center region.",
@@ -700,7 +826,6 @@
       "type": "object"
     },
     "ResourceIdentity": {
-      "description": "Msi identity details of the resource",
       "properties": {
         "type": {
           "description": "Identity type",
@@ -709,8 +834,14 @@
       },
       "type": "object"
     },
+    "ResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "ShippingAddress": {
-      "description": "Shipping address where customer wishes to receive the device.",
       "properties": {
         "addressType": {
           "description": "Type of address.",
@@ -766,14 +897,13 @@
         }
       },
       "required": [
-        "streetAddress1",
         "country",
-        "postalCode"
+        "postalCode",
+        "streetAddress1"
       ],
       "type": "object"
     },
     "Sku": {
-      "description": "The Sku.",
       "properties": {
         "displayName": {
           "description": "The display name of the sku.",
@@ -805,8 +935,34 @@
       ],
       "type": "object"
     },
+    "StorageAccountDetails": {
+      "properties": {
+        "dataAccountType": {
+          "description": "Account Type of the data to be transferred.",
+          "oneOf": [
+            {
+              "enum": [
+                "StorageAccount"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "storageAccountId": {
+          "description": "Storage Account Resource Id.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dataAccountType",
+        "storageAccountId"
+      ],
+      "type": "object"
+    },
     "TransferAllDetails": {
-      "description": "Details to transfer all data.",
       "properties": {
         "dataAccountType": {
           "description": "Type of the account of data",
@@ -852,7 +1008,6 @@
       "type": "object"
     },
     "TransferConfiguration": {
-      "description": "Configuration for defining the transfer of data.",
       "properties": {
         "transferAllDetails": {
           "description": "Map of filter type and the details to transfer all data. This field is required only if the TransferConfigurationType is given as TransferAll",
@@ -898,7 +1053,6 @@
       "type": "object"
     },
     "TransferConfigurationTransferAllDetails": {
-      "description": "Map of filter type and the details to transfer all data. This field is required only if the TransferConfigurationType is given as TransferAll",
       "properties": {
         "include": {
           "description": "Details to transfer all data.",
@@ -915,7 +1069,6 @@
       "type": "object"
     },
     "TransferConfigurationTransferFilterDetails": {
-      "description": "Map of filter type and the details to filter. This field is required only if the TransferConfigurationType is given as TransferUsingFilter.",
       "properties": {
         "include": {
           "description": "Details of the filtering the transfer of data.",
@@ -932,7 +1085,6 @@
       "type": "object"
     },
     "TransferFilterDetails": {
-      "description": "Details of the filtering the transfer of data.",
       "properties": {
         "azureFileFilterDetails": {
           "description": "Filter details to transfer Azure files.",
@@ -992,7 +1144,6 @@
       "type": "object"
     },
     "TransportPreferences": {
-      "description": "Preferences related to the shipment logistics of the sku",
       "properties": {
         "preferredShipmentType": {
           "description": "Indicates Shipment Logistics type that the customer preferred.",

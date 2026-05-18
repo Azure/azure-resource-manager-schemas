@@ -18,14 +18,14 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the server.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "Properties of the server.",
           "oneOf": [
             {
-              "$ref": "#/definitions/ServerPropertiesForCreate"
+              "$ref": "#/definitions/ServerPropertiesForCreateOrServerProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -36,19 +36,19 @@
           "items": {
             "oneOf": [
               {
+                "$ref": "#/definitions/servers_configurations_childResource"
+              },
+              {
                 "$ref": "#/definitions/servers_databases_childResource"
               },
               {
                 "$ref": "#/definitions/servers_firewallRules_childResource"
               },
               {
-                "$ref": "#/definitions/servers_configurations_childResource"
+                "$ref": "#/definitions/servers_securityAlertPolicies_childResource"
               },
               {
                 "$ref": "#/definitions/servers_virtualNetworkRules_childResource"
-              },
-              {
-                "$ref": "#/definitions/servers_securityAlertPolicies_childResource"
               }
             ]
           },
@@ -88,6 +88,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -105,7 +106,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the server configuration.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -144,7 +145,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the database.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -183,7 +184,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the server firewall rule.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -222,7 +223,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the threat detection policy.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*/Default$",
@@ -269,7 +270,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the virtual network rule.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -301,7 +302,6 @@
   },
   "definitions": {
     "ConfigurationProperties": {
-      "description": "The properties of a configuration.",
       "properties": {
         "source": {
           "description": "Source of the configuration.",
@@ -315,7 +315,6 @@
       "type": "object"
     },
     "DatabaseProperties": {
-      "description": "The properties of a database.",
       "properties": {
         "charset": {
           "description": "The charset of the database.",
@@ -329,7 +328,6 @@
       "type": "object"
     },
     "FirewallRuleProperties": {
-      "description": "The properties of a server firewall rule.",
       "properties": {
         "endIpAddress": {
           "description": "The end IP address of the server firewall rule. Must be IPv4 format.",
@@ -357,13 +355,12 @@
         }
       },
       "required": [
-        "startIpAddress",
-        "endIpAddress"
+        "endIpAddress",
+        "startIpAddress"
       ],
       "type": "object"
     },
     "SecurityAlertPolicyProperties": {
-      "description": "Properties of a security alert policy.",
       "properties": {
         "disabledAlerts": {
           "description": "Specifies an array of alerts that are disabled. Allowed values are: Sql_Injection, Sql_Injection_Vulnerability, Access_Anomaly",
@@ -444,152 +441,185 @@
       ],
       "type": "object"
     },
-    "ServerPropertiesForCreate": {
-      "description": "The properties used to create a new server.",
-      "oneOf": [
+    "ServerForCreateTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "ServerPropertiesForCreateOrServerProperties": {
+      "allOf": [
         {
-          "description": "The properties used to create a new server.",
-          "properties": {
-            "administratorLogin": {
-              "description": "The administrator's login name of a server. Can only be specified when the server is being created (and is required for creation).",
-              "type": "string"
-            },
-            "administratorLoginPassword": {
-              "description": "The password of the administrator login.",
-              "type": "string"
-            },
-            "createMode": {
-              "enum": [
-                "Default"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "administratorLogin",
-            "administratorLoginPassword",
-            "createMode"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "The properties used to create a new server by restoring to a different region from a geo replicated backup.",
+          "additionalProperties": false,
           "properties": {
             "createMode": {
               "enum": [
-                "GeoRestore"
-              ],
-              "type": "string"
-            },
-            "sourceServerId": {
-              "description": "The source server id to restore from.",
-              "type": "string"
-            }
-          },
-          "required": [
-            "sourceServerId",
-            "createMode"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "The properties used to create a new server by restoring from a backup.",
-          "properties": {
-            "createMode": {
-              "enum": [
-                "PointInTimeRestore"
-              ],
-              "type": "string"
-            },
-            "restorePointInTime": {
-              "description": "Restore point creation time (ISO8601 format), specifying the time to restore from.",
-              "format": "date-time",
-              "type": "string"
-            },
-            "sourceServerId": {
-              "description": "The source server id to restore from.",
-              "type": "string"
-            }
-          },
-          "required": [
-            "sourceServerId",
-            "restorePointInTime",
-            "createMode"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "The properties to create a new replica.",
-          "properties": {
-            "createMode": {
-              "enum": [
+                "Default",
+                "GeoRestore",
+                "PointInTimeRestore",
                 "Replica"
               ],
               "type": "string"
             },
-            "sourceServerId": {
-              "description": "The master server id to create replica from.",
-              "type": "string"
+            "minimalTlsVersion": {
+              "description": "Enforce a minimal Tls version for the server.",
+              "oneOf": [
+                {
+                  "enum": [
+                    "TLS1_0",
+                    "TLS1_1",
+                    "TLS1_2",
+                    "TLSEnforcementDisabled"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "sslEnforcement": {
+              "description": "Enable ssl enforcement or not when connect to server.",
+              "oneOf": [
+                {
+                  "enum": [
+                    "Enabled",
+                    "Disabled"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "storageProfile": {
+              "description": "Storage profile of a server.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/StorageProfile"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "version": {
+              "description": "Server version.",
+              "oneOf": [
+                {
+                  "enum": [
+                    "10.2",
+                    "10.3"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
             }
           },
           "required": [
-            "sourceServerId",
             "createMode"
           ],
           "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ServerPropertiesForDefaultCreate"
+                },
+                {
+                  "properties": {
+                    "createMode": {
+                      "const": "Default"
+                    }
+                  },
+                  "required": [
+                    "createMode"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ServerPropertiesForGeoRestore"
+                },
+                {
+                  "properties": {
+                    "createMode": {
+                      "const": "GeoRestore"
+                    }
+                  },
+                  "required": [
+                    "createMode"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ServerPropertiesForRestore"
+                },
+                {
+                  "properties": {
+                    "createMode": {
+                      "const": "PointInTimeRestore"
+                    }
+                  },
+                  "required": [
+                    "createMode"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ServerPropertiesForReplica"
+                },
+                {
+                  "properties": {
+                    "createMode": {
+                      "const": "Replica"
+                    }
+                  },
+                  "required": [
+                    "createMode"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
-      ],
+      ]
+    },
+    "ServerPropertiesForDefaultCreate": {
       "properties": {
-        "minimalTlsVersion": {
-          "description": "Enforce a minimal Tls version for the server.",
+        "administratorLogin": {
+          "description": "The administrator's login name of a server. Can only be specified when the server is being created (and is required for creation).",
+          "type": "string"
+        },
+        "administratorLoginPassword": {
+          "description": "The password of the administrator login.",
+          "type": "string"
+        },
+        "createMode": {
+          "description": "The mode to create a new server.",
           "oneOf": [
             {
               "enum": [
-                "TLS1_0",
-                "TLS1_1",
-                "TLS1_2",
-                "TLSEnforcementDisabled"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "sslEnforcement": {
-          "description": "Enable ssl enforcement or not when connect to server.",
-          "oneOf": [
-            {
-              "enum": [
-                "Enabled",
-                "Disabled"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "storageProfile": {
-          "description": "Storage profile of a server.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/StorageProfile"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "version": {
-          "description": "Server version.",
-          "oneOf": [
-            {
-              "enum": [
-                "10.2",
-                "10.3"
+                "Default"
               ],
               "type": "string"
             },
@@ -599,10 +629,100 @@
           ]
         }
       },
+      "required": [
+        "administratorLogin",
+        "administratorLoginPassword",
+        "createMode"
+      ],
+      "type": "object"
+    },
+    "ServerPropertiesForGeoRestore": {
+      "properties": {
+        "createMode": {
+          "description": "The mode to create a new server.",
+          "oneOf": [
+            {
+              "enum": [
+                "GeoRestore"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "sourceServerId": {
+          "description": "The source server id to restore from.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "createMode",
+        "sourceServerId"
+      ],
+      "type": "object"
+    },
+    "ServerPropertiesForReplica": {
+      "properties": {
+        "createMode": {
+          "description": "The mode to create a new server.",
+          "oneOf": [
+            {
+              "enum": [
+                "Replica"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "sourceServerId": {
+          "description": "The master server id to create replica from.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "createMode",
+        "sourceServerId"
+      ],
+      "type": "object"
+    },
+    "ServerPropertiesForRestore": {
+      "properties": {
+        "createMode": {
+          "description": "The mode to create a new server.",
+          "oneOf": [
+            {
+              "enum": [
+                "PointInTimeRestore"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "restorePointInTime": {
+          "description": "Restore point creation time (ISO8601 format), specifying the time to restore from.",
+          "type": "string"
+        },
+        "sourceServerId": {
+          "description": "The source server id to restore from.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "createMode",
+        "restorePointInTime",
+        "sourceServerId"
+      ],
       "type": "object"
     },
     "Sku": {
-      "description": "Billing information related properties of a server.",
       "properties": {
         "capacity": {
           "description": "The scale up/out capacity, representing server's compute units.",
@@ -651,7 +771,6 @@
       "type": "object"
     },
     "StorageProfile": {
-      "description": "Storage Profile properties of a server",
       "properties": {
         "backupRetentionDays": {
           "description": "Backup retention days for the server.",
@@ -709,7 +828,6 @@
       "type": "object"
     },
     "VirtualNetworkRuleProperties": {
-      "description": "Properties of a virtual network rule.",
       "properties": {
         "ignoreMissingVnetServiceEndpoint": {
           "description": "Create firewall rule before the virtual network has vnet service endpoint enabled.",
@@ -733,7 +851,7 @@
       "type": "object"
     },
     "servers_configurations_childResource": {
-      "description": "Microsoft.DBforMariaDB/servers/configurations",
+      "description": "configurations",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -742,7 +860,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the server configuration.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -772,7 +890,7 @@
       "type": "object"
     },
     "servers_databases_childResource": {
-      "description": "Microsoft.DBforMariaDB/servers/databases",
+      "description": "databases",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -781,7 +899,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the database.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -811,7 +929,7 @@
       "type": "object"
     },
     "servers_firewallRules_childResource": {
-      "description": "Microsoft.DBforMariaDB/servers/firewallRules",
+      "description": "firewallRules",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -820,7 +938,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the server firewall rule.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -850,7 +968,7 @@
       "type": "object"
     },
     "servers_securityAlertPolicies_childResource": {
-      "description": "Microsoft.DBforMariaDB/servers/securityAlertPolicies",
+      "description": "securityAlertPolicies",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -859,7 +977,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the threat detection policy.",
+          "description": "The resource name",
           "oneOf": [
             {
               "enum": [
@@ -899,7 +1017,7 @@
       "type": "object"
     },
     "servers_virtualNetworkRules_childResource": {
-      "description": "Microsoft.DBforMariaDB/servers/virtualNetworkRules",
+      "description": "virtualNetworkRules",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -908,7 +1026,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the virtual network rule.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {

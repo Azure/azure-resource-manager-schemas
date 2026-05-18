@@ -3,35 +3,6 @@
   "title": "Microsoft.CostManagement",
   "description": "Microsoft CostManagement Resource Types",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "managementGroup_resourceDefinitions": {
-    "externalSubscriptions": {
-      "description": "Microsoft.CostManagement/externalSubscriptions",
-      "properties": {
-        "apiVersion": {
-          "enum": [
-            "2019-03-01-preview"
-          ],
-          "type": "string"
-        },
-        "name": {
-          "description": "External Subscription Name. (eg 'aws-{UsageAccountId}')",
-          "type": "string"
-        },
-        "type": {
-          "enum": [
-            "Microsoft.CostManagement/externalSubscriptions"
-          ],
-          "type": "string"
-        }
-      },
-      "required": [
-        "name",
-        "apiVersion",
-        "type"
-      ],
-      "type": "object"
-    }
-  },
   "tenant_resourceDefinitions": {
     "cloudConnectors": {
       "description": "Microsoft.CostManagement/cloudConnectors",
@@ -47,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Connector Name.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -77,9 +48,9 @@
       "type": "object"
     }
   },
-  "extension_resourceDefinitions": {
-    "showbackRules": {
-      "description": "Microsoft.CostManagement/showbackRules",
+  "managementGroup_resourceDefinitions": {
+    "externalSubscriptions": {
+      "description": "Microsoft.CostManagement/externalSubscriptions",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -88,30 +59,18 @@
           "type": "string"
         },
         "name": {
-          "description": "Showback rule name",
+          "description": "The resource name",
           "type": "string"
-        },
-        "properties": {
-          "description": "Showback rule properties",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ShowbackRuleProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
         },
         "type": {
           "enum": [
-            "Microsoft.CostManagement/showbackRules"
+            "Microsoft.CostManagement/externalSubscriptions"
           ],
           "type": "string"
         }
       },
       "required": [
         "name",
-        "properties",
         "apiVersion",
         "type"
       ],
@@ -120,7 +79,6 @@
   },
   "definitions": {
     "ConnectorProperties": {
-      "description": "The properties of a Connector",
       "properties": {
         "billingModel": {
           "description": "Connector billing model",
@@ -167,7 +125,6 @@
       "type": "object"
     },
     "CostAllocationDetails": {
-      "description": "Represents CostAllocation showback rule model",
       "properties": {
         "policy": {
           "description": "Cost allocation policy.",
@@ -188,8 +145,40 @@
       },
       "type": "object"
     },
+    "CostAllocationDetailsKind": {
+      "properties": {
+        "details": {
+          "description": "The CostAllocation properties to validate.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CostAllocationDetails"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "ruleType": {
+          "description": "The rule type of the showback rule solution.",
+          "oneOf": [
+            {
+              "enum": [
+                "CostAllocation"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "ruleType"
+      ],
+      "type": "object"
+    },
     "CustomPriceDetails": {
-      "description": "Represents Custom price showback rule model",
       "properties": {
         "benefits": {
           "description": "Array of benefits.",
@@ -232,8 +221,40 @@
       },
       "type": "object"
     },
+    "CustomPriceDetailsKind": {
+      "properties": {
+        "details": {
+          "description": "The Custom price properties to validate.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CustomPriceDetails"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "ruleType": {
+          "description": "The rule type of the showback rule solution.",
+          "oneOf": [
+            {
+              "enum": [
+                "CustomPrice"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "ruleType"
+      ],
+      "type": "object"
+    },
     "Markup": {
-      "description": "The Markup model definition",
       "properties": {
         "percentage": {
           "type": "string"
@@ -242,126 +263,100 @@
       "type": "object"
     },
     "Scope": {
-      "description": "The Scope model definition",
-      "properties": {
-        "childScope": {
-          "description": "The Scope model definition",
-          "oneOf": [
-            {
-              "type": "object"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "id": {
-          "description": "Scope id",
-          "type": "string"
-        },
-        "name": {
-          "description": "Scope name",
-          "type": "string"
-        },
-        "type": {
-          "description": "Scope type",
-          "type": "string"
-        }
-      },
       "type": "object"
     },
     "ShowbackRuleProperties": {
-      "description": "The properties of a showback rule.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Represents CostAllocation showback rule model",
+          "additionalProperties": false,
           "properties": {
-            "details": {
-              "description": "The CostAllocation properties to validate.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/CostAllocationDetails"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "ruleType": {
-              "enum": [
-                "CostAllocation"
-              ],
+            "description": {
+              "description": "Description of a showback rule.",
               "type": "string"
-            }
-          },
-          "required": [
-            "ruleType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Represents Custom price showback rule model",
-          "properties": {
-            "details": {
-              "description": "The Custom price properties to validate.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/CustomPriceDetails"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
             },
             "ruleType": {
               "enum": [
+                "CostAllocation",
                 "CustomPrice"
               ],
               "type": "string"
+            },
+            "scopes": {
+              "description": "List of authorized assigned scopes.",
+              "oneOf": [
+                {
+                  "items": {
+                    "$ref": "#/definitions/Scope"
+                  },
+                  "type": "array"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "status": {
+              "description": "The current status of the showback rule.",
+              "oneOf": [
+                {
+                  "enum": [
+                    "NotActive",
+                    "Active"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
             }
           },
           "required": [
             "ruleType"
           ],
           "type": "object"
-        }
-      ],
-      "properties": {
-        "description": {
-          "description": "Description of a showback rule.",
-          "type": "string"
         },
-        "scopes": {
-          "description": "List of authorized assigned scopes.",
+        {
           "oneOf": [
             {
-              "items": {
-                "$ref": "#/definitions/Scope"
-              },
-              "type": "array"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/CostAllocationDetailsKind"
+                },
+                {
+                  "properties": {
+                    "ruleType": {
+                      "const": "CostAllocation"
+                    }
+                  },
+                  "required": [
+                    "ruleType"
+                  ],
+                  "type": "object"
+                }
+              ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "status": {
-          "description": "The current status of the showback rule.",
-          "oneOf": [
-            {
-              "enum": [
-                "NotActive",
-                "Active"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/CustomPriceDetailsKind"
+                },
+                {
+                  "properties": {
+                    "ruleType": {
+                      "const": "CustomPrice"
+                    }
+                  },
+                  "required": [
+                    "ruleType"
+                  ],
+                  "type": "object"
+                }
+              ]
             }
           ]
         }
-      },
-      "type": "object"
+      ]
     }
   }
 }

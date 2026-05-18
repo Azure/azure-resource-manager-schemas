@@ -22,7 +22,6 @@ internal class TestSchemaCache : INormalizedSchemaCache
     // copied from https://msazure.visualstudio.com/One/_git/AzureUX-Deployments?path=%2Fsrc%2FTemplateSchemas%2FSchemaLoader.cs&_a=contents&version=GBmaster
     private HashSet<string> CircularReferenceSchemas { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
-        "Microsoft.Media/2018-07-01",
         "Microsoft.DataFactory/2017-09-01-preview",
         "Microsoft.DataFactory/2018-06-01",
     };

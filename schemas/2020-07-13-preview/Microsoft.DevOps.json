@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Pipeline resource in ARM.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -65,7 +65,6 @@
   },
   "definitions": {
     "Authorization": {
-      "description": "Authorization info used to access a resource (like code repository).",
       "properties": {
         "authorizationType": {
           "description": "Type of authorization.",
@@ -102,8 +101,60 @@
       ],
       "type": "object"
     },
+    "AuthorizationParameters": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "AzurePipelineProperties": {
+      "properties": {
+        "organization": {
+          "description": "Reference to the Azure DevOps Organization containing the Pipeline. Required for 'azurePipeline' pipeline type.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/OrganizationReference"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "pipelineType": {
+          "description": "Specifies which CI/CD provider to use. Valid options are 'azurePipeline', 'githubWorkflow'.",
+          "oneOf": [
+            {
+              "enum": [
+                "azurePipeline"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "project": {
+          "description": "Reference to the Azure DevOps Project containing the Pipeline. Required for 'azurePipeline' pipeline type.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ProjectReference"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "organization",
+        "pipelineType",
+        "project"
+      ],
+      "type": "object"
+    },
     "BootstrapConfiguration": {
-      "description": "Configuration used to bootstrap a Pipeline.",
       "properties": {
         "sourceRepository": {
           "description": "Repository containing the source code for the pipeline. Currently only 'azurePipeline' pipeline type supports this.",
@@ -134,7 +185,6 @@
       "type": "object"
     },
     "CodeRepository": {
-      "description": "Repository containing the source code for a pipeline.",
       "properties": {
         "authorization": {
           "description": "Authorization info to access the code repository.",
@@ -187,14 +237,54 @@
         }
       },
       "required": [
-        "repositoryType",
+        "defaultBranch",
         "id",
-        "defaultBranch"
+        "repositoryType"
+      ],
+      "type": "object"
+    },
+    "CodeRepositoryProperties": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "GithubWorkflowProperties": {
+      "properties": {
+        "pipelineType": {
+          "description": "Specifies which CI/CD provider to use. Valid options are 'azurePipeline', 'githubWorkflow'.",
+          "oneOf": [
+            {
+              "enum": [
+                "githubWorkflow"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "repository": {
+          "description": "Contains the specifications of the repository to be created for generating the workflow. Required for 'githubWorkflow' pipeline type.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CodeRepository"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "pipelineType",
+        "repository"
       ],
       "type": "object"
     },
     "OrganizationReference": {
-      "description": "Reference to an Azure DevOps Organization.",
       "properties": {
         "name": {
           "description": "Name of the Azure DevOps Organization.",
@@ -207,16 +297,15 @@
       "type": "object"
     },
     "PipelineProperties": {
-      "description": "Custom properties of a Pipeline.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Custom properties of a Azure Pipeline.",
+          "additionalProperties": false,
           "properties": {
-            "organization": {
-              "description": "Reference to the Azure DevOps Organization containing the Pipeline. Required for 'azurePipeline' pipeline type.",
+            "bootstrapConfiguration": {
+              "description": "Configuration used to bootstrap the Pipeline.",
               "oneOf": [
                 {
-                  "$ref": "#/definitions/OrganizationReference"
+                  "$ref": "#/definitions/BootstrapConfiguration"
                 },
                 {
                   "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -225,77 +314,61 @@
             },
             "pipelineType": {
               "enum": [
-                "azurePipeline"
+                "azurePipeline",
+                "githubWorkflow"
               ],
               "type": "string"
-            },
-            "project": {
-              "description": "Reference to the Azure DevOps Project containing the Pipeline. Required for 'azurePipeline' pipeline type.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/ProjectReference"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
             }
           },
           "required": [
-            "organization",
-            "project",
+            "bootstrapConfiguration",
             "pipelineType"
           ],
           "type": "object"
         },
         {
-          "description": "Custom properties of an Github Pipeline.",
-          "properties": {
-            "pipelineType": {
-              "enum": [
-                "githubWorkflow"
-              ],
-              "type": "string"
-            },
-            "repository": {
-              "description": "Contains the specifications of the repository to be created for generating the workflow. Required for 'githubWorkflow' pipeline type.",
-              "oneOf": [
+          "oneOf": [
+            {
+              "allOf": [
                 {
-                  "$ref": "#/definitions/CodeRepository"
+                  "$ref": "#/definitions/AzurePipelineProperties"
                 },
                 {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                  "properties": {
+                    "pipelineType": {
+                      "const": "azurePipeline"
+                    }
+                  },
+                  "required": [
+                    "pipelineType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/GithubWorkflowProperties"
+                },
+                {
+                  "properties": {
+                    "pipelineType": {
+                      "const": "githubWorkflow"
+                    }
+                  },
+                  "required": [
+                    "pipelineType"
+                  ],
+                  "type": "object"
                 }
               ]
             }
-          },
-          "required": [
-            "repository",
-            "pipelineType"
-          ],
-          "type": "object"
-        }
-      ],
-      "properties": {
-        "bootstrapConfiguration": {
-          "description": "Configuration used to bootstrap the Pipeline.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/BootstrapConfiguration"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
           ]
         }
-      },
-      "required": [
-        "bootstrapConfiguration"
-      ],
-      "type": "object"
+      ]
     },
     "PipelineTemplate": {
-      "description": "Template used to bootstrap the pipeline.",
       "properties": {
         "id": {
           "description": "Unique identifier of the pipeline template.",
@@ -322,8 +395,14 @@
       ],
       "type": "object"
     },
+    "PipelineTemplateParameters": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "ProjectReference": {
-      "description": "Reference to an Azure DevOps Project.",
       "properties": {
         "name": {
           "description": "Name of the Azure DevOps Project.",
@@ -333,6 +412,13 @@
       "required": [
         "name"
       ],
+      "type": "object"
+    },
+    "ResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
       "type": "object"
     }
   }

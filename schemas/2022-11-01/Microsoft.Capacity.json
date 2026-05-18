@@ -18,14 +18,14 @@
           "type": "string"
         },
         "name": {
-          "description": "Order Id of the reservation",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "Properties of reservation purchase request",
           "oneOf": [
             {
-              "$ref": "#/definitions/PurchaseRequestProperties"
+              "$ref": "#/definitions/PurchaseRequestPropertiesOrReservationOrderProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -61,7 +61,6 @@
   },
   "definitions": {
     "AppliedScopeProperties": {
-      "description": "Properties specific to applied scope type. Not required if not applicable. Required and need to provide tenantId and managementGroupId if AppliedScopeType is ManagementGroup",
       "properties": {
         "displayName": {
           "description": "Display name",
@@ -86,14 +85,27 @@
       },
       "type": "object"
     },
-    "PurchaseRequestProperties": {
-      "description": "Properties of reservation purchase request",
+    "PurchaseRequestPropertiesOrReservationOrderProperties": {
       "properties": {
         "appliedScopeProperties": {
           "description": "Properties specific to applied scope type. Not required if not applicable. Required and need to provide tenantId and managementGroupId if AppliedScopeType is ManagementGroup",
           "oneOf": [
             {
               "$ref": "#/definitions/AppliedScopeProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "appliedScopes": {
+          "description": "List of the subscriptions that the benefit will be applied. Do not specify if AppliedScopeType is Shared. This property will be deprecated and replaced by appliedScopeProperties instead for Single AppliedScopeType.",
+          "oneOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -110,20 +122,6 @@
                 "ManagementGroup"
               ],
               "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "appliedScopes": {
-          "description": "List of the subscriptions that the benefit will be applied. Do not specify if AppliedScopeType is Shared. This property will be deprecated and replaced by appliedScopeProperties instead for Single AppliedScopeType.",
-          "oneOf": [
-            {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -168,7 +166,6 @@
           "description": "Setting this to true will automatically purchase a new reservation on the expiration date time.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -228,7 +225,6 @@
         },
         "reviewDateTime": {
           "description": "This is the date-time when the Azure hybrid benefit needs to be reviewed.",
-          "format": "date-time",
           "type": "string"
         },
         "term": {
@@ -251,7 +247,6 @@
       "type": "object"
     },
     "PurchaseRequestPropertiesReservedResourceProperties": {
-      "description": "Properties specific to each reserved resource type. Not required if not applicable.",
       "properties": {
         "instanceFlexibility": {
           "description": "Turning this on will apply the reservation discount to other VMs in the same VM size group. Only specify for VirtualMachines reserved resource type.",
@@ -272,7 +267,6 @@
       "type": "object"
     },
     "SkuName": {
-      "description": "The name of sku",
       "properties": {
         "name": {
           "type": "string"

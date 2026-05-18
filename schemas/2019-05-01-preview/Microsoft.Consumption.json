@@ -3,7 +3,7 @@
   "title": "Microsoft.Consumption",
   "description": "Microsoft Consumption Resource Types",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "resourceDefinitions": {
+  "tenant_resourceDefinitions": {
     "budgets": {
       "description": "Microsoft.Consumption/budgets",
       "properties": {
@@ -18,52 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Budget Name.",
-          "type": "string"
-        },
-        "properties": {
-          "description": "The properties of the budget.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/BudgetProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.Consumption/budgets"
-          ],
-          "type": "string"
-        }
-      },
-      "required": [
-        "name",
-        "properties",
-        "apiVersion",
-        "type"
-      ],
-      "type": "object"
-    }
-  },
-  "subscription_resourceDefinitions": {
-    "budgets": {
-      "description": "Microsoft.Consumption/budgets",
-      "properties": {
-        "apiVersion": {
-          "enum": [
-            "2019-05-01-preview"
-          ],
-          "type": "string"
-        },
-        "eTag": {
-          "description": "eTag of the resource. To handle concurrent update scenario, this field will be used to determine whether the user is updating the latest version or not.",
-          "type": "string"
-        },
-        "name": {
-          "description": "Budget Name.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -108,7 +63,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Budget Name.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -138,7 +93,7 @@
       "type": "object"
     }
   },
-  "tenant_resourceDefinitions": {
+  "subscription_resourceDefinitions": {
     "budgets": {
       "description": "Microsoft.Consumption/budgets",
       "properties": {
@@ -153,7 +108,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Budget Name.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -183,7 +138,7 @@
       "type": "object"
     }
   },
-  "extension_resourceDefinitions": {
+  "resourceDefinitions": {
     "budgets": {
       "description": "Microsoft.Consumption/budgets",
       "properties": {
@@ -198,7 +153,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Budget Name.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -230,13 +185,12 @@
   },
   "definitions": {
     "BudgetProperties": {
-      "description": "The properties of the budget.",
       "properties": {
         "amount": {
           "description": "The total amount of cost to track with the budget",
           "oneOf": [
             {
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -313,24 +267,28 @@
         }
       },
       "required": [
-        "category",
         "amount",
+        "category",
         "timeGrain",
         "timePeriod"
       ],
       "type": "object"
     },
+    "BudgetPropertiesNotifications": {
+      "additionalProperties": {
+        "$ref": "#/definitions/Notification"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "BudgetTimePeriod": {
-      "description": "The start and end date for a budget.",
       "properties": {
         "endDate": {
           "description": "The end date for the budget. If not provided, we default this to 10 years from the start date.",
-          "format": "date-time",
           "type": "string"
         },
         "startDate": {
           "description": "The start date for the budget.",
-          "format": "date-time",
           "type": "string"
         }
       },
@@ -340,14 +298,15 @@
       "type": "object"
     },
     "Filters": {
-      "description": "May be used to filter budgets by resource group, resource, or meter.",
       "properties": {
         "meters": {
-          "description": "The list of filters on meters (GUID), mandatory for budgets of usage category. ",
+          "description": "The list of filters on meters (GUID), mandatory for budgets of usage category.",
           "oneOf": [
             {
               "items": {
-                "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+                "maxLength": 36,
+                "minLength": 36,
+                "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
                 "type": "string"
               },
               "type": "array"
@@ -406,8 +365,17 @@
       },
       "type": "object"
     },
+    "FiltersTags": {
+      "additionalProperties": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "Notification": {
-      "description": "The notification associated with a budget.",
       "properties": {
         "contactEmails": {
           "description": "Email addresses to send the budget notification to when the threshold is exceeded.",
@@ -482,7 +450,7 @@
           "description": "Threshold value associated with a notification. Notification is sent when the cost exceeded the threshold. It is always percent and has to be between 0 and 1000.",
           "oneOf": [
             {
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -491,10 +459,10 @@
         }
       },
       "required": [
+        "contactEmails",
         "enabled",
         "operator",
-        "threshold",
-        "contactEmails"
+        "threshold"
       ],
       "type": "object"
     }

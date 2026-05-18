@@ -26,7 +26,6 @@ namespace DeploymentsSchemaTests
         public HashSet<string> CircularReferenceSchemas { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
             // This list should be kept in-sync with the product code
-            "Microsoft.Media/2018-07-01",
             "Microsoft.DataFactory/2017-09-01-preview",
             "Microsoft.DataFactory/2018-06-01",
         };

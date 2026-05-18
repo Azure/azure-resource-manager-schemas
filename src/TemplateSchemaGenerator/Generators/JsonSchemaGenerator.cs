@@ -40,7 +40,6 @@ public static class JsonSchemaGenerator
 
             ("Microsoft.MachineLearning", "definitions.ModeValueInfo"),
             ("Microsoft.MachineLearningServices", "definitions.LabelClass"),
-            ("Microsoft.Media", "definitions.JobInput"),
 
             ("Microsoft.Network", "definitions.ApplicationGatewayBackendAddressPool"),
             ("Microsoft.Network", "definitions.BackendAddressPool"),

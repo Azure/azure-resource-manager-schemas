@@ -29,7 +29,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Monitor resource name",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -47,10 +47,10 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/monitors_tagRules_childResource"
+                "$ref": "#/definitions/monitors_singleSignOnConfigurations_childResource"
               },
               {
-                "$ref": "#/definitions/monitors_singleSignOnConfigurations_childResource"
+                "$ref": "#/definitions/monitors_tagRules_childResource"
               }
             ]
           },
@@ -79,6 +79,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -96,7 +97,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Single Sign On Configuration Name",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -135,7 +136,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Monitor resource name",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -167,7 +168,6 @@
   },
   "definitions": {
     "AccountInfo": {
-      "description": "Dynatrace Account Information",
       "properties": {
         "accountId": {
           "description": "Account Id of the account this environment is linked to",
@@ -181,7 +181,6 @@
       "type": "object"
     },
     "DynatraceEnvironmentProperties": {
-      "description": "Properties of the Dynatrace environment.",
       "properties": {
         "accountInfo": {
           "description": "Dynatrace Account Information",
@@ -224,7 +223,6 @@
       "type": "object"
     },
     "DynatraceSingleSignOnProperties": {
-      "description": "The details of a Dynatrace single sign-on.",
       "properties": {
         "aadDomains": {
           "description": "array of Aad(azure active directory) domains",
@@ -269,7 +267,6 @@
       "type": "object"
     },
     "EnvironmentInfo": {
-      "description": "Dynatrace Environment Information",
       "properties": {
         "environmentId": {
           "description": "Id of the environment created",
@@ -291,7 +288,6 @@
       "type": "object"
     },
     "FilteringTag": {
-      "description": "The definition of a filtering tag. Filtering tags are used for capturing resources and include/exclude them from being monitored.",
       "properties": {
         "action": {
           "description": "Valid actions for a filtering tag. Exclusion takes priority over inclusion.",
@@ -320,7 +316,6 @@
       "type": "object"
     },
     "IdentityProperties": {
-      "description": "The properties of the managed service identities assigned to this resource.",
       "properties": {
         "type": {
           "description": "The type of managed identity assigned to this resource.",
@@ -359,8 +354,14 @@
       ],
       "type": "object"
     },
+    "IdentityPropertiesUserAssignedIdentities": {
+      "additionalProperties": {
+        "$ref": "#/definitions/UserAssignedIdentity"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "LogRules": {
-      "description": "Set of rules for sending logs for the Monitor resource.",
       "properties": {
         "filteringTags": {
           "description": "List of filtering tags to be used for capturing logs. This only takes effect if SendActivityLogs flag is enabled. If empty, all resources will be captured.\nIf only Exclude action is specified, the rules will apply to the list of all available resources. If Include actions are specified, the rules will only include resources with the associated tags.",
@@ -425,7 +426,6 @@
       "type": "object"
     },
     "MetricRules": {
-      "description": "Set of rules for sending metrics for the Monitor resource.",
       "properties": {
         "filteringTags": {
           "description": "List of filtering tags to be used for capturing metrics. If empty, all resources will be captured. If only Exclude action is specified, the rules will apply to the list of all available resources. If Include actions are specified, the rules will only include resources with the associated tags.",
@@ -444,8 +444,34 @@
       },
       "type": "object"
     },
+    "MonitoringTagRulesProperties": {
+      "properties": {
+        "logRules": {
+          "description": "Set of rules for sending logs for the Monitor resource.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/LogRules"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "metricRules": {
+          "description": "Set of rules for sending metrics for the Monitor resource.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MetricRules"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
     "MonitorProperties": {
-      "description": "Properties specific to the monitor resource.",
       "properties": {
         "dynatraceEnvironmentProperties": {
           "description": "Properties of the Dynatrace environment.",
@@ -513,36 +539,7 @@
       },
       "type": "object"
     },
-    "MonitoringTagRulesProperties": {
-      "description": "Properties for the Tag rules resource of a Monitor account.",
-      "properties": {
-        "logRules": {
-          "description": "Set of rules for sending logs for the Monitor resource.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/LogRules"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "metricRules": {
-          "description": "Set of rules for sending metrics for the Monitor resource.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/MetricRules"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "type": "object"
-    },
     "PlanData": {
-      "description": "Billing plan information.",
       "properties": {
         "billingCycle": {
           "description": "different billing cycles like MONTHLY/WEEKLY. this could be enum",
@@ -550,7 +547,6 @@
         },
         "effectiveDate": {
           "description": "date when plan was applied",
-          "format": "date-time",
           "type": "string"
         },
         "planDetails": {
@@ -564,8 +560,14 @@
       },
       "type": "object"
     },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "UserAssignedIdentity": {
-      "description": "A managed identity assigned by the user.",
       "properties": {
         "clientId": {
           "description": "The active directory client identifier for this principal.",
@@ -583,7 +585,6 @@
       "type": "object"
     },
     "UserInfo": {
-      "description": "User info.",
       "properties": {
         "country": {
           "description": "Country of the user",
@@ -611,14 +612,21 @@
         },
         "phoneNumber": {
           "description": "Phone number of the user used by Dynatrace for contacting them if needed",
-          "maxLength": 40,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 40,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "type": "object"
     },
     "monitors_singleSignOnConfigurations_childResource": {
-      "description": "Dynatrace.Observability/monitors/singleSignOnConfigurations",
+      "description": "singleSignOnConfigurations",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -627,7 +635,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Single Sign On Configuration Name",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -657,7 +665,7 @@
       "type": "object"
     },
     "monitors_tagRules_childResource": {
-      "description": "Dynatrace.Observability/monitors/tagRules",
+      "description": "tagRules",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -666,7 +674,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Monitor resource name",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {

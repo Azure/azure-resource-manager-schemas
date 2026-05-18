@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The identity of the application.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -55,6 +55,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -76,7 +77,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The identity of the gateway.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -113,6 +114,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -134,7 +136,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The identity of the network.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -171,6 +173,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -192,7 +195,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the secret resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -239,6 +242,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -260,7 +264,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the secret resource value which is typically the version identifier for the value.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -297,6 +301,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -318,7 +323,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The identity of the volume.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -355,6 +360,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -364,8 +370,65 @@
     }
   },
   "definitions": {
+    "AddRemoveReplicaScalingMechanism": {
+      "properties": {
+        "kind": {
+          "description": "The type of auto scaling mechanism.",
+          "oneOf": [
+            {
+              "enum": [
+                "AddRemoveReplica"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "maxCount": {
+          "description": "Maximum number of containers (scale up won't be performed above this number).",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "minCount": {
+          "description": "Minimum number of containers (scale down won't be performed below this number).",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "scaleIncrement": {
+          "description": "Each time auto scaling is performed, this number of containers will be added or removed.",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "maxCount",
+        "minCount",
+        "scaleIncrement"
+      ],
+      "type": "object"
+    },
     "ApplicationResourceProperties": {
-      "description": "This type describes properties of an application resource.",
       "properties": {
         "debugParams": {
           "description": "Internal - used by Visual Studio to setup the debugging session on the local development environment.",
@@ -404,7 +467,6 @@
       "type": "object"
     },
     "ApplicationScopedVolume": {
-      "description": "Describes a volume whose lifetime is scoped to the application's lifetime.",
       "properties": {
         "creationParameters": {
           "description": "Describes parameters for creating application-scoped volumes.",
@@ -439,153 +501,178 @@
       },
       "required": [
         "creationParameters",
-        "name",
-        "destinationPath"
+        "destinationPath",
+        "name"
       ],
       "type": "object"
     },
     "ApplicationScopedVolumeCreationParameters": {
-      "description": "Describes parameters for creating application-scoped volumes.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Describes parameters for creating application-scoped volumes provided by Service Fabric Volume Disks",
+          "additionalProperties": false,
           "properties": {
+            "description": {
+              "description": "User readable description of the volume.",
+              "type": "string"
+            },
             "kind": {
               "enum": [
                 "ServiceFabricVolumeDisk"
               ],
               "type": "string"
-            },
-            "sizeDisk": {
-              "description": "Volume size",
-              "oneOf": [
-                {
-                  "enum": [
-                    "Small",
-                    "Medium",
-                    "Large"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
             }
           },
           "required": [
-            "sizeDisk",
             "kind"
           ],
           "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ApplicationScopedVolumeCreationParametersServiceFabricVolumeDisk"
+                },
+                {
+                  "properties": {
+                    "kind": {
+                      "const": "ServiceFabricVolumeDisk"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
-      ],
+      ]
+    },
+    "ApplicationScopedVolumeCreationParametersServiceFabricVolumeDisk": {
       "properties": {
-        "description": {
-          "description": "User readable description of the volume.",
-          "type": "string"
+        "kind": {
+          "description": "Specifies the application-scoped volume kind.",
+          "oneOf": [
+            {
+              "enum": [
+                "ServiceFabricVolumeDisk"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "sizeDisk": {
+          "description": "Volume size",
+          "oneOf": [
+            {
+              "enum": [
+                "Small",
+                "Medium",
+                "Large"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
+      "required": [
+        "kind",
+        "sizeDisk"
+      ],
       "type": "object"
     },
     "AutoScalingMechanism": {
-      "description": "Describes the mechanism for performing auto scaling operation. Derived classes will describe the actual mechanism.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Describes the horizontal auto scaling mechanism that adds or removes replicas (containers or container groups).",
+          "additionalProperties": false,
           "properties": {
             "kind": {
               "enum": [
                 "AddRemoveReplica"
               ],
               "type": "string"
-            },
-            "maxCount": {
-              "description": "Maximum number of containers (scale up won't be performed above this number).",
-              "oneOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "minCount": {
-              "description": "Minimum number of containers (scale down won't be performed below this number).",
-              "oneOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "scaleIncrement": {
-              "description": "Each time auto scaling is performed, this number of containers will be added or removed.",
-              "oneOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
             }
           },
           "required": [
-            "minCount",
-            "maxCount",
-            "scaleIncrement",
             "kind"
           ],
           "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/AddRemoveReplicaScalingMechanism"
+                },
+                {
+                  "properties": {
+                    "kind": {
+                      "const": "AddRemoveReplica"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
-      ],
-      "properties": {},
-      "type": "object"
+      ]
     },
     "AutoScalingMetric": {
-      "description": "Describes the metric that is used for triggering auto scaling operation. Derived classes will describe resources or metrics.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Describes the resource that is used for triggering auto scaling.",
+          "additionalProperties": false,
           "properties": {
             "kind": {
               "enum": [
                 "Resource"
               ],
               "type": "string"
-            },
-            "name": {
-              "description": "Name of the resource.",
-              "oneOf": [
-                {
-                  "enum": [
-                    "cpu",
-                    "memoryInGB"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
             }
           },
           "required": [
-            "name",
             "kind"
           ],
           "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/AutoScalingResourceMetric"
+                },
+                {
+                  "properties": {
+                    "kind": {
+                      "const": "Resource"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
-      ],
-      "properties": {},
-      "type": "object"
+      ]
     },
     "AutoScalingPolicy": {
-      "description": "Describes the auto scaling policy",
       "properties": {
         "mechanism": {
           "description": "The mechanism that is used to scale when auto scaling operation is invoked.",
@@ -615,85 +702,210 @@
         }
       },
       "required": [
+        "mechanism",
         "name",
-        "trigger",
-        "mechanism"
+        "trigger"
+      ],
+      "type": "object"
+    },
+    "AutoScalingResourceMetric": {
+      "properties": {
+        "kind": {
+          "description": "The type of auto scaling metric",
+          "oneOf": [
+            {
+              "enum": [
+                "Resource"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "name": {
+          "description": "Name of the resource.",
+          "oneOf": [
+            {
+              "enum": [
+                "cpu",
+                "memoryInGB"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "name"
       ],
       "type": "object"
     },
     "AutoScalingTrigger": {
-      "description": "Describes the trigger for performing auto scaling operation.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Describes the average load trigger used for auto scaling.",
+          "additionalProperties": false,
           "properties": {
             "kind": {
               "enum": [
                 "AverageLoad"
               ],
               "type": "string"
-            },
-            "lowerLoadThreshold": {
-              "description": "Lower load threshold (if average load is below this threshold, service will scale down).",
-              "oneOf": [
-                {
-                  "type": "number"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "metric": {
-              "description": "Description of the metric that is used for scaling.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/AutoScalingMetric"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "scaleIntervalInSeconds": {
-              "description": "Scale interval that indicates how often will this trigger be checked.",
-              "oneOf": [
-                {
-                  "minimum": 60,
-                  "type": "integer"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "upperLoadThreshold": {
-              "description": "Upper load threshold (if average load is above this threshold, service will scale up).",
-              "oneOf": [
-                {
-                  "type": "number"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
             }
           },
           "required": [
-            "metric",
-            "lowerLoadThreshold",
-            "upperLoadThreshold",
-            "scaleIntervalInSeconds",
             "kind"
           ],
           "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/AverageLoadScalingTrigger"
+                },
+                {
+                  "properties": {
+                    "kind": {
+                      "const": "AverageLoad"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
+      ]
+    },
+    "AverageLoadScalingTrigger": {
+      "properties": {
+        "kind": {
+          "description": "The type of auto scaling trigger",
+          "oneOf": [
+            {
+              "enum": [
+                "AverageLoad"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "lowerLoadThreshold": {
+          "description": "Lower load threshold (if average load is below this threshold, service will scale down).",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "metric": {
+          "description": "Description of the metric that is used for scaling.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AutoScalingMetric"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "scaleIntervalInSeconds": {
+          "description": "Scale interval that indicates how often will this trigger be checked.",
+          "oneOf": [
+            {
+              "minimum": 60,
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "upperLoadThreshold": {
+          "description": "Upper load threshold (if average load is above this threshold, service will scale up).",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "lowerLoadThreshold",
+        "metric",
+        "scaleIntervalInSeconds",
+        "upperLoadThreshold"
       ],
-      "properties": {},
+      "type": "object"
+    },
+    "AzureInternalMonitoringPipelineSinkDescription": {
+      "properties": {
+        "accountName": {
+          "description": "Azure Internal monitoring pipeline account.",
+          "type": "string"
+        },
+        "autoKeyConfigUrl": {
+          "description": "Azure Internal monitoring pipeline autokey associated with the certificate.",
+          "type": "string"
+        },
+        "fluentdConfigUrl": {
+          "description": "Azure Internal monitoring agent fluentd configuration.",
+          "oneOf": [
+            {},
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "kind": {
+          "description": "The kind of DiagnosticsSink.",
+          "oneOf": [
+            {
+              "enum": [
+                "AzureInternalMonitoringPipeline"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "maConfigUrl": {
+          "description": "Azure Internal monitoring agent configuration.",
+          "type": "string"
+        },
+        "namespace": {
+          "description": "Azure Internal monitoring pipeline account namespace.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind"
+      ],
       "type": "object"
     },
     "ContainerCodePackageProperties": {
-      "description": "Describes a container and its runtime properties.",
       "properties": {
         "commands": {
           "description": "Command array to execute within the container in exec form.",
@@ -854,14 +1066,13 @@
         }
       },
       "required": [
-        "name",
         "image",
+        "name",
         "resources"
       ],
       "type": "object"
     },
     "ContainerLabel": {
-      "description": "Describes a container label.",
       "properties": {
         "name": {
           "description": "The name of the container label.",
@@ -879,7 +1090,6 @@
       "type": "object"
     },
     "DiagnosticsDescription": {
-      "description": "Describes the diagnostics options available",
       "properties": {
         "defaultSinkRefs": {
           "description": "The sinks to be used if diagnostics is enabled. Sink choices can be overridden at the service and code package level.",
@@ -924,7 +1134,6 @@
       "type": "object"
     },
     "DiagnosticsRef": {
-      "description": "Reference to sinks in DiagnosticsDescription.",
       "properties": {
         "enabled": {
           "description": "Status of whether or not sinks are enabled.",
@@ -955,21 +1164,13 @@
       "type": "object"
     },
     "DiagnosticsSinkProperties": {
-      "description": "Properties of a DiagnosticsSink.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Diagnostics settings for Geneva.",
+          "additionalProperties": false,
           "properties": {
-            "accountName": {
-              "description": "Azure Internal monitoring pipeline account.",
+            "description": {
+              "description": "A description of the sink.",
               "type": "string"
-            },
-            "autoKeyConfigUrl": {
-              "description": "Azure Internal monitoring pipeline autokey associated with the certificate.",
-              "type": "string"
-            },
-            "fluentdConfigUrl": {
-              "description": "Azure Internal monitoring agent fluentd configuration."
             },
             "kind": {
               "enum": [
@@ -977,12 +1178,8 @@
               ],
               "type": "string"
             },
-            "maConfigUrl": {
-              "description": "Azure Internal monitoring agent configuration.",
-              "type": "string"
-            },
-            "namespace": {
-              "description": "Azure Internal monitoring pipeline account namespace.",
+            "name": {
+              "description": "Name of the sink. This value is referenced by DiagnosticsReferenceDescription",
               "type": "string"
             }
           },
@@ -990,22 +1187,32 @@
             "kind"
           ],
           "type": "object"
-        }
-      ],
-      "properties": {
-        "description": {
-          "description": "A description of the sink.",
-          "type": "string"
         },
-        "name": {
-          "description": "Name of the sink. This value is referenced by DiagnosticsReferenceDescription",
-          "type": "string"
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/AzureInternalMonitoringPipelineSinkDescription"
+                },
+                {
+                  "properties": {
+                    "kind": {
+                      "const": "AzureInternalMonitoringPipeline"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
-      },
-      "type": "object"
+      ]
     },
     "EndpointProperties": {
-      "description": "Describes a container endpoint.",
       "properties": {
         "name": {
           "description": "The name of the endpoint.",
@@ -1029,7 +1236,6 @@
       "type": "object"
     },
     "EndpointRef": {
-      "description": "Describes a reference to a service endpoint.",
       "properties": {
         "name": {
           "description": "Name of the endpoint.",
@@ -1039,7 +1245,6 @@
       "type": "object"
     },
     "EnvironmentVariable": {
-      "description": "Describes an environment variable for the container.",
       "properties": {
         "name": {
           "description": "The name of the environment variable.",
@@ -1053,7 +1258,6 @@
       "type": "object"
     },
     "GatewayDestination": {
-      "description": "Describes destination endpoint for routing traffic.",
       "properties": {
         "applicationName": {
           "description": "Name of the service fabric Mesh application.",
@@ -1070,13 +1274,12 @@
       },
       "required": [
         "applicationName",
-        "serviceName",
-        "endpointName"
+        "endpointName",
+        "serviceName"
       ],
       "type": "object"
     },
     "GatewayResourceProperties": {
-      "description": "This type describes properties of a gateway resource.",
       "properties": {
         "description": {
           "description": "User readable description of the gateway.",
@@ -1134,13 +1337,12 @@
         }
       },
       "required": [
-        "sourceNetwork",
-        "destinationNetwork"
+        "destinationNetwork",
+        "sourceNetwork"
       ],
       "type": "object"
     },
     "HttpConfig": {
-      "description": "Describes the http configuration for external connectivity for this network.",
       "properties": {
         "hosts": {
           "description": "description for routing.",
@@ -1173,14 +1375,13 @@
         }
       },
       "required": [
+        "hosts",
         "name",
-        "port",
-        "hosts"
+        "port"
       ],
       "type": "object"
     },
     "HttpHostConfig": {
-      "description": "Describes the hostname properties for http routing.",
       "properties": {
         "name": {
           "description": "http hostname config name.",
@@ -1208,7 +1409,6 @@
       "type": "object"
     },
     "HttpRouteConfig": {
-      "description": "Describes the hostname properties for http routing.",
       "properties": {
         "destination": {
           "description": "Describes destination endpoint for routing traffic.",
@@ -1238,14 +1438,13 @@
         }
       },
       "required": [
-        "name",
+        "destination",
         "match",
-        "destination"
+        "name"
       ],
       "type": "object"
     },
     "HttpRouteMatchHeader": {
-      "description": "Describes header information for http route matching.",
       "properties": {
         "name": {
           "description": "Name of header to match in request.",
@@ -1276,7 +1475,6 @@
       "type": "object"
     },
     "HttpRouteMatchPath": {
-      "description": "Path to match for routing.",
       "properties": {
         "rewrite": {
           "description": "replacement string for matched part of the Uri.",
@@ -1302,13 +1500,12 @@
         }
       },
       "required": [
-        "value",
-        "type"
+        "type",
+        "value"
       ],
       "type": "object"
     },
     "HttpRouteMatchRule": {
-      "description": "Describes a rule for http route matching.",
       "properties": {
         "headers": {
           "description": "headers and their values to match in request.",
@@ -1342,7 +1539,6 @@
       "type": "object"
     },
     "ImageRegistryCredential": {
-      "description": "Image registry credential.",
       "properties": {
         "password": {
           "description": "The password for the private registry. The password is required for create or update operations, however it is not returned in the get or list operations.",
@@ -1363,8 +1559,55 @@
       ],
       "type": "object"
     },
+    "InlinedValueSecretResourceProperties": {
+      "properties": {
+        "kind": {
+          "description": "Describes the kind of secret.",
+          "oneOf": [
+            {
+              "enum": [
+                "inlinedValue"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "type": "object"
+    },
+    "LocalNetworkResourceProperties": {
+      "properties": {
+        "kind": {
+          "description": "The type of a Service Fabric container network.",
+          "oneOf": [
+            {
+              "enum": [
+                "Local"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "networkAddressPrefix": {
+          "description": "Address space for the local container network.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "type": "object"
+    },
     "NetworkRef": {
-      "description": "Describes a network reference in a service.",
       "properties": {
         "endpointRefs": {
           "description": "A list of endpoints that are exposed on this network.",
@@ -1388,19 +1631,18 @@
       "type": "object"
     },
     "NetworkResourceProperties": {
-      "description": "Describes properties of a network resource.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Information about a Service Fabric container network local to a single Service Fabric cluster.",
+          "additionalProperties": false,
           "properties": {
+            "description": {
+              "description": "User readable description of the network.",
+              "type": "string"
+            },
             "kind": {
               "enum": [
                 "Local"
               ],
-              "type": "string"
-            },
-            "networkAddressPrefix": {
-              "description": "Address space for the local container network.",
               "type": "string"
             }
           },
@@ -1408,18 +1650,32 @@
             "kind"
           ],
           "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/LocalNetworkResourceProperties"
+                },
+                {
+                  "properties": {
+                    "kind": {
+                      "const": "Local"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
-      ],
-      "properties": {
-        "description": {
-          "description": "User readable description of the network.",
-          "type": "string"
-        }
-      },
-      "type": "object"
+      ]
     },
     "ReliableCollectionsRef": {
-      "description": "Specifying this parameter adds support for reliable collections",
       "properties": {
         "doNotPersistState": {
           "description": "False (the default) if ReliableCollections state is persisted to disk as usual. True if you do not want to persist state, in which case replication is still enabled and you can use ReliableCollections as distributed cache.",
@@ -1443,13 +1699,12 @@
       "type": "object"
     },
     "ResourceLimits": {
-      "description": "This type describes the resource limits for a given container. It describes the most amount of resources a container is allowed to use before being restarted.",
       "properties": {
         "cpu": {
           "description": "CPU limits in cores. At present, only full cores are supported.",
           "oneOf": [
             {
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -1460,7 +1715,7 @@
           "description": "The memory limit in GB.",
           "oneOf": [
             {
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -1471,13 +1726,12 @@
       "type": "object"
     },
     "ResourceRequests": {
-      "description": "This type describes the requested resources for a given container. It describes the least amount of resources required for the container. A container can consume more than requested resources up to the specified limits before being restarted. Currently, the requested resources are treated as limits.",
       "properties": {
         "cpu": {
           "description": "Requested number of CPU cores. At present, only full cores are supported.",
           "oneOf": [
             {
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -1488,7 +1742,7 @@
           "description": "The memory request in GB for this container.",
           "oneOf": [
             {
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -1497,13 +1751,12 @@
         }
       },
       "required": [
-        "memoryInGB",
-        "cpu"
+        "cpu",
+        "memoryInGB"
       ],
       "type": "object"
     },
     "ResourceRequirements": {
-      "description": "This type describes the resource requirements for a container or a service.",
       "properties": {
         "limits": {
           "description": "Describes the maximum limits on the resources for a given container.",
@@ -1534,11 +1787,18 @@
       "type": "object"
     },
     "SecretResourceProperties": {
-      "description": "Describes the properties of a secret resource.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Describes the properties of a secret resource whose value is provided explicitly as plaintext. The secret resource may have multiple values, each being uniquely versioned. The secret value of each version is stored encrypted, and delivered as plaintext into the context of applications referencing it.",
+          "additionalProperties": false,
           "properties": {
+            "contentType": {
+              "description": "The type of the content stored in the secret value. The value of this property is opaque to Service Fabric. Once set, the value of this property cannot be changed.",
+              "type": "string"
+            },
+            "description": {
+              "description": "User readable description of the secret.",
+              "type": "string"
+            },
             "kind": {
               "enum": [
                 "inlinedValue"
@@ -1550,22 +1810,32 @@
             "kind"
           ],
           "type": "object"
-        }
-      ],
-      "properties": {
-        "contentType": {
-          "description": "The type of the content stored in the secret value. The value of this property is opaque to Service Fabric. Once set, the value of this property cannot be changed.",
-          "type": "string"
         },
-        "description": {
-          "description": "User readable description of the secret.",
-          "type": "string"
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/InlinedValueSecretResourceProperties"
+                },
+                {
+                  "properties": {
+                    "kind": {
+                      "const": "inlinedValue"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
-      },
-      "type": "object"
+      ]
     },
     "SecretValueResourceProperties": {
-      "description": "This type describes properties of a secret value resource.",
       "properties": {
         "value": {
           "description": "The actual value of the secret.",
@@ -1575,7 +1845,6 @@
       "type": "object"
     },
     "ServiceResourceDescription": {
-      "description": "This type describes a service resource.",
       "properties": {
         "name": {
           "description": "The name of the resource",
@@ -1599,7 +1868,6 @@
       "type": "object"
     },
     "ServiceResourceProperties": {
-      "description": "This type describes properties of a service resource.",
       "properties": {
         "autoScalingPolicies": {
           "description": "Auto scaling policies",
@@ -1686,13 +1954,12 @@
         }
       },
       "required": [
-        "osType",
-        "codePackages"
+        "codePackages",
+        "osType"
       ],
       "type": "object"
     },
     "Setting": {
-      "description": "Describes a setting for the container. The setting file path can be fetched from environment variable \"Fabric_SettingPath\". The path for Windows container is \"C:\\\\secrets\". The path for Linux container is \"/var/secrets\".",
       "properties": {
         "name": {
           "description": "The name of the setting.",
@@ -1706,7 +1973,6 @@
       "type": "object"
     },
     "TcpConfig": {
-      "description": "Describes the tcp configuration for external connectivity for this network.",
       "properties": {
         "destination": {
           "description": "Describes destination endpoint for routing traffic.",
@@ -1736,14 +2002,20 @@
         }
       },
       "required": [
+        "destination",
         "name",
-        "port",
-        "destination"
+        "port"
       ],
       "type": "object"
     },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "VolumeProviderParametersAzureFile": {
-      "description": "This type describes a volume provided by an Azure Files file share.",
       "properties": {
         "accountKey": {
           "description": "Access key of the Azure storage account for the File Share.",
@@ -1765,7 +2037,6 @@
       "type": "object"
     },
     "VolumeReference": {
-      "description": "Describes a reference to a volume resource.",
       "properties": {
         "destinationPath": {
           "description": "The path within the container at which the volume should be mounted. Only valid path characters are allowed.",
@@ -1788,13 +2059,12 @@
         }
       },
       "required": [
-        "name",
-        "destinationPath"
+        "destinationPath",
+        "name"
       ],
       "type": "object"
     },
     "VolumeResourceProperties": {
-      "description": "This type describes properties of a volume resource.",
       "properties": {
         "azureFileParameters": {
           "description": "This type describes a volume provided by an Azure Files file share.",
@@ -1832,7 +2102,7 @@
       "type": "object"
     },
     "secrets_values_childResource": {
-      "description": "Microsoft.ServiceFabricMesh/secrets/values",
+      "description": "values",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1845,7 +2115,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the secret resource value which is typically the version identifier for the value.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -1882,6 +2152,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",

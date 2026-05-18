@@ -26,7 +26,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the service",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -84,6 +84,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -105,7 +106,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the project",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -152,6 +153,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -173,7 +175,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the Task",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -204,8 +206,56 @@
     }
   },
   "definitions": {
+    "ConnectionInfo": {
+      "allOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "password": {
+              "description": "Password credential.",
+              "type": "string"
+            },
+            "type": {
+              "enum": [
+                "SqlConnectionInfo"
+              ],
+              "type": "string"
+            },
+            "userName": {
+              "description": "User name",
+              "type": "string"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/SqlConnectionInfo"
+                },
+                {
+                  "properties": {
+                    "type": {
+                      "const": "SqlConnectionInfo"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
     "ConnectToSourceSqlServerTaskInput": {
-      "description": "Input for the task that validates connection to SQL Server and also validates source server requirements",
       "properties": {
         "checkPermissionsGroup": {
           "description": "Permission group for validations",
@@ -239,8 +289,40 @@
       ],
       "type": "object"
     },
+    "ConnectToSourceSqlServerTaskProperties": {
+      "properties": {
+        "input": {
+          "description": "Task input",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ConnectToSourceSqlServerTaskInput"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "taskType": {
+          "description": "Task type.",
+          "oneOf": [
+            {
+              "enum": [
+                "ConnectToSource.SqlServer"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "taskType"
+      ],
+      "type": "object"
+    },
     "ConnectToTargetSqlDbTaskInput": {
-      "description": "Input for the task that validates connection to SQL DB and target server requirements",
       "properties": {
         "targetConnectionInfo": {
           "description": "Connection information for target SQL DB",
@@ -259,90 +341,52 @@
       ],
       "type": "object"
     },
-    "ConnectionInfo": {
-      "description": "Defines the connection properties of a server",
-      "oneOf": [
-        {
-          "description": "Information for connecting to SQL database server",
-          "properties": {
-            "additionalSettings": {
-              "description": "Additional connection settings",
-              "type": "string"
+    "ConnectToTargetSqlDbTaskProperties": {
+      "properties": {
+        "input": {
+          "description": "Task input",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ConnectToTargetSqlDbTaskInput"
             },
-            "authentication": {
-              "description": "Authentication type to use for connection",
-              "oneOf": [
-                {
-                  "enum": [
-                    "None",
-                    "WindowsAuthentication",
-                    "SqlAuthentication",
-                    "ActiveDirectoryIntegrated",
-                    "ActiveDirectoryPassword"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "dataSource": {
-              "description": "Data source in the format Protocol:MachineName\\SQLServerInstanceName,PortNumber",
-              "type": "string"
-            },
-            "encryptConnection": {
-              "description": "Whether to encrypt the connection",
-              "oneOf": [
-                {
-                  "default": true,
-                  "type": "boolean"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "trustServerCertificate": {
-              "description": "Whether to trust the server certificate",
-              "oneOf": [
-                {
-                  "default": false,
-                  "type": "boolean"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "type": {
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "taskType": {
+          "description": "Task type.",
+          "oneOf": [
+            {
               "enum": [
-                "SqlConnectionInfo"
+                "ConnectToTarget.SqlDb"
               ],
               "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "dataSource",
-            "type"
-          ],
-          "type": "object"
+          ]
         }
+      },
+      "required": [
+        "taskType"
       ],
+      "type": "object"
+    },
+    "DatabaseInfo": {
       "properties": {
-        "password": {
-          "description": "Password credential.",
-          "type": "string"
-        },
-        "userName": {
-          "description": "User name",
+        "sourceDatabaseName": {
+          "description": "Name of the database",
           "type": "string"
         }
       },
+      "required": [
+        "sourceDatabaseName"
+      ],
       "type": "object"
     },
     "DataMigrationServiceProperties": {
-      "description": "Properties of the Data Migration service instance",
       "properties": {
         "publicKey": {
           "description": "The public key of the service, used to encrypt secrets sent to the service",
@@ -358,21 +402,7 @@
       ],
       "type": "object"
     },
-    "DatabaseInfo": {
-      "description": "Project Database Details",
-      "properties": {
-        "sourceDatabaseName": {
-          "description": "Name of the database",
-          "type": "string"
-        }
-      },
-      "required": [
-        "sourceDatabaseName"
-      ],
-      "type": "object"
-    },
     "GetUserTablesSqlTaskInput": {
-      "description": "Input for the task that collects user tables for the given list of databases",
       "properties": {
         "connectionInfo": {
           "description": "Connection information for SQL Server",
@@ -406,8 +436,40 @@
       ],
       "type": "object"
     },
+    "GetUserTablesSqlTaskProperties": {
+      "properties": {
+        "input": {
+          "description": "Task input",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/GetUserTablesSqlTaskInput"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "taskType": {
+          "description": "Task type.",
+          "oneOf": [
+            {
+              "enum": [
+                "GetUserTables.Sql"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "taskType"
+      ],
+      "type": "object"
+    },
     "MigrateSqlServerSqlDbDatabaseInput": {
-      "description": "Database specific information for SQL to Azure SQL DB migration task inputs",
       "properties": {
         "makeSourceDbReadOnly": {
           "description": "Whether to set database read only before migration",
@@ -446,8 +508,14 @@
       },
       "type": "object"
     },
+    "MigrateSqlServerSqlDbDatabaseInputTableMap": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "MigrateSqlServerSqlDbTaskInput": {
-      "description": "Input for the task that migrates on-prem SQL Server databases to Azure SQL Database",
       "properties": {
         "selectedDatabases": {
           "description": "Databases to migrate",
@@ -504,8 +572,40 @@
       ],
       "type": "object"
     },
+    "MigrateSqlServerSqlDbTaskProperties": {
+      "properties": {
+        "input": {
+          "description": "Task input",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MigrateSqlServerSqlDbTaskInput"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "taskType": {
+          "description": "Task type.",
+          "oneOf": [
+            {
+              "enum": [
+                "Migrate.SqlServer.SqlDb"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "taskType"
+      ],
+      "type": "object"
+    },
     "MigrationValidationOptions": {
-      "description": "Types of validations to run after the migration",
       "properties": {
         "enableDataIntegrityValidation": {
           "description": "Allows to perform a checksum based data integrity validation between source and target for the selected database / tables .",
@@ -544,7 +644,6 @@
       "type": "object"
     },
     "ProjectProperties": {
-      "description": "Project-specific properties",
       "properties": {
         "databasesInfo": {
           "description": "List of DatabaseInfo",
@@ -620,102 +719,15 @@
       "type": "object"
     },
     "ProjectTaskProperties": {
-      "description": "Base class for all types of DMS task properties. If task is not supported by current client, this object is returned.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Properties for the task that validates connection to SQL Server and also validates source server requirements",
+          "additionalProperties": false,
           "properties": {
-            "input": {
-              "description": "Task input",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/ConnectToSourceSqlServerTaskInput"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
             "taskType": {
               "enum": [
-                "ConnectToSource.SqlServer"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "taskType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Properties for the task that validates connection to SQL DB and target server requirements",
-          "properties": {
-            "input": {
-              "description": "Task input",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/ConnectToTargetSqlDbTaskInput"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "taskType": {
-              "enum": [
-                "ConnectToTarget.SqlDb"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "taskType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Properties for the task that collects user tables for the given list of databases",
-          "properties": {
-            "input": {
-              "description": "Task input",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/GetUserTablesSqlTaskInput"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "taskType": {
-              "enum": [
-                "GetUserTables.Sql"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "taskType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Properties for the task that migrates on-prem SQL Server databases to Azure SQL Database",
-          "properties": {
-            "input": {
-              "description": "Task input",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/MigrateSqlServerSqlDbTaskInput"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "taskType": {
-              "enum": [
+                "ConnectToSource.SqlServer",
+                "ConnectToTarget.SqlDb",
+                "GetUserTables.Sql",
                 "Migrate.SqlServer.SqlDb"
               ],
               "type": "string"
@@ -725,13 +737,86 @@
             "taskType"
           ],
           "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ConnectToSourceSqlServerTaskProperties"
+                },
+                {
+                  "properties": {
+                    "taskType": {
+                      "const": "ConnectToSource.SqlServer"
+                    }
+                  },
+                  "required": [
+                    "taskType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ConnectToTargetSqlDbTaskProperties"
+                },
+                {
+                  "properties": {
+                    "taskType": {
+                      "const": "ConnectToTarget.SqlDb"
+                    }
+                  },
+                  "required": [
+                    "taskType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/GetUserTablesSqlTaskProperties"
+                },
+                {
+                  "properties": {
+                    "taskType": {
+                      "const": "GetUserTables.Sql"
+                    }
+                  },
+                  "required": [
+                    "taskType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/MigrateSqlServerSqlDbTaskProperties"
+                },
+                {
+                  "properties": {
+                    "taskType": {
+                      "const": "Migrate.SqlServer.SqlDb"
+                    }
+                  },
+                  "required": [
+                    "taskType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
-      ],
-      "properties": {},
-      "type": "object"
+      ]
     },
     "ServiceSku": {
-      "description": "An Azure SKU instance",
       "properties": {
         "capacity": {
           "description": "The capacity of the SKU, if it supports scaling",
@@ -764,7 +849,6 @@
       "type": "object"
     },
     "SqlConnectionInfo": {
-      "description": "Information for connecting to SQL database server",
       "properties": {
         "additionalSettings": {
           "description": "Additional connection settings",
@@ -796,7 +880,6 @@
           "description": "Whether to encrypt the connection",
           "oneOf": [
             {
-              "default": true,
               "type": "boolean"
             },
             {
@@ -812,7 +895,6 @@
           "description": "Whether to trust the server certificate",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -835,8 +917,15 @@
       ],
       "type": "object"
     },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "services_projects_childResource": {
-      "description": "Microsoft.DataMigration/services/projects",
+      "description": "projects",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -849,7 +938,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the project",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -886,6 +975,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -894,7 +984,7 @@
       "type": "object"
     },
     "services_projects_tasks_childResource": {
-      "description": "Microsoft.DataMigration/services/projects/tasks",
+      "description": "tasks",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -907,7 +997,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the Task",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {

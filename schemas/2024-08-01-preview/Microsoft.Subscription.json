@@ -3,56 +3,6 @@
   "title": "Microsoft.Subscription",
   "description": "Microsoft Subscription Resource Types",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "subscription_resourceDefinitions": {
-    "changeTenantRequest": {
-      "description": "Microsoft.Subscription/changeTenantRequest",
-      "properties": {
-        "apiVersion": {
-          "enum": [
-            "2024-08-01-preview"
-          ],
-          "type": "string"
-        },
-        "name": {
-          "oneOf": [
-            {
-              "enum": [
-                "default"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "properties": {
-          "description": "Target Directory request properties.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/TargetDirectoryRequestProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.Subscription/changeTenantRequest"
-          ],
-          "type": "string"
-        }
-      },
-      "required": [
-        "name",
-        "properties",
-        "apiVersion",
-        "type"
-      ],
-      "type": "object"
-    }
-  },
   "tenant_resourceDefinitions": {
     "aliases": {
       "description": "Microsoft.Subscription/aliases",
@@ -64,14 +14,14 @@
           "type": "string"
         },
         "name": {
-          "description": "AliasName is the name for the subscription creation request. Note that this is not the same as subscription name and this doesn’t have any other lifecycle need beyond the request for subscription creation.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "Put alias request properties.",
           "oneOf": [
             {
-              "$ref": "#/definitions/PutAliasRequestProperties"
+              "$ref": "#/definitions/PutAliasRequestPropertiesOrSubscriptionAliasResponseProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -129,7 +79,9 @@
           "oneOf": [
             {
               "items": {
-                "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+                "maxLength": 36,
+                "minLength": 36,
+                "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
                 "type": "string"
               },
               "type": "array"
@@ -140,6 +92,7 @@
           ]
         },
         "name": {
+          "description": "The resource name",
           "oneOf": [
             {
               "enum": [
@@ -167,9 +120,59 @@
       "type": "object"
     }
   },
+  "subscription_resourceDefinitions": {
+    "changeTenantRequest": {
+      "description": "Microsoft.Subscription/changeTenantRequest",
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "2024-08-01-preview"
+          ],
+          "type": "string"
+        },
+        "name": {
+          "description": "The resource name",
+          "oneOf": [
+            {
+              "enum": [
+                "default"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "description": "Target Directory request properties.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/TargetDirectoryRequestPropertiesOrTargetDirectoryResultProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "enum": [
+            "Microsoft.Subscription/changeTenantRequest"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "properties",
+        "apiVersion",
+        "type"
+      ],
+      "type": "object"
+    }
+  },
   "definitions": {
     "PutAliasRequestAdditionalProperties": {
-      "description": "Put subscription additional properties.",
       "properties": {
         "managementGroupId": {
           "description": "Management group Id for the subscription.",
@@ -201,8 +204,14 @@
       },
       "type": "object"
     },
-    "PutAliasRequestProperties": {
-      "description": "Put subscription properties.",
+    "PutAliasRequestAdditionalPropertiesTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "PutAliasRequestPropertiesOrSubscriptionAliasResponseProperties": {
       "properties": {
         "additionalProperties": {
           "description": "Put alias request additional properties.",
@@ -249,8 +258,7 @@
       },
       "type": "object"
     },
-    "TargetDirectoryRequestProperties": {
-      "description": "Properties of subscription Request for Changed Target Directory.",
+    "TargetDirectoryRequestPropertiesOrTargetDirectoryResultProperties": {
       "properties": {
         "destinationOwnerId": {
           "description": "The destination OwnerId, can be object id or email address",

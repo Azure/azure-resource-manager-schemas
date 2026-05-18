@@ -29,7 +29,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Monitor resource name",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",
@@ -55,13 +55,13 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/monitors_tagRules_childResource"
+                "$ref": "#/definitions/monitors_monitoredSubscriptions_childResource"
               },
               {
                 "$ref": "#/definitions/monitors_openAIIntegrations_childResource"
               },
               {
-                "$ref": "#/definitions/monitors_monitoredSubscriptions_childResource"
+                "$ref": "#/definitions/monitors_tagRules_childResource"
               }
             ]
           },
@@ -101,6 +101,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -118,7 +119,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The configuration name. Only 'default' value is supported.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",
@@ -165,7 +166,7 @@
           "type": "string"
         },
         "name": {
-          "description": "OpenAI Integration name",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-z][a-z0-9]*$",
@@ -212,7 +213,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Tag Rule Set resource name",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",
@@ -252,48 +253,86 @@
   },
   "definitions": {
     "CompanyInfo": {
-      "description": "Company information of the user to be passed to partners.",
       "properties": {
         "business": {
           "description": "Business of the company",
-          "maxLength": 64,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "country": {
           "description": "Country of the company location.",
-          "maxLength": 64,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "domain": {
           "description": "Domain of the company",
-          "maxLength": 250,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 250,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "employeesNumber": {
           "description": "Number of employees in the company",
-          "maxLength": 20,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 20,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "state": {
           "description": "State of the company location.",
-          "maxLength": 64,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "type": "object"
     },
     "ElasticCloudDeployment": {
-      "description": "Details of the user's elastic deployment associated with the monitor resource.",
       "properties": {},
       "type": "object"
     },
     "ElasticCloudUser": {
-      "description": "Details of the user's elastic account.",
+      "properties": {},
+      "type": "object"
+    },
+    "ElasticMonitorResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
       "properties": {},
       "type": "object"
     },
     "ElasticProperties": {
-      "description": "Elastic Resource Properties.",
       "properties": {
         "elasticCloudDeployment": {
           "description": "Details of the elastic cloud deployment.",
@@ -321,7 +360,6 @@
       "type": "object"
     },
     "FilteringTag": {
-      "description": "The definition of a filtering tag. Filtering tags are used for capturing resources and include/exclude them from being monitored.",
       "properties": {
         "action": {
           "description": "Valid actions for a filtering tag.",
@@ -350,7 +388,6 @@
       "type": "object"
     },
     "IdentityProperties": {
-      "description": "Identity properties.",
       "properties": {
         "type": {
           "description": "Managed identity type.",
@@ -370,7 +407,6 @@
       "type": "object"
     },
     "LogRules": {
-      "description": "Set of rules for sending logs for the Monitor resource.",
       "properties": {
         "filteringTags": {
           "description": "List of filtering tags to be used for capturing logs. This only takes effect if SendActivityLogs flag is enabled. If empty, all resources will be captured. If only Exclude action is specified, the rules will apply to the list of all available resources. If Include actions are specified, the rules will only include resources with the associated tags.",
@@ -422,8 +458,64 @@
       },
       "type": "object"
     },
+    "MonitoredSubscription": {
+      "properties": {
+        "error": {
+          "description": "The reason of not monitoring the subscription.",
+          "type": "string"
+        },
+        "status": {
+          "description": "The state of monitoring.",
+          "oneOf": [
+            {
+              "enum": [
+                "InProgress",
+                "Active",
+                "Failed",
+                "Deleting"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "subscriptionId": {
+          "description": "The subscriptionId to be monitored.",
+          "type": "string"
+        },
+        "tagRules": {
+          "description": "Definition of the properties for a TagRules resource.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MonitoringTagRulesProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "MonitoringTagRulesProperties": {
+      "properties": {
+        "logRules": {
+          "description": "Rules for sending logs.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/LogRules"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
     "MonitorProperties": {
-      "description": "Properties specific to the monitor resource.",
       "properties": {
         "elasticProperties": {
           "description": "Elastic cloud properties.",
@@ -507,67 +599,7 @@
       },
       "type": "object"
     },
-    "MonitoredSubscription": {
-      "description": "The list of subscriptions and it's monitoring status by current Elastic monitor.",
-      "properties": {
-        "error": {
-          "description": "The reason of not monitoring the subscription.",
-          "type": "string"
-        },
-        "status": {
-          "description": "The state of monitoring.",
-          "oneOf": [
-            {
-              "enum": [
-                "InProgress",
-                "Active",
-                "Failed",
-                "Deleting"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "subscriptionId": {
-          "description": "The subscriptionId to be monitored.",
-          "type": "string"
-        },
-        "tagRules": {
-          "description": "Definition of the properties for a TagRules resource.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/MonitoringTagRulesProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "type": "object"
-    },
-    "MonitoringTagRulesProperties": {
-      "description": "Definition of the properties for a TagRules resource.",
-      "properties": {
-        "logRules": {
-          "description": "Rules for sending logs.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/LogRules"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "type": "object"
-    },
     "OpenAIIntegrationProperties": {
-      "description": "Open AI Integration details.",
       "properties": {
         "key": {
           "description": "Value of API key for Open AI resource",
@@ -589,7 +621,6 @@
       "type": "object"
     },
     "PlanDetails": {
-      "description": "Plan details of the monitor resource.",
       "properties": {
         "offerID": {
           "description": "Offer ID of the plan",
@@ -615,7 +646,6 @@
       "type": "object"
     },
     "ResourceSku": {
-      "description": "Microsoft.Elastic SKU.",
       "properties": {
         "name": {
           "description": "Name of the SKU.",
@@ -628,7 +658,6 @@
       "type": "object"
     },
     "SubscriptionList": {
-      "description": "The request to update subscriptions needed to be monitored by the Elastic monitor resource.",
       "properties": {
         "monitoredSubscriptionList": {
           "description": "List of subscriptions and the state of the monitoring.",
@@ -666,7 +695,6 @@
       "type": "object"
     },
     "UserInfo": {
-      "description": "User Information to be passed to partners.",
       "properties": {
         "companyInfo": {
           "description": "Company information of the user to be passed to partners.",
@@ -681,8 +709,15 @@
         },
         "companyName": {
           "description": "Company name of the user",
-          "maxLength": 64,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "emailAddress": {
           "description": "Email of the user used by Elastic for contacting them if needed",
@@ -698,19 +733,33 @@
         },
         "firstName": {
           "description": "First name of the user",
-          "maxLength": 50,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 50,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "lastName": {
           "description": "Last name of the user",
-          "maxLength": 50,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 50,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "type": "object"
     },
     "monitors_monitoredSubscriptions_childResource": {
-      "description": "Microsoft.Elastic/monitors/monitoredSubscriptions",
+      "description": "monitoredSubscriptions",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -719,7 +768,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The configuration name. Only 'default' value is supported.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",
@@ -757,7 +806,7 @@
       "type": "object"
     },
     "monitors_openAIIntegrations_childResource": {
-      "description": "Microsoft.Elastic/monitors/openAIIntegrations",
+      "description": "openAIIntegrations",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -766,7 +815,7 @@
           "type": "string"
         },
         "name": {
-          "description": "OpenAI Integration name",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-z][a-z0-9]*$",
@@ -804,7 +853,7 @@
       "type": "object"
     },
     "monitors_tagRules_childResource": {
-      "description": "Microsoft.Elastic/monitors/tagRules",
+      "description": "tagRules",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -813,7 +862,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Tag Rule Set resource name",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",

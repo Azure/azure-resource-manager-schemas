@@ -3,6 +3,47 @@
   "title": "Microsoft.CostManagement",
   "description": "Microsoft CostManagement Resource Types",
   "$schema": "http://json-schema.org/draft-04/schema#",
+  "subscription_resourceDefinitions": {
+    "reports": {
+      "description": "Microsoft.CostManagement/reports",
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "2018-08-01-preview"
+          ],
+          "type": "string"
+        },
+        "name": {
+          "description": "The resource name",
+          "type": "string"
+        },
+        "properties": {
+          "description": "The properties of the report.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ReportProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "enum": [
+            "Microsoft.CostManagement/reports"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "properties",
+        "apiVersion",
+        "type"
+      ],
+      "type": "object"
+    }
+  },
   "resourceDefinitions": {
     "connectors": {
       "description": "Microsoft.CostManagement/connectors",
@@ -22,7 +63,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Connector Name.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -76,89 +117,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Report Name.",
-          "type": "string"
-        },
-        "properties": {
-          "description": "The properties of the report.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ReportProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.CostManagement/reports"
-          ],
-          "type": "string"
-        }
-      },
-      "required": [
-        "name",
-        "properties",
-        "apiVersion",
-        "type"
-      ],
-      "type": "object"
-    }
-  },
-  "subscription_resourceDefinitions": {
-    "reports": {
-      "description": "Microsoft.CostManagement/reports",
-      "properties": {
-        "apiVersion": {
-          "enum": [
-            "2018-08-01-preview"
-          ],
-          "type": "string"
-        },
-        "name": {
-          "description": "Report Name.",
-          "type": "string"
-        },
-        "properties": {
-          "description": "The properties of the report.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ReportProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.CostManagement/reports"
-          ],
-          "type": "string"
-        }
-      },
-      "required": [
-        "name",
-        "properties",
-        "apiVersion",
-        "type"
-      ],
-      "type": "object"
-    }
-  },
-  "extension_resourceDefinitions": {
-    "reports": {
-      "description": "Microsoft.CostManagement/reports",
-      "properties": {
-        "apiVersion": {
-          "enum": [
-            "2018-08-01-preview"
-          ],
-          "type": "string"
-        },
-        "name": {
-          "description": "Report Name.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -189,8 +148,14 @@
     }
   },
   "definitions": {
+    "ConnectorDefinitionTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "ConnectorProperties": {
-      "description": "The properties of a Connector",
       "properties": {
         "credentialsKey": {
           "description": "Credentials authentication key (eg AWS ARN)",
@@ -228,7 +193,6 @@
       "type": "object"
     },
     "ReportAggregation": {
-      "description": "The aggregation expression to be used in the report.",
       "properties": {
         "function": {
           "description": "The name of the aggregation function to use.",
@@ -250,13 +214,12 @@
         }
       },
       "required": [
-        "name",
-        "function"
+        "function",
+        "name"
       ],
       "type": "object"
     },
     "ReportComparisonExpression": {
-      "description": "The comparison expression to be used in the report.",
       "properties": {
         "name": {
           "description": "The name of the column to use in comparison.",
@@ -299,7 +262,6 @@
       "type": "object"
     },
     "ReportDataset": {
-      "description": "The definition of data present in the report.",
       "properties": {
         "aggregation": {
           "description": "Dictionary of aggregation expression to use in the report. The key of each item in the dictionary is the alias for the aggregated column. Report can have up to 2 aggregation clauses.",
@@ -370,8 +332,14 @@
       },
       "type": "object"
     },
+    "ReportDatasetAggregation": {
+      "additionalProperties": {
+        "$ref": "#/definitions/ReportAggregation"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "ReportDatasetConfiguration": {
-      "description": "The configuration of dataset in the report.",
       "properties": {
         "columns": {
           "description": "Array of column names to be included in the report. Any valid report column name is allowed. If not provided, then report includes all columns.",
@@ -391,24 +359,12 @@
       "type": "object"
     },
     "ReportDefinition": {
-      "description": "The definition of a report.",
       "properties": {
         "dataset": {
           "description": "Has definition for data in this report.",
           "oneOf": [
             {
               "$ref": "#/definitions/ReportDataset"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "timePeriod": {
-          "description": "Has time period for pulling data for the report.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ReportTimePeriod"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -431,6 +387,17 @@
             }
           ]
         },
+        "timePeriod": {
+          "description": "Has time period for pulling data for the report.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ReportTimePeriod"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
         "type": {
           "description": "The type of the report.",
           "oneOf": [
@@ -447,13 +414,12 @@
         }
       },
       "required": [
-        "type",
-        "timeframe"
+        "timeframe",
+        "type"
       ],
       "type": "object"
     },
     "ReportDeliveryDestination": {
-      "description": "The destination information for the delivery of the report.",
       "properties": {
         "container": {
           "description": "The name of the container where reports will be uploaded.",
@@ -469,13 +435,12 @@
         }
       },
       "required": [
-        "resourceId",
-        "container"
+        "container",
+        "resourceId"
       ],
       "type": "object"
     },
     "ReportDeliveryInfo": {
-      "description": "The delivery information associated with a report.",
       "properties": {
         "destination": {
           "description": "Has destination for the report being delivered.",
@@ -495,74 +460,9 @@
       "type": "object"
     },
     "ReportFilter": {
-      "description": "The filter expression to be used in the report.",
-      "properties": {
-        "and": {
-          "description": "The logical \"AND\" expression. Must have at least 2 items.",
-          "oneOf": [
-            {
-              "items": {
-                "type": "object"
-              },
-              "type": "array"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "dimension": {
-          "description": "Has comparison expression for a dimension",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ReportComparisonExpression"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "not": {
-          "description": "The logical \"NOT\" expression.",
-          "oneOf": [
-            {
-              "type": "object"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "or": {
-          "description": "The logical \"OR\" expression. Must have at least 2 items.",
-          "oneOf": [
-            {
-              "items": {
-                "type": "object"
-              },
-              "type": "array"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "tag": {
-          "description": "Has comparison expression for a tag",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ReportComparisonExpression"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
       "type": "object"
     },
     "ReportGrouping": {
-      "description": "The group by expression to be used in the report.",
       "properties": {
         "name": {
           "description": "The name of the column to group.",
@@ -585,13 +485,12 @@
         }
       },
       "required": [
-        "type",
-        "name"
+        "name",
+        "type"
       ],
       "type": "object"
     },
     "ReportProperties": {
-      "description": "The properties of the report.",
       "properties": {
         "definition": {
           "description": "Has definition for the report.",
@@ -642,22 +541,19 @@
         }
       },
       "required": [
-        "deliveryInfo",
-        "definition"
+        "definition",
+        "deliveryInfo"
       ],
       "type": "object"
     },
     "ReportRecurrencePeriod": {
-      "description": "The start and end date for recurrence schedule.",
       "properties": {
         "from": {
           "description": "The start date of recurrence.",
-          "format": "date-time",
           "type": "string"
         },
         "to": {
           "description": "The end date of recurrence.",
-          "format": "date-time",
           "type": "string"
         }
       },
@@ -667,7 +563,6 @@
       "type": "object"
     },
     "ReportSchedule": {
-      "description": "The schedule associated with a report.",
       "properties": {
         "recurrence": {
           "description": "The schedule recurrence.",
@@ -719,16 +614,13 @@
       "type": "object"
     },
     "ReportTimePeriod": {
-      "description": "The start and end date for pulling data for the report.",
       "properties": {
         "from": {
           "description": "The start date to pull data from.",
-          "format": "date-time",
           "type": "string"
         },
         "to": {
           "description": "The end date to pull data to.",
-          "format": "date-time",
           "type": "string"
         }
       },

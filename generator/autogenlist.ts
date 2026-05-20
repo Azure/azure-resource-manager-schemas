@@ -88,6 +88,7 @@ const csharpGeneratorProviders: CsharpGeneratorConfig[] = [
     { namespace: 'Microsoft.DevHub', enabled: true },
     { namespace: 'Microsoft.Devices', enabled: true },
     { namespace: 'Microsoft.DeviceUpdate', enabled: true },
+    { namespace: 'Microsoft.DevCenter', enabled: true },
     { namespace: 'Microsoft.DevOps', enabled: true },
     { namespace: 'Microsoft.DevSpaces', enabled: true },
     { namespace: 'Microsoft.DevTestLab', enabled: false },
@@ -135,11 +136,11 @@ const csharpGeneratorProviders: CsharpGeneratorConfig[] = [
     { namespace: 'Microsoft.ManagementPartner', enabled: true },
     { namespace: 'Microsoft.Maps', enabled: true },
     { namespace: 'Microsoft.Marketplace', enabled: true },
-    { namespace: 'Microsoft.Migrate', enabled: false },
+    { namespace: 'Microsoft.Migrate', enabled: true },
     { namespace: 'Microsoft.MixedReality', enabled: true },
     { namespace: 'Microsoft.NetApp', enabled: false },
     { namespace: 'Microsoft.Network', enabled: false },
-    { namespace: 'Microsoft.NotificationHubs', enabled: false },
+    { namespace: 'Microsoft.NotificationHubs', enabled: true },
     { namespace: 'Microsoft.OffAzure', enabled: true },
     { namespace: 'Microsoft.OperationalInsights', enabled: false },
     { namespace: 'Microsoft.Peering', enabled: true },
@@ -158,7 +159,7 @@ const csharpGeneratorProviders: CsharpGeneratorConfig[] = [
     { namespace: 'Microsoft.ResourceHealth', enabled: true },
     { namespace: 'Microsoft.Resources', enabled: true },
     { namespace: 'Microsoft.Scheduler', enabled: true },
-    { namespace: 'Microsoft.Search', enabled: false },
+    { namespace: 'Microsoft.Search', enabled: true },
     { namespace: 'Microsoft.Security', enabled: false },
     { namespace: 'Microsoft.SecurityInsights', enabled: true },
     { namespace: 'Microsoft.SerialConsole', enabled: true },
@@ -189,6 +190,7 @@ const csharpGeneratorProviders: CsharpGeneratorConfig[] = [
     { namespace: 'Microsoft.WindowsESU', enabled: true },
     { namespace: 'Microsoft.WindowsIoT', enabled: true },
     { namespace: 'Microsoft.WorkloadMonitor', enabled: true },
+    { namespace: 'Microsoft.Workloads', enabled: true },
 ];
 
 export const csharpGeneratorEnabledProviders = csharpGeneratorProviders.filter(p => p.enabled).map(x => x.namespace);

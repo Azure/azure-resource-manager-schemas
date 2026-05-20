@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Maps resource name",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z][a-zA-Z0-9-]{2,23}$",
@@ -73,6 +73,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -94,7 +95,7 @@
           "type": "string"
         },
         "name": {
-          "description": "discovery source resource",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z][a-zA-Z0-9-]{2,23}$",
@@ -139,6 +140,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -149,11 +151,14 @@
   },
   "definitions": {
     "DiscoverySourceResourceProperties": {
-      "description": "The properties of Discovery Source resource",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "OffAzure discovery source resource properties",
+          "additionalProperties": false,
           "properties": {
+            "sourceId": {
+              "description": "Source ArmId of Discovery Source resource",
+              "type": "string"
+            },
             "sourceType": {
               "enum": [
                 "OffAzure"
@@ -162,29 +167,70 @@
             }
           },
           "required": [
+            "sourceId",
             "sourceType"
           ],
           "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/OffAzureDiscoverySourceResourceProperties"
+                },
+                {
+                  "properties": {
+                    "sourceType": {
+                      "const": "OffAzure"
+                    }
+                  },
+                  "required": [
+                    "sourceType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
-      ],
+      ]
+    },
+    "MapsResourceProperties": {
+      "properties": {},
+      "type": "object"
+    },
+    "OffAzureDiscoverySourceResourceProperties": {
       "properties": {
-        "sourceId": {
-          "description": "Source ArmId of Discovery Source resource",
-          "type": "string"
+        "sourceType": {
+          "description": "Source type of Discovery Source resource.",
+          "oneOf": [
+            {
+              "enum": [
+                "OffAzure"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "required": [
-        "sourceId"
+        "sourceType"
       ],
       "type": "object"
     },
-    "MapsResourceProperties": {
-      "description": "The properties of Maps resource",
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
       "properties": {},
       "type": "object"
     },
     "maps_discoverySources_childResource": {
-      "description": "Microsoft.DependencyMap/maps/discoverySources",
+      "description": "discoverySources",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -197,7 +243,7 @@
           "type": "string"
         },
         "name": {
-          "description": "discovery source resource",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z][a-zA-Z0-9-]{2,23}$",
@@ -242,6 +288,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",

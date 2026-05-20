@@ -1,15 +1,15 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2025-11-01/Microsoft.DurableTask.json#",
-  "title": "Microsoft.DurableTask",
-  "description": "Microsoft DurableTask Resource Types",
+  "id": "https://schema.management.azure.com/schemas/2025-10-03-preview/Microsoft.Monitor.json#",
+  "title": "Microsoft.Monitor",
+  "description": "Microsoft Monitor Resource Types",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "resourceDefinitions": {
-    "schedulers": {
-      "description": "Microsoft.DurableTask/schedulers",
+    "accounts": {
+      "description": "Microsoft.Monitor/accounts",
       "properties": {
         "apiVersion": {
           "enum": [
-            "2025-11-01"
+            "2025-10-03-preview"
           ],
           "type": "string"
         },
@@ -21,7 +21,7 @@
           "description": "The resource name",
           "oneOf": [
             {
-              "pattern": "^[a-zA-Z0-9-]{3,64}$",
+              "pattern": "^(?!-)[a-zA-Z0-9-]+[^-]$",
               "type": "string"
             },
             {
@@ -30,10 +30,10 @@
           ]
         },
         "properties": {
-          "description": "The resource-specific properties for this resource.",
+          "description": "Resource properties",
           "oneOf": [
             {
-              "$ref": "#/definitions/SchedulerProperties"
+              "$ref": "#/definitions/AzureMonitorWorkspace"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -44,10 +44,10 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/schedulers_retentionPolicies_childResource"
+                "$ref": "#/definitions/accounts_issues_childResource"
               },
               {
-                "$ref": "#/definitions/schedulers_taskHubs_childResource"
+                "$ref": "#/definitions/accounts_metricsContainers_childResource"
               }
             ]
           },
@@ -70,7 +70,7 @@
         },
         "type": {
           "enum": [
-            "Microsoft.DurableTask/schedulers"
+            "Microsoft.Monitor/accounts"
           ],
           "type": "string"
         }
@@ -84,12 +84,12 @@
       ],
       "type": "object"
     },
-    "schedulers_retentionPolicies": {
-      "description": "Microsoft.DurableTask/schedulers/retentionPolicies",
+    "accounts_issues": {
+      "description": "Microsoft.Monitor/accounts/issues",
       "properties": {
         "apiVersion": {
           "enum": [
-            "2025-11-01"
+            "2025-10-03-preview"
           ],
           "type": "string"
         },
@@ -97,7 +97,7 @@
           "description": "The resource name",
           "oneOf": [
             {
-              "pattern": "^.*/default$",
+              "pattern": "^(?!-)[a-zA-Z0-9-]+[^-]$",
               "type": "string"
             },
             {
@@ -109,7 +109,7 @@
           "description": "The resource-specific properties for this resource.",
           "oneOf": [
             {
-              "$ref": "#/definitions/RetentionPolicyProperties"
+              "$ref": "#/definitions/IssueProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -118,7 +118,7 @@
         },
         "type": {
           "enum": [
-            "Microsoft.DurableTask/schedulers/retentionPolicies"
+            "Microsoft.Monitor/accounts/issues"
           ],
           "type": "string"
         }
@@ -131,12 +131,12 @@
       ],
       "type": "object"
     },
-    "schedulers_taskHubs": {
-      "description": "Microsoft.DurableTask/schedulers/taskHubs",
+    "accounts_metricsContainers": {
+      "description": "Microsoft.Monitor/accounts/metricsContainers",
       "properties": {
         "apiVersion": {
           "enum": [
-            "2025-11-01"
+            "2025-10-03-preview"
           ],
           "type": "string"
         },
@@ -144,7 +144,7 @@
           "description": "The resource name",
           "oneOf": [
             {
-              "pattern": "^[a-zA-Z0-9-]{3,64}$",
+              "pattern": "^default$",
               "type": "string"
             },
             {
@@ -156,7 +156,7 @@
           "description": "The resource-specific properties for this resource.",
           "oneOf": [
             {
-              "$ref": "#/definitions/TaskHubProperties"
+              "$ref": "#/definitions/MetricsContainer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -165,7 +165,7 @@
         },
         "type": {
           "enum": [
-            "Microsoft.DurableTask/schedulers/taskHubs"
+            "Microsoft.Monitor/accounts/metricsContainers"
           ],
           "type": "string"
         }
@@ -180,16 +180,100 @@
     }
   },
   "definitions": {
-    "RetentionPolicyDetails": {
+    "AzureMonitorWorkspace": {
       "properties": {
-        "orchestrationState": {
-          "description": "The orchestration state to which this policy applies. If omitted, the policy applies to all purgeable orchestration states.",
+        "publicNetworkAccess": {
+          "description": "Gets or sets allow or disallow public network access to Azure Monitor Workspace",
           "oneOf": [
             {
               "enum": [
-                "Completed",
-                "Failed",
-                "Terminated",
+                "Enabled",
+                "Disabled"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "Background": {
+      "properties": {
+        "details": {
+          "description": "The background details",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/BackgroundDetails"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "text": {
+          "description": "The background text",
+          "type": "string"
+        },
+        "type": {
+          "description": "The background type",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "BackgroundDetails": {
+      "properties": {
+        "name": {
+          "description": "The background details name",
+          "type": "string"
+        },
+        "value": {
+          "description": "The background details value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "type": "object"
+    },
+    "IssueProperties": {
+      "properties": {
+        "background": {
+          "description": "The issue background information",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Background"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "impactTime": {
+          "description": "The issue impact time (in UTC)",
+          "type": "string"
+        },
+        "severity": {
+          "description": "The issue severity",
+          "type": "string"
+        },
+        "status": {
+          "description": "The issue status",
+          "oneOf": [
+            {
+              "enum": [
+                "New",
+                "InProgress",
+                "Mitigated",
+                "Closed",
                 "Canceled"
               ],
               "type": "string"
@@ -199,8 +283,54 @@
             }
           ]
         },
-        "retentionPeriodInDays": {
-          "description": "The retention period in days after which the orchestration will be purged automatically",
+        "title": {
+          "description": "The issue title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "impactTime",
+        "severity",
+        "status",
+        "title"
+      ],
+      "type": "object"
+    },
+    "MetricsContainer": {
+      "properties": {
+        "limits": {
+          "description": "Metrics limits.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MetricsLimits"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "version": {
+          "description": "The version of Metrics Query Service that this AMW will use for all metric queries.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "MetricsLimits": {
+      "properties": {
+        "maxActiveTimeSeries": {
+          "description": "Maximum number of active time series allowed on the metrics containers.",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "maxEventsPerMinute": {
+          "description": "Maximum rate (events per minute) that can be processed on the metrics containers.",
           "oneOf": [
             {
               "type": "integer"
@@ -211,100 +341,6 @@
           ]
         }
       },
-      "required": [
-        "retentionPeriodInDays"
-      ],
-      "type": "object"
-    },
-    "RetentionPolicyProperties": {
-      "properties": {
-        "retentionPolicies": {
-          "description": "The orchestration retention policies",
-          "oneOf": [
-            {
-              "items": {
-                "$ref": "#/definitions/RetentionPolicyDetails"
-              },
-              "type": "array"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "type": "object"
-    },
-    "SchedulerProperties": {
-      "properties": {
-        "ipAllowlist": {
-          "description": "IP allow list for durable task scheduler. Values can be IPv4, IPv6 or CIDR",
-          "oneOf": [
-            {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "sku": {
-          "description": "SKU of the durable task scheduler",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/SchedulerSku"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "required": [
-        "ipAllowlist",
-        "sku"
-      ],
-      "type": "object"
-    },
-    "SchedulerSku": {
-      "properties": {
-        "capacity": {
-          "description": "The SKU capacity. This allows scale out/in for the resource and impacts zone redundancy",
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "name": {
-          "description": "The name of the SKU",
-          "oneOf": [
-            {
-              "enum": [
-                "Dedicated",
-                "Consumption"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "type": "object"
-    },
-    "TaskHubProperties": {
-      "properties": {},
       "type": "object"
     },
     "TrackedResourceTags": {
@@ -314,12 +350,12 @@
       "properties": {},
       "type": "object"
     },
-    "schedulers_retentionPolicies_childResource": {
-      "description": "retentionPolicies",
+    "accounts_issues_childResource": {
+      "description": "issues",
       "properties": {
         "apiVersion": {
           "enum": [
-            "2025-11-01"
+            "2025-10-03-preview"
           ],
           "type": "string"
         },
@@ -327,9 +363,7 @@
           "description": "The resource name",
           "oneOf": [
             {
-              "enum": [
-                "default"
-              ],
+              "pattern": "^(?!-)[a-zA-Z0-9-]+[^-]$",
               "type": "string"
             },
             {
@@ -341,7 +375,7 @@
           "description": "The resource-specific properties for this resource.",
           "oneOf": [
             {
-              "$ref": "#/definitions/RetentionPolicyProperties"
+              "$ref": "#/definitions/IssueProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -350,7 +384,7 @@
         },
         "type": {
           "enum": [
-            "retentionPolicies"
+            "issues"
           ],
           "type": "string"
         }
@@ -363,12 +397,12 @@
       ],
       "type": "object"
     },
-    "schedulers_taskHubs_childResource": {
-      "description": "taskHubs",
+    "accounts_metricsContainers_childResource": {
+      "description": "metricsContainers",
       "properties": {
         "apiVersion": {
           "enum": [
-            "2025-11-01"
+            "2025-10-03-preview"
           ],
           "type": "string"
         },
@@ -376,7 +410,7 @@
           "description": "The resource name",
           "oneOf": [
             {
-              "pattern": "^[a-zA-Z0-9-]{3,64}$",
+              "pattern": "^default$",
               "type": "string"
             },
             {
@@ -388,7 +422,7 @@
           "description": "The resource-specific properties for this resource.",
           "oneOf": [
             {
-              "$ref": "#/definitions/TaskHubProperties"
+              "$ref": "#/definitions/MetricsContainer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -397,7 +431,7 @@
         },
         "type": {
           "enum": [
-            "taskHubs"
+            "metricsContainers"
           ],
           "type": "string"
         }

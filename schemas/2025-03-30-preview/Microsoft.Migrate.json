@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2025-12-01-preview/Microsoft.Migrate.Waves.json#",
+  "id": "https://schema.management.azure.com/schemas/2025-03-30-preview/Microsoft.Migrate.json#",
   "title": "Microsoft.Migrate",
   "description": "Microsoft Migrate Resource Types",
   "$schema": "http://json-schema.org/draft-04/schema#",
@@ -9,12 +9,12 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2025-12-01-preview"
+            "2025-03-30-preview"
           ],
           "type": "string"
         },
         "name": {
-          "description": "Migration Entity ARM name",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[^<>&:\\?/#]{1,260}$",
@@ -56,12 +56,12 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2025-12-01-preview"
+            "2025-03-30-preview"
           ],
           "type": "string"
         },
         "name": {
-          "description": "Migration Entity Group ARM name",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[^<>&:\\?/#]{1,260}$",
@@ -103,12 +103,12 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2025-12-01-preview"
+            "2025-03-30-preview"
           ],
           "type": "string"
         },
         "name": {
-          "description": "Task ARM name",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[^<>&:\\?/#]{1,260}$",
@@ -150,12 +150,12 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2025-12-01-preview"
+            "2025-03-30-preview"
           ],
           "type": "string"
         },
         "name": {
-          "description": "Migration Wave Resource",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[^<>&:\\?/#]{1,260}$",
@@ -195,7 +195,6 @@
   },
   "definitions": {
     "Arg": {
-      "description": "ARG query and other details to create workloads within a wave.",
       "properties": {
         "query": {
           "description": "The query to create workloads within the wave.",
@@ -208,14 +207,13 @@
       "type": "object"
     },
     "MigrationEntityGroupProperties": {
-      "description": "Migration Entity Group Properties class.",
       "properties": {
         "applicationDisplayName": {
           "description": "Display Name of the Workload.",
           "type": "string"
         },
         "applicationId": {
-          "description": "Application id ",
+          "description": "Application id",
           "type": "string"
         },
         "associatedAssessmentId": {
@@ -242,13 +240,12 @@
         }
       },
       "required": [
-        "applicationId",
-        "applicationDisplayName"
+        "applicationDisplayName",
+        "applicationId"
       ],
       "type": "object"
     },
     "MigrationEntityProperties": {
-      "description": "Migration Entity Properties class.",
       "properties": {
         "assessedEntityArmId": {
           "description": "Assessed Entity ARM Id",
@@ -259,7 +256,7 @@
           "type": "string"
         },
         "associatedInventoryResourceId": {
-          "description": "inventory resource id ",
+          "description": "inventory resource id",
           "type": "string"
         },
         "associatedMigrationEntityGroupIds": {
@@ -323,19 +320,10 @@
       "type": "object"
     },
     "MigrationSpecificPropertiesBase": {
-      "description": "The base Migration Specific Properties model.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Represents a Server Migration Specific properties base model.",
+          "additionalProperties": false,
           "properties": {
-            "currentJobId": {
-              "description": "A type definition that refers the id to an Azure Resource Manager resource.",
-              "type": "string"
-            },
-            "drApplianceInventoryId": {
-              "description": "A type definition that refers the id to an Azure Resource Manager resource.",
-              "type": "string"
-            },
             "instanceType": {
               "enum": [
                 "ServerMigration"
@@ -347,20 +335,69 @@
             "instanceType"
           ],
           "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ServerMigrationSpecificProperties"
+                },
+                {
+                  "properties": {
+                    "instanceType": {
+                      "const": "ServerMigration"
+                    }
+                  },
+                  "required": [
+                    "instanceType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
+      ]
+    },
+    "ServerMigrationSpecificProperties": {
+      "properties": {
+        "currentJobId": {
+          "description": "A type definition that refers the id to an Azure Resource Manager resource.",
+          "type": "string"
+        },
+        "drApplianceInventoryId": {
+          "description": "A type definition that refers the id to an Azure Resource Manager resource.",
+          "type": "string"
+        },
+        "instanceType": {
+          "description": "Discriminator for migration specific properties.",
+          "oneOf": [
+            {
+              "enum": [
+                "ServerMigration"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "instanceType"
       ],
-      "properties": {},
       "type": "object"
     },
     "TaskProperties": {
-      "description": "Task Properties class.",
       "properties": {
         "description": {
           "description": "Task Description",
           "type": "string"
         },
         "displayName": {
-          "description": "Task Dislay Name ",
+          "description": "Task Dislay Name",
           "type": "string"
         },
         "scope": {
@@ -393,15 +430,14 @@
         }
       },
       "required": [
-        "scopeId",
         "displayName",
-        "status",
-        "scope"
+        "scope",
+        "scopeId",
+        "status"
       ],
       "type": "object"
     },
     "WaveProperties": {
-      "description": "Migration Wave Properties class.",
       "properties": {
         "arg": {
           "description": "ARG query and other details to create workloads within a wave",
@@ -424,18 +460,16 @@
         },
         "plannedCompletionDate": {
           "description": "Planned completion date of the wave.",
-          "format": "date-time",
           "type": "string"
         },
         "plannedStartDate": {
           "description": "Planned start date of the wave.",
-          "format": "date-time",
           "type": "string"
         }
       },
       "required": [
-        "displayName",
         "arg",
+        "displayName",
         "plannedStartDate"
       ],
       "type": "object"

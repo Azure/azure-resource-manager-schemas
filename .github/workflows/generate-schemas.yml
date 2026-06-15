@@ -9,13 +9,53 @@ on:
         description: 'Git ref or full SHA for https://github.com/Azure/azure-rest-api-specs.'
         required: true
         default: 'main'
+      bicep_types_az_ref:
+        description: 'Optional bicep-types-az commit SHA to pin. If empty, pins to latest default branch HEAD.'
+        required: false
+        default: ''
 
 env:
   # This must be kept in sync with the arguments passed to the "batch" matrix
   BATCH_COUNT: 20
 
 jobs:
+  pin:
+    name: Pin bicep-types-az
+    runs-on: ubuntu-22.04 #Pinning the image to a specific version due to an issue with ICU packages in the latest image https://github.com/actions/runner-images/issues/10989
+    outputs:
+      new_sha: ${{ steps.resolve.outputs.new_sha }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Resolve target SHA
+        id: resolve
+        run: |
+          set -e
+          old_sha=$(git ls-tree HEAD bicep-types-az | awk '{print $3}')
+          input='${{ github.event.inputs.bicep_types_az_ref }}'
+          if [ -n "$input" ]; then
+            new_sha=$(git ls-remote https://github.com/Azure/bicep-types-az "$input" | cut -f1)
+            # Fall back to treating the input as a raw SHA if ls-remote returns nothing.
+            [ -z "$new_sha" ] && new_sha="$input"
+            echo "Using requested ref '$input' -> $new_sha"
+          else
+            new_sha=$(git ls-remote https://github.com/Azure/bicep-types-az HEAD | cut -f1)
+            echo "No ref provided; using latest default branch HEAD -> $new_sha"
+          fi
+          echo "new_sha=$new_sha" >> "$GITHUB_OUTPUT"
+          {
+            echo "## bicep-types-az pin"
+            echo "| | commit |"
+            echo "|---|---|"
+            echo "| before | \`$old_sha\` |"
+            echo "| after  | \`$new_sha\` |"
+            echo ""
+            echo "Compare: https://github.com/Azure/bicep-types-az/compare/$old_sha...$new_sha"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
   generate:
+    needs: pin
     name: Update Schemas Batch ${{ matrix.batch }}
     runs-on: ubuntu-22.04 #Pinning the image to a specific version due to an issue with ICU packages in the latest image https://github.com/actions/runner-images/issues/10989
     strategy:
@@ -27,6 +67,13 @@ jobs:
         uses: actions/checkout@v6
         with: 
           submodules: recursive
+
+      - name: Pin bicep-types-az to resolved SHA
+        run: |
+          set -e
+          git -C bicep-types-az fetch origin '${{ needs.pin.outputs.new_sha }}'
+          git -C bicep-types-az checkout '${{ needs.pin.outputs.new_sha }}'
+          git -C bicep-types-az submodule update --init --recursive
 
       - name: Clone azure-rest-api-specs
         uses: actions/checkout@v6
@@ -97,7 +144,7 @@ jobs:
           if-no-files-found: error
 
   combine:
-    needs: generate
+    needs: [pin, generate]
     name: Combine Schema Batches
     permissions:
       contents: write
@@ -131,6 +178,9 @@ jobs:
         run: |
           npm run list-resources
         working-directory: generator
+
+      - name: Stage bumped bicep-types-az pointer
+        run: git update-index --cacheinfo 160000,${{ needs.pin.outputs.new_sha }},bicep-types-az
 
       - name: Push to autogenerate-batch branch
         uses: stefanzweifel/git-auto-commit-action@v7

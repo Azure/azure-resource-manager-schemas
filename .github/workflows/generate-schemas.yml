@@ -152,6 +152,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v6
+        with:
+          submodules: recursive
 
       - name: Download batch results
         uses: actions/download-artifact@v8
@@ -179,8 +181,12 @@ jobs:
           npm run list-resources
         working-directory: generator
 
-      - name: Stage bumped bicep-types-az pointer
-        run: git update-index --cacheinfo 160000,${{ needs.pin.outputs.new_sha }},bicep-types-az
+      - name: Pin bicep-types-az to resolved SHA
+        run: |
+          set -e
+          git -C bicep-types-az fetch origin '${{ needs.pin.outputs.new_sha }}'
+          git -C bicep-types-az checkout '${{ needs.pin.outputs.new_sha }}'
+          git -C bicep-types-az submodule update --init --recursive
 
       - name: Push to autogenerate-batch branch
         uses: stefanzweifel/git-auto-commit-action@v7

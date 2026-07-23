@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2024-02-01/Microsoft.Cache.Enterprise.json#",
+  "id": "https://schema.management.azure.com/schemas/2020-10-01-preview/Microsoft.Cache.json#",
   "title": "Microsoft.Cache",
   "description": "Microsoft Cache Resource Types",
   "$schema": "http://json-schema.org/draft-04/schema#",
@@ -9,27 +9,16 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2024-02-01"
+            "2020-10-01-preview"
           ],
           "type": "string"
-        },
-        "identity": {
-          "description": "The identity of the resource.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ManagedServiceIdentity"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
         },
         "location": {
           "description": "The geo-location where the resource lives",
           "type": "string"
         },
         "name": {
-          "description": "The name of the RedisEnterprise cluster.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -89,7 +78,7 @@
           "type": "string"
         },
         "zones": {
-          "description": "The Availability Zones where this cluster will be deployed.",
+          "description": "The zones where this cluster will be deployed.",
           "oneOf": [
             {
               "items": {
@@ -104,7 +93,9 @@
         }
       },
       "required": [
+        "location",
         "name",
+        "sku",
         "properties",
         "apiVersion",
         "type"
@@ -116,12 +107,12 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2024-02-01"
+            "2020-10-01-preview"
           ],
           "type": "string"
         },
         "name": {
-          "description": "The name of the database.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -155,12 +146,12 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2024-02-01"
+            "2020-10-01-preview"
           ],
           "type": "string"
         },
         "name": {
-          "description": "The name of the private endpoint connection associated with the Azure resource",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -192,103 +183,15 @@
   },
   "definitions": {
     "ClusterProperties": {
-      "description": "Properties of RedisEnterprise clusters, as opposed to general resource properties like location, tags",
       "properties": {
-        "encryption": {
-          "description": "Encryption-at-rest configuration for the cluster.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ClusterPropertiesEncryption"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
         "minimumTlsVersion": {
           "description": "The minimum TLS version for the cluster to support, e.g. '1.2'",
-          "oneOf": [
-            {
-              "enum": [
-                "1.0",
-                "1.1",
-                "1.2"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "type": "object"
-    },
-    "ClusterPropertiesEncryption": {
-      "description": "Encryption-at-rest configuration for the cluster.",
-      "properties": {
-        "customerManagedKeyEncryption": {
-          "description": "All Customer-managed key encryption properties for the resource. Set this to an empty object to use Microsoft-managed key encryption.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ClusterPropertiesEncryptionCustomerManagedKeyEncryption"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "type": "object"
-    },
-    "ClusterPropertiesEncryptionCustomerManagedKeyEncryption": {
-      "description": "All Customer-managed key encryption properties for the resource. Set this to an empty object to use Microsoft-managed key encryption.",
-      "properties": {
-        "keyEncryptionKeyIdentity": {
-          "description": "All identity configuration for Customer-managed key settings defining which identity should be used to auth to Key Vault.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ClusterPropertiesEncryptionCustomerManagedKeyEncryptionKeyIdentity"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "keyEncryptionKeyUrl": {
-          "description": "Key encryption key Url, versioned only. Ex: https://contosovault.vault.azure.net/keys/contosokek/562a4bb76b524a1493a6afe8e536ee78",
-          "type": "string"
-        }
-      },
-      "type": "object"
-    },
-    "ClusterPropertiesEncryptionCustomerManagedKeyEncryptionKeyIdentity": {
-      "description": "All identity configuration for Customer-managed key settings defining which identity should be used to auth to Key Vault.",
-      "properties": {
-        "identityType": {
-          "description": "Only userAssignedIdentity is supported in this API version; other types may be supported in the future",
-          "oneOf": [
-            {
-              "enum": [
-                "systemAssignedIdentity",
-                "userAssignedIdentity"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "userAssignedIdentityResourceId": {
-          "description": "User assigned identity to use for accessing key encryption key Url. Ex: /subscriptions/<sub uuid>/resourceGroups/<resource group>/providers/Microsoft.ManagedIdentity/userAssignedIdentities/myId.",
           "type": "string"
         }
       },
       "type": "object"
     },
     "DatabaseProperties": {
-      "description": "Properties of RedisEnterprise databases, as opposed to general resource properties like location, tags",
       "properties": {
         "clientProtocol": {
           "description": "Specifies whether redis clients can connect using TLS-encrypted or plaintext redis protocols. Default is TLS-encrypted.",
@@ -341,17 +244,6 @@
             }
           ]
         },
-        "geoReplication": {
-          "description": "Optional set of properties to configure geo replication for this database.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/DatabasePropertiesGeoReplication"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
         "modules": {
           "description": "Optional set of redis modules to enable in this database - modules can only be added at creation time.",
           "oneOf": [
@@ -360,17 +252,6 @@
                 "$ref": "#/definitions/Module"
               },
               "type": "array"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "persistence": {
-          "description": "Persistence settings",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/Persistence"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -391,86 +272,10 @@
       },
       "type": "object"
     },
-    "DatabasePropertiesGeoReplication": {
-      "description": "Optional set of properties to configure geo replication for this database.",
-      "properties": {
-        "groupNickname": {
-          "description": "Name for the group of linked database resources",
-          "type": "string"
-        },
-        "linkedDatabases": {
-          "description": "List of database resources to link with this database",
-          "oneOf": [
-            {
-              "items": {
-                "$ref": "#/definitions/LinkedDatabase"
-              },
-              "type": "array"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "type": "object"
-    },
-    "LinkedDatabase": {
-      "description": "Specifies details of a linked database resource.",
-      "properties": {
-        "id": {
-          "description": "Resource ID of a database resource to link with this database.",
-          "type": "string"
-        }
-      },
-      "type": "object"
-    },
-    "ManagedServiceIdentity": {
-      "description": "Managed service identity (system assigned and/or user assigned identities)",
-      "properties": {
-        "type": {
-          "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).",
-          "oneOf": [
-            {
-              "enum": [
-                "None",
-                "SystemAssigned",
-                "UserAssigned",
-                "SystemAssigned, UserAssigned"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "userAssignedIdentities": {
-          "description": "The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.",
-          "oneOf": [
-            {
-              "additionalProperties": {
-                "$ref": "#/definitions/UserAssignedIdentity"
-              },
-              "properties": {},
-              "type": "object"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "required": [
-        "type"
-      ],
-      "type": "object"
-    },
     "Module": {
-      "description": "Specifies configuration of a redis module",
       "properties": {
         "args": {
-          "description": "Configuration options for the module, e.g. 'ERROR_RATE 0.01 INITIAL_SIZE 400'.",
+          "description": "Configuration options for the module, e.g. 'ERROR_RATE 0.00 INITIAL_SIZE 400'.",
           "type": "string"
         },
         "name": {
@@ -483,72 +288,11 @@
       ],
       "type": "object"
     },
-    "Persistence": {
-      "description": "Persistence-related configuration for the RedisEnterprise database",
-      "properties": {
-        "aofEnabled": {
-          "description": "Sets whether AOF is enabled.",
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "aofFrequency": {
-          "description": "Sets the frequency at which data is written to disk.",
-          "oneOf": [
-            {
-              "enum": [
-                "1s",
-                "always"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "rdbEnabled": {
-          "description": "Sets whether RDB is enabled.",
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "rdbFrequency": {
-          "description": "Sets the frequency at which a snapshot of the database is created.",
-          "oneOf": [
-            {
-              "enum": [
-                "1h",
-                "6h",
-                "12h"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "type": "object"
-    },
     "PrivateEndpoint": {
-      "description": "The Private Endpoint resource.",
       "properties": {},
       "type": "object"
     },
     "PrivateEndpointConnectionProperties": {
-      "description": "Properties of the PrivateEndpointConnectProperties.",
       "properties": {
         "privateEndpoint": {
           "description": "The resource of private end point.",
@@ -579,7 +323,6 @@
       "type": "object"
     },
     "PrivateLinkServiceConnectionState": {
-      "description": "A collection of information about the state of the connection between service consumer and provider.",
       "properties": {
         "actionsRequired": {
           "description": "A message indicating if changes on the service provider require any updates on the consumer.",
@@ -609,7 +352,6 @@
       "type": "object"
     },
     "Sku": {
-      "description": "SKU parameters supplied to the create RedisEnterprise operation.",
       "properties": {
         "capacity": {
           "description": "The size of the RedisEnterprise cluster. Defaults to 2 or 3 depending on SKU. Valid values are (2, 4, 6, ...) for Enterprise SKUs and (3, 9, 15, ...) for Flash SKUs.",
@@ -627,7 +369,6 @@
           "oneOf": [
             {
               "enum": [
-                "Enterprise_E5",
                 "Enterprise_E10",
                 "Enterprise_E20",
                 "Enterprise_E50",
@@ -649,22 +390,24 @@
       ],
       "type": "object"
     },
-    "UserAssignedIdentity": {
-      "description": "User assigned identity properties",
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
       "properties": {},
       "type": "object"
     },
     "redisEnterprise_databases_childResource": {
-      "description": "Microsoft.Cache/redisEnterprise/databases",
+      "description": "databases",
       "properties": {
         "apiVersion": {
           "enum": [
-            "2024-02-01"
+            "2020-10-01-preview"
           ],
           "type": "string"
         },
         "name": {
-          "description": "The name of the database.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -694,16 +437,16 @@
       "type": "object"
     },
     "redisEnterprise_privateEndpointConnections_childResource": {
-      "description": "Microsoft.Cache/redisEnterprise/privateEndpointConnections",
+      "description": "privateEndpointConnections",
       "properties": {
         "apiVersion": {
           "enum": [
-            "2024-02-01"
+            "2020-10-01-preview"
           ],
           "type": "string"
         },
         "name": {
-          "description": "The name of the private endpoint connection associated with the Azure resource",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {

@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2026-02-01-preview/Microsoft.Cache.Enterprise.json#",
+  "id": "https://schema.management.azure.com/schemas/2025-04-01/Microsoft.Cache.json#",
   "title": "Microsoft.Cache",
   "description": "Microsoft Cache Resource Types",
   "$schema": "http://json-schema.org/draft-04/schema#",
@@ -9,12 +9,12 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2026-02-01-preview"
+            "2025-04-01"
           ],
           "type": "string"
         },
         "identity": {
-          "description": "The managed service identities assigned to this resource.",
+          "description": "The identity of the resource.",
           "oneOf": [
             {
               "$ref": "#/definitions/ManagedServiceIdentity"
@@ -29,7 +29,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Redis Enterprise cluster. Name must be 1-60 characters long. Allowed characters(A-Z, a-z, 0-9) and hyphen(-). There can be no leading nor trailing nor consecutive hyphens",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^(?=.{1,60}$)[A-Za-z0-9]+(-[A-Za-z0-9]+)*$",
@@ -44,7 +44,7 @@
           "description": "Other properties of the cluster.",
           "oneOf": [
             {
-              "$ref": "#/definitions/ClusterCreateProperties"
+              "$ref": "#/definitions/ClusterProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -56,9 +56,6 @@
             "oneOf": [
               {
                 "$ref": "#/definitions/redisEnterprise_databases_childResource"
-              },
-              {
-                "$ref": "#/definitions/redisEnterprise_migrations_childResource"
               },
               {
                 "$ref": "#/definitions/redisEnterprise_privateEndpointConnections_childResource"
@@ -100,7 +97,7 @@
           "type": "string"
         },
         "zones": {
-          "description": "The availability zones.",
+          "description": "The Availability Zones where this cluster will be deployed.",
           "oneOf": [
             {
               "items": {
@@ -115,7 +112,9 @@
         }
       },
       "required": [
+        "location",
         "name",
+        "sku",
         "properties",
         "apiVersion",
         "type"
@@ -127,12 +126,12 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2026-02-01-preview"
+            "2025-04-01"
           ],
           "type": "string"
         },
         "name": {
-          "description": "The name of the Redis Enterprise database.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^(?=.{1,60}$)[A-Za-z0-9]+(-[A-Za-z0-9]+)*$",
@@ -147,7 +146,7 @@
           "description": "Other properties of the database.",
           "oneOf": [
             {
-              "$ref": "#/definitions/DatabaseCreateProperties"
+              "$ref": "#/definitions/DatabaseProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -184,12 +183,12 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2026-02-01-preview"
+            "2025-04-01"
           ],
           "type": "string"
         },
         "name": {
-          "description": "The name of the Redis Enterprise database access policy assignment.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[A-Za-z0-9]{1,60}$",
@@ -226,63 +225,17 @@
       ],
       "type": "object"
     },
-    "redisEnterprise_migrations": {
-      "description": "Microsoft.Cache/redisEnterprise/migrations",
-      "properties": {
-        "apiVersion": {
-          "enum": [
-            "2026-02-01-preview"
-          ],
-          "type": "string"
-        },
-        "name": {
-          "oneOf": [
-            {
-              "pattern": "^.*/default$",
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "properties": {
-          "description": "Properties of the migration operation.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/MigrationProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.Cache/redisEnterprise/migrations"
-          ],
-          "type": "string"
-        }
-      },
-      "required": [
-        "name",
-        "properties",
-        "apiVersion",
-        "type"
-      ],
-      "type": "object"
-    },
     "redisEnterprise_privateEndpointConnections": {
       "description": "Microsoft.Cache/redisEnterprise/privateEndpointConnections",
       "properties": {
         "apiVersion": {
           "enum": [
-            "2026-02-01-preview"
+            "2025-04-01"
           ],
           "type": "string"
         },
         "name": {
-          "description": "The name of the private endpoint connection associated with the Azure resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -314,7 +267,6 @@
   },
   "definitions": {
     "AccessPolicyAssignmentProperties": {
-      "description": "Properties of Redis Enterprise database access policy assignment.",
       "properties": {
         "accessPolicyName": {
           "description": "Name of access policy under specific access policy assignment. Only \"default\" policy is supported for now.",
@@ -347,7 +299,6 @@
       "type": "object"
     },
     "AccessPolicyAssignmentPropertiesUser": {
-      "description": "The user associated with the access policy.",
       "properties": {
         "objectId": {
           "description": "The object ID of the user.",
@@ -356,8 +307,7 @@
       },
       "type": "object"
     },
-    "ClusterCreateProperties": {
-      "description": "Properties of Redis Enterprise clusters for create operations",
+    "ClusterProperties": {
       "properties": {
         "encryption": {
           "description": "Encryption-at-rest configuration for the cluster.",
@@ -385,17 +335,6 @@
             }
           ]
         },
-        "maintenanceConfiguration": {
-          "description": "Cluster-level maintenance configuration.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/MaintenanceConfiguration"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
         "minimumTlsVersion": {
           "description": "The minimum TLS version for the cluster to support, e.g. '1.2'. Newer versions can be added in the future. Note that TLS 1.0 and TLS 1.1 are now completely obsolete -- you cannot use them. They are mentioned only for the sake of consistency with old API versions.",
           "oneOf": [
@@ -411,30 +350,11 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
-        },
-        "publicNetworkAccess": {
-          "description": "Whether or not public network traffic can access the Redis cluster. Only 'Enabled' or 'Disabled' can be set. null is returned only for clusters created using an old API version which do not have this property and cannot be set.",
-          "oneOf": [
-            {
-              "enum": [
-                "Enabled",
-                "Disabled"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
         }
       },
-      "required": [
-        "publicNetworkAccess"
-      ],
       "type": "object"
     },
     "ClusterPropertiesEncryption": {
-      "description": "Encryption-at-rest configuration for the cluster.",
       "properties": {
         "customerManagedKeyEncryption": {
           "description": "All Customer-managed key encryption properties for the resource. Set this to an empty object to use Microsoft-managed key encryption.",
@@ -451,7 +371,6 @@
       "type": "object"
     },
     "ClusterPropertiesEncryptionCustomerManagedKeyEncryption": {
-      "description": "All Customer-managed key encryption properties for the resource. Set this to an empty object to use Microsoft-managed key encryption.",
       "properties": {
         "keyEncryptionKeyIdentity": {
           "description": "All identity configuration for Customer-managed key settings defining which identity should be used to auth to Key Vault.",
@@ -472,7 +391,6 @@
       "type": "object"
     },
     "ClusterPropertiesEncryptionCustomerManagedKeyEncryptionKeyIdentity": {
-      "description": "All identity configuration for Customer-managed key settings defining which identity should be used to auth to Key Vault.",
       "properties": {
         "identityType": {
           "description": "Only userAssignedIdentity is supported in this API version; other types may be supported in the future",
@@ -496,8 +414,7 @@
       },
       "type": "object"
     },
-    "DatabaseCreateProperties": {
-      "description": "Properties for creating Redis Enterprise databases",
+    "DatabaseProperties": {
       "properties": {
         "accessKeysAuthentication": {
           "description": "This property can be Enabled/Disabled to allow or deny access with the current access keys. Can be updated even after database is created.",
@@ -530,13 +447,12 @@
           ]
         },
         "clusteringPolicy": {
-          "description": "Clustering policy - default is OSSCluster. This property can be updated only if the current value is NoCluster. If the value is OSSCluster or EnterpriseCluster, it cannot be updated without deleting the database.",
+          "description": "Clustering policy - default is OSSCluster. This property must be chosen at create time, and cannot be changed without deleting the database.",
           "oneOf": [
             {
               "enum": [
                 "EnterpriseCluster",
-                "OSSCluster",
-                "NoCluster"
+                "OSSCluster"
               ],
               "type": "string"
             },
@@ -606,10 +522,6 @@
             }
           ]
         },
-        "notifyKeyspaceEvents": {
-          "description": "Specifies which keyspace events should trigger notifications. Default is an empty string, meaning this feature is disabled. When enabled, at least 'K' (keyspace events) or 'E' (keyevent events) must be present. For example, 'AKE' enables all standard events. See https://redis.io/docs/latest/develop/use/keyspace-notifications/ for the complete list of event types.",
-          "type": "string"
-        },
         "persistence": {
           "description": "Persistence settings",
           "oneOf": [
@@ -636,7 +548,6 @@
       "type": "object"
     },
     "DatabasePropertiesGeoReplication": {
-      "description": "Optional set of properties to configure geo replication for this database.",
       "properties": {
         "groupNickname": {
           "description": "Name for the group of linked database resources",
@@ -660,7 +571,6 @@
       "type": "object"
     },
     "LinkedDatabase": {
-      "description": "Specifies details of a linked database resource.",
       "properties": {
         "id": {
           "description": "Resource ID of a database resource to link with this database.",
@@ -669,108 +579,7 @@
       },
       "type": "object"
     },
-    "MaintenanceConfiguration": {
-      "description": "Cluster-level maintenance configuration.",
-      "properties": {
-        "maintenanceWindows": {
-          "description": "Custom maintenance windows that apply to the cluster.",
-          "oneOf": [
-            {
-              "items": {
-                "$ref": "#/definitions/MaintenanceWindow"
-              },
-              "type": "array"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "type": "object"
-    },
-    "MaintenanceWindow": {
-      "description": "A single custom maintenance window.",
-      "properties": {
-        "duration": {
-          "description": "Duration in ISO-8601 format, for example 'PT5H'.",
-          "type": "string"
-        },
-        "schedule": {
-          "description": "Recurring schedule for the maintenance window.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/MaintenanceWindowSchedule"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "startHourUtc": {
-          "description": "Start hour (0-23) in UTC when the maintenance window begins.",
-          "oneOf": [
-            {
-              "maximum": 23,
-              "minimum": 0,
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "type": {
-          "description": "Maintenance window type.",
-          "oneOf": [
-            {
-              "enum": [
-                "Weekly"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "required": [
-        "type",
-        "duration",
-        "startHourUtc",
-        "schedule"
-      ],
-      "type": "object"
-    },
-    "MaintenanceWindowSchedule": {
-      "description": "Schedule details for a maintenance window.",
-      "properties": {
-        "dayOfWeek": {
-          "description": "Day of week. Required when the maintenance window type is 'Weekly'.",
-          "oneOf": [
-            {
-              "enum": [
-                "Sunday",
-                "Monday",
-                "Tuesday",
-                "Wednesday",
-                "Thursday",
-                "Friday",
-                "Saturday"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "type": "object"
-    },
     "ManagedServiceIdentity": {
-      "description": "Managed service identity (system assigned and/or user assigned identities)",
       "properties": {
         "type": {
           "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).",
@@ -810,70 +619,7 @@
       ],
       "type": "object"
     },
-    "MigrationProperties": {
-      "description": "Properties for Redis Enterprise migration operation.",
-      "oneOf": [
-        {
-          "description": "Properties for Redis Enterprise migration operation for Azure Cache for Redis.",
-          "properties": {
-            "forceMigrate": {
-              "description": "Sets whether to ignore warnings when performing validation of the migration request. If this property is true, warning-level disparities between the source and target resources will be ignored, and the request will only fail validation if there are error-level disparities. The default value is false.",
-              "oneOf": [
-                {
-                  "type": "boolean"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "skipDataMigration": {
-              "description": "Sets whether the data is migrated from source to target or not. This property must be true during the preview.",
-              "oneOf": [
-                {
-                  "type": "boolean"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "sourceResourceId": {
-              "description": "The source resource ID to migrate from. This is the resource ID of the Azure Cache for Redis.",
-              "type": "string"
-            },
-            "sourceType": {
-              "enum": [
-                "AzureCacheForRedis"
-              ],
-              "type": "string"
-            },
-            "switchDns": {
-              "description": "Sets whether the DNS is switched automatically after the data is transferred from the source cache to the target cache. This property must be true during the preview.",
-              "oneOf": [
-                {
-                  "type": "boolean"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            }
-          },
-          "required": [
-            "sourceResourceId",
-            "switchDns",
-            "skipDataMigration",
-            "sourceType"
-          ],
-          "type": "object"
-        }
-      ],
-      "properties": {},
-      "type": "object"
-    },
     "Module": {
-      "description": "Specifies configuration of a redis module",
       "properties": {
         "args": {
           "description": "Configuration options for the module, e.g. 'ERROR_RATE 0.01 INITIAL_SIZE 400'.",
@@ -890,7 +636,6 @@
       "type": "object"
     },
     "Persistence": {
-      "description": "Persistence-related configuration for the Redis Enterprise database",
       "properties": {
         "aofEnabled": {
           "description": "Sets whether AOF is enabled. Note that at most one of AOF or RDB persistence may be enabled.",
@@ -949,15 +694,13 @@
       "type": "object"
     },
     "PrivateEndpoint": {
-      "description": "The private endpoint resource.",
       "properties": {},
       "type": "object"
     },
     "PrivateEndpointConnectionProperties": {
-      "description": "Properties of the private endpoint connection.",
       "properties": {
         "privateEndpoint": {
-          "description": "The private endpoint resource.",
+          "description": "The resource of private end point.",
           "oneOf": [
             {
               "$ref": "#/definitions/PrivateEndpoint"
@@ -985,7 +728,6 @@
       "type": "object"
     },
     "PrivateLinkServiceConnectionState": {
-      "description": "A collection of information about the state of the connection between service consumer and provider.",
       "properties": {
         "actionsRequired": {
           "description": "A message indicating if changes on the service provider require any updates on the consumer.",
@@ -1015,7 +757,6 @@
       "type": "object"
     },
     "Sku": {
-      "description": "SKU parameters supplied to the create Redis Enterprise cluster operation.",
       "properties": {
         "capacity": {
           "description": "This property is only used with Enterprise and EnterpriseFlash SKUs. Determines the size of the cluster. Valid values are (2, 4, 6, ...) for Enterprise SKUs and (3, 9, 15, ...) for EnterpriseFlash SKUs.",
@@ -1102,22 +843,35 @@
       ],
       "type": "object"
     },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "UserAssignedIdentities": {
+      "additionalProperties": {
+        "$ref": "#/definitions/UserAssignedIdentity"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "UserAssignedIdentity": {
-      "description": "User assigned identity properties",
       "properties": {},
       "type": "object"
     },
     "redisEnterprise_databases_accessPolicyAssignments_childResource": {
-      "description": "Microsoft.Cache/redisEnterprise/databases/accessPolicyAssignments",
+      "description": "accessPolicyAssignments",
       "properties": {
         "apiVersion": {
           "enum": [
-            "2026-02-01-preview"
+            "2025-04-01"
           ],
           "type": "string"
         },
         "name": {
-          "description": "The name of the Redis Enterprise database access policy assignment.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[A-Za-z0-9]{1,60}$",
@@ -1155,16 +909,16 @@
       "type": "object"
     },
     "redisEnterprise_databases_childResource": {
-      "description": "Microsoft.Cache/redisEnterprise/databases",
+      "description": "databases",
       "properties": {
         "apiVersion": {
           "enum": [
-            "2026-02-01-preview"
+            "2025-04-01"
           ],
           "type": "string"
         },
         "name": {
-          "description": "The name of the Redis Enterprise database.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^(?=.{1,60}$)[A-Za-z0-9]+(-[A-Za-z0-9]+)*$",
@@ -1179,7 +933,7 @@
           "description": "Other properties of the database.",
           "oneOf": [
             {
-              "$ref": "#/definitions/DatabaseCreateProperties"
+              "$ref": "#/definitions/DatabaseProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -1201,65 +955,17 @@
       ],
       "type": "object"
     },
-    "redisEnterprise_migrations_childResource": {
-      "description": "Microsoft.Cache/redisEnterprise/migrations",
-      "properties": {
-        "apiVersion": {
-          "enum": [
-            "2026-02-01-preview"
-          ],
-          "type": "string"
-        },
-        "name": {
-          "oneOf": [
-            {
-              "enum": [
-                "default"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "properties": {
-          "description": "Properties of the migration operation.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/MigrationProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "type": {
-          "enum": [
-            "migrations"
-          ],
-          "type": "string"
-        }
-      },
-      "required": [
-        "name",
-        "properties",
-        "apiVersion",
-        "type"
-      ],
-      "type": "object"
-    },
     "redisEnterprise_privateEndpointConnections_childResource": {
-      "description": "Microsoft.Cache/redisEnterprise/privateEndpointConnections",
+      "description": "privateEndpointConnections",
       "properties": {
         "apiVersion": {
           "enum": [
-            "2026-02-01-preview"
+            "2025-04-01"
           ],
           "type": "string"
         },
         "name": {
-          "description": "The name of the private endpoint connection associated with the Azure resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {

@@ -29,7 +29,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of Azure Machine Learning workspace.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -108,7 +108,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the Azure Machine Learning compute.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -154,8 +154,40 @@
     }
   },
   "definitions": {
+    "AKS": {
+      "properties": {
+        "computeType": {
+          "description": "The type of compute",
+          "oneOf": [
+            {
+              "enum": [
+                "AKS"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "description": "AKS properties",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AKSProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "computeType"
+      ],
+      "type": "object"
+    },
     "AKSProperties": {
-      "description": "AKS properties",
       "properties": {
         "agentCount": {
           "description": "Number of agents",
@@ -205,8 +237,40 @@
       },
       "type": "object"
     },
+    "BatchAI": {
+      "properties": {
+        "computeType": {
+          "description": "The type of compute",
+          "oneOf": [
+            {
+              "enum": [
+                "BatchAI"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "description": "BatchAI properties",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BatchAIProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "computeType"
+      ],
+      "type": "object"
+    },
     "BatchAIProperties": {
-      "description": "BatchAI properties",
       "properties": {
         "scaleSettings": {
           "description": "Scale settings for BatchAI",
@@ -231,27 +295,31 @@
       "type": "object"
     },
     "Compute": {
-      "description": "Machine Learning compute object.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "A Machine Learning compute based on AKS.",
+          "additionalProperties": false,
           "properties": {
+            "computeLocation": {
+              "description": "Location for the underlying compute",
+              "type": "string"
+            },
             "computeType": {
               "enum": [
-                "AKS"
+                "AKS",
+                "BatchAI",
+                "DataFactory",
+                "HDInsight",
+                "VirtualMachine"
               ],
               "type": "string"
             },
-            "properties": {
-              "description": "AKS properties",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/AKSProperties"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            "description": {
+              "description": "The description of the Machine Learning compute.",
+              "type": "string"
+            },
+            "resourceId": {
+              "description": "ARM resource id of the compute",
+              "type": "string"
             }
           },
           "required": [
@@ -260,111 +328,153 @@
           "type": "object"
         },
         {
-          "description": "A Machine Learning compute based on Azure BatchAI.",
-          "properties": {
-            "computeType": {
-              "enum": [
-                "BatchAI"
-              ],
-              "type": "string"
-            },
-            "properties": {
-              "description": "BatchAI properties",
-              "oneOf": [
+          "oneOf": [
+            {
+              "allOf": [
                 {
-                  "$ref": "#/definitions/BatchAIProperties"
+                  "$ref": "#/definitions/AKS"
                 },
                 {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                  "properties": {
+                    "computeType": {
+                      "const": "AKS"
+                    }
+                  },
+                  "required": [
+                    "computeType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/BatchAI"
+                },
+                {
+                  "properties": {
+                    "computeType": {
+                      "const": "BatchAI"
+                    }
+                  },
+                  "required": [
+                    "computeType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DataFactory"
+                },
+                {
+                  "properties": {
+                    "computeType": {
+                      "const": "DataFactory"
+                    }
+                  },
+                  "required": [
+                    "computeType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/HDInsight"
+                },
+                {
+                  "properties": {
+                    "computeType": {
+                      "const": "HDInsight"
+                    }
+                  },
+                  "required": [
+                    "computeType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/VirtualMachine"
+                },
+                {
+                  "properties": {
+                    "computeType": {
+                      "const": "VirtualMachine"
+                    }
+                  },
+                  "required": [
+                    "computeType"
+                  ],
+                  "type": "object"
                 }
               ]
             }
-          },
-          "required": [
-            "computeType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "A DataFactory compute.",
-          "properties": {
-            "computeType": {
+          ]
+        }
+      ]
+    },
+    "DataFactory": {
+      "properties": {
+        "computeType": {
+          "description": "The type of compute",
+          "oneOf": [
+            {
               "enum": [
                 "DataFactory"
               ],
               "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "computeType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "A HDInsight compute.",
-          "properties": {
-            "computeType": {
+          ]
+        }
+      },
+      "required": [
+        "computeType"
+      ],
+      "type": "object"
+    },
+    "HDInsight": {
+      "properties": {
+        "computeType": {
+          "description": "The type of compute",
+          "oneOf": [
+            {
               "enum": [
                 "HDInsight"
               ],
               "type": "string"
             },
-            "properties": {
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/HDInsightProperties"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "computeType"
-          ],
-          "type": "object"
+          ]
         },
-        {
-          "description": "A Machine Learning compute based on Azure Virtual Machines.",
-          "properties": {
-            "computeType": {
-              "enum": [
-                "VirtualMachine"
-              ],
-              "type": "string"
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/HDInsightProperties"
             },
-            "properties": {
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/VirtualMachineProperties"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "computeType"
-          ],
-          "type": "object"
-        }
-      ],
-      "properties": {
-        "computeLocation": {
-          "description": "Location for the underlying compute",
-          "type": "string"
-        },
-        "description": {
-          "description": "The description of the Machine Learning compute.",
-          "type": "string"
-        },
-        "resourceId": {
-          "description": "ARM resource id of the compute",
-          "type": "string"
+          ]
         }
       },
+      "required": [
+        "computeType"
+      ],
       "type": "object"
     },
     "HDInsightProperties": {
@@ -399,7 +509,6 @@
       "type": "object"
     },
     "Identity": {
-      "description": "Identity for the resource.",
       "properties": {
         "type": {
           "description": "The identity type.",
@@ -418,8 +527,14 @@
       },
       "type": "object"
     },
+    "ResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "ScaleSettings": {
-      "description": "scale settings for BatchAI Compute",
       "properties": {
         "autoScaleEnabled": {
           "description": "Enable or disable auto scale",
@@ -458,7 +573,6 @@
       "type": "object"
     },
     "SslConfiguration": {
-      "description": "The SSL configuration for scoring",
       "properties": {
         "cert": {
           "description": "Cert data",
@@ -491,8 +605,39 @@
       "type": "object"
     },
     "SystemService": {
-      "description": "A system service running on a compute.",
       "properties": {},
+      "type": "object"
+    },
+    "VirtualMachine": {
+      "properties": {
+        "computeType": {
+          "description": "The type of compute",
+          "oneOf": [
+            {
+              "enum": [
+                "VirtualMachine"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/VirtualMachineProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "computeType"
+      ],
       "type": "object"
     },
     "VirtualMachineProperties": {
@@ -531,7 +676,6 @@
       "type": "object"
     },
     "VirtualMachineSshCredentials": {
-      "description": "Admin credentials for virtual machine",
       "properties": {
         "password": {
           "description": "Password of admin account",
@@ -553,7 +697,6 @@
       "type": "object"
     },
     "WorkspaceProperties": {
-      "description": "The properties of a machine learning workspace.",
       "properties": {
         "applicationInsights": {
           "description": "ARM id of the application insights associated with this workspace. This cannot be changed once the workspace has been created",
@@ -591,7 +734,7 @@
       "type": "object"
     },
     "workspaces_computes_childResource": {
-      "description": "Microsoft.MachineLearningServices/workspaces/computes",
+      "description": "computes",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -615,7 +758,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the Azure Machine Learning compute.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {

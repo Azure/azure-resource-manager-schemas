@@ -84,6 +84,23 @@
     }
   },
   "definitions": {
+    "AmwAccount": {
+      "properties": {
+        "identity": {
+          "description": "The ARM resource ID of the managed identity with access to the source account.",
+          "type": "string"
+        },
+        "resourceId": {
+          "description": "The ARM resource ID of the account where metrics are emitted.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "identity",
+        "resourceId"
+      ],
+      "type": "object"
+    },
     "AzureMonitorWorkspaceLogsApiConfig": {
       "properties": {
         "dataCollectionEndpointUrl": {
@@ -208,6 +225,76 @@
       "required": [
         "name",
         "type"
+      ],
+      "type": "object"
+    },
+    "Baseline": {
+      "properties": {
+        "evaluationCalculationType": {
+          "description": "Specifies how evaluation is calculated, either based on calendar days or a rolling window.",
+          "oneOf": [
+            {
+              "enum": [
+                "CalendarDays",
+                "RollingDays"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "evaluationPeriodDays": {
+          "description": "The time frame (in days) used for SLI evaluation.",
+          "oneOf": [
+            {
+              "maximum": 90,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "value": {
+          "description": "The user-defined or Azure-defined target value used for comparison against the SLI value.",
+          "oneOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "evaluationCalculationType",
+        "evaluationPeriodDays",
+        "value"
+      ],
+      "type": "object"
+    },
+    "BaselineProperties": {
+      "properties": {
+        "baseline": {
+          "description": "Defines the baseline target, which is compared against the SLI value to determine compliance.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Baseline"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "baseline"
       ],
       "type": "object"
     },
@@ -358,6 +445,83 @@
           ]
         }
       },
+      "type": "object"
+    },
+    "Condition": {
+      "properties": {
+        "dimensionName": {
+          "description": "Dimension name used in filtering.",
+          "type": "string"
+        },
+        "operator": {
+          "description": "Operator used in the filtering condition.",
+          "oneOf": [
+            {
+              "enum": [
+                "eq",
+                "ne",
+                "lt",
+                "lte",
+                "gt",
+                "gte",
+                "in",
+                "notin",
+                "startswith",
+                "notstartswith",
+                "contains",
+                "notcontains"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "samplingType": {
+          "description": "Defines the sampling type.",
+          "oneOf": [
+            {
+              "enum": [
+                "Average",
+                "Sum",
+                "Count",
+                "Min",
+                "Max"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "scalarFunction": {
+          "description": "Scalar function applied for filtering.",
+          "oneOf": [
+            {
+              "enum": [
+                "max",
+                "min",
+                "avg",
+                "sum"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "value": {
+          "description": "Value used in filtering. For most operators (eq, ne, lt, lte, gt, gte, startswith, notstartswith, contains, notcontains) this is a single value (for example \"GetContosoUsers\"). For the `in` and `notin` operators, multiple values must be joined by the delimiter `^^` (for example \"east^^west^^north\").",
+          "type": "string"
+        }
+      },
+      "required": [
+        "operator",
+        "value"
+      ],
       "type": "object"
     },
     "DistributionPolicy": {
@@ -527,6 +691,46 @@
           "type": "string"
         }
       },
+      "type": "object"
+    },
+    "ManagedServiceIdentity": {
+      "properties": {
+        "type": {
+          "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).",
+          "oneOf": [
+            {
+              "enum": [
+                "None",
+                "SystemAssigned",
+                "UserAssigned",
+                "SystemAssigned,UserAssigned"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "userAssignedIdentities": {
+          "description": "The set of user assigned identities associated with the resource. The userAssignedIdentities dictionary keys will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}. The dictionary values can be empty objects ({}) in requests.",
+          "oneOf": [
+            {
+              "additionalProperties": {
+                "$ref": "#/definitions/UserAssignedIdentity"
+              },
+              "properties": {},
+              "type": "object"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
       "type": "object"
     },
     "OtlpReceiver": {
@@ -1084,6 +1288,297 @@
       ],
       "type": "object"
     },
+    "Signal": {
+      "properties": {
+        "signalFormula": {
+          "description": "Mathematical formula used to combine multiple metrics.",
+          "type": "string"
+        },
+        "signalSources": {
+          "description": "Sources of metrics used for SLIs.",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/SignalSource"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "signalFormula",
+        "signalSources"
+      ],
+      "type": "object"
+    },
+    "SignalSource": {
+      "properties": {
+        "filters": {
+          "description": "Filters applied to modify signal values.",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/Condition"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "metricName": {
+          "description": "Name of the metric.",
+          "type": "string"
+        },
+        "metricNamespace": {
+          "description": "Namespace of the metric.",
+          "type": "string"
+        },
+        "signalSourceId": {
+          "description": "Unique identifier for the signal source.",
+          "type": "string"
+        },
+        "sourceAmwAccountManagedIdentity": {
+          "description": "Managed identity for authenticating the signal source.",
+          "type": "string"
+        },
+        "sourceAmwAccountResourceId": {
+          "description": "Resource ID of the source AMW account.",
+          "type": "string"
+        },
+        "spatialAggregation": {
+          "description": "Defines how measurements are aggregated across multiple time series.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SpatialAggregation"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "temporalAggregation": {
+          "description": "Defines how measurements are aggregated over a specific time window within the same time series.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/TemporalAggregation"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "filters",
+        "metricName",
+        "metricNamespace",
+        "signalSourceId",
+        "sourceAmwAccountManagedIdentity",
+        "sourceAmwAccountResourceId",
+        "spatialAggregation",
+        "temporalAggregation"
+      ],
+      "type": "object"
+    },
+    "SliProperties": {
+      "properties": {
+        "goodSignals": {
+          "description": "Represents good signals used in request-based SLI calculations.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Signal"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "signals": {
+          "description": "Signals used for window-based SLI calculations.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Signal"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "totalSignals": {
+          "description": "Represents total signals used in request-based SLI calculations.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Signal"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "windowUptimeCriteria": {
+          "description": "Defines the uptime criteria for window-based SLIs.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WindowUptimeCriteria"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "SliResource": {
+      "properties": {
+        "baselineProperties": {
+          "description": "Defines the SLO baseline associated with the SLI.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BaselineProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "category": {
+          "description": "Specifies the category of the SLI, used to classify signals such as Availability and Latency.",
+          "oneOf": [
+            {
+              "enum": [
+                "Availability",
+                "Latency"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "description": {
+          "description": "A user-provided description of the SLI, with a maximum length of 1000 characters.",
+          "oneOf": [
+            {
+              "pattern": "^[\\s\\S]{0,1000}$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "destinationAmwAccounts": {
+          "description": "Destination AMW accounts.",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/AmwAccount"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "enableAlert": {
+          "description": "A flag to determine whether alert is enabled.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "evaluationType": {
+          "description": "Determines how the SLI is evaluated—either based on request counts or time windows.",
+          "oneOf": [
+            {
+              "enum": [
+                "WindowBased",
+                "RequestBased"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "sliProperties": {
+          "description": "Defines the SLI properties associated with the SLI.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SliProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "baselineProperties",
+        "category",
+        "description",
+        "destinationAmwAccounts",
+        "enableAlert",
+        "evaluationType",
+        "sliProperties"
+      ],
+      "type": "object"
+    },
+    "SpatialAggregation": {
+      "properties": {
+        "dimensions": {
+          "description": "Dimensions considered for spatial aggregation.",
+          "oneOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "description": "Type of spatial aggregation.",
+          "oneOf": [
+            {
+              "enum": [
+                "Average",
+                "Min",
+                "Max",
+                "Sum",
+                "Count"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "dimensions",
+        "type"
+      ],
+      "type": "object"
+    },
     "SyslogReceiver": {
       "properties": {
         "allowSkipPriHeader": {
@@ -1142,6 +1637,47 @@
       },
       "required": [
         "endpoint"
+      ],
+      "type": "object"
+    },
+    "TemporalAggregation": {
+      "properties": {
+        "type": {
+          "description": "Type of temporal aggregation.",
+          "oneOf": [
+            {
+              "enum": [
+                "Average",
+                "Min",
+                "Max",
+                "Sum",
+                "Rate",
+                "IRate",
+                "Delta",
+                "IDelta",
+                "Increase"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "windowSizeMinutes": {
+          "description": "Time window size for aggregation, in minutes.",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type"
       ],
       "type": "object"
     },
@@ -1291,6 +1827,54 @@
       },
       "required": [
         "endpoint"
+      ],
+      "type": "object"
+    },
+    "UserAssignedIdentities": {
+      "additionalProperties": {
+        "$ref": "#/definitions/UserAssignedIdentity"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "UserAssignedIdentity": {
+      "properties": {},
+      "type": "object"
+    },
+    "WindowUptimeCriteria": {
+      "properties": {
+        "comparator": {
+          "description": "Comparison operator used for uptime evaluation.",
+          "oneOf": [
+            {
+              "enum": [
+                "lt",
+                "gt",
+                "lte",
+                "gte"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "target": {
+          "description": "Threshold value used to determine uptime.",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "comparator",
+        "target"
       ],
       "type": "object"
     }

@@ -33,7 +33,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the backup vault.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -51,10 +51,10 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/backupVaults_backupPolicies_childResource"
+                "$ref": "#/definitions/backupVaults_backupInstances_childResource"
               },
               {
-                "$ref": "#/definitions/backupVaults_backupInstances_childResource"
+                "$ref": "#/definitions/backupVaults_backupPolicies_childResource"
               }
             ]
           },
@@ -100,7 +100,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the backup instance",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -139,7 +139,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the policy",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -197,7 +197,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of ResourceGuard",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -243,8 +243,29 @@
     }
   },
   "definitions": {
+    "AbsoluteDeleteOption": {
+      "properties": {
+        "objectType": {
+          "description": "Type of the specific object - used for deserializing",
+          "oneOf": [
+            {
+              "enum": [
+                "AbsoluteDeleteOption"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "objectType"
+      ],
+      "type": "object"
+    },
     "AdhocBasedTaggingCriteria": {
-      "description": "Adhoc backup tagging criteria",
       "properties": {
         "tagInfo": {
           "description": "Retention tag information",
@@ -260,41 +281,165 @@
       },
       "type": "object"
     },
+    "AdhocBasedTriggerContext": {
+      "properties": {
+        "objectType": {
+          "description": "Type of the specific object - used for deserializing",
+          "oneOf": [
+            {
+              "enum": [
+                "AdhocBasedTriggerContext"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "taggingCriteria": {
+          "description": "Tagging Criteria containing retention tag for adhoc backup.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AdhocBasedTaggingCriteria"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "objectType",
+        "taggingCriteria"
+      ],
+      "type": "object"
+    },
     "AuthCredentials": {
-      "description": "Base class for different types of authentication credentials.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Secret store based authentication credentials.",
+          "additionalProperties": false,
           "properties": {
             "objectType": {
               "enum": [
                 "SecretStoreBasedAuthCredentials"
               ],
               "type": "string"
-            },
-            "secretStoreResource": {
-              "description": "Secret store resource",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/SecretStoreResource"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
             }
           },
           "required": [
             "objectType"
           ],
           "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/SecretStoreBasedAuthCredentials"
+                },
+                {
+                  "properties": {
+                    "objectType": {
+                      "const": "SecretStoreBasedAuthCredentials"
+                    }
+                  },
+                  "required": [
+                    "objectType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
+      ]
+    },
+    "AzureBackupParams": {
+      "properties": {
+        "backupType": {
+          "description": "BackupType ; Full/Incremental etc",
+          "type": "string"
+        },
+        "objectType": {
+          "description": "Type of the specific object - used for deserializing",
+          "oneOf": [
+            {
+              "enum": [
+                "AzureBackupParams"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "backupType",
+        "objectType"
       ],
-      "properties": {},
+      "type": "object"
+    },
+    "AzureBackupRule": {
+      "properties": {
+        "backupParameters": {
+          "description": "BackupParameters base",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BackupParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "dataStore": {
+          "description": "DataStoreInfo base",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DataStoreInfoBase"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "objectType": {
+          "oneOf": [
+            {
+              "enum": [
+                "AzureBackupRule"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "trigger": {
+          "description": "Trigger context",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/TriggerContext"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "dataStore",
+        "objectType",
+        "trigger"
+      ],
       "type": "object"
     },
     "AzureMonitorAlertSettings": {
-      "description": "Settings for Azure Monitor based alerts",
       "properties": {
         "alertsForAllJobFailures": {
           "oneOf": [
@@ -313,153 +458,131 @@
       },
       "type": "object"
     },
+    "AzureOperationalStoreParameters": {
+      "properties": {
+        "objectType": {
+          "description": "Type of the specific object - used for deserializing",
+          "oneOf": [
+            {
+              "enum": [
+                "AzureOperationalStoreParameters"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "resourceGroupId": {
+          "description": "Gets or sets the Snapshot Resource Group Uri.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "objectType"
+      ],
+      "type": "object"
+    },
+    "AzureRetentionRule": {
+      "properties": {
+        "isDefault": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "lifecycles": {
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/SourceLifeCycle"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "objectType": {
+          "oneOf": [
+            {
+              "enum": [
+                "AzureRetentionRule"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "lifecycles",
+        "objectType"
+      ],
+      "type": "object"
+    },
     "BackupCriteria": {
-      "description": "BackupCriteria base class",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Schedule based backup criteria",
+          "additionalProperties": false,
           "properties": {
-            "absoluteCriteria": {
-              "description": "it contains absolute values like \"AllBackup\" / \"FirstOfDay\" / \"FirstOfWeek\" / \"FirstOfMonth\"\r\nand should be part of AbsoluteMarker enum",
-              "oneOf": [
-                {
-                  "items": {
-                    "enum": [
-                      "AllBackup",
-                      "FirstOfDay",
-                      "FirstOfMonth",
-                      "FirstOfWeek",
-                      "FirstOfYear"
-                    ],
-                    "type": "string"
-                  },
-                  "type": "array"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "daysOfMonth": {
-              "description": "This is day of the month from 1 to 28 other wise last of month",
-              "oneOf": [
-                {
-                  "items": {
-                    "$ref": "#/definitions/Day"
-                  },
-                  "type": "array"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "daysOfTheWeek": {
-              "description": "It should be Sunday/Monday/T..../Saturday",
-              "oneOf": [
-                {
-                  "items": {
-                    "enum": [
-                      "Friday",
-                      "Monday",
-                      "Saturday",
-                      "Sunday",
-                      "Thursday",
-                      "Tuesday",
-                      "Wednesday"
-                    ],
-                    "type": "string"
-                  },
-                  "type": "array"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "monthsOfYear": {
-              "description": "It should be January/February/....../December",
-              "oneOf": [
-                {
-                  "items": {
-                    "enum": [
-                      "April",
-                      "August",
-                      "December",
-                      "February",
-                      "January",
-                      "July",
-                      "June",
-                      "March",
-                      "May",
-                      "November",
-                      "October",
-                      "September"
-                    ],
-                    "type": "string"
-                  },
-                  "type": "array"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
             "objectType": {
               "enum": [
                 "ScheduleBasedBackupCriteria"
               ],
               "type": "string"
-            },
-            "scheduleTimes": {
-              "description": "List of schedule times for backup",
-              "oneOf": [
-                {
-                  "items": {
-                    "format": "date-time",
-                    "type": "string"
-                  },
-                  "type": "array"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "weeksOfTheMonth": {
-              "description": "It should be First/Second/Third/Fourth/Last",
-              "oneOf": [
-                {
-                  "items": {
-                    "enum": [
-                      "First",
-                      "Fourth",
-                      "Last",
-                      "Second",
-                      "Third"
-                    ],
-                    "type": "string"
-                  },
-                  "type": "array"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
             }
           },
           "required": [
             "objectType"
           ],
           "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ScheduleBasedBackupCriteria"
+                },
+                {
+                  "properties": {
+                    "objectType": {
+                      "const": "ScheduleBasedBackupCriteria"
+                    }
+                  },
+                  "required": [
+                    "objectType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
-      ],
-      "properties": {},
-      "type": "object"
+      ]
     },
     "BackupInstance": {
-      "description": "Backup Instance",
       "properties": {
+        "datasourceAuthCredentials": {
+          "description": "Credentials to use to authenticate with data source provider.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AuthCredentials"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
         "dataSourceInfo": {
           "description": "Gets or sets the data source information.",
           "oneOf": [
@@ -476,17 +599,6 @@
           "oneOf": [
             {
               "$ref": "#/definitions/DatasourceSet"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "datasourceAuthCredentials": {
-          "description": "Credentials to use to authenticate with data source provider.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/AuthCredentials"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -529,21 +641,16 @@
       },
       "required": [
         "dataSourceInfo",
-        "policyInfo",
-        "objectType"
+        "objectType",
+        "policyInfo"
       ],
       "type": "object"
     },
     "BackupParameters": {
-      "description": "BackupParameters base",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Azure backup parameters",
+          "additionalProperties": false,
           "properties": {
-            "backupType": {
-              "description": "BackupType ; Full/Incremental etc",
-              "type": "string"
-            },
             "objectType": {
               "enum": [
                 "AzureBackupParams"
@@ -552,17 +659,71 @@
             }
           },
           "required": [
-            "backupType",
             "objectType"
           ],
           "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/AzureBackupParams"
+                },
+                {
+                  "properties": {
+                    "objectType": {
+                      "const": "AzureBackupParams"
+                    }
+                  },
+                  "required": [
+                    "objectType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
+      ]
+    },
+    "BackupPolicy": {
+      "properties": {
+        "objectType": {
+          "oneOf": [
+            {
+              "enum": [
+                "BackupPolicy"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "policyRules": {
+          "description": "Policy rule dictionary that contains rules for each backuptype i.e Full/Incremental/Logs etc",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/BasePolicyRule"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "objectType",
+        "policyRules"
       ],
-      "properties": {},
       "type": "object"
     },
     "BackupSchedule": {
-      "description": "Schedule for backup",
       "properties": {
         "repeatingTimeIntervals": {
           "description": "Repeating time intervals that define the backup schedule.\n\nEach value must follow the format: `R/YYYY-MM-DDThh:mm:ss[.fff][Z|(+/-)hh:mm]/Duration`\n\nOnly the exact formats listed below are supported. Other ISO 8601 variations are not accepted.\n\nSupported time formats:\n- `Thh:mm:ss.fff` (with milliseconds)\n- `Thh:mm:ss` (with seconds)\n- `Thh:mm` (hours and minutes only)\n\nA timezone indicator (`Z`, `+hh:mm`, or `-hh:mm`) may be appended to any of the above.\n\nUnsupported formats include compact notation such as `T1430`, `T143045`, or `T14.5`.\n\nExamples:\n- `R/2023-10-15T14:30:00Z/P1W`\n- `R/2023-10-15T14:30:45.123+05:30/P1D`\n- `R/2023-10-15T14:30Z/P1D`",
@@ -589,7 +750,6 @@
       "type": "object"
     },
     "BackupVault": {
-      "description": "Backup Vault",
       "properties": {
         "monitoringSettings": {
           "description": "Monitoring Settings",
@@ -623,23 +783,16 @@
       "type": "object"
     },
     "BaseBackupPolicy": {
-      "description": "BackupPolicy base",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Rule based backup policy",
+          "additionalProperties": false,
           "properties": {
-            "objectType": {
-              "enum": [
-                "BackupPolicy"
-              ],
-              "type": "string"
-            },
-            "policyRules": {
-              "description": "Policy rule dictionary that contains rules for each backuptype i.e Full/Incremental/Logs etc",
+            "datasourceTypes": {
+              "description": "Type of datasource for the backup management",
               "oneOf": [
                 {
                   "items": {
-                    "$ref": "#/definitions/BasePolicyRule"
+                    "type": "string"
                   },
                   "type": "array"
                 },
@@ -647,24 +800,118 @@
                   "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
                 }
               ]
+            },
+            "objectType": {
+              "enum": [
+                "BackupPolicy"
+              ],
+              "type": "string"
             }
           },
           "required": [
-            "policyRules",
+            "datasourceTypes",
             "objectType"
           ],
           "type": "object"
-        }
-      ],
-      "properties": {
-        "datasourceTypes": {
-          "description": "Type of datasource for the backup management",
+        },
+        {
           "oneOf": [
             {
-              "items": {
-                "type": "string"
-              },
-              "type": "array"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/BackupPolicy"
+                },
+                {
+                  "properties": {
+                    "objectType": {
+                      "const": "BackupPolicy"
+                    }
+                  },
+                  "required": [
+                    "objectType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "BasePolicyRule": {
+      "allOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "objectType": {
+              "enum": [
+                "AzureBackupRule",
+                "AzureRetentionRule"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "objectType"
+          ],
+          "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/AzureBackupRule"
+                },
+                {
+                  "properties": {
+                    "objectType": {
+                      "const": "AzureBackupRule"
+                    }
+                  },
+                  "required": [
+                    "objectType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/AzureRetentionRule"
+                },
+                {
+                  "properties": {
+                    "objectType": {
+                      "const": "AzureRetentionRule"
+                    }
+                  },
+                  "required": [
+                    "objectType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "CopyOnExpiryOption": {
+      "properties": {
+        "objectType": {
+          "description": "Type of the specific object - used for deserializing",
+          "oneOf": [
+            {
+              "enum": [
+                "CopyOnExpiryOption"
+              ],
+              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -673,156 +920,19 @@
         }
       },
       "required": [
-        "datasourceTypes"
-      ],
-      "type": "object"
-    },
-    "BasePolicyRule": {
-      "description": "BasePolicy Rule",
-      "oneOf": [
-        {
-          "description": "Azure backup rule",
-          "properties": {
-            "backupParameters": {
-              "description": "BackupParameters base",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/BackupParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "dataStore": {
-              "description": "DataStoreInfo base",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/DataStoreInfoBase"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "objectType": {
-              "enum": [
-                "AzureBackupRule"
-              ],
-              "type": "string"
-            },
-            "trigger": {
-              "description": "Trigger context",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/TriggerContext"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            }
-          },
-          "required": [
-            "dataStore",
-            "trigger",
-            "objectType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Azure retention rule",
-          "properties": {
-            "isDefault": {
-              "oneOf": [
-                {
-                  "type": "boolean"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "lifecycles": {
-              "description": "Array of SourceLifeCycle",
-              "oneOf": [
-                {
-                  "items": {
-                    "$ref": "#/definitions/SourceLifeCycle"
-                  },
-                  "type": "array"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "objectType": {
-              "enum": [
-                "AzureRetentionRule"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "lifecycles",
-            "objectType"
-          ],
-          "type": "object"
-        }
-      ],
-      "properties": {
-        "name": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "name"
+        "objectType"
       ],
       "type": "object"
     },
     "CopyOption": {
-      "description": "Options to copy",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Copy on Expiry Option",
+          "additionalProperties": false,
           "properties": {
             "objectType": {
               "enum": [
-                "CopyOnExpiryOption"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "objectType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Duration based custom options to copy",
-          "properties": {
-            "duration": {
-              "description": "Data copied after given timespan",
-              "type": "string"
-            },
-            "objectType": {
-              "enum": [
-                "CustomCopyOption"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "objectType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Immediate copy Option",
-          "properties": {
-            "objectType": {
-              "enum": [
+                "CopyOnExpiryOption",
+                "CustomCopyOption",
                 "ImmediateCopyOption"
               ],
               "type": "string"
@@ -832,22 +942,79 @@
             "objectType"
           ],
           "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/CopyOnExpiryOption"
+                },
+                {
+                  "properties": {
+                    "objectType": {
+                      "const": "CopyOnExpiryOption"
+                    }
+                  },
+                  "required": [
+                    "objectType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/CustomCopyOption"
+                },
+                {
+                  "properties": {
+                    "objectType": {
+                      "const": "CustomCopyOption"
+                    }
+                  },
+                  "required": [
+                    "objectType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ImmediateCopyOption"
+                },
+                {
+                  "properties": {
+                    "objectType": {
+                      "const": "ImmediateCopyOption"
+                    }
+                  },
+                  "required": [
+                    "objectType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
-      ],
-      "properties": {},
-      "type": "object"
+      ]
     },
-    "DataStoreInfoBase": {
-      "description": "DataStoreInfo base",
+    "CustomCopyOption": {
       "properties": {
-        "dataStoreType": {
-          "description": "type of datastore; Operational/Vault/Archive",
+        "duration": {
+          "description": "Data copied after given timespan",
+          "type": "string"
+        },
+        "objectType": {
+          "description": "Type of the specific object - used for deserializing",
           "oneOf": [
             {
               "enum": [
-                "OperationalStore",
-                "VaultStore",
-                "ArchiveStore"
+                "CustomCopyOption"
               ],
               "type": "string"
             },
@@ -855,66 +1022,14 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
-        },
-        "objectType": {
-          "description": "Type of Datasource object, used to initialize the right inherited type",
-          "type": "string"
         }
       },
       "required": [
-        "dataStoreType",
         "objectType"
       ],
       "type": "object"
     },
-    "DataStoreParameters": {
-      "description": "Parameters for DataStore",
-      "oneOf": [
-        {
-          "description": "Parameters for Operational-Tier DataStore",
-          "properties": {
-            "objectType": {
-              "enum": [
-                "AzureOperationalStoreParameters"
-              ],
-              "type": "string"
-            },
-            "resourceGroupId": {
-              "description": "Gets or sets the Snapshot Resource Group Uri.",
-              "type": "string"
-            }
-          },
-          "required": [
-            "objectType"
-          ],
-          "type": "object"
-        }
-      ],
-      "properties": {
-        "dataStoreType": {
-          "description": "type of datastore; Operational/Vault/Archive",
-          "oneOf": [
-            {
-              "enum": [
-                "OperationalStore",
-                "VaultStore",
-                "ArchiveStore"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "required": [
-        "dataStoreType"
-      ],
-      "type": "object"
-    },
     "Datasource": {
-      "description": "Datasource to be backed up",
       "properties": {
         "datasourceType": {
           "description": "DatasourceType of the resource.",
@@ -951,7 +1066,6 @@
       "type": "object"
     },
     "DatasourceSet": {
-      "description": "DatasourceSet details of datasource to be backed up",
       "properties": {
         "datasourceType": {
           "description": "DatasourceType of the resource.",
@@ -987,8 +1101,94 @@
       ],
       "type": "object"
     },
+    "DataStoreInfoBase": {
+      "properties": {
+        "dataStoreType": {
+          "description": "type of datastore; Operational/Vault/Archive",
+          "oneOf": [
+            {
+              "enum": [
+                "OperationalStore",
+                "VaultStore",
+                "ArchiveStore"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "objectType": {
+          "description": "Type of Datasource object, used to initialize the right inherited type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dataStoreType",
+        "objectType"
+      ],
+      "type": "object"
+    },
+    "DataStoreParameters": {
+      "allOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "dataStoreType": {
+              "description": "type of datastore; Operational/Vault/Archive",
+              "oneOf": [
+                {
+                  "enum": [
+                    "OperationalStore",
+                    "VaultStore",
+                    "ArchiveStore"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "objectType": {
+              "enum": [
+                "AzureOperationalStoreParameters"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "dataStoreType",
+            "objectType"
+          ],
+          "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/AzureOperationalStoreParameters"
+                },
+                {
+                  "properties": {
+                    "objectType": {
+                      "const": "AzureOperationalStoreParameters"
+                    }
+                  },
+                  "required": [
+                    "objectType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
     "Day": {
-      "description": "Day of the week",
       "properties": {
         "date": {
           "description": "Date of the month",
@@ -1016,11 +1216,14 @@
       "type": "object"
     },
     "DeleteOption": {
-      "description": "Delete Option",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Delete option with duration",
+          "additionalProperties": false,
           "properties": {
+            "duration": {
+              "description": "Duration of deletion after given timespan",
+              "type": "string"
+            },
             "objectType": {
               "enum": [
                 "AbsoluteDeleteOption"
@@ -1029,24 +1232,36 @@
             }
           },
           "required": [
+            "duration",
             "objectType"
           ],
           "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/AbsoluteDeleteOption"
+                },
+                {
+                  "properties": {
+                    "objectType": {
+                      "const": "AbsoluteDeleteOption"
+                    }
+                  },
+                  "required": [
+                    "objectType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
-      ],
-      "properties": {
-        "duration": {
-          "description": "Duration of deletion after given timespan",
-          "type": "string"
-        }
-      },
-      "required": [
-        "duration"
-      ],
-      "type": "object"
+      ]
     },
     "DppIdentityDetails": {
-      "description": "Identity details",
       "properties": {
         "type": {
           "description": "The identityType which can be either SystemAssigned or None",
@@ -1055,8 +1270,36 @@
       },
       "type": "object"
     },
+    "DppTrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "ImmediateCopyOption": {
+      "properties": {
+        "objectType": {
+          "description": "Type of the specific object - used for deserializing",
+          "oneOf": [
+            {
+              "enum": [
+                "ImmediateCopyOption"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "objectType"
+      ],
+      "type": "object"
+    },
     "MonitoringSettings": {
-      "description": "Monitoring Settings",
       "properties": {
         "azureMonitorAlertSettings": {
           "description": "Settings for Azure Monitor based alerts",
@@ -1073,7 +1316,6 @@
       "type": "object"
     },
     "PolicyInfo": {
-      "description": "Policy Info in backupInstance",
       "properties": {
         "policyId": {
           "type": "string"
@@ -1096,7 +1338,6 @@
       "type": "object"
     },
     "PolicyParameters": {
-      "description": "Parameters in Policy",
       "properties": {
         "dataStoreParametersList": {
           "description": "Gets or sets the DataStore Parameters",
@@ -1135,7 +1376,6 @@
       "type": "object"
     },
     "RetentionTag": {
-      "description": "Retention tag",
       "properties": {
         "tagName": {
           "description": "Retention Tag Name to relate it to retention rule.",
@@ -1147,8 +1387,232 @@
       ],
       "type": "object"
     },
+    "ScheduleBasedBackupCriteria": {
+      "properties": {
+        "absoluteCriteria": {
+          "description": "it contains absolute values like \"AllBackup\" / \"FirstOfDay\" / \"FirstOfWeek\" / \"FirstOfMonth\"\r\nand should be part of AbsoluteMarker enum",
+          "oneOf": [
+            {
+              "items": {
+                "enum": [
+                  "AllBackup",
+                  "FirstOfDay",
+                  "FirstOfMonth",
+                  "FirstOfWeek",
+                  "FirstOfYear"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "daysOfMonth": {
+          "description": "This is day of the month from 1 to 28 other wise last of month",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/Day"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "daysOfTheWeek": {
+          "description": "It should be Sunday/Monday/T..../Saturday",
+          "oneOf": [
+            {
+              "items": {
+                "enum": [
+                  "Friday",
+                  "Monday",
+                  "Saturday",
+                  "Sunday",
+                  "Thursday",
+                  "Tuesday",
+                  "Wednesday"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "monthsOfYear": {
+          "description": "It should be January/February/....../December",
+          "oneOf": [
+            {
+              "items": {
+                "enum": [
+                  "April",
+                  "August",
+                  "December",
+                  "February",
+                  "January",
+                  "July",
+                  "June",
+                  "March",
+                  "May",
+                  "November",
+                  "October",
+                  "September"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "objectType": {
+          "description": "Type of the specific object - used for deserializing",
+          "oneOf": [
+            {
+              "enum": [
+                "ScheduleBasedBackupCriteria"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "scheduleTimes": {
+          "description": "List of schedule times for backup",
+          "oneOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "weeksOfTheMonth": {
+          "description": "It should be First/Second/Third/Fourth/Last",
+          "oneOf": [
+            {
+              "items": {
+                "enum": [
+                  "First",
+                  "Fourth",
+                  "Last",
+                  "Second",
+                  "Third"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "objectType"
+      ],
+      "type": "object"
+    },
+    "ScheduleBasedTriggerContext": {
+      "properties": {
+        "objectType": {
+          "description": "Type of the specific object - used for deserializing",
+          "oneOf": [
+            {
+              "enum": [
+                "ScheduleBasedTriggerContext"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "schedule": {
+          "description": "Schedule for this backup",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/BackupSchedule"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "taggingCriteria": {
+          "description": "List of tags that can be applicable for given schedule.",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/TaggingCriteria"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "objectType",
+        "schedule",
+        "taggingCriteria"
+      ],
+      "type": "object"
+    },
+    "SecretStoreBasedAuthCredentials": {
+      "properties": {
+        "objectType": {
+          "description": "Type of the specific object - used for deserializing",
+          "oneOf": [
+            {
+              "enum": [
+                "SecretStoreBasedAuthCredentials"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "secretStoreResource": {
+          "description": "Secret store resource",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SecretStoreResource"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "objectType"
+      ],
+      "type": "object"
+    },
     "SecretStoreResource": {
-      "description": "Class representing a secret store resource.",
       "properties": {
         "secretStoreType": {
           "description": "Gets or sets the type of secret store",
@@ -1180,7 +1644,6 @@
       "type": "object"
     },
     "SourceLifeCycle": {
-      "description": "Source LifeCycle",
       "properties": {
         "deleteAfter": {
           "description": "Delete Option",
@@ -1205,7 +1668,6 @@
           ]
         },
         "targetDataStoreCopySettings": {
-          "description": "Array of TargetCopySetting",
           "oneOf": [
             {
               "items": {
@@ -1226,7 +1688,6 @@
       "type": "object"
     },
     "StorageSetting": {
-      "description": "Storage setting",
       "properties": {
         "datastoreType": {
           "description": "Gets or sets the type of the datastore.",
@@ -1263,7 +1724,6 @@
       "type": "object"
     },
     "TaggingCriteria": {
-      "description": "Tagging criteria",
       "properties": {
         "criteria": {
           "description": "Criteria which decides whether the tag can be applied to a triggered backup.",
@@ -1290,22 +1750,22 @@
             }
           ]
         },
-        "tagInfo": {
-          "description": "Retention tag information",
+        "taggingPriority": {
+          "description": "Retention Tag priority.",
           "oneOf": [
             {
-              "$ref": "#/definitions/RetentionTag"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
         },
-        "taggingPriority": {
-          "description": "Retention Tag priority.",
+        "tagInfo": {
+          "description": "Retention tag information",
           "oneOf": [
             {
-              "type": "integer"
+              "$ref": "#/definitions/RetentionTag"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -1321,7 +1781,6 @@
       "type": "object"
     },
     "TargetCopySetting": {
-      "description": "Target copy settings",
       "properties": {
         "copyAfter": {
           "description": "It can be CustomCopyOption or ImmediateCopyOption.",
@@ -1353,83 +1812,67 @@
       "type": "object"
     },
     "TriggerContext": {
-      "description": "Trigger context",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Adhoc trigger context",
+          "additionalProperties": false,
           "properties": {
             "objectType": {
               "enum": [
-                "AdhocBasedTriggerContext"
+                "AdhocBasedTriggerContext",
+                "ScheduleBasedTriggerContext"
               ],
               "type": "string"
-            },
-            "taggingCriteria": {
-              "description": "Tagging Criteria containing retention tag for adhoc backup.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/AdhocBasedTaggingCriteria"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
             }
           },
           "required": [
-            "taggingCriteria",
             "objectType"
           ],
           "type": "object"
         },
         {
-          "description": "Schedule based trigger context",
-          "properties": {
-            "objectType": {
-              "enum": [
-                "ScheduleBasedTriggerContext"
-              ],
-              "type": "string"
-            },
-            "schedule": {
-              "description": "Schedule for this backup",
-              "oneOf": [
+          "oneOf": [
+            {
+              "allOf": [
                 {
-                  "$ref": "#/definitions/BackupSchedule"
+                  "$ref": "#/definitions/AdhocBasedTriggerContext"
                 },
                 {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                  "properties": {
+                    "objectType": {
+                      "const": "AdhocBasedTriggerContext"
+                    }
+                  },
+                  "required": [
+                    "objectType"
+                  ],
+                  "type": "object"
                 }
               ]
             },
-            "taggingCriteria": {
-              "description": "List of tags that can be applicable for given schedule.",
-              "oneOf": [
+            {
+              "allOf": [
                 {
-                  "items": {
-                    "$ref": "#/definitions/TaggingCriteria"
-                  },
-                  "type": "array"
+                  "$ref": "#/definitions/ScheduleBasedTriggerContext"
                 },
                 {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                  "properties": {
+                    "objectType": {
+                      "const": "ScheduleBasedTriggerContext"
+                    }
+                  },
+                  "required": [
+                    "objectType"
+                  ],
+                  "type": "object"
                 }
               ]
             }
-          },
-          "required": [
-            "schedule",
-            "taggingCriteria",
-            "objectType"
-          ],
-          "type": "object"
+          ]
         }
-      ],
-      "properties": {},
-      "type": "object"
+      ]
     },
     "backupVaults_backupInstances_childResource": {
-      "description": "Microsoft.DataProtection/backupVaults/backupInstances",
+      "description": "backupInstances",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1438,7 +1881,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the backup instance",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -1468,7 +1911,7 @@
       "type": "object"
     },
     "backupVaults_backupPolicies_childResource": {
-      "description": "Microsoft.DataProtection/backupVaults/backupPolicies",
+      "description": "backupPolicies",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1477,7 +1920,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the policy",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {

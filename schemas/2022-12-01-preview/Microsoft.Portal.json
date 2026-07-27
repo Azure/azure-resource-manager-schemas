@@ -3,6 +3,55 @@
   "title": "Microsoft.Portal",
   "description": "Microsoft Portal Resource Types",
   "$schema": "http://json-schema.org/draft-04/schema#",
+  "tenant_resourceDefinitions": {
+    "tenantConfigurations": {
+      "description": "Microsoft.Portal/tenantConfigurations",
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "2022-12-01-preview"
+          ],
+          "type": "string"
+        },
+        "name": {
+          "description": "The resource name",
+          "oneOf": [
+            {
+              "pattern": "^(?!con$|prn$|aux$|nul$|com[1-9]$)(?!.*[._-]{2,})[a-zA-Z0-9]([a-zA-Z0-9-._]*[a-zA-Z0-9])?$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "description": "The resource-specific properties for this resource.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ConfigurationProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "enum": [
+            "Microsoft.Portal/tenantConfigurations"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "properties",
+        "apiVersion",
+        "type"
+      ],
+      "type": "object"
+    }
+  },
   "resourceDefinitions": {
     "dashboards": {
       "description": "Microsoft.Portal/dashboards",
@@ -18,7 +67,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the dashboard.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 64,
@@ -65,55 +114,7 @@
         }
       },
       "required": [
-        "name",
-        "properties",
-        "apiVersion",
-        "type"
-      ],
-      "type": "object"
-    }
-  },
-  "tenant_resourceDefinitions": {
-    "tenantConfigurations": {
-      "description": "Microsoft.Portal/tenantConfigurations",
-      "properties": {
-        "apiVersion": {
-          "enum": [
-            "2022-12-01-preview"
-          ],
-          "type": "string"
-        },
-        "name": {
-          "description": "The name of the Configuration",
-          "oneOf": [
-            {
-              "pattern": "^(?!con$|prn$|aux$|nul$|com[1-9]$)(?!.*[._-]{2,})[a-zA-Z0-9]([a-zA-Z0-9-._]*[a-zA-Z0-9])?$",
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "properties": {
-          "description": "The resource-specific properties for this resource.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ConfigurationProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.Portal/tenantConfigurations"
-          ],
-          "type": "string"
-        }
-      },
-      "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -124,7 +125,6 @@
   },
   "definitions": {
     "ConfigurationProperties": {
-      "description": "Tenant Configuration Properties with Provisioning state",
       "properties": {
         "enforcePrivateMarkdownStorage": {
           "description": "When flag is set to true Markdown tile will require external storage configuration (URI). The inline content configuration will be prohibited.",
@@ -141,14 +141,11 @@
       "type": "object"
     },
     "DashboardLens": {
-      "description": "A dashboard lens.",
       "properties": {
         "metadata": {
           "description": "The dashboard len's metadata.",
           "oneOf": [
-            {
-              "type": "object"
-            },
+            {},
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
@@ -187,36 +184,10 @@
       "type": "object"
     },
     "DashboardPartMetadata": {
-      "description": "A dashboard part metadata.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Markdown part metadata.",
+          "additionalProperties": false,
           "properties": {
-            "inputs": {
-              "description": "Input to dashboard part.",
-              "oneOf": [
-                {
-                  "items": {
-                    "type": "object"
-                  },
-                  "type": "array"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "settings": {
-              "description": "Markdown part settings.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/MarkdownPartMetadataSettings"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
             "type": {
               "enum": [
                 "Extension/HubsExtension/PartType/MarkdownPart"
@@ -228,13 +199,32 @@
             "type"
           ],
           "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/MarkdownPartMetadata"
+                },
+                {
+                  "properties": {
+                    "type": {
+                      "const": "Extension/HubsExtension/PartType/MarkdownPart"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
-      ],
-      "properties": {},
-      "type": "object"
+      ]
     },
     "DashboardParts": {
-      "description": "A dashboard part.",
       "properties": {
         "metadata": {
           "description": "The dashboard part's metadata.",
@@ -265,7 +255,6 @@
       "type": "object"
     },
     "DashboardPartsPosition": {
-      "description": "The dashboard's part position.",
       "properties": {
         "colSpan": {
           "description": "The dashboard's part column span.",
@@ -281,9 +270,7 @@
         "metadata": {
           "description": "The dashboard part's metadata.",
           "oneOf": [
-            {
-              "type": "object"
-            },
+            {},
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
@@ -324,15 +311,14 @@
         }
       },
       "required": [
-        "x",
-        "y",
+        "colSpan",
         "rowSpan",
-        "colSpan"
+        "x",
+        "y"
       ],
       "type": "object"
     },
     "DashboardPropertiesWithProvisioningState": {
-      "description": "Dashboard Properties with Provisioning state",
       "properties": {
         "lenses": {
           "description": "The dashboard lenses.",
@@ -351,9 +337,7 @@
         "metadata": {
           "description": "The dashboard metadata.",
           "oneOf": [
-            {
-              "type": "object"
-            },
+            {},
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
@@ -362,8 +346,52 @@
       },
       "type": "object"
     },
+    "MarkdownPartMetadata": {
+      "properties": {
+        "inputs": {
+          "description": "Input to dashboard part.",
+          "oneOf": [
+            {
+              "items": {},
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "settings": {
+          "description": "Markdown part settings.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MarkdownPartMetadataSettings"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "description": "The dashboard part metadata type.",
+          "oneOf": [
+            {
+              "enum": [
+                "Extension/HubsExtension/PartType/MarkdownPart"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
     "MarkdownPartMetadataSettings": {
-      "description": "Markdown part settings.",
       "properties": {
         "content": {
           "description": "The content of markdown part.",
@@ -380,7 +408,6 @@
       "type": "object"
     },
     "MarkdownPartMetadataSettingsContent": {
-      "description": "The content of markdown part.",
       "properties": {
         "settings": {
           "description": "The setting of the content of markdown part.",
@@ -397,7 +424,6 @@
       "type": "object"
     },
     "MarkdownPartMetadataSettingsContentSettings": {
-      "description": "The setting of the content of markdown part.",
       "properties": {
         "content": {
           "description": "The content of the markdown part.",
@@ -427,6 +453,13 @@
           "type": "string"
         }
       },
+      "type": "object"
+    },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
       "type": "object"
     }
   }

@@ -29,14 +29,14 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of Storage Sync Service resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "The parameters used to create the storage sync service.",
           "oneOf": [
             {
-              "$ref": "#/definitions/StorageSyncServiceCreateParametersProperties"
+              "$ref": "#/definitions/StorageSyncServiceCreateParametersPropertiesOrStorageSyncServiceProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -47,13 +47,13 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/storageSyncServices_syncGroups_childResource"
+                "$ref": "#/definitions/storageSyncServices_privateEndpointConnections_childResource"
               },
               {
                 "$ref": "#/definitions/storageSyncServices_registeredServers_childResource"
               },
               {
-                "$ref": "#/definitions/storageSyncServices_privateEndpointConnections_childResource"
+                "$ref": "#/definitions/storageSyncServices_syncGroups_childResource"
               }
             ]
           },
@@ -82,6 +82,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -99,7 +100,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the private endpoint connection associated with the Azure resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -138,10 +139,12 @@
           "type": "string"
         },
         "name": {
-          "description": "GUID identifying the on-premises server.",
+          "description": "The resource name",
           "oneOf": [
             {
-              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+              "maxLength": 36,
+              "minLength": 36,
+              "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
               "type": "string"
             },
             {
@@ -153,7 +156,7 @@
           "description": "The parameters used to create the registered server.",
           "oneOf": [
             {
-              "$ref": "#/definitions/RegisteredServerCreateParametersProperties"
+              "$ref": "#/definitions/RegisteredServerCreateParametersPropertiesOrRegisteredServerProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -185,11 +188,17 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of Sync Group resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
-          "description": "The parameters used to create the sync group"
+          "description": "The parameters used to create the sync group",
+          "oneOf": [
+            {},
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "resources": {
           "items": {
@@ -229,14 +238,14 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of Cloud Endpoint object.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "The parameters used to create the cloud endpoint.",
           "oneOf": [
             {
-              "$ref": "#/definitions/CloudEndpointCreateParametersProperties"
+              "$ref": "#/definitions/CloudEndpointCreateParametersPropertiesOrCloudEndpointProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -268,14 +277,14 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of Server Endpoint object.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "The parameters used to create the server endpoint.",
           "oneOf": [
             {
-              "$ref": "#/definitions/ServerEndpointCreateParametersProperties"
+              "$ref": "#/definitions/ServerEndpointCreateParametersPropertiesOrServerEndpointProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -299,8 +308,7 @@
     }
   },
   "definitions": {
-    "CloudEndpointCreateParametersProperties": {
-      "description": "CloudEndpoint Properties object.",
+    "CloudEndpointCreateParametersPropertiesOrCloudEndpointProperties": {
       "properties": {
         "azureFileShareName": {
           "description": "Azure file share name",
@@ -322,7 +330,6 @@
       "type": "object"
     },
     "ManagedServiceIdentity": {
-      "description": "Managed service identity (system assigned and/or user assigned identities)",
       "properties": {
         "type": {
           "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).",
@@ -363,12 +370,10 @@
       "type": "object"
     },
     "PrivateEndpoint": {
-      "description": "The private endpoint resource.",
       "properties": {},
       "type": "object"
     },
     "PrivateEndpointConnectionProperties": {
-      "description": "Properties of the private endpoint connection.",
       "properties": {
         "privateEndpoint": {
           "description": "The private endpoint resource.",
@@ -399,7 +404,6 @@
       "type": "object"
     },
     "PrivateLinkServiceConnectionState": {
-      "description": "A collection of information about the state of the connection between service consumer and provider.",
       "properties": {
         "actionsRequired": {
           "description": "A message indicating if changes on the service provider require any updates on the consumer.",
@@ -428,8 +432,7 @@
       },
       "type": "object"
     },
-    "RegisteredServerCreateParametersProperties": {
-      "description": "RegisteredServer Create Properties object.",
+    "RegisteredServerCreateParametersPropertiesOrRegisteredServerProperties": {
       "properties": {
         "agentVersion": {
           "description": "Registered Server Agent Version",
@@ -485,8 +488,7 @@
       },
       "type": "object"
     },
-    "ServerEndpointCreateParametersProperties": {
-      "description": "ServerEndpoint Properties object.",
+    "ServerEndpointCreateParametersPropertiesOrServerEndpointProperties": {
       "properties": {
         "cloudTiering": {
           "description": "Cloud Tiering.",
@@ -584,7 +586,6 @@
           "description": "Tier files older than days.",
           "oneOf": [
             {
-              "default": 0,
               "maximum": 2147483647,
               "minimum": 0,
               "type": "integer"
@@ -598,7 +599,6 @@
           "description": "Level of free space to be maintained by Cloud Tiering if it is enabled.",
           "oneOf": [
             {
-              "default": 20,
               "maximum": 100,
               "minimum": 0,
               "type": "integer"
@@ -611,8 +611,7 @@
       },
       "type": "object"
     },
-    "StorageSyncServiceCreateParametersProperties": {
-      "description": "StorageSyncService Properties object.",
+    "StorageSyncServiceCreateParametersPropertiesOrStorageSyncServiceProperties": {
       "properties": {
         "incomingTrafficPolicy": {
           "description": "Incoming Traffic Policy",
@@ -643,13 +642,26 @@
       },
       "type": "object"
     },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "UserAssignedIdentities": {
+      "additionalProperties": {
+        "$ref": "#/definitions/UserAssignedIdentity"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "UserAssignedIdentity": {
-      "description": "User assigned identity properties",
       "properties": {},
       "type": "object"
     },
     "storageSyncServices_privateEndpointConnections_childResource": {
-      "description": "Microsoft.StorageSync/storageSyncServices/privateEndpointConnections",
+      "description": "privateEndpointConnections",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -658,7 +670,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the private endpoint connection associated with the Azure resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -688,7 +700,7 @@
       "type": "object"
     },
     "storageSyncServices_registeredServers_childResource": {
-      "description": "Microsoft.StorageSync/storageSyncServices/registeredServers",
+      "description": "registeredServers",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -697,10 +709,12 @@
           "type": "string"
         },
         "name": {
-          "description": "GUID identifying the on-premises server.",
+          "description": "The resource name",
           "oneOf": [
             {
-              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+              "maxLength": 36,
+              "minLength": 36,
+              "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
               "type": "string"
             },
             {
@@ -712,7 +726,7 @@
           "description": "The parameters used to create the registered server.",
           "oneOf": [
             {
-              "$ref": "#/definitions/RegisteredServerCreateParametersProperties"
+              "$ref": "#/definitions/RegisteredServerCreateParametersPropertiesOrRegisteredServerProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -735,7 +749,7 @@
       "type": "object"
     },
     "storageSyncServices_syncGroups_childResource": {
-      "description": "Microsoft.StorageSync/storageSyncServices/syncGroups",
+      "description": "syncGroups",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -744,11 +758,17 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of Sync Group resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
-          "description": "The parameters used to create the sync group"
+          "description": "The parameters used to create the sync group",
+          "oneOf": [
+            {},
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "type": {
           "enum": [
@@ -766,7 +786,7 @@
       "type": "object"
     },
     "storageSyncServices_syncGroups_cloudEndpoints_childResource": {
-      "description": "Microsoft.StorageSync/storageSyncServices/syncGroups/cloudEndpoints",
+      "description": "cloudEndpoints",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -775,14 +795,14 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of Cloud Endpoint object.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "The parameters used to create the cloud endpoint.",
           "oneOf": [
             {
-              "$ref": "#/definitions/CloudEndpointCreateParametersProperties"
+              "$ref": "#/definitions/CloudEndpointCreateParametersPropertiesOrCloudEndpointProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -805,7 +825,7 @@
       "type": "object"
     },
     "storageSyncServices_syncGroups_serverEndpoints_childResource": {
-      "description": "Microsoft.StorageSync/storageSyncServices/syncGroups/serverEndpoints",
+      "description": "serverEndpoints",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -814,14 +834,14 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of Server Endpoint object.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "The parameters used to create the server endpoint.",
           "oneOf": [
             {
-              "$ref": "#/definitions/ServerEndpointCreateParametersProperties"
+              "$ref": "#/definitions/ServerEndpointCreateParametersPropertiesOrServerEndpointProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"

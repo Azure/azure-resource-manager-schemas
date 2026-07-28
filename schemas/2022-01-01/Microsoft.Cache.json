@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2020-10-01-preview/Microsoft.Cache.Enterprise.json#",
+  "id": "https://schema.management.azure.com/schemas/2022-01-01/Microsoft.Cache.json#",
   "title": "Microsoft.Cache",
   "description": "Microsoft Cache Resource Types",
   "$schema": "http://json-schema.org/draft-04/schema#",
@@ -9,7 +9,7 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2020-10-01-preview"
+            "2022-01-01"
           ],
           "type": "string"
         },
@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the RedisEnterprise cluster.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -78,7 +78,7 @@
           "type": "string"
         },
         "zones": {
-          "description": "The zones where this cluster will be deployed.",
+          "description": "The Availability Zones where this cluster will be deployed.",
           "oneOf": [
             {
               "items": {
@@ -93,7 +93,9 @@
         }
       },
       "required": [
+        "location",
         "name",
+        "sku",
         "properties",
         "apiVersion",
         "type"
@@ -105,12 +107,12 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2020-10-01-preview"
+            "2022-01-01"
           ],
           "type": "string"
         },
         "name": {
-          "description": "The name of the database.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -144,12 +146,12 @@
       "properties": {
         "apiVersion": {
           "enum": [
-            "2020-10-01-preview"
+            "2022-01-01"
           ],
           "type": "string"
         },
         "name": {
-          "description": "The name of the private endpoint connection associated with the Azure resource",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -181,17 +183,27 @@
   },
   "definitions": {
     "ClusterProperties": {
-      "description": "Properties of RedisEnterprise clusters, as opposed to general resource properties like location, tags",
       "properties": {
         "minimumTlsVersion": {
           "description": "The minimum TLS version for the cluster to support, e.g. '1.2'",
-          "type": "string"
+          "oneOf": [
+            {
+              "enum": [
+                "1.0",
+                "1.1",
+                "1.2"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "type": "object"
     },
     "DatabaseProperties": {
-      "description": "Properties of RedisEnterprise databases, as opposed to general resource properties like location, tags",
       "properties": {
         "clientProtocol": {
           "description": "Specifies whether redis clients can connect using TLS-encrypted or plaintext redis protocols. Default is TLS-encrypted.",
@@ -244,6 +256,17 @@
             }
           ]
         },
+        "geoReplication": {
+          "description": "Optional set of properties to configure geo replication for this database.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DatabasePropertiesGeoReplication"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
         "modules": {
           "description": "Optional set of redis modules to enable in this database - modules can only be added at creation time.",
           "oneOf": [
@@ -252,6 +275,17 @@
                 "$ref": "#/definitions/Module"
               },
               "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "persistence": {
+          "description": "Persistence settings",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/Persistence"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -272,11 +306,42 @@
       },
       "type": "object"
     },
+    "DatabasePropertiesGeoReplication": {
+      "properties": {
+        "groupNickname": {
+          "description": "Name for the group of linked database resources",
+          "type": "string"
+        },
+        "linkedDatabases": {
+          "description": "List of database resources to link with this database",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/LinkedDatabase"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "LinkedDatabase": {
+      "properties": {
+        "id": {
+          "description": "Resource ID of a database resource to link with this database.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "Module": {
-      "description": "Specifies configuration of a redis module",
       "properties": {
         "args": {
-          "description": "Configuration options for the module, e.g. 'ERROR_RATE 0.00 INITIAL_SIZE 400'.",
+          "description": "Configuration options for the module, e.g. 'ERROR_RATE 0.01 INITIAL_SIZE 400'.",
           "type": "string"
         },
         "name": {
@@ -289,13 +354,69 @@
       ],
       "type": "object"
     },
+    "Persistence": {
+      "properties": {
+        "aofEnabled": {
+          "description": "Sets whether AOF is enabled.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "aofFrequency": {
+          "description": "Sets the frequency at which data is written to disk.",
+          "oneOf": [
+            {
+              "enum": [
+                "1s",
+                "always"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "rdbEnabled": {
+          "description": "Sets whether RDB is enabled.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "rdbFrequency": {
+          "description": "Sets the frequency at which a snapshot of the database is created.",
+          "oneOf": [
+            {
+              "enum": [
+                "1h",
+                "6h",
+                "12h"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
     "PrivateEndpoint": {
-      "description": "The Private Endpoint resource.",
       "properties": {},
       "type": "object"
     },
     "PrivateEndpointConnectionProperties": {
-      "description": "Properties of the PrivateEndpointConnectProperties.",
       "properties": {
         "privateEndpoint": {
           "description": "The resource of private end point.",
@@ -326,7 +447,6 @@
       "type": "object"
     },
     "PrivateLinkServiceConnectionState": {
-      "description": "A collection of information about the state of the connection between service consumer and provider.",
       "properties": {
         "actionsRequired": {
           "description": "A message indicating if changes on the service provider require any updates on the consumer.",
@@ -356,7 +476,6 @@
       "type": "object"
     },
     "Sku": {
-      "description": "SKU parameters supplied to the create RedisEnterprise operation.",
       "properties": {
         "capacity": {
           "description": "The size of the RedisEnterprise cluster. Defaults to 2 or 3 depending on SKU. Valid values are (2, 4, 6, ...) for Enterprise SKUs and (3, 9, 15, ...) for Flash SKUs.",
@@ -395,17 +514,24 @@
       ],
       "type": "object"
     },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "redisEnterprise_databases_childResource": {
-      "description": "Microsoft.Cache/redisEnterprise/databases",
+      "description": "databases",
       "properties": {
         "apiVersion": {
           "enum": [
-            "2020-10-01-preview"
+            "2022-01-01"
           ],
           "type": "string"
         },
         "name": {
-          "description": "The name of the database.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -435,16 +561,16 @@
       "type": "object"
     },
     "redisEnterprise_privateEndpointConnections_childResource": {
-      "description": "Microsoft.Cache/redisEnterprise/privateEndpointConnections",
+      "description": "privateEndpointConnections",
       "properties": {
         "apiVersion": {
           "enum": [
-            "2020-10-01-preview"
+            "2022-01-01"
           ],
           "type": "string"
         },
         "name": {
-          "description": "The name of the private endpoint connection associated with the Azure resource",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {

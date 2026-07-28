@@ -27,7 +27,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of targeted NGINX deployment",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^([a-z0-9A-Z][a-z0-9A-Z-]{0,28}[a-z0-9A-Z]|[a-z0-9A-Z])$",
@@ -114,7 +114,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The resource name of the API key",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^([a-z0-9A-Z][a-z0-9A-Z-]{0,28}[a-z0-9A-Z]|[a-z0-9A-Z])$",
@@ -128,7 +128,7 @@
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/NginxDeploymentApiKeyRequestProperties"
+              "$ref": "#/definitions/NginxDeploymentApiKeyRequestPropertiesOrNginxDeploymentApiKeyResponseProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -163,7 +163,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of certificate",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -201,13 +201,13 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of configuration, only 'default' is supported value due to the singleton of NGINX conf",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/NginxConfigurationRequestProperties"
+              "$ref": "#/definitions/NginxConfigurationRequestPropertiesOrNginxConfigurationResponseProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -232,7 +232,6 @@
   },
   "definitions": {
     "AutoUpgradeProfile": {
-      "description": "Autoupgrade settings of a deployment.",
       "properties": {
         "upgradeChannel": {
           "description": "Channel used for autoupgrade.",
@@ -278,6 +277,13 @@
           ]
         }
       },
+      "type": "object"
+    },
+    "IdentityPropertiesUserAssignedIdentities": {
+      "additionalProperties": {
+        "$ref": "#/definitions/UserIdentityProperties"
+      },
+      "properties": {},
       "type": "object"
     },
     "NginxCertificateErrorResponseBody": {
@@ -332,7 +338,6 @@
           "type": "string"
         },
         "protectedFiles": {
-          "description": "Array of NginxConfigurationPackageProtectedFilesItem",
           "oneOf": [
             {
               "items": {
@@ -348,7 +353,7 @@
       },
       "type": "object"
     },
-    "NginxConfigurationProtectedFileRequest": {
+    "NginxConfigurationProtectedFileRequestOrNginxConfigurationProtectedFileResponse": {
       "properties": {
         "content": {
           "description": "The content of the protected file. This value is a PUT only value. If you perform a GET request on this value, it will be empty because it is a protected file.",
@@ -365,10 +370,9 @@
       },
       "type": "object"
     },
-    "NginxConfigurationRequestProperties": {
+    "NginxConfigurationRequestPropertiesOrNginxConfigurationResponseProperties": {
       "properties": {
         "files": {
-          "description": "Array of NginxConfigurationFile",
           "oneOf": [
             {
               "items": {
@@ -392,11 +396,10 @@
           ]
         },
         "protectedFiles": {
-          "description": "Array of NginxConfigurationProtectedFileRequest",
           "oneOf": [
             {
               "items": {
-                "$ref": "#/definitions/NginxConfigurationProtectedFileRequest"
+                "$ref": "#/definitions/NginxConfigurationProtectedFileRequestOrNginxConfigurationProtectedFileResponse"
               },
               "type": "array"
             },
@@ -411,11 +414,10 @@
       },
       "type": "object"
     },
-    "NginxDeploymentApiKeyRequestProperties": {
+    "NginxDeploymentApiKeyRequestPropertiesOrNginxDeploymentApiKeyResponseProperties": {
       "properties": {
         "endDateTime": {
           "description": "The time after which this Dataplane API Key is no longer valid.",
-          "format": "date-time",
           "type": "string"
         },
         "secretText": {
@@ -504,7 +506,6 @@
       "type": "object"
     },
     "NginxDeploymentPropertiesNginxAppProtect": {
-      "description": "Settings for NGINX App Protect (NAP)",
       "properties": {
         "webApplicationFirewallSettings": {
           "description": "Settings for the NGINX App Protect Web Application Firewall (WAF)",
@@ -524,7 +525,6 @@
       "type": "object"
     },
     "NginxDeploymentScalingProperties": {
-      "description": "Information on how the deployment will be scaled.",
       "properties": {
         "autoScaleSettings": {
           "description": "The settings for enabling automatic scaling of the deployment. If this field is specified, 'scale.capacity' must be empty.",
@@ -551,10 +551,8 @@
       "type": "object"
     },
     "NginxDeploymentScalingPropertiesAutoScaleSettings": {
-      "description": "The settings for enabling automatic scaling of the deployment. If this field is specified, 'scale.capacity' must be empty.",
       "properties": {
         "profiles": {
-          "description": "Array of ScaleProfile",
           "oneOf": [
             {
               "items": {
@@ -571,6 +569,13 @@
       "required": [
         "profiles"
       ],
+      "type": "object"
+    },
+    "NginxDeploymentTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
       "type": "object"
     },
     "NginxDeploymentUserProfile": {
@@ -593,7 +598,6 @@
     "NginxFrontendIPConfiguration": {
       "properties": {
         "privateIPAddresses": {
-          "description": "Array of NginxPrivateIPAddress",
           "oneOf": [
             {
               "items": {
@@ -607,7 +611,6 @@
           ]
         },
         "publicIPAddresses": {
-          "description": "Array of NginxPublicIPAddress",
           "oneOf": [
             {
               "items": {
@@ -728,7 +731,6 @@
       "type": "object"
     },
     "ScaleProfile": {
-      "description": "The autoscale profile.",
       "properties": {
         "capacity": {
           "description": "The capacity parameters of the profile.",
@@ -746,13 +748,12 @@
         }
       },
       "required": [
-        "name",
-        "capacity"
+        "capacity",
+        "name"
       ],
       "type": "object"
     },
     "ScaleProfileCapacity": {
-      "description": "The capacity parameters of the profile.",
       "properties": {
         "max": {
           "description": "The maximum number of NCUs the deployment can be autoscaled to.",
@@ -780,8 +781,8 @@
         }
       },
       "required": [
-        "min",
-        "max"
+        "max",
+        "min"
       ],
       "type": "object"
     },
@@ -790,7 +791,6 @@
       "type": "object"
     },
     "WebApplicationFirewallSettings": {
-      "description": "Settings for the NGINX App Protect Web Application Firewall (WAF)",
       "properties": {
         "activationState": {
           "description": "The activation state of the WAF. Use 'Enabled' to enable the WAF and 'Disabled' to disable it.",
@@ -811,7 +811,7 @@
       "type": "object"
     },
     "nginxDeployments_apiKeys_childResource": {
-      "description": "Nginx.NginxPlus/nginxDeployments/apiKeys",
+      "description": "apiKeys",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -820,7 +820,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The resource name of the API key",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^([a-z0-9A-Z][a-z0-9A-Z-]{0,28}[a-z0-9A-Z]|[a-z0-9A-Z])$",
@@ -834,7 +834,7 @@
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/NginxDeploymentApiKeyRequestProperties"
+              "$ref": "#/definitions/NginxDeploymentApiKeyRequestPropertiesOrNginxDeploymentApiKeyResponseProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -857,7 +857,7 @@
       "type": "object"
     },
     "nginxDeployments_certificates_childResource": {
-      "description": "Nginx.NginxPlus/nginxDeployments/certificates",
+      "description": "certificates",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -869,7 +869,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of certificate",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -898,7 +898,7 @@
       "type": "object"
     },
     "nginxDeployments_configurations_childResource": {
-      "description": "Nginx.NginxPlus/nginxDeployments/configurations",
+      "description": "configurations",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -907,13 +907,13 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of configuration, only 'default' is supported value due to the singleton of NGINX conf",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/NginxConfigurationRequestProperties"
+              "$ref": "#/definitions/NginxConfigurationRequestPropertiesOrNginxConfigurationResponseProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"

@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the CDN profile which is unique within the resource group.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -76,7 +76,9 @@
         }
       },
       "required": [
+        "location",
         "name",
+        "sku",
         "properties",
         "apiVersion",
         "type"
@@ -97,7 +99,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the endpoint under the profile which is unique globally.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -115,13 +117,13 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/profiles_endpoints_origins_childResource"
+                "$ref": "#/definitions/profiles_endpoints_customDomains_childResource"
               },
               {
                 "$ref": "#/definitions/profiles_endpoints_originGroups_childResource"
               },
               {
-                "$ref": "#/definitions/profiles_endpoints_customDomains_childResource"
+                "$ref": "#/definitions/profiles_endpoints_origins_childResource"
               }
             ]
           },
@@ -150,6 +152,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -167,14 +170,14 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the custom domain within an endpoint.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "The JSON object that contains the properties of the custom domain to create.",
           "oneOf": [
             {
-              "$ref": "#/definitions/CustomDomainPropertiesParameters"
+              "$ref": "#/definitions/CustomDomainPropertiesParametersOrCustomDomainProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -206,7 +209,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the origin group which is unique within the endpoint.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -245,7 +248,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the origin that is unique within the endpoint.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -277,7 +280,6 @@
   },
   "definitions": {
     "CacheExpirationActionParameters": {
-      "description": "Defines the parameters for the cache expiration action.",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -335,7 +337,6 @@
       "type": "object"
     },
     "CacheKeyQueryStringActionParameters": {
-      "description": "Defines the parameters for the cache-key query string action.",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -379,7 +380,6 @@
       "type": "object"
     },
     "CookiesMatchConditionParameters": {
-      "description": "Defines the parameters for Cookies match conditions",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -474,8 +474,7 @@
       ],
       "type": "object"
     },
-    "CustomDomainPropertiesParameters": {
-      "description": "The JSON object that contains the properties of the custom domain to create.",
+    "CustomDomainPropertiesParametersOrCustomDomainProperties": {
       "properties": {
         "hostName": {
           "description": "The host name of the custom domain. Must be a domain name.",
@@ -488,10 +487,9 @@
       "type": "object"
     },
     "DeepCreatedOrigin": {
-      "description": "The main origin of CDN content which is added when creating a CDN endpoint.",
       "properties": {
         "name": {
-          "description": "Origin name which must be unique within the endpoint. ",
+          "description": "Origin name which must be unique within the endpoint.",
           "type": "string"
         },
         "properties": {
@@ -512,7 +510,6 @@
       "type": "object"
     },
     "DeepCreatedOriginGroup": {
-      "description": "The origin group for CDN content which is added when creating a CDN endpoint. Traffic is sent to the origins within the origin group based on origin health.",
       "properties": {
         "name": {
           "description": "Origin group name which must be unique within the endpoint.",
@@ -536,7 +533,6 @@
       "type": "object"
     },
     "DeepCreatedOriginGroupProperties": {
-      "description": "Properties of the origin group created on the CDN endpoint.",
       "properties": {
         "healthProbeSettings": {
           "description": "Health probe settings to the origin that is used to determine the health of the origin.",
@@ -594,7 +590,6 @@
       "type": "object"
     },
     "DeepCreatedOriginProperties": {
-      "description": "Properties of the origin created on the CDN endpoint.",
       "properties": {
         "enabled": {
           "description": "Origin is enabled for load balancing or not. By default, origin is always enabled.",
@@ -674,7 +669,6 @@
       "type": "object"
     },
     "DeliveryRule": {
-      "description": "A rule that specifies a set of actions and conditions",
       "properties": {
         "actions": {
           "description": "A list of actions that are executed when all the conditions of a rule are satisfied.",
@@ -721,594 +715,1067 @@
         }
       },
       "required": [
-        "order",
-        "actions"
+        "actions",
+        "order"
       ],
       "type": "object"
     },
     "DeliveryRuleActionAutoGenerated": {
-      "description": "An action for the delivery rule.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Defines the cache expiration action for the delivery rule.",
+          "additionalProperties": false,
           "properties": {
             "name": {
+              "enum": [
+                "CacheExpiration",
+                "CacheKeyQueryString",
+                "ModifyRequestHeader",
+                "ModifyResponseHeader",
+                "OriginGroupOverride",
+                "UrlRedirect",
+                "UrlRewrite"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "name"
+          ],
+          "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeliveryRuleCacheExpirationAction"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "CacheExpiration"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeliveryRuleCacheKeyQueryStringAction"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "CacheKeyQueryString"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeliveryRuleRequestHeaderAction"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "ModifyRequestHeader"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeliveryRuleResponseHeaderAction"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "ModifyResponseHeader"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/OriginGroupOverrideAction"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "OriginGroupOverride"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/UrlRedirectAction"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "UrlRedirect"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/UrlRewriteAction"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "UrlRewrite"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "DeliveryRuleCacheExpirationAction": {
+      "properties": {
+        "name": {
+          "description": "The name of the action for the delivery rule.",
+          "oneOf": [
+            {
               "enum": [
                 "CacheExpiration"
               ],
               "type": "string"
             },
-            "parameters": {
-              "description": "Defines the parameters for the action.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/CacheExpirationActionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
+          ]
         },
-        {
-          "description": "Defines the cache-key query string action for the delivery rule.",
-          "properties": {
-            "name": {
+        "parameters": {
+          "description": "Defines the parameters for the action.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CacheExpirationActionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "type": "object"
+    },
+    "DeliveryRuleCacheKeyQueryStringAction": {
+      "properties": {
+        "name": {
+          "description": "The name of the action for the delivery rule.",
+          "oneOf": [
+            {
               "enum": [
                 "CacheKeyQueryString"
               ],
               "type": "string"
             },
-            "parameters": {
-              "description": "Defines the parameters for the action.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/CacheKeyQueryStringActionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
+          ]
         },
-        {
-          "description": "Defines the request header action for the delivery rule.",
-          "properties": {
-            "name": {
-              "enum": [
-                "ModifyRequestHeader"
-              ],
-              "type": "string"
+        "parameters": {
+          "description": "Defines the parameters for the action.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CacheKeyQueryStringActionParameters"
             },
-            "parameters": {
-              "description": "Defines the parameters for the action.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/HeaderActionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Defines the response header action for the delivery rule.",
-          "properties": {
-            "name": {
-              "enum": [
-                "ModifyResponseHeader"
-              ],
-              "type": "string"
-            },
-            "parameters": {
-              "description": "Defines the parameters for the action.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/HeaderActionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Defines the Origin Group override action for the delivery rule.",
-          "properties": {
-            "name": {
-              "enum": [
-                "OriginGroupOverride"
-              ],
-              "type": "string"
-            },
-            "parameters": {
-              "description": "Defines the parameters for the action.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/OriginGroupOverrideActionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Defines the url redirect action for the delivery rule.",
-          "properties": {
-            "name": {
-              "enum": [
-                "UrlRedirect"
-              ],
-              "type": "string"
-            },
-            "parameters": {
-              "description": "Defines the parameters for the action.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/UrlRedirectActionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Defines the url rewrite action for the delivery rule.",
-          "properties": {
-            "name": {
-              "enum": [
-                "UrlRewrite"
-              ],
-              "type": "string"
-            },
-            "parameters": {
-              "description": "Defines the parameters for the action.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/UrlRewriteActionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
+          ]
         }
+      },
+      "required": [
+        "name",
+        "parameters"
       ],
-      "properties": {},
       "type": "object"
     },
     "DeliveryRuleCondition": {
-      "description": "A condition for the delivery rule.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Defines the Cookies condition for the delivery rule.",
+          "additionalProperties": false,
           "properties": {
             "name": {
+              "enum": [
+                "Cookies",
+                "HttpVersion",
+                "IsDevice",
+                "PostArgs",
+                "QueryString",
+                "RemoteAddress",
+                "RequestBody",
+                "RequestHeader",
+                "RequestMethod",
+                "RequestScheme",
+                "RequestUri",
+                "UrlFileExtension",
+                "UrlFileName",
+                "UrlPath"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "name"
+          ],
+          "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeliveryRuleCookiesCondition"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "Cookies"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeliveryRuleHttpVersionCondition"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "HttpVersion"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeliveryRuleIsDeviceCondition"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "IsDevice"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeliveryRulePostArgsCondition"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "PostArgs"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeliveryRuleQueryStringCondition"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "QueryString"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeliveryRuleRemoteAddressCondition"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "RemoteAddress"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeliveryRuleRequestBodyCondition"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "RequestBody"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeliveryRuleRequestHeaderCondition"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "RequestHeader"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeliveryRuleRequestMethodCondition"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "RequestMethod"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeliveryRuleRequestSchemeCondition"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "RequestScheme"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeliveryRuleRequestUriCondition"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "RequestUri"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeliveryRuleUrlFileExtensionCondition"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "UrlFileExtension"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeliveryRuleUrlFileNameCondition"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "UrlFileName"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeliveryRuleUrlPathCondition"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "UrlPath"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "DeliveryRuleCookiesCondition": {
+      "properties": {
+        "name": {
+          "description": "The name of the condition for the delivery rule.",
+          "oneOf": [
+            {
               "enum": [
                 "Cookies"
               ],
               "type": "string"
             },
-            "parameters": {
-              "description": "Defines the parameters for the condition.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/CookiesMatchConditionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
+          ]
         },
-        {
-          "description": "Defines the HttpVersion condition for the delivery rule.",
-          "properties": {
-            "name": {
+        "parameters": {
+          "description": "Defines the parameters for the condition.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CookiesMatchConditionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "type": "object"
+    },
+    "DeliveryRuleHttpVersionCondition": {
+      "properties": {
+        "name": {
+          "description": "The name of the condition for the delivery rule.",
+          "oneOf": [
+            {
               "enum": [
                 "HttpVersion"
               ],
               "type": "string"
             },
-            "parameters": {
-              "description": "Defines the parameters for the condition.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/HttpVersionMatchConditionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
+          ]
         },
-        {
-          "description": "Defines the IsDevice condition for the delivery rule.",
-          "properties": {
-            "name": {
+        "parameters": {
+          "description": "Defines the parameters for the condition.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/HttpVersionMatchConditionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "type": "object"
+    },
+    "DeliveryRuleIsDeviceCondition": {
+      "properties": {
+        "name": {
+          "description": "The name of the condition for the delivery rule.",
+          "oneOf": [
+            {
               "enum": [
                 "IsDevice"
               ],
               "type": "string"
             },
-            "parameters": {
-              "description": "Defines the parameters for the condition.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/IsDeviceMatchConditionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
+          ]
         },
-        {
-          "description": "Defines the PostArgs condition for the delivery rule.",
-          "properties": {
-            "name": {
+        "parameters": {
+          "description": "Defines the parameters for the condition.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/IsDeviceMatchConditionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "type": "object"
+    },
+    "DeliveryRulePostArgsCondition": {
+      "properties": {
+        "name": {
+          "description": "The name of the condition for the delivery rule.",
+          "oneOf": [
+            {
               "enum": [
                 "PostArgs"
               ],
               "type": "string"
             },
-            "parameters": {
-              "description": "Defines the parameters for the condition.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/PostArgsMatchConditionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
+          ]
         },
-        {
-          "description": "Defines the QueryString condition for the delivery rule.",
-          "properties": {
-            "name": {
+        "parameters": {
+          "description": "Defines the parameters for the condition.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PostArgsMatchConditionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "type": "object"
+    },
+    "DeliveryRuleQueryStringCondition": {
+      "properties": {
+        "name": {
+          "description": "The name of the condition for the delivery rule.",
+          "oneOf": [
+            {
               "enum": [
                 "QueryString"
               ],
               "type": "string"
             },
-            "parameters": {
-              "description": "Defines the parameters for the condition.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/QueryStringMatchConditionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
+          ]
         },
-        {
-          "description": "Defines the RemoteAddress condition for the delivery rule.",
-          "properties": {
-            "name": {
+        "parameters": {
+          "description": "Defines the parameters for the condition.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/QueryStringMatchConditionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "type": "object"
+    },
+    "DeliveryRuleRemoteAddressCondition": {
+      "properties": {
+        "name": {
+          "description": "The name of the condition for the delivery rule.",
+          "oneOf": [
+            {
               "enum": [
                 "RemoteAddress"
               ],
               "type": "string"
             },
-            "parameters": {
-              "description": "Defines the parameters for the condition.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/RemoteAddressMatchConditionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
+          ]
         },
-        {
-          "description": "Defines the RequestBody condition for the delivery rule.",
-          "properties": {
-            "name": {
+        "parameters": {
+          "description": "Defines the parameters for the condition.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/RemoteAddressMatchConditionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "type": "object"
+    },
+    "DeliveryRuleRequestBodyCondition": {
+      "properties": {
+        "name": {
+          "description": "The name of the condition for the delivery rule.",
+          "oneOf": [
+            {
               "enum": [
                 "RequestBody"
               ],
               "type": "string"
             },
-            "parameters": {
-              "description": "Defines the parameters for the condition.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/RequestBodyMatchConditionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
+          ]
         },
-        {
-          "description": "Defines the RequestHeader condition for the delivery rule.",
-          "properties": {
-            "name": {
+        "parameters": {
+          "description": "Defines the parameters for the condition.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/RequestBodyMatchConditionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "type": "object"
+    },
+    "DeliveryRuleRequestHeaderAction": {
+      "properties": {
+        "name": {
+          "description": "The name of the action for the delivery rule.",
+          "oneOf": [
+            {
+              "enum": [
+                "ModifyRequestHeader"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "parameters": {
+          "description": "Defines the parameters for the action.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/HeaderActionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "type": "object"
+    },
+    "DeliveryRuleRequestHeaderCondition": {
+      "properties": {
+        "name": {
+          "description": "The name of the condition for the delivery rule.",
+          "oneOf": [
+            {
               "enum": [
                 "RequestHeader"
               ],
               "type": "string"
             },
-            "parameters": {
-              "description": "Defines the parameters for the condition.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/RequestHeaderMatchConditionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
+          ]
         },
-        {
-          "description": "Defines the RequestMethod condition for the delivery rule.",
-          "properties": {
-            "name": {
+        "parameters": {
+          "description": "Defines the parameters for the condition.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/RequestHeaderMatchConditionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "type": "object"
+    },
+    "DeliveryRuleRequestMethodCondition": {
+      "properties": {
+        "name": {
+          "description": "The name of the condition for the delivery rule.",
+          "oneOf": [
+            {
               "enum": [
                 "RequestMethod"
               ],
               "type": "string"
             },
-            "parameters": {
-              "description": "Defines the parameters for the condition.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/RequestMethodMatchConditionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
+          ]
         },
-        {
-          "description": "Defines the RequestScheme condition for the delivery rule.",
-          "properties": {
-            "name": {
+        "parameters": {
+          "description": "Defines the parameters for the condition.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/RequestMethodMatchConditionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "type": "object"
+    },
+    "DeliveryRuleRequestSchemeCondition": {
+      "properties": {
+        "name": {
+          "description": "The name of the condition for the delivery rule.",
+          "oneOf": [
+            {
               "enum": [
                 "RequestScheme"
               ],
               "type": "string"
             },
-            "parameters": {
-              "description": "Defines the parameters for the condition.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/RequestSchemeMatchConditionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
+          ]
         },
-        {
-          "description": "Defines the RequestUri condition for the delivery rule.",
-          "properties": {
-            "name": {
+        "parameters": {
+          "description": "Defines the parameters for the condition.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/RequestSchemeMatchConditionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "type": "object"
+    },
+    "DeliveryRuleRequestUriCondition": {
+      "properties": {
+        "name": {
+          "description": "The name of the condition for the delivery rule.",
+          "oneOf": [
+            {
               "enum": [
                 "RequestUri"
               ],
               "type": "string"
             },
-            "parameters": {
-              "description": "Defines the parameters for the condition.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/RequestUriMatchConditionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
+          ]
         },
-        {
-          "description": "Defines the UrlFileExtension condition for the delivery rule.",
-          "properties": {
-            "name": {
+        "parameters": {
+          "description": "Defines the parameters for the condition.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/RequestUriMatchConditionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "type": "object"
+    },
+    "DeliveryRuleResponseHeaderAction": {
+      "properties": {
+        "name": {
+          "description": "The name of the action for the delivery rule.",
+          "oneOf": [
+            {
+              "enum": [
+                "ModifyResponseHeader"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "parameters": {
+          "description": "Defines the parameters for the action.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/HeaderActionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "type": "object"
+    },
+    "DeliveryRuleUrlFileExtensionCondition": {
+      "properties": {
+        "name": {
+          "description": "The name of the condition for the delivery rule.",
+          "oneOf": [
+            {
               "enum": [
                 "UrlFileExtension"
               ],
               "type": "string"
             },
-            "parameters": {
-              "description": "Defines the parameters for the condition.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/UrlFileExtensionMatchConditionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
+          ]
         },
-        {
-          "description": "Defines the UrlFileName condition for the delivery rule.",
-          "properties": {
-            "name": {
+        "parameters": {
+          "description": "Defines the parameters for the condition.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/UrlFileExtensionMatchConditionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "type": "object"
+    },
+    "DeliveryRuleUrlFileNameCondition": {
+      "properties": {
+        "name": {
+          "description": "The name of the condition for the delivery rule.",
+          "oneOf": [
+            {
               "enum": [
                 "UrlFileName"
               ],
               "type": "string"
             },
-            "parameters": {
-              "description": "Defines the parameters for the condition.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/UrlFileNameMatchConditionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
+          ]
         },
-        {
-          "description": "Defines the UrlPath condition for the delivery rule.",
-          "properties": {
-            "name": {
+        "parameters": {
+          "description": "Defines the parameters for the condition.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/UrlFileNameMatchConditionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "type": "object"
+    },
+    "DeliveryRuleUrlPathCondition": {
+      "properties": {
+        "name": {
+          "description": "The name of the condition for the delivery rule.",
+          "oneOf": [
+            {
               "enum": [
                 "UrlPath"
               ],
               "type": "string"
             },
-            "parameters": {
-              "description": "Defines the parameters for the condition.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/UrlPathMatchConditionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
+          ]
+        },
+        "parameters": {
+          "description": "Defines the parameters for the condition.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/UrlPathMatchConditionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
+      },
+      "required": [
+        "name",
+        "parameters"
       ],
-      "properties": {},
       "type": "object"
     },
     "EndpointProperties": {
-      "description": "The JSON object that contains the properties required to create an endpoint.",
       "properties": {
         "contentTypesToCompress": {
           "description": "List of content types on which compression applies. The value should be a valid MIME type.",
@@ -1475,7 +1942,6 @@
       "type": "object"
     },
     "EndpointPropertiesUpdateParametersDeliveryPolicy": {
-      "description": "A policy that specifies the delivery rules to be used for an endpoint.",
       "properties": {
         "description": {
           "description": "User-friendly description of the policy.",
@@ -1502,7 +1968,6 @@
       "type": "object"
     },
     "GeoFilter": {
-      "description": "Rules defining user's geo access within a CDN endpoint.",
       "properties": {
         "action": {
           "description": "Action of the geo filter, i.e. allow or block access.",
@@ -1539,14 +2004,13 @@
         }
       },
       "required": [
-        "relativePath",
         "action",
-        "countryCodes"
+        "countryCodes",
+        "relativePath"
       ],
       "type": "object"
     },
     "HeaderActionParameters": {
-      "description": "Defines the parameters for the request header action.",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -1594,7 +2058,6 @@
       "type": "object"
     },
     "HealthProbeParameters": {
-      "description": "The JSON object that contains the properties to send health probes to origin.",
       "properties": {
         "probeIntervalInSeconds": {
           "description": "The number of seconds between health probes.Default is 240sec.",
@@ -1649,7 +2112,6 @@
       "type": "object"
     },
     "HttpErrorRangeParameters": {
-      "description": "The JSON object that represents the range for http status codes",
       "properties": {
         "begin": {
           "description": "The inclusive start of the http status code range.",
@@ -1681,7 +2143,6 @@
       "type": "object"
     },
     "HttpVersionMatchConditionParameters": {
-      "description": "Defines the parameters for HttpVersion match conditions",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -1743,7 +2204,6 @@
       "type": "object"
     },
     "IsDeviceMatchConditionParameters": {
-      "description": "Defines the parameters for IsDevice match conditions",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -1830,8 +2290,41 @@
       ],
       "type": "object"
     },
+    "OriginGroupOverrideAction": {
+      "properties": {
+        "name": {
+          "description": "The name of the action for the delivery rule.",
+          "oneOf": [
+            {
+              "enum": [
+                "OriginGroupOverride"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "parameters": {
+          "description": "Defines the parameters for the action.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/OriginGroupOverrideActionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "type": "object"
+    },
     "OriginGroupOverrideActionParameters": {
-      "description": "Defines the parameters for the Origin Group override action.",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -1865,7 +2358,6 @@
       "type": "object"
     },
     "OriginGroupProperties": {
-      "description": "The JSON object that contains the properties of the origin group.",
       "properties": {
         "healthProbeSettings": {
           "description": "Health probe settings to the origin that is used to determine the health of the origin.",
@@ -1920,7 +2412,6 @@
       "type": "object"
     },
     "OriginProperties": {
-      "description": "The JSON object that contains the properties of the origin.",
       "properties": {
         "enabled": {
           "description": "Origin is enabled for load balancing or not",
@@ -1997,7 +2488,6 @@
       "type": "object"
     },
     "PostArgsMatchConditionParameters": {
-      "description": "Defines the parameters for PostArgs match conditions",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -2093,12 +2583,10 @@
       "type": "object"
     },
     "ProfileProperties": {
-      "description": "The JSON object that contains the properties required to create a profile.",
       "properties": {},
       "type": "object"
     },
     "QueryStringMatchConditionParameters": {
-      "description": "Defines the parameters for QueryString match conditions",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -2190,7 +2678,6 @@
       "type": "object"
     },
     "RemoteAddressMatchConditionParameters": {
-      "description": "Defines the parameters for RemoteAddress match conditions",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -2276,7 +2763,6 @@
       "type": "object"
     },
     "RequestBodyMatchConditionParameters": {
-      "description": "Defines the parameters for RequestBody match conditions",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -2368,7 +2854,6 @@
       "type": "object"
     },
     "RequestHeaderMatchConditionParameters": {
-      "description": "Defines the parameters for RequestHeader match conditions",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -2464,7 +2949,6 @@
       "type": "object"
     },
     "RequestMethodMatchConditionParameters": {
-      "description": "Defines the parameters for RequestMethod match conditions",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -2535,7 +3019,6 @@
       "type": "object"
     },
     "RequestSchemeMatchConditionParameters": {
-      "description": "Defines the parameters for RequestScheme match conditions ",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -2601,7 +3084,6 @@
       "type": "object"
     },
     "RequestUriMatchConditionParameters": {
-      "description": "Defines the parameters for RequestUri match conditions",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -2693,7 +3175,6 @@
       "type": "object"
     },
     "ResourceReference": {
-      "description": "Reference to another resource.",
       "properties": {
         "id": {
           "description": "Resource ID.",
@@ -2703,7 +3184,6 @@
       "type": "object"
     },
     "ResponseBasedOriginErrorDetectionParameters": {
-      "description": "The JSON object that contains the properties to determine origin health using real requests/responses.",
       "properties": {
         "httpErrorRanges": {
           "description": "The list of Http status code ranges that are considered as server errors for origin and it is marked as unhealthy.",
@@ -2752,7 +3232,6 @@
       "type": "object"
     },
     "Sku": {
-      "description": "The pricing tier (defines a CDN provider, feature list and rate) of the CDN profile.",
       "properties": {
         "name": {
           "description": "Name of the pricing tier.",
@@ -2777,8 +3256,14 @@
       },
       "type": "object"
     },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "UrlFileExtensionMatchConditionParameters": {
-      "description": "Defines the parameters for UrlFileExtension match conditions",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -2870,7 +3355,6 @@
       "type": "object"
     },
     "UrlFileNameMatchConditionParameters": {
-      "description": "Defines the parameters for UrlFilename match conditions",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -2962,7 +3446,6 @@
       "type": "object"
     },
     "UrlPathMatchConditionParameters": {
-      "description": "Defines the parameters for UrlPath match conditions",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -3054,8 +3537,41 @@
       ],
       "type": "object"
     },
+    "UrlRedirectAction": {
+      "properties": {
+        "name": {
+          "description": "The name of the action for the delivery rule.",
+          "oneOf": [
+            {
+              "enum": [
+                "UrlRedirect"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "parameters": {
+          "description": "Defines the parameters for the action.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/UrlRedirectActionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "type": "object"
+    },
     "UrlRedirectActionParameters": {
-      "description": "Defines the parameters for the url redirect action.",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -3126,8 +3642,41 @@
       ],
       "type": "object"
     },
+    "UrlRewriteAction": {
+      "properties": {
+        "name": {
+          "description": "The name of the action for the delivery rule.",
+          "oneOf": [
+            {
+              "enum": [
+                "UrlRewrite"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "parameters": {
+          "description": "Defines the parameters for the action.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/UrlRewriteActionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "type": "object"
+    },
     "UrlRewriteActionParameters": {
-      "description": "Defines the parameters for the url rewrite action.",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -3164,13 +3713,13 @@
       },
       "required": [
         "@odata.type",
-        "sourcePattern",
-        "destination"
+        "destination",
+        "sourcePattern"
       ],
       "type": "object"
     },
     "profiles_endpoints_childResource": {
-      "description": "Microsoft.Cdn/profiles/endpoints",
+      "description": "endpoints",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -3183,7 +3732,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the endpoint under the profile which is unique globally.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -3220,6 +3769,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -3228,7 +3778,7 @@
       "type": "object"
     },
     "profiles_endpoints_customDomains_childResource": {
-      "description": "Microsoft.Cdn/profiles/endpoints/customDomains",
+      "description": "customDomains",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -3237,14 +3787,14 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the custom domain within an endpoint.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "The JSON object that contains the properties of the custom domain to create.",
           "oneOf": [
             {
-              "$ref": "#/definitions/CustomDomainPropertiesParameters"
+              "$ref": "#/definitions/CustomDomainPropertiesParametersOrCustomDomainProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -3267,7 +3817,7 @@
       "type": "object"
     },
     "profiles_endpoints_originGroups_childResource": {
-      "description": "Microsoft.Cdn/profiles/endpoints/originGroups",
+      "description": "originGroups",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -3276,7 +3826,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the origin group which is unique within the endpoint.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -3306,7 +3856,7 @@
       "type": "object"
     },
     "profiles_endpoints_origins_childResource": {
-      "description": "Microsoft.Cdn/profiles/endpoints/origins",
+      "description": "origins",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -3315,7 +3865,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the origin that is unique within the endpoint.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {

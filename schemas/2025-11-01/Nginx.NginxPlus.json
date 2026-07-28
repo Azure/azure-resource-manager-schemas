@@ -29,7 +29,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of targeted NGINX deployment",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^([a-z0-9A-Z][a-z0-9A-Z-]{0,28}[a-z0-9A-Z]|[a-z0-9A-Z])$",
@@ -58,13 +58,13 @@
                 "$ref": "#/definitions/nginxDeployments_apiKeys_childResource"
               },
               {
-                "$ref": "#/definitions/nginxDeployments_wafPolicies_childResource"
-              },
-              {
                 "$ref": "#/definitions/nginxDeployments_certificates_childResource"
               },
               {
                 "$ref": "#/definitions/nginxDeployments_configurations_childResource"
+              },
+              {
+                "$ref": "#/definitions/nginxDeployments_wafPolicies_childResource"
               }
             ]
           },
@@ -104,6 +104,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -121,7 +122,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The resource name of the API key",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^([a-z0-9A-Z][a-z0-9A-Z-]{0,28}[a-z0-9A-Z]|[a-z0-9A-Z])$",
@@ -136,7 +137,7 @@
           "description": "Nginx Deployment Api Key Request Properties",
           "oneOf": [
             {
-              "$ref": "#/definitions/NginxDeploymentApiKeyRequestProperties"
+              "$ref": "#/definitions/NginxDeploymentApiKeyRequestPropertiesOrNginxDeploymentApiKeyResponseProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -172,7 +173,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of certificate",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^([a-z0-9A-Z][a-z0-9A-Z-]{0,28}[a-z0-9A-Z]|[a-z0-9A-Z])$",
@@ -219,7 +220,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of configuration, only 'default' is supported value due to the singleton of NGINX conf",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-z][a-z0-9]*$",
@@ -234,7 +235,7 @@
           "description": "Nginx Configuration Request Properties",
           "oneOf": [
             {
-              "$ref": "#/definitions/NginxConfigurationRequestProperties"
+              "$ref": "#/definitions/NginxConfigurationRequestPropertiesOrNginxConfigurationResponseProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -266,7 +267,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of Waf Policy",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^([a-z0-9A-Z][a-z0-9A-Z-]{0,28}[a-z0-9A-Z]|[a-z0-9A-Z])$",
@@ -306,7 +307,6 @@
   },
   "definitions": {
     "AutoUpgradeProfile": {
-      "description": "Autoupgrade settings of a deployment.",
       "properties": {
         "upgradeChannel": {
           "description": "Channel used for autoupgrade.",
@@ -319,7 +319,6 @@
       "type": "object"
     },
     "IdentityProperties": {
-      "description": "Identity Properties",
       "properties": {
         "type": {
           "description": "Identity Type",
@@ -356,8 +355,14 @@
       },
       "type": "object"
     },
+    "IdentityPropertiesUserAssignedIdentities": {
+      "additionalProperties": {
+        "$ref": "#/definitions/UserIdentityProperties"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "NginxCertificateErrorResponseBody": {
-      "description": "Nginx Certificate Error Response Body",
       "properties": {
         "code": {
           "type": "string"
@@ -369,7 +374,6 @@
       "type": "object"
     },
     "NginxCertificateProperties": {
-      "description": "Nginx Certificate Properties",
       "properties": {
         "certificateError": {
           "description": "Nginx Certificate Error Response Body",
@@ -395,7 +399,6 @@
       "type": "object"
     },
     "NginxConfigurationFile": {
-      "description": "Nginx Configuration File",
       "properties": {
         "content": {
           "type": "string"
@@ -407,13 +410,11 @@
       "type": "object"
     },
     "NginxConfigurationPackage": {
-      "description": "Nginx Configuration Package",
       "properties": {
         "data": {
           "type": "string"
         },
         "protectedFiles": {
-          "description": "Array of NginxConfigurationPackageProtectedFilesItem",
           "oneOf": [
             {
               "items": {
@@ -429,8 +430,7 @@
       },
       "type": "object"
     },
-    "NginxConfigurationProtectedFileRequest": {
-      "description": "Nginx Configuration Protected File Request",
+    "NginxConfigurationProtectedFileRequestOrNginxConfigurationProtectedFileResponse": {
       "properties": {
         "content": {
           "description": "The content of the protected file. This value is a PUT only value. If you perform a GET request on this value, it will be empty because it is a protected file.",
@@ -447,11 +447,9 @@
       },
       "type": "object"
     },
-    "NginxConfigurationRequestProperties": {
-      "description": "Nginx Configuration Request Properties",
+    "NginxConfigurationRequestPropertiesOrNginxConfigurationResponseProperties": {
       "properties": {
         "files": {
-          "description": "Array of NginxConfigurationFile",
           "oneOf": [
             {
               "items": {
@@ -476,11 +474,10 @@
           ]
         },
         "protectedFiles": {
-          "description": "Array of NginxConfigurationProtectedFileRequest",
           "oneOf": [
             {
               "items": {
-                "$ref": "#/definitions/NginxConfigurationProtectedFileRequest"
+                "$ref": "#/definitions/NginxConfigurationProtectedFileRequestOrNginxConfigurationProtectedFileResponse"
               },
               "type": "array"
             },
@@ -495,12 +492,10 @@
       },
       "type": "object"
     },
-    "NginxDeploymentApiKeyRequestProperties": {
-      "description": "Nginx Deployment Api Key Request Properties",
+    "NginxDeploymentApiKeyRequestPropertiesOrNginxDeploymentApiKeyResponseProperties": {
       "properties": {
         "endDateTime": {
           "description": "The time after which this Dataplane API Key is no longer valid.",
-          "format": "date-time",
           "type": "string"
         },
         "secretText": {
@@ -511,7 +506,6 @@
       "type": "object"
     },
     "NginxDeploymentProperties": {
-      "description": "Nginx Deployment Properties",
       "properties": {
         "autoUpgradeProfile": {
           "description": "Autoupgrade settings of a deployment.",
@@ -593,7 +587,6 @@
       "type": "object"
     },
     "NginxDeploymentPropertiesNginxAppProtect": {
-      "description": "Settings for NGINX App Protect (NAP)",
       "properties": {
         "webApplicationFirewallSettings": {
           "description": "Settings for the NGINX App Protect Web Application Firewall (WAF)",
@@ -613,7 +606,6 @@
       "type": "object"
     },
     "NginxDeploymentScalingProperties": {
-      "description": "Information on how the deployment will be scaled.",
       "properties": {
         "autoScaleSettings": {
           "description": "The settings for enabling automatic scaling of the deployment. If this field is specified, 'scale.capacity' must be empty.",
@@ -640,10 +632,8 @@
       "type": "object"
     },
     "NginxDeploymentScalingPropertiesAutoScaleSettings": {
-      "description": "The settings for enabling automatic scaling of the deployment. If this field is specified, 'scale.capacity' must be empty.",
       "properties": {
         "profiles": {
-          "description": "Array of ScaleProfile",
           "oneOf": [
             {
               "items": {
@@ -663,7 +653,6 @@
       "type": "object"
     },
     "NginxDeploymentUserProfile": {
-      "description": "Nginx Deployment User Profile",
       "properties": {
         "preferredEmail": {
           "description": "The preferred support contact email address of the user used for sending alerts and notification. Can be an empty string or a valid email address.",
@@ -681,10 +670,15 @@
       "type": "object"
     },
     "NginxDeploymentWafPolicyProperties": {
-      "description": "Nginx Deployment Waf Policy Properties",
       "properties": {
         "content": {
-          "description": "The byte content of the Policy"
+          "description": "The byte content of the Policy",
+          "oneOf": [
+            {},
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "filepath": {
           "description": "The file path where the Policy is to be saved",
@@ -694,10 +688,8 @@
       "type": "object"
     },
     "NginxFrontendIPConfiguration": {
-      "description": "Nginx Frontend IP Configuration",
       "properties": {
         "privateIPAddresses": {
-          "description": "Array of NginxPrivateIPAddress",
           "oneOf": [
             {
               "items": {
@@ -711,7 +703,6 @@
           ]
         },
         "publicIPAddresses": {
-          "description": "Array of NginxPublicIPAddress",
           "oneOf": [
             {
               "items": {
@@ -728,7 +719,6 @@
       "type": "object"
     },
     "NginxLogging": {
-      "description": "Nginx Logging",
       "properties": {
         "storageAccount": {
           "description": "Nginx Storage Account",
@@ -745,7 +735,6 @@
       "type": "object"
     },
     "NginxNetworkInterfaceConfiguration": {
-      "description": "Nginx Network Interface Configuration",
       "properties": {
         "subnetId": {
           "type": "string"
@@ -754,7 +743,6 @@
       "type": "object"
     },
     "NginxNetworkProfile": {
-      "description": "Nginx Network Profile",
       "properties": {
         "frontEndIPConfiguration": {
           "description": "Nginx Frontend IP Configuration",
@@ -782,7 +770,6 @@
       "type": "object"
     },
     "NginxPrivateIPAddress": {
-      "description": "Nginx Private IP Address",
       "properties": {
         "privateIPAddress": {
           "type": "string"
@@ -809,7 +796,6 @@
       "type": "object"
     },
     "NginxPublicIPAddress": {
-      "description": "Nginx Public IP Address",
       "properties": {
         "id": {
           "type": "string"
@@ -818,7 +804,6 @@
       "type": "object"
     },
     "NginxStorageAccount": {
-      "description": "Nginx Storage Account",
       "properties": {
         "accountName": {
           "type": "string"
@@ -830,7 +815,6 @@
       "type": "object"
     },
     "ResourceSku": {
-      "description": "Resource Sku",
       "properties": {
         "name": {
           "description": "Name of the SKU.",
@@ -843,7 +827,6 @@
       "type": "object"
     },
     "ScaleProfile": {
-      "description": "The autoscale profile.",
       "properties": {
         "capacity": {
           "description": "The capacity parameters of the profile.",
@@ -861,13 +844,12 @@
         }
       },
       "required": [
-        "name",
-        "capacity"
+        "capacity",
+        "name"
       ],
       "type": "object"
     },
     "ScaleProfileCapacity": {
-      "description": "The capacity parameters of the profile.",
       "properties": {
         "max": {
           "description": "The maximum number of NCUs the deployment can be autoscaled to.",
@@ -893,18 +875,23 @@
         }
       },
       "required": [
-        "min",
-        "max"
+        "max",
+        "min"
       ],
       "type": "object"
     },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "UserIdentityProperties": {
-      "description": "User Identity Properties",
       "properties": {},
       "type": "object"
     },
     "WebApplicationFirewallSettings": {
-      "description": "Settings for the NGINX App Protect Web Application Firewall (WAF)",
       "properties": {
         "activationState": {
           "description": "The activation state of the WAF. Use 'Enabled' to enable the WAF and 'Disabled' to disable it.",
@@ -925,7 +912,7 @@
       "type": "object"
     },
     "nginxDeployments_apiKeys_childResource": {
-      "description": "Nginx.NginxPlus/nginxDeployments/apiKeys",
+      "description": "apiKeys",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -934,7 +921,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The resource name of the API key",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^([a-z0-9A-Z][a-z0-9A-Z-]{0,28}[a-z0-9A-Z]|[a-z0-9A-Z])$",
@@ -949,7 +936,7 @@
           "description": "Nginx Deployment Api Key Request Properties",
           "oneOf": [
             {
-              "$ref": "#/definitions/NginxDeploymentApiKeyRequestProperties"
+              "$ref": "#/definitions/NginxDeploymentApiKeyRequestPropertiesOrNginxDeploymentApiKeyResponseProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -972,7 +959,7 @@
       "type": "object"
     },
     "nginxDeployments_certificates_childResource": {
-      "description": "Nginx.NginxPlus/nginxDeployments/certificates",
+      "description": "certificates",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -985,7 +972,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of certificate",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^([a-z0-9A-Z][a-z0-9A-Z-]{0,28}[a-z0-9A-Z]|[a-z0-9A-Z])$",
@@ -1023,7 +1010,7 @@
       "type": "object"
     },
     "nginxDeployments_configurations_childResource": {
-      "description": "Nginx.NginxPlus/nginxDeployments/configurations",
+      "description": "configurations",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1032,7 +1019,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of configuration, only 'default' is supported value due to the singleton of NGINX conf",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-z][a-z0-9]*$",
@@ -1047,7 +1034,7 @@
           "description": "Nginx Configuration Request Properties",
           "oneOf": [
             {
-              "$ref": "#/definitions/NginxConfigurationRequestProperties"
+              "$ref": "#/definitions/NginxConfigurationRequestPropertiesOrNginxConfigurationResponseProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -1070,7 +1057,7 @@
       "type": "object"
     },
     "nginxDeployments_wafPolicies_childResource": {
-      "description": "Nginx.NginxPlus/nginxDeployments/wafPolicies",
+      "description": "wafPolicies",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1079,7 +1066,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of Waf Policy",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^([a-z0-9A-Z][a-z0-9A-Z-]{0,28}[a-z0-9A-Z]|[a-z0-9A-Z])$",

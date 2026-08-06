@@ -216,6 +216,8 @@ public static class JsonSchemaGenerator
             root["definitions"] = definitionsObject;
         }
 
+        SpecialCaseRewriter.Rewrite(providerNamespace, root);
+
         return sortProperties ? SortKeysRecursive(root) : root;
     }
 

@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the cluster resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -55,6 +55,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -65,7 +66,6 @@
   },
   "definitions": {
     "ApplicationDeltaHealthPolicy": {
-      "description": "Defines a delta health policy used to evaluate the health of an application or one of its child entities when upgrading the cluster.\n",
       "properties": {
         "defaultServiceTypeDeltaHealthPolicy": {
           "description": "The delta health policy used by default to evaluate the health of a service type when upgrading the cluster.",
@@ -96,8 +96,14 @@
       },
       "type": "object"
     },
+    "ApplicationDeltaHealthPolicyMap": {
+      "additionalProperties": {
+        "$ref": "#/definitions/ApplicationDeltaHealthPolicy"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "ApplicationHealthPolicy": {
-      "description": "Defines a health policy used to evaluate the health of an application or one of its children entities.\n",
       "properties": {
         "defaultServiceTypeHealthPolicy": {
           "description": "The health policy used by default to evaluate the health of a service type.",
@@ -128,8 +134,14 @@
       },
       "type": "object"
     },
+    "ApplicationHealthPolicyMap": {
+      "additionalProperties": {
+        "$ref": "#/definitions/ApplicationHealthPolicy"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "AzureActiveDirectory": {
-      "description": "The settings to enable AAD authentication on the cluster.",
       "properties": {
         "clientApplication": {
           "description": "Azure active directory client application id.",
@@ -147,7 +159,6 @@
       "type": "object"
     },
     "CertificateDescription": {
-      "description": "Describes the certificate details.",
       "properties": {
         "thumbprint": {
           "description": "Thumbprint of the primary certificate.",
@@ -185,7 +196,6 @@
       "type": "object"
     },
     "ClientCertificateCommonName": {
-      "description": "Describes the client certificate details using common name.",
       "properties": {
         "certificateCommonName": {
           "description": "The common name of the client certificate.",
@@ -208,14 +218,13 @@
         }
       },
       "required": [
-        "isAdmin",
         "certificateCommonName",
-        "certificateIssuerThumbprint"
+        "certificateIssuerThumbprint",
+        "isAdmin"
       ],
       "type": "object"
     },
     "ClientCertificateThumbprint": {
-      "description": "Describes the client certificate details using thumbprint.",
       "properties": {
         "certificateThumbprint": {
           "description": "The thumbprint of the client certificate.",
@@ -234,13 +243,12 @@
         }
       },
       "required": [
-        "isAdmin",
-        "certificateThumbprint"
+        "certificateThumbprint",
+        "isAdmin"
       ],
       "type": "object"
     },
     "ClusterHealthPolicy": {
-      "description": "Defines a health policy used to evaluate the health of the cluster or of a cluster node.\n",
       "properties": {
         "applicationHealthPolicies": {
           "description": "Defines the application health policy map used to evaluate the health of an application or one of its children entities.",
@@ -258,10 +266,9 @@
           ]
         },
         "maxPercentUnhealthyApplications": {
-          "description": "The maximum allowed percentage of unhealthy applications before reporting an error. For example, to allow 10% of applications to be unhealthy, this value would be 10.\n\nThe percentage represents the maximum tolerated percentage of applications that can be unhealthy before the cluster is considered in error.\nIf the percentage is respected but there is at least one unhealthy application, the health is evaluated as Warning.\nThis is calculated by dividing the number of unhealthy applications over the total number of application instances in the cluster, excluding applications of application types that are included in the ApplicationTypeHealthPolicyMap.\nThe computation rounds up to tolerate one failure on small numbers of applications. Default percentage is zero.\n",
+          "description": "The maximum allowed percentage of unhealthy applications before reporting an error. For example, to allow 10% of applications to be unhealthy, this value would be 10.\n\nThe percentage represents the maximum tolerated percentage of applications that can be unhealthy before the cluster is considered in error.\nIf the percentage is respected but there is at least one unhealthy application, the health is evaluated as Warning.\nThis is calculated by dividing the number of unhealthy applications over the total number of application instances in the cluster, excluding applications of application types that are included in the ApplicationTypeHealthPolicyMap.\nThe computation rounds up to tolerate one failure on small numbers of applications. Default percentage is zero.",
           "oneOf": [
             {
-              "default": 0,
               "maximum": 100,
               "minimum": 0,
               "type": "integer"
@@ -272,10 +279,9 @@
           ]
         },
         "maxPercentUnhealthyNodes": {
-          "description": "The maximum allowed percentage of unhealthy nodes before reporting an error. For example, to allow 10% of nodes to be unhealthy, this value would be 10.\n\nThe percentage represents the maximum tolerated percentage of nodes that can be unhealthy before the cluster is considered in error.\nIf the percentage is respected but there is at least one unhealthy node, the health is evaluated as Warning.\nThe percentage is calculated by dividing the number of unhealthy nodes over the total number of nodes in the cluster.\nThe computation rounds up to tolerate one failure on small numbers of nodes. Default percentage is zero.\n\nIn large clusters, some nodes will always be down or out for repairs, so this percentage should be configured to tolerate that.\n",
+          "description": "The maximum allowed percentage of unhealthy nodes before reporting an error. For example, to allow 10% of nodes to be unhealthy, this value would be 10.\n\nThe percentage represents the maximum tolerated percentage of nodes that can be unhealthy before the cluster is considered in error.\nIf the percentage is respected but there is at least one unhealthy node, the health is evaluated as Warning.\nThe percentage is calculated by dividing the number of unhealthy nodes over the total number of nodes in the cluster.\nThe computation rounds up to tolerate one failure on small numbers of nodes. Default percentage is zero.\n\nIn large clusters, some nodes will always be down or out for repairs, so this percentage should be configured to tolerate that.",
           "oneOf": [
             {
-              "default": 0,
               "maximum": 100,
               "minimum": 0,
               "type": "integer"
@@ -289,7 +295,6 @@
       "type": "object"
     },
     "ClusterProperties": {
-      "description": "Describes the cluster resource properties.",
       "properties": {
         "addOnFeatures": {
           "description": "The list of add-on features to enable in the cluster.",
@@ -420,7 +425,7 @@
           ]
         },
         "reliabilityLevel": {
-          "description": "The reliability level sets the replica set size of system services. Learn about [ReliabilityLevel](https://docs.microsoft.com/azure/service-fabric/service-fabric-cluster-capacity).\n\n  - None - Run the System services with a target replica set count of 1. This should only be used for test clusters.\n  - Bronze - Run the System services with a target replica set count of 3. This should only be used for test clusters.\n  - Silver - Run the System services with a target replica set count of 5.\n  - Gold - Run the System services with a target replica set count of 7.\n  - Platinum - Run the System services with a target replica set count of 9.\n",
+          "description": "The reliability level sets the replica set size of system services. Learn about [ReliabilityLevel](https://docs.microsoft.com/azure/service-fabric/service-fabric-cluster-capacity).\n\n  - None - Run the System services with a target replica set count of 1. This should only be used for test clusters.\n  - Bronze - Run the System services with a target replica set count of 3. This should only be used for test clusters.\n  - Silver - Run the System services with a target replica set count of 5.\n  - Gold - Run the System services with a target replica set count of 7.\n  - Platinum - Run the System services with a target replica set count of 9.",
           "oneOf": [
             {
               "enum": [
@@ -471,7 +476,7 @@
           ]
         },
         "upgradeMode": {
-          "description": "The upgrade mode of the cluster when new Service Fabric runtime version is available.\n\n  - Automatic - The cluster will be automatically upgraded to the latest Service Fabric runtime version as soon as it is available.\n  - Manual - The cluster will not be automatically upgraded to the latest Service Fabric runtime version. The cluster is upgraded by setting the **clusterCodeVersion** property in the cluster resource.\n",
+          "description": "The upgrade mode of the cluster when new Service Fabric runtime version is available.\n\n  - Automatic - The cluster will be automatically upgraded to the latest Service Fabric runtime version as soon as it is available.\n  - Manual - The cluster will not be automatically upgraded to the latest Service Fabric runtime version. The cluster is upgraded by setting the **clusterCodeVersion** property in the cluster resource.",
           "oneOf": [
             {
               "enum": [
@@ -497,7 +502,6 @@
       "type": "object"
     },
     "ClusterUpgradeDeltaHealthPolicy": {
-      "description": "Describes the delta health policies for the cluster upgrade.",
       "properties": {
         "applicationDeltaHealthPolicies": {
           "description": "Defines the application delta health policy map used to evaluate the health of an application or one of its child entities when upgrading the cluster.",
@@ -515,7 +519,7 @@
           ]
         },
         "maxPercentDeltaUnhealthyApplications": {
-          "description": "The maximum allowed percentage of applications health degradation allowed during cluster upgrades.\nThe delta is measured between the state of the applications at the beginning of upgrade and the state of the applications at the time of the health evaluation.\nThe check is performed after every upgrade domain upgrade completion to make sure the global state of the cluster is within tolerated limits. System services are not included in this.\n",
+          "description": "The maximum allowed percentage of applications health degradation allowed during cluster upgrades.\nThe delta is measured between the state of the applications at the beginning of upgrade and the state of the applications at the time of the health evaluation.\nThe check is performed after every upgrade domain upgrade completion to make sure the global state of the cluster is within tolerated limits. System services are not included in this.",
           "oneOf": [
             {
               "maximum": 100,
@@ -528,7 +532,7 @@
           ]
         },
         "maxPercentDeltaUnhealthyNodes": {
-          "description": "The maximum allowed percentage of nodes health degradation allowed during cluster upgrades.\nThe delta is measured between the state of the nodes at the beginning of upgrade and the state of the nodes at the time of the health evaluation.\nThe check is performed after every upgrade domain upgrade completion to make sure the global state of the cluster is within tolerated limits.\n",
+          "description": "The maximum allowed percentage of nodes health degradation allowed during cluster upgrades.\nThe delta is measured between the state of the nodes at the beginning of upgrade and the state of the nodes at the time of the health evaluation.\nThe check is performed after every upgrade domain upgrade completion to make sure the global state of the cluster is within tolerated limits.",
           "oneOf": [
             {
               "maximum": 100,
@@ -541,7 +545,7 @@
           ]
         },
         "maxPercentUpgradeDomainDeltaUnhealthyNodes": {
-          "description": "The maximum allowed percentage of upgrade domain nodes health degradation allowed during cluster upgrades.\nThe delta is measured between the state of the upgrade domain nodes at the beginning of upgrade and the state of the upgrade domain nodes at the time of the health evaluation.\nThe check is performed after every upgrade domain upgrade completion for all completed upgrade domains to make sure the state of the upgrade domains is within tolerated limits.\n",
+          "description": "The maximum allowed percentage of upgrade domain nodes health degradation allowed during cluster upgrades.\nThe delta is measured between the state of the upgrade domain nodes at the beginning of upgrade and the state of the upgrade domain nodes at the time of the health evaluation.\nThe check is performed after every upgrade domain upgrade completion for all completed upgrade domains to make sure the state of the upgrade domains is within tolerated limits.",
           "oneOf": [
             {
               "maximum": 100,
@@ -555,14 +559,13 @@
         }
       },
       "required": [
+        "maxPercentDeltaUnhealthyApplications",
         "maxPercentDeltaUnhealthyNodes",
-        "maxPercentUpgradeDomainDeltaUnhealthyNodes",
-        "maxPercentDeltaUnhealthyApplications"
+        "maxPercentUpgradeDomainDeltaUnhealthyNodes"
       ],
       "type": "object"
     },
     "ClusterUpgradePolicy": {
-      "description": "Describes the policy used when upgrading the cluster.",
       "properties": {
         "deltaHealthPolicy": {
           "description": "The cluster delta health policy used when upgrading the cluster.",
@@ -623,18 +626,17 @@
         }
       },
       "required": [
-        "upgradeReplicaSetCheckTimeout",
-        "healthCheckWaitDuration",
-        "healthCheckStableDuration",
         "healthCheckRetryTimeout",
-        "upgradeTimeout",
+        "healthCheckStableDuration",
+        "healthCheckWaitDuration",
+        "healthPolicy",
         "upgradeDomainTimeout",
-        "healthPolicy"
+        "upgradeReplicaSetCheckTimeout",
+        "upgradeTimeout"
       ],
       "type": "object"
     },
     "DiagnosticsStorageAccountConfig": {
-      "description": "The storage account information for storing Service Fabric diagnostic logs.",
       "properties": {
         "blobEndpoint": {
           "description": "The blob endpoint of the azure storage account.",
@@ -658,16 +660,15 @@
         }
       },
       "required": [
-        "storageAccountName",
-        "protectedAccountKeyName",
         "blobEndpoint",
+        "protectedAccountKeyName",
         "queueEndpoint",
+        "storageAccountName",
         "tableEndpoint"
       ],
       "type": "object"
     },
     "EndpointRangeDescription": {
-      "description": "Port range details",
       "properties": {
         "endPort": {
           "description": "End port of a range of ports",
@@ -693,13 +694,12 @@
         }
       },
       "required": [
-        "startPort",
-        "endPort"
+        "endPort",
+        "startPort"
       ],
       "type": "object"
     },
     "NodeTypeDescription": {
-      "description": "Describes a node type in the cluster, each node type represents sub set of nodes in the cluster.",
       "properties": {
         "applicationPorts": {
           "description": "The range of ports from which cluster assigned port to Service Fabric applications.",
@@ -739,7 +739,7 @@
           ]
         },
         "durabilityLevel": {
-          "description": "The durability level of the node type. Learn about [DurabilityLevel](https://docs.microsoft.com/azure/service-fabric/service-fabric-cluster-capacity).\n\n  - Bronze - No privileges. This is the default.\n  - Silver - The infrastructure jobs can be paused for a duration of 10 minutes per UD.\n  - Gold - The infrastructure jobs can be paused for a duration of 2 hours per UD. Gold durability can be enabled only on full node VM SKUs like D15_V2, G5 etc.\n",
+          "description": "The durability level of the node type. Learn about [DurabilityLevel](https://docs.microsoft.com/azure/service-fabric/service-fabric-cluster-capacity).\n\n  - Bronze - No privileges. This is the default.\n  - Silver - The infrastructure jobs can be paused for a duration of 10 minutes per UD.\n  - Gold - The infrastructure jobs can be paused for a duration of 2 hours per UD. Gold durability can be enabled only on full node VM SKUs like D15_V2, G5 etc.",
           "oneOf": [
             {
               "enum": [
@@ -832,16 +832,36 @@
         }
       },
       "required": [
-        "name",
         "clientConnectionEndpointPort",
         "httpGatewayEndpointPort",
         "isPrimary",
+        "name",
         "vmInstanceCount"
       ],
       "type": "object"
     },
+    "NodeTypeDescriptionCapacities": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "NodeTypeDescriptionPlacementProperties": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "ResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "ServerCertificateCommonName": {
-      "description": "Describes the server certificate details using common name.",
       "properties": {
         "certificateCommonName": {
           "description": "The common name of the server certificate.",
@@ -859,7 +879,6 @@
       "type": "object"
     },
     "ServerCertificateCommonNames": {
-      "description": "Describes a list of server certificates referenced by common name that are used to secure the cluster.",
       "properties": {
         "commonNames": {
           "description": "The list of server certificates referenced by common name that are used to secure the cluster.",
@@ -900,13 +919,11 @@
       "type": "object"
     },
     "ServiceTypeDeltaHealthPolicy": {
-      "description": "Represents the delta health policy used to evaluate the health of services belonging to a service type when upgrading the cluster.\n",
       "properties": {
         "maxPercentDeltaUnhealthyServices": {
-          "description": "The maximum allowed percentage of services health degradation allowed during cluster upgrades.\nThe delta is measured between the state of the services at the beginning of upgrade and the state of the services at the time of the health evaluation.\nThe check is performed after every upgrade domain upgrade completion to make sure the global state of the cluster is within tolerated limits.\n",
+          "description": "The maximum allowed percentage of services health degradation allowed during cluster upgrades.\nThe delta is measured between the state of the services at the beginning of upgrade and the state of the services at the time of the health evaluation.\nThe check is performed after every upgrade domain upgrade completion to make sure the global state of the cluster is within tolerated limits.",
           "oneOf": [
             {
-              "default": 0,
               "maximum": 100,
               "minimum": 0,
               "type": "integer"
@@ -917,16 +934,21 @@
           ]
         }
       },
+      "type": "object"
+    },
+    "ServiceTypeDeltaHealthPolicyMap": {
+      "additionalProperties": {
+        "$ref": "#/definitions/ServiceTypeDeltaHealthPolicy"
+      },
+      "properties": {},
       "type": "object"
     },
     "ServiceTypeHealthPolicy": {
-      "description": "Represents the health policy used to evaluate the health of services belonging to a service type.\n",
       "properties": {
         "maxPercentUnhealthyServices": {
-          "description": "The maximum percentage of services allowed to be unhealthy before your application is considered in error.\n",
+          "description": "The maximum percentage of services allowed to be unhealthy before your application is considered in error.",
           "oneOf": [
             {
-              "default": 0,
               "maximum": 100,
               "minimum": 0,
               "type": "integer"
@@ -939,8 +961,14 @@
       },
       "type": "object"
     },
+    "ServiceTypeHealthPolicyMap": {
+      "additionalProperties": {
+        "$ref": "#/definitions/ServiceTypeHealthPolicy"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "SettingsParameterDescription": {
-      "description": "Describes a parameter in fabric settings of the cluster.",
       "properties": {
         "name": {
           "description": "The parameter name of fabric setting.",
@@ -958,7 +986,6 @@
       "type": "object"
     },
     "SettingsSectionDescription": {
-      "description": "Describes a section in the fabric settings of the cluster.",
       "properties": {
         "name": {
           "description": "The section name of the fabric settings.",

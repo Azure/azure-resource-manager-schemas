@@ -188,7 +188,7 @@ const csharpGeneratorProviders: CsharpGeneratorConfig[] = [
     { namespace: 'Microsoft.SecurityInsights', enabled: true },
     { namespace: 'Microsoft.SerialConsole', enabled: true },
     { namespace: 'Microsoft.ServiceBus', enabled: false },
-    { namespace: 'Microsoft.ServiceFabric', enabled: false },
+    { namespace: 'Microsoft.ServiceFabric', enabled: true },
     { namespace: 'Microsoft.ServiceFabricMesh', enabled: true },
     { namespace: 'Microsoft.ServiceLinker', enabled: true },
     { namespace: 'Microsoft.ServiceNetworking', enabled: true },

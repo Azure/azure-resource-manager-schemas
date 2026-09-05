@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the database fleet.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.+$",
@@ -44,10 +44,10 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/fleets_tiers_childResource"
+                "$ref": "#/definitions/fleets_fleetspaces_childResource"
               },
               {
-                "$ref": "#/definitions/fleets_fleetspaces_childResource"
+                "$ref": "#/definitions/fleets_tiers_childResource"
               }
             ]
           },
@@ -76,6 +76,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -93,7 +94,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the fleetspace.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.+$",
@@ -153,7 +154,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the database.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.+$",
@@ -200,7 +201,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the firewall rule.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.+$",
@@ -247,7 +248,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the tier.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.+$",
@@ -287,13 +288,14 @@
   },
   "definitions": {
     "DatabaseIdentity": {
-      "description": "Database Identity properties.",
       "properties": {
         "clientId": {
           "description": "Client Id of the database identity.",
           "oneOf": [
             {
-              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+              "maxLength": 36,
+              "minLength": 36,
+              "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
               "type": "string"
             },
             {
@@ -305,7 +307,9 @@
           "description": "Principal Id of the database identity.",
           "oneOf": [
             {
-              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+              "maxLength": 36,
+              "minLength": 36,
+              "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
               "type": "string"
             },
             {
@@ -321,7 +325,6 @@
       "type": "object"
     },
     "FirewallRuleProperties": {
-      "description": "A Firewall rule properties.",
       "properties": {
         "endIpAddress": {
           "description": "End IP address.",
@@ -335,7 +338,6 @@
       "type": "object"
     },
     "FleetDatabaseProperties": {
-      "description": "Fleet database properties.",
       "properties": {
         "collation": {
           "description": "Database collation.",
@@ -385,7 +387,6 @@
         },
         "restoreFromTime": {
           "description": "Restore from time when CreateMode is PointInTimeRestore.",
-          "format": "date-time",
           "type": "string"
         },
         "sourceDatabaseName": {
@@ -410,8 +411,14 @@
       },
       "type": "object"
     },
+    "FleetDatabasePropertiesResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "FleetProperties": {
-      "description": "The Database Fleet properties.",
       "properties": {
         "description": {
           "description": "Fleet description.",
@@ -420,8 +427,34 @@
       },
       "type": "object"
     },
+    "FleetspaceProperties": {
+      "properties": {
+        "capacityMax": {
+          "description": "Maximum number of vCores database fleet manager is allowed to provision in the fleetspace.",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "mainPrincipal": {
+          "description": "Main Microsoft Entra ID principal that has admin access to all databases in the fleetspace.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MainPrincipal"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
     "FleetTierProperties": {
-      "description": "A Fleet tier properties.",
       "properties": {
         "capacity": {
           "description": "Capacity of provisioned resources in the tier, in units matching the specified service tier, for example vCore for GeneralPurpose.",
@@ -438,7 +471,7 @@
           "description": "Maximum allocated capacity per database, in units matching the specified service tier.",
           "oneOf": [
             {
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -449,7 +482,7 @@
           "description": "Minimum allocated capacity per database, in units matching the specified service tier.",
           "oneOf": [
             {
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -482,22 +515,22 @@
             }
           ]
         },
-        "poolNumOfDatabasesMax": {
-          "description": "Maximum number of databases per pool.",
+        "pooled": {
+          "description": "If true, databases are pooled.",
           "oneOf": [
             {
-              "type": "integer"
+              "type": "boolean"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
         },
-        "pooled": {
-          "description": "If true, databases are pooled.",
+        "poolNumOfDatabasesMax": {
+          "description": "Maximum number of databases per pool.",
           "oneOf": [
             {
-              "type": "boolean"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -537,42 +570,15 @@
       },
       "type": "object"
     },
-    "FleetspaceProperties": {
-      "description": "A Fleetspace properties.",
-      "properties": {
-        "capacityMax": {
-          "description": "Maximum number of vCores database fleet manager is allowed to provision in the fleetspace.",
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "mainPrincipal": {
-          "description": "Main Microsoft Entra ID principal that has admin access to all databases in the fleetspace.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/MainPrincipal"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "type": "object"
-    },
     "Identity": {
-      "description": "Database Identity.",
       "properties": {
         "federatedClientId": {
           "description": "The federated client id for the SQL Database. It is used for cross tenant CMK scenario.",
           "oneOf": [
             {
-              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+              "maxLength": 36,
+              "minLength": 36,
+              "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
               "type": "string"
             },
             {
@@ -613,13 +619,14 @@
       "type": "object"
     },
     "MainPrincipal": {
-      "description": "A main principal.",
       "properties": {
         "applicationId": {
           "description": "Application Id of the main principal.",
           "oneOf": [
             {
-              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+              "maxLength": 36,
+              "minLength": 36,
+              "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
               "type": "string"
             },
             {
@@ -635,7 +642,9 @@
           "description": "Object Id of the main principal.",
           "oneOf": [
             {
-              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+              "maxLength": 36,
+              "minLength": 36,
+              "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
               "type": "string"
             },
             {
@@ -662,7 +671,9 @@
           "description": "Tenant Id of the main principal.",
           "oneOf": [
             {
-              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+              "maxLength": 36,
+              "minLength": 36,
+              "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
               "type": "string"
             },
             {
@@ -673,8 +684,14 @@
       },
       "type": "object"
     },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "TransparentDataEncryption": {
-      "description": "Transparent Data Encryption properties.",
       "properties": {
         "enableAutoRotation": {
           "description": "Enable key auto rotation",
@@ -686,10 +703,6 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
-        },
-        "keyUri": {
-          "description": "Customer Managed Key (CMK) Uri.",
-          "type": "string"
         },
         "keys": {
           "description": "Additional Keys",
@@ -704,12 +717,16 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
+        },
+        "keyUri": {
+          "description": "Customer Managed Key (CMK) Uri.",
+          "type": "string"
         }
       },
       "type": "object"
     },
     "fleets_fleetspaces_childResource": {
-      "description": "Microsoft.DatabaseFleetManager/fleets/fleetspaces",
+      "description": "fleetspaces",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -718,7 +735,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the fleetspace.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.+$",
@@ -756,7 +773,7 @@
       "type": "object"
     },
     "fleets_fleetspaces_databases_childResource": {
-      "description": "Microsoft.DatabaseFleetManager/fleets/fleetspaces/databases",
+      "description": "databases",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -765,7 +782,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the database.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.+$",
@@ -803,7 +820,7 @@
       "type": "object"
     },
     "fleets_fleetspaces_firewallRules_childResource": {
-      "description": "Microsoft.DatabaseFleetManager/fleets/fleetspaces/firewallRules",
+      "description": "firewallRules",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -812,7 +829,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the firewall rule.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.+$",
@@ -850,7 +867,7 @@
       "type": "object"
     },
     "fleets_tiers_childResource": {
-      "description": "Microsoft.DatabaseFleetManager/fleets/tiers",
+      "description": "tiers",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -859,7 +876,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the tier.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.+$",

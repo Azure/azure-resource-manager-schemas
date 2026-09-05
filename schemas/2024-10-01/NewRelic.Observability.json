@@ -29,7 +29,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the Monitors resource",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -47,10 +47,10 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/monitors_tagRules_childResource"
+                "$ref": "#/definitions/monitors_monitoredSubscriptions_childResource"
               },
               {
-                "$ref": "#/definitions/monitors_monitoredSubscriptions_childResource"
+                "$ref": "#/definitions/monitors_tagRules_childResource"
               }
             ]
           },
@@ -79,6 +79,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -96,7 +97,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The configuration name. Only 'default' value is supported.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*/default$",
@@ -143,7 +144,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the TagRule",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -175,7 +176,6 @@
   },
   "definitions": {
     "AccountInfo": {
-      "description": "Account Info of the NewRelic account",
       "properties": {
         "accountId": {
           "description": "Account id",
@@ -193,7 +193,6 @@
       "type": "object"
     },
     "FilteringTag": {
-      "description": "The definition of a filtering tag. Filtering tags are used for capturing resources and include/exclude them from being monitored.",
       "properties": {
         "action": {
           "description": "Valid actions for a filtering tag. Exclusion takes priority over inclusion.",
@@ -222,7 +221,6 @@
       "type": "object"
     },
     "LogRules": {
-      "description": "Set of rules for sending logs for the Monitor resource.",
       "properties": {
         "filteringTags": {
           "description": "List of filtering tags to be used for capturing logs. This only takes effect if SendActivityLogs flag is enabled. If empty, all resources will be captured.\nIf only Exclude action is specified, the rules will apply to the list of all available resources. If Include actions are specified, the rules will only include resources with the associated tags.",
@@ -287,7 +285,6 @@
       "type": "object"
     },
     "ManagedServiceIdentity": {
-      "description": "Managed service identity (system assigned and/or user assigned identities)",
       "properties": {
         "type": {
           "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).",
@@ -328,7 +325,6 @@
       "type": "object"
     },
     "MetricRules": {
-      "description": "Set of rules for sending metrics for the Monitor resource.",
       "properties": {
         "filteringTags": {
           "description": "List of filtering tags to be used for capturing metrics.",
@@ -374,8 +370,75 @@
       },
       "type": "object"
     },
+    "MonitoredSubscription": {
+      "properties": {
+        "error": {
+          "description": "The reason of not monitoring the subscription.",
+          "type": "string"
+        },
+        "status": {
+          "description": "The state of monitoring.",
+          "oneOf": [
+            {
+              "enum": [
+                "InProgress",
+                "Active",
+                "Failed",
+                "Deleting"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "subscriptionId": {
+          "description": "The subscriptionId to be monitored.",
+          "type": "string"
+        },
+        "tagRules": {
+          "description": "The resource-specific properties for this resource.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MonitoringTagRulesProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "MonitoringTagRulesProperties": {
+      "properties": {
+        "logRules": {
+          "description": "Set of rules for sending logs for the Monitor resource.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/LogRules"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "metricRules": {
+          "description": "Set of rules for sending metrics for the Monitor resource.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MetricRules"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
     "MonitorProperties": {
-      "description": "Properties specific to the NewRelic Monitor resource",
       "properties": {
         "accountCreationSource": {
           "description": "Source of account creation",
@@ -451,78 +514,7 @@
       },
       "type": "object"
     },
-    "MonitoredSubscription": {
-      "description": "The list of subscriptions and it's monitoring status by current NewRelic monitor.",
-      "properties": {
-        "error": {
-          "description": "The reason of not monitoring the subscription.",
-          "type": "string"
-        },
-        "status": {
-          "description": "The state of monitoring.",
-          "oneOf": [
-            {
-              "enum": [
-                "InProgress",
-                "Active",
-                "Failed",
-                "Deleting"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "subscriptionId": {
-          "description": "The subscriptionId to be monitored.",
-          "type": "string"
-        },
-        "tagRules": {
-          "description": "The resource-specific properties for this resource.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/MonitoringTagRulesProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "type": "object"
-    },
-    "MonitoringTagRulesProperties": {
-      "description": "The resource-specific properties for this resource.",
-      "properties": {
-        "logRules": {
-          "description": "Set of rules for sending logs for the Monitor resource.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/LogRules"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "metricRules": {
-          "description": "Set of rules for sending metrics for the Monitor resource.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/MetricRules"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "type": "object"
-    },
     "NewRelicAccountProperties": {
-      "description": "Properties of the NewRelic account",
       "properties": {
         "accountInfo": {
           "description": "NewRelic Account Information",
@@ -565,7 +557,6 @@
       "type": "object"
     },
     "NewRelicSingleSignOnProperties": {
-      "description": "Single sign on Info of the NewRelic account",
       "properties": {
         "enterpriseAppId": {
           "description": "The Id of the Enterprise App used for Single sign-on.",
@@ -618,7 +609,6 @@
       "type": "object"
     },
     "OrganizationInfo": {
-      "description": "Organization Info of the NewRelic account",
       "properties": {
         "organizationId": {
           "description": "Organization id",
@@ -628,7 +618,6 @@
       "type": "object"
     },
     "PlanData": {
-      "description": "Plan data of NewRelic Monitor resource",
       "properties": {
         "billingCycle": {
           "description": "Different billing cycles like Monthly/Weekly.",
@@ -636,7 +625,6 @@
         },
         "effectiveDate": {
           "description": "date when plan was applied",
-          "format": "date-time",
           "type": "string"
         },
         "planDetails": {
@@ -662,7 +650,6 @@
       "type": "object"
     },
     "SubscriptionList": {
-      "description": "The request to update subscriptions needed to be monitored by the NewRelic monitor resource.",
       "properties": {
         "monitoredSubscriptionList": {
           "description": "List of subscriptions and the state of the monitoring.",
@@ -699,13 +686,25 @@
       },
       "type": "object"
     },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "UserAssignedIdentities": {
+      "additionalProperties": {
+        "$ref": "#/definitions/UserAssignedIdentity"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "UserAssignedIdentity": {
-      "description": "User assigned identity properties",
       "properties": {},
       "type": "object"
     },
     "UserInfo": {
-      "description": "User Info of NewRelic Monitor resource",
       "properties": {
         "country": {
           "description": "country if user",
@@ -725,24 +724,45 @@
         },
         "firstName": {
           "description": "First name",
-          "maxLength": 50,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 50,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "lastName": {
           "description": "Last name",
-          "maxLength": 50,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 50,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "phoneNumber": {
           "description": "Contact phone number",
-          "maxLength": 40,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 40,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "type": "object"
     },
     "monitors_monitoredSubscriptions_childResource": {
-      "description": "NewRelic.Observability/monitors/monitoredSubscriptions",
+      "description": "monitoredSubscriptions",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -751,7 +771,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The configuration name. Only 'default' value is supported.",
+          "description": "The resource name",
           "oneOf": [
             {
               "enum": [
@@ -791,7 +811,7 @@
       "type": "object"
     },
     "monitors_tagRules_childResource": {
-      "description": "NewRelic.Observability/monitors/tagRules",
+      "description": "tagRules",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -800,7 +820,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the TagRule",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {

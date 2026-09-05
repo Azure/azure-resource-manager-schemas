@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Storage Mover resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -39,10 +39,10 @@
                 "$ref": "#/definitions/storageMovers_agents_childResource"
               },
               {
-                "$ref": "#/definitions/storageMovers_projects_childResource"
+                "$ref": "#/definitions/storageMovers_endpoints_childResource"
               },
               {
-                "$ref": "#/definitions/storageMovers_endpoints_childResource"
+                "$ref": "#/definitions/storageMovers_projects_childResource"
               }
             ]
           },
@@ -71,6 +71,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -88,7 +89,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Agent resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -126,7 +127,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Endpoint resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -165,7 +166,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Project resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -214,7 +215,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Job Definition resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -266,84 +267,103 @@
       ],
       "type": "object"
     },
-    "EndpointBaseProperties": {
-      "description": "The resource specific properties for the Storage Mover resource.",
-      "oneOf": [
-        {
-          "properties": {
-            "blobContainerName": {
-              "description": "The name of the Storage blob container that is the target destination.",
-              "type": "string"
-            },
-            "endpointType": {
+    "AzureStorageBlobContainerEndpointProperties": {
+      "properties": {
+        "blobContainerName": {
+          "description": "The name of the Storage blob container that is the target destination.",
+          "type": "string"
+        },
+        "endpointType": {
+          "description": "The Endpoint resource type.",
+          "oneOf": [
+            {
               "enum": [
                 "AzureStorageBlobContainer"
               ],
               "type": "string"
             },
-            "storageAccountResourceId": {
-              "description": "The Azure Resource ID of the storage account that is the target destination.",
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "storageAccountResourceId": {
+          "description": "The Azure Resource ID of the storage account that is the target destination.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "blobContainerName",
+        "endpointType",
+        "storageAccountResourceId"
+      ],
+      "type": "object"
+    },
+    "EndpointBaseProperties": {
+      "allOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "description": {
+              "description": "A description for the Endpoint.",
+              "type": "string"
+            },
+            "endpointType": {
+              "enum": [
+                "AzureStorageBlobContainer",
+                "NfsMount"
+              ],
               "type": "string"
             }
           },
           "required": [
-            "storageAccountResourceId",
-            "blobContainerName",
             "endpointType"
           ],
           "type": "object"
         },
         {
-          "properties": {
-            "endpointType": {
-              "enum": [
-                "NfsMount"
-              ],
-              "type": "string"
-            },
-            "export": {
-              "description": "The directory being exported from the server.",
-              "type": "string"
-            },
-            "host": {
-              "description": "The host name or IP address of the server exporting the file system.",
-              "type": "string"
-            },
-            "nfsVersion": {
-              "description": "The NFS protocol version.",
-              "oneOf": [
+          "oneOf": [
+            {
+              "allOf": [
                 {
-                  "enum": [
-                    "NFSauto",
-                    "NFSv3",
-                    "NFSv4"
-                  ],
-                  "type": "string"
+                  "$ref": "#/definitions/AzureStorageBlobContainerEndpointProperties"
                 },
                 {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                  "properties": {
+                    "endpointType": {
+                      "const": "AzureStorageBlobContainer"
+                    }
+                  },
+                  "required": [
+                    "endpointType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/NfsMountEndpointProperties"
+                },
+                {
+                  "properties": {
+                    "endpointType": {
+                      "const": "NfsMount"
+                    }
+                  },
+                  "required": [
+                    "endpointType"
+                  ],
+                  "type": "object"
                 }
               ]
             }
-          },
-          "required": [
-            "host",
-            "export",
-            "endpointType"
-          ],
-          "type": "object"
+          ]
         }
-      ],
-      "properties": {
-        "description": {
-          "description": "A description for the Endpoint.",
-          "type": "string"
-        }
-      },
-      "type": "object"
+      ]
     },
     "JobDefinitionProperties": {
-      "description": "Job definition properties.",
       "properties": {
         "agentName": {
           "description": "Name of the Agent to assign for new Job Runs of this Job Definition.",
@@ -392,8 +412,55 @@
       ],
       "type": "object"
     },
+    "NfsMountEndpointProperties": {
+      "properties": {
+        "endpointType": {
+          "description": "The Endpoint resource type.",
+          "oneOf": [
+            {
+              "enum": [
+                "NfsMount"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "export": {
+          "description": "The directory being exported from the server.",
+          "type": "string"
+        },
+        "host": {
+          "description": "The host name or IP address of the server exporting the file system.",
+          "type": "string"
+        },
+        "nfsVersion": {
+          "description": "The NFS protocol version.",
+          "oneOf": [
+            {
+              "enum": [
+                "NFSauto",
+                "NFSv3",
+                "NFSv4"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "endpointType",
+        "export",
+        "host"
+      ],
+      "type": "object"
+    },
     "ProjectProperties": {
-      "description": "Project properties.",
       "properties": {
         "description": {
           "description": "A description for the Project.",
@@ -403,7 +470,6 @@
       "type": "object"
     },
     "StorageMoverProperties": {
-      "description": "The resource specific properties for the Storage Mover resource.",
       "properties": {
         "description": {
           "description": "A description for the Storage Mover.",
@@ -412,8 +478,15 @@
       },
       "type": "object"
     },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "storageMovers_agents_childResource": {
-      "description": "Microsoft.StorageMover/storageMovers/agents",
+      "description": "agents",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -422,7 +495,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Agent resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -451,7 +524,7 @@
       "type": "object"
     },
     "storageMovers_endpoints_childResource": {
-      "description": "Microsoft.StorageMover/storageMovers/endpoints",
+      "description": "endpoints",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -460,7 +533,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Endpoint resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -490,7 +563,7 @@
       "type": "object"
     },
     "storageMovers_projects_childResource": {
-      "description": "Microsoft.StorageMover/storageMovers/projects",
+      "description": "projects",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -499,7 +572,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Project resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -529,7 +602,7 @@
       "type": "object"
     },
     "storageMovers_projects_jobDefinitions_childResource": {
-      "description": "Microsoft.StorageMover/storageMovers/projects/jobDefinitions",
+      "description": "jobDefinitions",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -538,7 +611,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Job Definition resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {

@@ -29,7 +29,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the container registry task.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 50,
@@ -76,6 +76,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -86,7 +87,6 @@
   },
   "definitions": {
     "AgentProperties": {
-      "description": "The properties that determine the run agent configuration.",
       "properties": {
         "cpu": {
           "description": "The CPU configuration in terms of number of cores required for the run.",
@@ -103,13 +103,11 @@
       "type": "object"
     },
     "Argument": {
-      "description": "The properties of a run argument.",
       "properties": {
         "isSecret": {
           "description": "Flag to indicate whether the argument represents a secret and want to be removed from build logs.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -133,7 +131,6 @@
       "type": "object"
     },
     "AuthInfo": {
-      "description": "The authorization properties for accessing the source code repository.",
       "properties": {
         "expiresIn": {
           "description": "Time in seconds that the token remains valid",
@@ -175,13 +172,12 @@
         }
       },
       "required": [
-        "tokenType",
-        "token"
+        "token",
+        "tokenType"
       ],
       "type": "object"
     },
     "BaseImageTrigger": {
-      "description": "The trigger based on base image dependency.",
       "properties": {
         "baseImageTriggerType": {
           "description": "The type of the auto trigger for base image dependency updates.",
@@ -225,7 +221,6 @@
       "type": "object"
     },
     "Credentials": {
-      "description": "The parameters that describes a set of credentials that will be used when a run is invoked.",
       "properties": {
         "customRegistries": {
           "description": "Describes the credential parameters for accessing other custom registries. The key\r\nfor the dictionary item will be the registry login server (myregistry.azurecr.io) and\r\nthe value of the item will be the registry credentials for accessing the registry.",
@@ -256,8 +251,14 @@
       },
       "type": "object"
     },
+    "CredentialsCustomRegistries": {
+      "additionalProperties": {
+        "$ref": "#/definitions/CustomRegistryCredentials"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "CustomRegistryCredentials": {
-      "description": "Describes the credentials that will be used to access a custom registry during a run.",
       "properties": {
         "identity": {
           "description": "Indicates the managed identity assigned to the custom credential. If a user-assigned identity\r\nthis value is the Client ID. If a system-assigned identity, the value will be `system`. In\r\nthe case of a system-assigned identity, the Client ID will be determined by the runner. This\r\nidentity may be used to authenticate to key vault to retrieve credentials or it may be the only \r\nsource of authentication used for accessing the registry.",
@@ -288,8 +289,178 @@
       },
       "type": "object"
     },
+    "DockerBuildStep": {
+      "properties": {
+        "arguments": {
+          "description": "The collection of override arguments to be used when executing this build step.",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/Argument"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "dockerFilePath": {
+          "description": "The Docker file path relative to the source context.",
+          "type": "string"
+        },
+        "imageNames": {
+          "description": "The fully qualified image names including the repository and tag.",
+          "oneOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "isPushEnabled": {
+          "description": "The value of this property indicates whether the image built should be pushed to the registry or not.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "noCache": {
+          "description": "The value of this property indicates whether the image cache is enabled or not.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "target": {
+          "description": "The name of the target build stage for the docker build.",
+          "type": "string"
+        },
+        "type": {
+          "description": "The type of the step.",
+          "oneOf": [
+            {
+              "enum": [
+                "Docker"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "dockerFilePath",
+        "type"
+      ],
+      "type": "object"
+    },
+    "EncodedTaskStep": {
+      "properties": {
+        "encodedTaskContent": {
+          "description": "Base64 encoded value of the template/definition file content.",
+          "type": "string"
+        },
+        "encodedValuesContent": {
+          "description": "Base64 encoded value of the parameters/values file content.",
+          "type": "string"
+        },
+        "type": {
+          "description": "The type of the step.",
+          "oneOf": [
+            {
+              "enum": [
+                "EncodedTask"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "values": {
+          "description": "The collection of overridable values that can be passed when running a task.",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/SetValue"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "encodedTaskContent",
+        "type"
+      ],
+      "type": "object"
+    },
+    "FileTaskStep": {
+      "properties": {
+        "taskFilePath": {
+          "description": "The task template/definition file path relative to the source context.",
+          "type": "string"
+        },
+        "type": {
+          "description": "The type of the step.",
+          "oneOf": [
+            {
+              "enum": [
+                "FileTask"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "values": {
+          "description": "The collection of overridable values that can be passed when running a task.",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/SetValue"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "valuesFilePath": {
+          "description": "The task values/parameters file path relative to the source context.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "taskFilePath",
+        "type"
+      ],
+      "type": "object"
+    },
     "IdentityProperties": {
-      "description": "Managed identity for the resource.",
       "properties": {
         "principalId": {
           "description": "The principal ID of resource identity.",
@@ -334,8 +505,14 @@
       },
       "type": "object"
     },
+    "IdentityPropertiesUserAssignedIdentities": {
+      "additionalProperties": {
+        "$ref": "#/definitions/UserIdentityProperties"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "PlatformProperties": {
-      "description": "The platform properties against which the run has to happen.",
       "properties": {
         "architecture": {
           "description": "The OS architecture.",
@@ -390,8 +567,14 @@
       ],
       "type": "object"
     },
+    "ResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "SecretObject": {
-      "description": "Describes the properties of a secret object value.",
       "properties": {
         "type": {
           "description": "The type of the secret object which determines how the value of the secret object has to be\r\ninterpreted.",
@@ -416,13 +599,11 @@
       "type": "object"
     },
     "SetValue": {
-      "description": "The properties of a overridable value that can be passed to a task template.",
       "properties": {
         "isSecret": {
           "description": "Flag to indicate whether the value represents a secret or not.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -446,7 +627,6 @@
       "type": "object"
     },
     "SourceProperties": {
-      "description": "The properties of the source code repository.",
       "properties": {
         "branch": {
           "description": "The branch name of the source code.",
@@ -484,13 +664,12 @@
         }
       },
       "required": [
-        "sourceControlType",
-        "repositoryUrl"
+        "repositoryUrl",
+        "sourceControlType"
       ],
       "type": "object"
     },
     "SourceRegistryCredentials": {
-      "description": "Describes the credential parameters for accessing the source registry.",
       "properties": {
         "loginMode": {
           "description": "The authentication mode which determines the source registry login scope. The credentials for the source registry\r\nwill be generated using the given scope. These credentials will be used to login to\r\nthe source registry during the run.",
@@ -511,7 +690,6 @@
       "type": "object"
     },
     "SourceTrigger": {
-      "description": "The properties of a source based trigger.",
       "properties": {
         "name": {
           "description": "The name of the trigger.",
@@ -563,14 +741,13 @@
         }
       },
       "required": [
+        "name",
         "sourceRepository",
-        "sourceTriggerEvents",
-        "name"
+        "sourceTriggerEvents"
       ],
       "type": "object"
     },
     "TaskProperties": {
-      "description": "The properties of a task.",
       "properties": {
         "agentConfiguration": {
           "description": "The machine configuration of the run agent.",
@@ -635,7 +812,6 @@
           "description": "Run timeout in seconds.",
           "oneOf": [
             {
-              "default": 3600,
               "maximum": 28800,
               "minimum": 300,
               "type": "integer"
@@ -664,175 +840,93 @@
       "type": "object"
     },
     "TaskStepProperties": {
-      "description": "Base properties for any task step.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "The Docker build step.",
+          "additionalProperties": false,
           "properties": {
-            "arguments": {
-              "description": "The collection of override arguments to be used when executing this build step.",
-              "oneOf": [
-                {
-                  "items": {
-                    "$ref": "#/definitions/Argument"
-                  },
-                  "type": "array"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "dockerFilePath": {
-              "description": "The Docker file path relative to the source context.",
+            "contextAccessToken": {
+              "description": "The token (git PAT or SAS token of storage account blob) associated with the context for a step.",
               "type": "string"
             },
-            "imageNames": {
-              "description": "The fully qualified image names including the repository and tag.",
-              "oneOf": [
-                {
-                  "items": {
-                    "type": "string"
-                  },
-                  "type": "array"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "isPushEnabled": {
-              "description": "The value of this property indicates whether the image built should be pushed to the registry or not.",
-              "oneOf": [
-                {
-                  "default": true,
-                  "type": "boolean"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "noCache": {
-              "description": "The value of this property indicates whether the image cache is enabled or not.",
-              "oneOf": [
-                {
-                  "default": false,
-                  "type": "boolean"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "target": {
-              "description": "The name of the target build stage for the docker build.",
+            "contextPath": {
+              "description": "The URL(absolute or relative) of the source context for the task step.",
               "type": "string"
             },
             "type": {
               "enum": [
-                "Docker"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "dockerFilePath",
-            "type"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "The properties of a encoded task step.",
-          "properties": {
-            "encodedTaskContent": {
-              "description": "Base64 encoded value of the template/definition file content.",
-              "type": "string"
-            },
-            "encodedValuesContent": {
-              "description": "Base64 encoded value of the parameters/values file content.",
-              "type": "string"
-            },
-            "type": {
-              "enum": [
-                "EncodedTask"
-              ],
-              "type": "string"
-            },
-            "values": {
-              "description": "The collection of overridable values that can be passed when running a task.",
-              "oneOf": [
-                {
-                  "items": {
-                    "$ref": "#/definitions/SetValue"
-                  },
-                  "type": "array"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            }
-          },
-          "required": [
-            "encodedTaskContent",
-            "type"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "The properties of a task step.",
-          "properties": {
-            "taskFilePath": {
-              "description": "The task template/definition file path relative to the source context.",
-              "type": "string"
-            },
-            "type": {
-              "enum": [
+                "Docker",
+                "EncodedTask",
                 "FileTask"
               ],
               "type": "string"
-            },
-            "values": {
-              "description": "The collection of overridable values that can be passed when running a task.",
-              "oneOf": [
-                {
-                  "items": {
-                    "$ref": "#/definitions/SetValue"
-                  },
-                  "type": "array"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "valuesFilePath": {
-              "description": "The task values/parameters file path relative to the source context.",
-              "type": "string"
             }
           },
           "required": [
-            "taskFilePath",
             "type"
           ],
           "type": "object"
-        }
-      ],
-      "properties": {
-        "contextAccessToken": {
-          "description": "The token (git PAT or SAS token of storage account blob) associated with the context for a step.",
-          "type": "string"
         },
-        "contextPath": {
-          "description": "The URL(absolute or relative) of the source context for the task step.",
-          "type": "string"
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DockerBuildStep"
+                },
+                {
+                  "properties": {
+                    "type": {
+                      "const": "Docker"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/EncodedTaskStep"
+                },
+                {
+                  "properties": {
+                    "type": {
+                      "const": "EncodedTask"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/FileTaskStep"
+                },
+                {
+                  "properties": {
+                    "type": {
+                      "const": "FileTask"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
-      },
-      "type": "object"
+      ]
     },
     "TimerTrigger": {
-      "description": "The properties of a timer trigger.",
       "properties": {
         "name": {
           "description": "The name of the trigger.",
@@ -859,13 +953,12 @@
         }
       },
       "required": [
-        "schedule",
-        "name"
+        "name",
+        "schedule"
       ],
       "type": "object"
     },
     "TriggerProperties": {
-      "description": "The properties of a trigger.",
       "properties": {
         "baseImageTrigger": {
           "description": "The trigger based on base image dependencies.",

@@ -96,32 +96,31 @@ public static class JsonSchemaGenerator
 
         var namedTypes = new Dictionary<string, TypeBase>(StringComparer.OrdinalIgnoreCase);
         var defNameByTypeName = new Dictionary<string, string>(StringComparer.Ordinal);
-        var defNameByType = new Dictionary<TypeBase, string>();
         foreach (var resourceType in resourceTypeArray)
         {
             var (resourceTypeName, _) = ParseResourceTypeName(resourceType.Name);
             foreach (var (name, type) in CollectNamedTypes(resourceType.Body.Type, resourceTypeName))
             {
-                if (!defNameByTypeName.TryGetValue(name, out var defName))
+                // Prefer first occurrence; most definitions are shared.
+                if (defNameByTypeName.ContainsKey(name))
                 {
-                    // Definition keys are compared case-insensitively, so names that only differ by casing
-                    // (e.g. AutoscaleProfile vs AutoScaleProfile) are disambiguated with a numeric suffix.
-                    defName = name;
-                    for (var suffix = 1; namedTypes.ContainsKey(defName); suffix++)
-                    {
-                        defName = $"{name}_{suffix}";
-                    }
-
-                    namedTypes.Add(defName, type);
-                    defNameByTypeName.Add(name, defName);
+                    continue;
                 }
 
-                // Prefer first occurrence; most definitions are shared.
-                defNameByType.TryAdd(type, defName);
+                // Definition keys are compared case-insensitively, so names that only differ by casing
+                // (e.g. AutoscaleProfile vs AutoScaleProfile) are disambiguated with a numeric suffix.
+                var defName = name;
+                for (var suffix = 1; namedTypes.ContainsKey(defName); suffix++)
+                {
+                    defName = $"{name}_{suffix}";
+                }
+
+                namedTypes.Add(defName, type);
+                defNameByTypeName.Add(name, defName);
             }
         }
 
-        var converter = new JsonSchemaConverter(defNameByType);
+        var converter = new JsonSchemaConverter(defNameByTypeName);
 
         var definitionsObject = new JsonObject();
         foreach (var (name, type) in namedTypes.OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase))
@@ -388,11 +387,11 @@ public static class JsonSchemaGenerator
 
     private sealed class JsonSchemaConverter
     {
-        private readonly IReadOnlyDictionary<TypeBase, string> defNameByType;
+        private readonly IReadOnlyDictionary<string, string> defNameByTypeName;
 
-        public JsonSchemaConverter(IReadOnlyDictionary<TypeBase, string> defNameByType)
+        public JsonSchemaConverter(IReadOnlyDictionary<string, string> defNameByTypeName)
         {
-            this.defNameByType = defNameByType;
+            this.defNameByTypeName = defNameByTypeName;
         }
 
         public JsonObject ConvertResourceDefinition(ResourceType resourceType, string resourceTypeName, string apiVersion)
@@ -555,7 +554,7 @@ public static class JsonSchemaGenerator
 
         private bool TryConvertToDefinitionRef(TypeBase type, out JsonObject? schema)
         {
-            if (type is ObjectType objectType && defNameByType.TryGetValue(objectType, out var objectDefName))
+            if (type is ObjectType objectType && defNameByTypeName.TryGetValue(objectType.Name, out var objectDefName))
             {
                 // Don't ref a definition that would be a pure additionalProperties map
                 // (all named properties are read-only). Inline it to match legacy TypeScript generator output.
@@ -570,7 +569,7 @@ public static class JsonSchemaGenerator
                 return true;
             }
 
-            if (type is DiscriminatedObjectType discType && defNameByType.TryGetValue(discType, out var discDefName))
+            if (type is DiscriminatedObjectType discType && defNameByTypeName.TryGetValue(discType.Name, out var discDefName))
             {
                 schema = RefToDef(discDefName);
                 return true;

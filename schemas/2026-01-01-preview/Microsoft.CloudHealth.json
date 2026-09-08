@@ -29,7 +29,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of health model resource",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z][a-zA-Z0-9-]{1,42}[a-zA-Z0-9]$",
@@ -55,19 +55,19 @@
           "items": {
             "oneOf": [
               {
+                "$ref": "#/definitions/healthmodels_authenticationsettings_childResource"
+              },
+              {
+                "$ref": "#/definitions/healthmodels_discoveryrules_childResource"
+              },
+              {
                 "$ref": "#/definitions/healthmodels_entities_childResource"
               },
               {
                 "$ref": "#/definitions/healthmodels_relationships_childResource"
               },
               {
-                "$ref": "#/definitions/healthmodels_discoveryrules_childResource"
-              },
-              {
                 "$ref": "#/definitions/healthmodels_signaldefinitions_childResource"
-              },
-              {
-                "$ref": "#/definitions/healthmodels_authenticationsettings_childResource"
               }
             ]
           },
@@ -96,6 +96,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -113,7 +114,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the authentication setting. Must be unique within a health model.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",
@@ -160,7 +161,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the discovery rule. Must be unique within a health model.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",
@@ -207,7 +208,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the entity. Must be unique within a health model.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",
@@ -254,7 +255,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the relationship. Must be unique within a health model. For example, a concatenation of parentEntityName and childEntityName can be used as the name.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",
@@ -301,7 +302,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the signal definition. Must be unique within a health model.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",
@@ -341,7 +342,6 @@
   },
   "definitions": {
     "AlertConfiguration": {
-      "description": "Alert configuration details",
       "properties": {
         "actionGroupIds": {
           "description": "Optional list of action group resource IDs to be notified when the alert is triggered.",
@@ -359,9 +359,16 @@
         },
         "description": {
           "description": "The alert rule description.",
-          "maxLength": 1000,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 1000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "severity": {
           "description": "The severity of triggered alert.",
@@ -387,11 +394,37 @@
       ],
       "type": "object"
     },
+    "ApplicationInsightsTopologySpecification": {
+      "properties": {
+        "applicationInsightsResourceId": {
+          "description": "Application Insights resource ID",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind of the discovery rule specification",
+          "oneOf": [
+            {
+              "enum": [
+                "ApplicationInsightsTopology"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "applicationInsightsResourceId",
+        "kind"
+      ],
+      "type": "object"
+    },
     "AuthenticationSettingProperties": {
-      "description": "Authentication setting properties",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Authentication setting properties for Azure Managed Identity",
+          "additionalProperties": false,
           "properties": {
             "authenticationKind": {
               "enum": [
@@ -399,32 +432,50 @@
               ],
               "type": "string"
             },
-            "managedIdentityName": {
-              "description": "Name of the managed identity to use. Either 'SystemAssigned' or the resourceId of a user-assigned identity.",
-              "maxLength": 500,
-              "minLength": 1,
-              "type": "string"
+            "displayName": {
+              "description": "Display name",
+              "oneOf": [
+                {
+                  "maxLength": 260,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
             }
           },
           "required": [
-            "managedIdentityName",
             "authenticationKind"
           ],
           "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ManagedIdentityAuthenticationSettingProperties"
+                },
+                {
+                  "properties": {
+                    "authenticationKind": {
+                      "const": "ManagedIdentity"
+                    }
+                  },
+                  "required": [
+                    "authenticationKind"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
-      ],
-      "properties": {
-        "displayName": {
-          "description": "Display name",
-          "maxLength": 260,
-          "minLength": 1,
-          "type": "string"
-        }
-      },
-      "type": "object"
+      ]
     },
     "AzureMonitorWorkspaceSignals": {
-      "description": "A grouping of Azure Monitor workspace signals.",
       "properties": {
         "authenticationSetting": {
           "description": "Reference to the name of the authentication setting which is used for querying the data source.",
@@ -464,7 +515,6 @@
       "type": "object"
     },
     "AzureResourceSignal": {
-      "description": "An Azure Resource Metric signal instance assigned to an entity.",
       "properties": {
         "aggregationType": {
           "description": "Type of aggregation to apply to the metric",
@@ -487,27 +537,55 @@
         },
         "dataUnit": {
           "description": "Unit of the signal result (e.g. Bytes, MilliSeconds, Percent, Count))",
-          "maxLength": 100,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 100,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "dimension": {
           "description": "Optional: Dimension to split by",
-          "maxLength": 256,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 256,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "dimensionFilter": {
           "description": "Optional: Dimension filter to apply to the dimension. Must only be set if also Dimension is set.",
-          "maxLength": 256,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 256,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "displayName": {
           "description": "Display name",
-          "maxLength": 260,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 260,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "evaluationRules": {
           "description": "Evaluation rules for the signal definition",
@@ -522,15 +600,29 @@
         },
         "metricName": {
           "description": "Name of the metric",
-          "maxLength": 256,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 256,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "metricNamespace": {
           "description": "Metric namespace",
-          "maxLength": 256,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 256,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "name": {
           "description": "Unique name of the signal within the entity.",
@@ -594,19 +686,25 @@
         },
         "timeGrain": {
           "description": "Time range of signal. ISO duration format like PT10M.",
-          "maxLength": 100,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 100,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "required": [
-        "signalKind",
-        "name"
+        "name",
+        "signalKind"
       ],
       "type": "object"
     },
     "AzureResourceSignals": {
-      "description": "A grouping of Azure resource signals",
       "properties": {
         "authenticationSetting": {
           "description": "Reference to the name of the authentication setting which is used for querying the data source.",
@@ -626,8 +724,15 @@
         },
         "azureResourceKind": {
           "description": "Azure resource kind (e.g., 'functionapp'). Populated by the UI for icon rendering. Can be null if not populated.",
-          "maxLength": 256,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 256,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "signals": {
           "description": "Signals assigned to this group.",
@@ -651,7 +756,6 @@
       "type": "object"
     },
     "DependenciesSignalGroupV2": {
-      "description": "Properties for dependent entities, i.e. child entities",
       "properties": {
         "aggregationType": {
           "description": "Aggregation type for child dependencies.",
@@ -674,7 +778,7 @@
           "oneOf": [
             {
               "minimum": 0,
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -685,7 +789,6 @@
           "description": "If true, children with Unknown health state are excluded from aggregation calculations. Defaults to true.",
           "oneOf": [
             {
-              "default": true,
               "type": "boolean"
             },
             {
@@ -698,7 +801,7 @@
           "oneOf": [
             {
               "minimum": 0,
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -727,7 +830,6 @@
       "type": "object"
     },
     "DiscoveryRuleProperties": {
-      "description": "Discovery rule properties",
       "properties": {
         "addRecommendedSignals": {
           "description": "Whether to add all recommended signals to the discovered entities.",
@@ -773,9 +875,16 @@
         },
         "displayName": {
           "description": "Display name",
-          "maxLength": 260,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 260,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "specification": {
           "description": "Specification of the discovery rule defining how entities are discovered.",
@@ -790,64 +899,74 @@
         }
       },
       "required": [
+        "addRecommendedSignals",
         "authenticationSetting",
         "discoverRelationships",
-        "addRecommendedSignals",
         "specification"
       ],
       "type": "object"
     },
     "DiscoveryRuleSpecification": {
-      "description": "Base model for discovery rule specifications",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Discovery rule specification for an Application Insights topology query",
+          "additionalProperties": false,
           "properties": {
-            "applicationInsightsResourceId": {
-              "description": "Application Insights resource ID",
-              "type": "string"
-            },
             "kind": {
               "enum": [
-                "ApplicationInsightsTopology"
+                "ApplicationInsightsTopology",
+                "ResourceGraphQuery"
               ],
               "type": "string"
             }
           },
           "required": [
-            "applicationInsightsResourceId",
             "kind"
           ],
           "type": "object"
         },
         {
-          "description": "Discovery rule specification for an Azure Resource Graph query",
-          "properties": {
-            "kind": {
-              "enum": [
-                "ResourceGraphQuery"
-              ],
-              "type": "string"
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ApplicationInsightsTopologySpecification"
+                },
+                {
+                  "properties": {
+                    "kind": {
+                      "const": "ApplicationInsightsTopology"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ],
+                  "type": "object"
+                }
+              ]
             },
-            "resourceGraphQuery": {
-              "description": "Azure Resource Graph query text in KQL syntax. The query must return at least a column named 'id' which contains the resource ID of the discovered resources.",
-              "maxLength": 5000,
-              "minLength": 1,
-              "type": "string"
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ResourceGraphQuerySpecification"
+                },
+                {
+                  "properties": {
+                    "kind": {
+                      "const": "ResourceGraphQuery"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ],
+                  "type": "object"
+                }
+              ]
             }
-          },
-          "required": [
-            "resourceGraphQuery",
-            "kind"
-          ],
-          "type": "object"
+          ]
         }
-      ],
-      "properties": {},
-      "type": "object"
+      ]
     },
     "EntityAlerts": {
-      "description": "Alert configuration for an entity",
       "properties": {
         "degraded": {
           "description": "Alert to be triggered on state change to degraded",
@@ -875,13 +994,12 @@
       "type": "object"
     },
     "EntityCoordinates": {
-      "description": "Visual position of the entity",
       "properties": {
         "x": {
           "description": "X Coordinate",
           "oneOf": [
             {
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -892,7 +1010,7 @@
           "description": "Y Coordinate",
           "oneOf": [
             {
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -907,7 +1025,6 @@
       "type": "object"
     },
     "EntityProperties": {
-      "description": "Properties which are common across all kinds of entities",
       "properties": {
         "alerts": {
           "description": "Alert configuration for this entity",
@@ -933,9 +1050,16 @@
         },
         "displayName": {
           "description": "Display name",
-          "maxLength": 260,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 260,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "healthObjective": {
           "description": "Health objective as a percentage of time the entity should be healthy.",
@@ -943,7 +1067,7 @@
             {
               "maximum": 100,
               "minimum": 0,
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -1007,8 +1131,15 @@
       },
       "type": "object"
     },
+    "EntityPropertiesTags": {
+      "additionalProperties": {
+        "maxLength": 4096,
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "EvaluationRule": {
-      "description": "Evaluation rule for a signal definition",
       "properties": {
         "degradedRule": {
           "description": "Degraded rule with static threshold.",
@@ -1039,24 +1170,36 @@
       "type": "object"
     },
     "HealthModelProperties": {
-      "description": "HealthModel properties",
       "properties": {},
       "type": "object"
     },
     "IconDefinition": {
-      "description": "Visual icon definition of an entity",
       "properties": {
         "customData": {
           "description": "Custom data. Base64-encoded SVG data. If set, this overrides the built-in icon.",
-          "maxLength": 5000,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 5000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "iconName": {
           "description": "Name of the built-in icon, or 'Custom' to use customData",
-          "maxLength": 100,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 100,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "required": [
@@ -1064,20 +1207,95 @@
       ],
       "type": "object"
     },
+    "LogAnalyticsQuerySignalDefinitionProperties": {
+      "properties": {
+        "queryText": {
+          "description": "Query text in KQL syntax",
+          "oneOf": [
+            {
+              "maxLength": 5000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "signalKind": {
+          "description": "Kind of the signal definition",
+          "oneOf": [
+            {
+              "enum": [
+                "LogAnalyticsQuery"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "timeGrain": {
+          "description": "Time range of signal. ISO duration format like PT10M. If not specified, the KQL query must define a time range.",
+          "oneOf": [
+            {
+              "maxLength": 100,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "valueColumnName": {
+          "description": "Name of the column in the result set to evaluate against the thresholds. Defaults to the first column in the result set if not specified. The column must be numeric.",
+          "oneOf": [
+            {
+              "maxLength": 100,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "queryText",
+        "signalKind"
+      ],
+      "type": "object"
+    },
     "LogAnalyticsSignal": {
-      "description": "A Log Analytics Query signal instance assigned to an entity.",
       "properties": {
         "dataUnit": {
           "description": "Unit of the signal result (e.g. Bytes, MilliSeconds, Percent, Count))",
-          "maxLength": 100,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 100,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "displayName": {
           "description": "Display name",
-          "maxLength": 260,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 260,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "evaluationRules": {
           "description": "Evaluation rules for the signal definition",
@@ -1104,9 +1322,16 @@
         },
         "queryText": {
           "description": "Query text in KQL syntax",
-          "maxLength": 5000,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 5000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "refreshInterval": {
           "description": "Interval in which the signal is being evaluated. Defaults to PT1M (1 minute).",
@@ -1158,25 +1383,38 @@
         },
         "timeGrain": {
           "description": "Time range of signal. ISO duration format like PT10M. If not specified, the KQL query must define a time range.",
-          "maxLength": 100,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 100,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "valueColumnName": {
           "description": "Name of the column in the result set to evaluate against the thresholds. Defaults to the first column in the result set if not specified. The column must be numeric.",
-          "maxLength": 100,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 100,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "required": [
-        "signalKind",
-        "name"
+        "name",
+        "signalKind"
       ],
       "type": "object"
     },
     "LogAnalyticsSignals": {
-      "description": "A grouping of Log Analytics workspace signals.",
       "properties": {
         "authenticationSetting": {
           "description": "Reference to the name of the authentication setting which is used for querying the data source.",
@@ -1215,8 +1453,43 @@
       ],
       "type": "object"
     },
+    "ManagedIdentityAuthenticationSettingProperties": {
+      "properties": {
+        "authenticationKind": {
+          "description": "Kind of the authentication setting",
+          "oneOf": [
+            {
+              "enum": [
+                "ManagedIdentity"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "managedIdentityName": {
+          "description": "Name of the managed identity to use. Either 'SystemAssigned' or the resourceId of a user-assigned identity.",
+          "oneOf": [
+            {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "authenticationKind",
+        "managedIdentityName"
+      ],
+      "type": "object"
+    },
     "ManagedServiceIdentity": {
-      "description": "Managed service identity (system assigned and/or user assigned identities)",
       "properties": {
         "type": {
           "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).",
@@ -1256,20 +1529,40 @@
       ],
       "type": "object"
     },
+    "ManagedServiceIdentityUserAssignedIdentities": {
+      "additionalProperties": {
+        "$ref": "#/definitions/UserAssignedIdentity"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "PrometheusMetricsSignal": {
-      "description": "A Prometheus Metrics Query signal instance assigned to an entity.",
       "properties": {
         "dataUnit": {
           "description": "Unit of the signal result (e.g. Bytes, MilliSeconds, Percent, Count))",
-          "maxLength": 100,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 100,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "displayName": {
           "description": "Display name",
-          "maxLength": 260,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 260,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "evaluationRules": {
           "description": "Evaluation rules for the signal definition",
@@ -1296,9 +1589,16 @@
         },
         "queryText": {
           "description": "Query text in PromQL syntax",
-          "maxLength": 5000,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 5000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "refreshInterval": {
           "description": "Interval in which the signal is being evaluated. Defaults to PT1M (1 minute).",
@@ -1350,19 +1650,74 @@
         },
         "timeGrain": {
           "description": "Time range of signal. ISO duration format like PT10M.",
-          "maxLength": 100,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 100,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "required": [
-        "signalKind",
-        "name"
+        "name",
+        "signalKind"
+      ],
+      "type": "object"
+    },
+    "PrometheusMetricsSignalDefinitionProperties": {
+      "properties": {
+        "queryText": {
+          "description": "Query text in PromQL syntax",
+          "oneOf": [
+            {
+              "maxLength": 5000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "signalKind": {
+          "description": "Kind of the signal definition",
+          "oneOf": [
+            {
+              "enum": [
+                "PrometheusMetricsQuery"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "timeGrain": {
+          "description": "Time range of signal. ISO duration format like PT10M.",
+          "oneOf": [
+            {
+              "maxLength": 100,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "queryText",
+        "signalKind"
       ],
       "type": "object"
     },
     "RelationshipProperties": {
-      "description": "Relationship properties",
       "properties": {
         "childEntityName": {
           "description": "Resource name of the child entity",
@@ -1378,9 +1733,16 @@
         },
         "displayName": {
           "description": "Display name",
-          "maxLength": 260,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 260,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "parentEntityName": {
           "description": "Resource name of the parent entity",
@@ -1412,180 +1774,27 @@
         }
       },
       "required": [
-        "parentEntityName",
-        "childEntityName"
+        "childEntityName",
+        "parentEntityName"
       ],
       "type": "object"
     },
-    "SignalDefinitionProperties": {
-      "description": "SignalDefinition properties",
-      "oneOf": [
-        {
-          "description": "Azure Resource Metric Signal Definition properties",
-          "properties": {
-            "aggregationType": {
-              "description": "Type of aggregation to apply to the metric",
-              "oneOf": [
-                {
-                  "enum": [
-                    "None",
-                    "Average",
-                    "Count",
-                    "Minimum",
-                    "Maximum",
-                    "Total"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "dimension": {
-              "description": "Optional: Dimension to split by",
-              "maxLength": 256,
-              "minLength": 1,
-              "type": "string"
-            },
-            "dimensionFilter": {
-              "description": "Optional: Dimension filter to apply to the dimension. Must only be set if also Dimension is set.",
-              "maxLength": 256,
-              "minLength": 1,
-              "type": "string"
-            },
-            "metricName": {
-              "description": "Name of the metric",
-              "maxLength": 256,
-              "minLength": 1,
-              "type": "string"
-            },
-            "metricNamespace": {
-              "description": "Metric namespace",
-              "maxLength": 256,
-              "minLength": 1,
-              "type": "string"
-            },
-            "signalKind": {
-              "enum": [
-                "AzureResourceMetric"
-              ],
-              "type": "string"
-            },
-            "timeGrain": {
-              "description": "Time range of signal. ISO duration format like PT10M.",
-              "maxLength": 100,
-              "minLength": 1,
-              "type": "string"
-            }
-          },
-          "required": [
-            "metricNamespace",
-            "metricName",
-            "timeGrain",
-            "aggregationType",
-            "signalKind"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Log Analytics Query Signal Definition properties",
-          "properties": {
-            "queryText": {
-              "description": "Query text in KQL syntax",
-              "maxLength": 5000,
-              "minLength": 1,
-              "type": "string"
-            },
-            "signalKind": {
-              "enum": [
-                "LogAnalyticsQuery"
-              ],
-              "type": "string"
-            },
-            "timeGrain": {
-              "description": "Time range of signal. ISO duration format like PT10M. If not specified, the KQL query must define a time range.",
-              "maxLength": 100,
-              "minLength": 1,
-              "type": "string"
-            },
-            "valueColumnName": {
-              "description": "Name of the column in the result set to evaluate against the thresholds. Defaults to the first column in the result set if not specified. The column must be numeric.",
-              "maxLength": 100,
-              "minLength": 1,
-              "type": "string"
-            }
-          },
-          "required": [
-            "queryText",
-            "signalKind"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Prometheus Metrics Signal Definition properties",
-          "properties": {
-            "queryText": {
-              "description": "Query text in PromQL syntax",
-              "maxLength": 5000,
-              "minLength": 1,
-              "type": "string"
-            },
-            "signalKind": {
-              "enum": [
-                "PrometheusMetricsQuery"
-              ],
-              "type": "string"
-            },
-            "timeGrain": {
-              "description": "Time range of signal. ISO duration format like PT10M.",
-              "maxLength": 100,
-              "minLength": 1,
-              "type": "string"
-            }
-          },
-          "required": [
-            "queryText",
-            "signalKind"
-          ],
-          "type": "object"
-        }
-      ],
+    "RelationshipPropertiesTags": {
+      "additionalProperties": {
+        "maxLength": 4096,
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "ResourceGraphQuerySpecification": {
       "properties": {
-        "dataUnit": {
-          "description": "Unit of the signal result (e.g. Bytes, MilliSeconds, Percent, Count))",
-          "maxLength": 100,
-          "minLength": 1,
-          "type": "string"
-        },
-        "displayName": {
-          "description": "Display name",
-          "maxLength": 260,
-          "minLength": 1,
-          "type": "string"
-        },
-        "evaluationRules": {
-          "description": "Evaluation rules for the signal definition",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/EvaluationRule"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "refreshInterval": {
-          "description": "Interval in which the signal is being evaluated. Defaults to PT1M (1 minute).",
+        "kind": {
+          "description": "Kind of the discovery rule specification",
           "oneOf": [
             {
               "enum": [
-                "PT1M",
-                "PT5M",
-                "PT10M",
-                "PT30M",
-                "PT1H",
-                "PT2H"
+                "ResourceGraphQuery"
               ],
               "type": "string"
             },
@@ -1594,16 +1803,13 @@
             }
           ]
         },
-        "tags": {
-          "description": "Optional set of tags (key-value pairs)",
+        "resourceGraphQuery": {
+          "description": "Azure Resource Graph query text in KQL syntax. The query must return at least a column named 'id' which contains the resource ID of the discovered resources.",
           "oneOf": [
             {
-              "additionalProperties": {
-                "maxLength": 4096,
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "maxLength": 5000,
+              "minLength": 1,
+              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -1612,12 +1818,282 @@
         }
       },
       "required": [
-        "evaluationRules"
+        "kind",
+        "resourceGraphQuery"
       ],
       "type": "object"
     },
+    "ResourceMetricSignalDefinitionProperties": {
+      "properties": {
+        "aggregationType": {
+          "description": "Type of aggregation to apply to the metric",
+          "oneOf": [
+            {
+              "enum": [
+                "None",
+                "Average",
+                "Count",
+                "Minimum",
+                "Maximum",
+                "Total"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "dimension": {
+          "description": "Optional: Dimension to split by",
+          "oneOf": [
+            {
+              "maxLength": 256,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "dimensionFilter": {
+          "description": "Optional: Dimension filter to apply to the dimension. Must only be set if also Dimension is set.",
+          "oneOf": [
+            {
+              "maxLength": 256,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "metricName": {
+          "description": "Name of the metric",
+          "oneOf": [
+            {
+              "maxLength": 256,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "metricNamespace": {
+          "description": "Metric namespace",
+          "oneOf": [
+            {
+              "maxLength": 256,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "signalKind": {
+          "description": "Kind of the signal definition",
+          "oneOf": [
+            {
+              "enum": [
+                "AzureResourceMetric"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "timeGrain": {
+          "description": "Time range of signal. ISO duration format like PT10M.",
+          "oneOf": [
+            {
+              "maxLength": 100,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "aggregationType",
+        "metricName",
+        "metricNamespace",
+        "signalKind",
+        "timeGrain"
+      ],
+      "type": "object"
+    },
+    "SignalDefinitionProperties": {
+      "allOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "dataUnit": {
+              "description": "Unit of the signal result (e.g. Bytes, MilliSeconds, Percent, Count))",
+              "oneOf": [
+                {
+                  "maxLength": 100,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "displayName": {
+              "description": "Display name",
+              "oneOf": [
+                {
+                  "maxLength": 260,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "evaluationRules": {
+              "description": "Evaluation rules for the signal definition",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/EvaluationRule"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "refreshInterval": {
+              "description": "Interval in which the signal is being evaluated. Defaults to PT1M (1 minute).",
+              "oneOf": [
+                {
+                  "enum": [
+                    "PT1M",
+                    "PT5M",
+                    "PT10M",
+                    "PT30M",
+                    "PT1H",
+                    "PT2H"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "signalKind": {
+              "enum": [
+                "AzureResourceMetric",
+                "LogAnalyticsQuery",
+                "PrometheusMetricsQuery"
+              ],
+              "type": "string"
+            },
+            "tags": {
+              "description": "Optional set of tags (key-value pairs)",
+              "oneOf": [
+                {
+                  "additionalProperties": {
+                    "maxLength": 4096,
+                    "type": "string"
+                  },
+                  "properties": {},
+                  "type": "object"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "evaluationRules",
+            "signalKind"
+          ],
+          "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ResourceMetricSignalDefinitionProperties"
+                },
+                {
+                  "properties": {
+                    "signalKind": {
+                      "const": "AzureResourceMetric"
+                    }
+                  },
+                  "required": [
+                    "signalKind"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/LogAnalyticsQuerySignalDefinitionProperties"
+                },
+                {
+                  "properties": {
+                    "signalKind": {
+                      "const": "LogAnalyticsQuery"
+                    }
+                  },
+                  "required": [
+                    "signalKind"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/PrometheusMetricsSignalDefinitionProperties"
+                },
+                {
+                  "properties": {
+                    "signalKind": {
+                      "const": "PrometheusMetricsQuery"
+                    }
+                  },
+                  "required": [
+                    "signalKind"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "SignalDefinitionPropertiesTags": {
+      "additionalProperties": {
+        "maxLength": 4096,
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "SignalGroups": {
-      "description": "Contains various signal groups that can be assigned to an entity",
       "properties": {
         "azureLogAnalytics": {
           "description": "Log Analytics Signal Group",
@@ -1667,7 +2143,6 @@
       "type": "object"
     },
     "ThresholdRuleV2": {
-      "description": "Threshold-based evaluation rule for a signal definition",
       "properties": {
         "operator": {
           "description": "Operator how to compare the signal value with the threshold",
@@ -1692,7 +2167,7 @@
           "description": "Threshold value",
           "oneOf": [
             {
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -1706,13 +2181,19 @@
       ],
       "type": "object"
     },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "UserAssignedIdentity": {
-      "description": "User assigned identity properties",
       "properties": {},
       "type": "object"
     },
     "healthmodels_authenticationsettings_childResource": {
-      "description": "Microsoft.CloudHealth/healthmodels/authenticationsettings",
+      "description": "authenticationsettings",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1721,7 +2202,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the authentication setting. Must be unique within a health model.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",
@@ -1759,7 +2240,7 @@
       "type": "object"
     },
     "healthmodels_discoveryrules_childResource": {
-      "description": "Microsoft.CloudHealth/healthmodels/discoveryrules",
+      "description": "discoveryrules",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1768,7 +2249,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the discovery rule. Must be unique within a health model.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",
@@ -1806,7 +2287,7 @@
       "type": "object"
     },
     "healthmodels_entities_childResource": {
-      "description": "Microsoft.CloudHealth/healthmodels/entities",
+      "description": "entities",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1815,7 +2296,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the entity. Must be unique within a health model.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",
@@ -1853,7 +2334,7 @@
       "type": "object"
     },
     "healthmodels_relationships_childResource": {
-      "description": "Microsoft.CloudHealth/healthmodels/relationships",
+      "description": "relationships",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1862,7 +2343,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the relationship. Must be unique within a health model. For example, a concatenation of parentEntityName and childEntityName can be used as the name.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",
@@ -1900,7 +2381,7 @@
       "type": "object"
     },
     "healthmodels_signaldefinitions_childResource": {
-      "description": "Microsoft.CloudHealth/healthmodels/signaldefinitions",
+      "description": "signaldefinitions",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1909,7 +2390,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the signal definition. Must be unique within a health model.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{1,258}[a-zA-Z0-9]$",

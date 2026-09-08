@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the NetApp account",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -36,16 +36,16 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/netAppAccounts_volumeGroups_childResource"
+                "$ref": "#/definitions/netAppAccounts_backupPolicies_childResource"
               },
               {
                 "$ref": "#/definitions/netAppAccounts_capacityPools_childResource"
               },
               {
-                "$ref": "#/definitions/netAppAccounts_backupPolicies_childResource"
+                "$ref": "#/definitions/netAppAccounts_snapshotPolicies_childResource"
               },
               {
-                "$ref": "#/definitions/netAppAccounts_snapshotPolicies_childResource"
+                "$ref": "#/definitions/netAppAccounts_volumeGroups_childResource"
               }
             ]
           },
@@ -74,6 +74,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -95,7 +96,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Backup policy Name which uniquely identify backup policy.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -132,6 +133,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -153,7 +155,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the capacity pool",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 64,
@@ -210,6 +212,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -231,7 +234,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the volume",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 64,
@@ -294,6 +297,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -315,7 +319,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the backup",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -337,6 +341,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -358,7 +363,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the snapshot",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -380,6 +385,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -397,7 +403,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the subvolume.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 64,
@@ -450,7 +456,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the snapshot policy",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -487,6 +493,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -508,7 +515,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the volumeGroup",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 64,
@@ -565,7 +572,6 @@
   },
   "definitions": {
     "AccountEncryption": {
-      "description": "Encryption settings",
       "properties": {
         "keySource": {
           "description": "Encryption Key Source. Possible values are: 'Microsoft.NetApp'.",
@@ -575,7 +581,6 @@
       "type": "object"
     },
     "AccountProperties": {
-      "description": "NetApp account properties",
       "properties": {
         "activeDirectories": {
           "description": "Active Directories",
@@ -606,16 +611,9 @@
       "type": "object"
     },
     "ActiveDirectory": {
-      "description": "Active Directory",
       "properties": {
         "activeDirectoryId": {
           "description": "Id of the Active Directory",
-          "type": "string"
-        },
-        "adName": {
-          "description": "Name of the active directory machine. This optional parameter is used only while creating kerberos volume",
-          "maxLength": 64,
-          "minLength": 1,
           "type": "string"
         },
         "administrators": {
@@ -634,6 +632,19 @@
             }
           ]
         },
+        "adName": {
+          "description": "Name of the active directory machine. This optional parameter is used only while creating kerberos volume",
+          "oneOf": [
+            {
+              "maxLength": 64,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
         "aesEncryption": {
           "description": "If enabled, AES encryption will be enabled for SMB communication.",
           "oneOf": [
@@ -646,7 +657,7 @@
           ]
         },
         "allowLocalNfsUsersWithLdap": {
-          "description": " If enabled, NFS client local users can also (in addition to LDAP users) access the NFS volumes.",
+          "description": "If enabled, NFS client local users can also (in addition to LDAP users) access the NFS volumes.",
           "oneOf": [
             {
               "type": "boolean"
@@ -745,7 +756,6 @@
           ]
         },
         "organizationalUnit": {
-          "default": "CN=Computers",
           "description": "The Organizational Unit (OU) within the Windows Active Directory",
           "type": "string"
         },
@@ -771,9 +781,16 @@
         },
         "serverRootCACertificate": {
           "description": "When LDAP over SSL/TLS is enabled, the LDAP client is required to have base64 encoded Active Directory Certificate Service's self-signed root CA certificate, this optional parameter is used only for dual protocol with LDAP user-mapping volumes.",
-          "maxLength": 10240,
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 10240,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "site": {
           "description": "The Active Directory site the service will limit Domain Controller discovery to",
@@ -791,7 +808,6 @@
       "type": "object"
     },
     "BackupPolicyProperties": {
-      "description": "Backup policy properties",
       "properties": {
         "dailyBackupsToKeep": {
           "description": "Daily backups count to keep",
@@ -841,7 +857,6 @@
       "type": "object"
     },
     "BackupProperties": {
-      "description": "Backup properties",
       "properties": {
         "label": {
           "description": "Label for backup",
@@ -851,7 +866,6 @@
           "description": "Manual backup an already existing snapshot. This will always be false for scheduled backups and true/false for manual backups",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -863,7 +877,6 @@
       "type": "object"
     },
     "DailySchedule": {
-      "description": "Daily Schedule properties",
       "properties": {
         "hour": {
           "description": "Indicates which hour in UTC timezone a snapshot should be taken",
@@ -913,7 +926,6 @@
       "type": "object"
     },
     "ExportPolicyRule": {
-      "description": "Volume Export Policy Rule",
       "properties": {
         "allowedClients": {
           "description": "Client ingress specification as comma separated string with IPv4 CIDRs, IPv4 host addresses and host names",
@@ -949,31 +961,6 @@
           "description": "Has root access to volume",
           "oneOf": [
             {
-              "default": true,
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "kerberos5ReadOnly": {
-          "description": "Kerberos5 Read only access. To be use with swagger version 2020-05-01 or later",
-          "oneOf": [
-            {
-              "default": false,
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "kerberos5ReadWrite": {
-          "description": "Kerberos5 Read and write access. To be use with swagger version 2020-05-01 or later",
-          "oneOf": [
-            {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -985,7 +972,6 @@
           "description": "Kerberos5i Read only access. To be use with swagger version 2020-05-01 or later",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -997,7 +983,6 @@
           "description": "Kerberos5i Read and write access. To be use with swagger version 2020-05-01 or later",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -1009,7 +994,6 @@
           "description": "Kerberos5p Read only access. To be use with swagger version 2020-05-01 or later",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -1021,7 +1005,28 @@
           "description": "Kerberos5p Read and write access. To be use with swagger version 2020-05-01 or later",
           "oneOf": [
             {
-              "default": false,
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "kerberos5ReadOnly": {
+          "description": "Kerberos5 Read only access. To be use with swagger version 2020-05-01 or later",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "kerberos5ReadWrite": {
+          "description": "Kerberos5 Read and write access. To be use with swagger version 2020-05-01 or later",
+          "oneOf": [
+            {
               "type": "boolean"
             },
             {
@@ -1088,7 +1093,6 @@
       "type": "object"
     },
     "HourlySchedule": {
-      "description": "Hourly Schedule properties",
       "properties": {
         "minute": {
           "description": "Indicates which minute snapshot should be taken",
@@ -1127,28 +1131,47 @@
       "type": "object"
     },
     "LdapSearchScopeOpt": {
-      "description": "LDAP search scope ",
       "properties": {
         "groupDN": {
           "description": "This specifies the group DN, which overrides the base DN for group lookups.",
-          "maxLength": 255,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 255,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "groupMembershipFilter": {
           "description": "This specifies the custom LDAP search filter to be used when looking up group membership from LDAP server.",
-          "maxLength": 255,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 255,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "userDN": {
           "description": "This specifies the user DN, which overrides the base DN for user lookups.",
-          "maxLength": 255,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 255,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "type": "object"
     },
     "MonthlySchedule": {
-      "description": "Monthly Schedule properties",
       "properties": {
         "daysOfMonth": {
           "description": "Indicates which days of the month snapshot should be taken. A comma delimited string.",
@@ -1202,7 +1225,6 @@
       "type": "object"
     },
     "PlacementKeyValuePairs": {
-      "description": "Application specific parameters for the placement of volumes in the volume group",
       "properties": {
         "key": {
           "description": "Key for an application specific parameter for the placement of volumes in the volume group",
@@ -1220,13 +1242,11 @@
       "type": "object"
     },
     "PoolProperties": {
-      "description": "Pool properties",
       "properties": {
         "coolAccess": {
           "description": "If enabled (true) the pool can contain cool Access enabled volumes.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -1285,7 +1305,6 @@
           "description": "Provisioned size of the pool (in bytes). Allowed values are in 1TiB chunks (value must be multiply of 4398046511104).",
           "oneOf": [
             {
-              "default": 4398046511104,
               "type": "integer"
             },
             {
@@ -1295,13 +1314,12 @@
         }
       },
       "required": [
-        "size",
-        "serviceLevel"
+        "serviceLevel",
+        "size"
       ],
       "type": "object"
     },
     "ReplicationObject": {
-      "description": "Replication properties",
       "properties": {
         "endpointType": {
           "description": "Indicates whether the local volume is the source or destination for the Volume Replication",
@@ -1352,8 +1370,14 @@
       ],
       "type": "object"
     },
+    "ResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "SnapshotPolicyProperties": {
-      "description": "Snapshot policy properties",
       "properties": {
         "dailySchedule": {
           "description": "Schedule for daily snapshots",
@@ -1414,12 +1438,10 @@
       "type": "object"
     },
     "SnapshotProperties": {
-      "description": "Snapshot properties",
       "properties": {},
       "type": "object"
     },
     "SubvolumeProperties": {
-      "description": "This represents path associated with the subvolume",
       "properties": {
         "parentPath": {
           "description": "parent path to the subvolume",
@@ -1443,8 +1465,14 @@
       },
       "type": "object"
     },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "VolumeBackupProperties": {
-      "description": "Volume Backup Properties",
       "properties": {
         "backupEnabled": {
           "description": "Backup Enabled",
@@ -1480,7 +1508,6 @@
       "type": "object"
     },
     "VolumeGroupMetaData": {
-      "description": "Volume group properties",
       "properties": {
         "applicationIdentifier": {
           "description": "Application specific identifier",
@@ -1526,7 +1553,6 @@
       "type": "object"
     },
     "VolumeGroupProperties": {
-      "description": "Volume group properties",
       "properties": {
         "groupMetaData": {
           "description": "Volume group details",
@@ -1557,7 +1583,6 @@
       "type": "object"
     },
     "VolumeGroupVolumeProperties": {
-      "description": "Volume resource",
       "properties": {
         "name": {
           "description": "Resource name",
@@ -1596,7 +1621,6 @@
       "type": "object"
     },
     "VolumeProperties": {
-      "description": "Volume properties",
       "properties": {
         "avsDataStore": {
           "description": "Specifies whether the volume is enabled for Azure VMware Solution (AVS) datastore purpose",
@@ -1635,7 +1659,6 @@
           "description": "Specifies whether Cool Access(tiering) is enabled for the volume.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -1685,7 +1708,6 @@
           "description": "Default group quota for volume in KiBs. If isDefaultQuotaEnabled is set, the minimum value of 4 KiBs applies.",
           "oneOf": [
             {
-              "default": 0,
               "type": "integer"
             },
             {
@@ -1697,7 +1719,6 @@
           "description": "Default user quota for volume in KiBs. If isDefaultQuotaEnabled is set, the minimum value of 4 KiBs applies .",
           "oneOf": [
             {
-              "default": 0,
               "type": "integer"
             },
             {
@@ -1739,7 +1760,6 @@
           "description": "Specifies if default quota is enabled for the volume.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -1762,7 +1782,6 @@
           "description": "Describe if a volume is KerberosEnabled. To be use with swagger version 2020-05-01 or later",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -1774,7 +1793,6 @@
           "description": "Specifies whether LDAP is enabled or not for a given NFS volume.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -1865,7 +1883,6 @@
           "description": "Enables continuously available share property for smb volume. Only applicable for SMB volume",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -1877,7 +1894,6 @@
           "description": "Enables encryption for in-flight smb3 data. Only applicable for SMB/DualProtocol volume. To be used with swagger version 2020-08-01 or later",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -1889,7 +1905,6 @@
           "description": "If enabled (true) the volume will contain a read-only snapshot directory which provides access to each of the volume's snapshots (default to true).",
           "oneOf": [
             {
-              "default": true,
               "type": "boolean"
             },
             {
@@ -1919,7 +1934,7 @@
           "description": "Maximum throughput in Mibps that can be achieved by this volume and this will be accepted as input only for manual qosType volume",
           "oneOf": [
             {
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -1927,17 +1942,22 @@
           ]
         },
         "unixPermissions": {
-          "default": "0770",
           "description": "UNIX permissions for NFS volume accepted in octal 4 digit format. First digit selects the set user ID(4), set group ID (2) and sticky (1) attributes. Second digit selects permission for the owner of the file: read (4), write (2) and execute (1). Third selects permissions for other users in the same group. the fourth for other users not in the group. 0755 - gives read/write/execute permissions to owner and read/execute to group and other users.",
-          "maxLength": 4,
-          "minLength": 4,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 4,
+              "minLength": 4,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "usageThreshold": {
           "description": "Maximum storage quota allowed for a file system in bytes. This is a soft quota used for alerting only. Minimum size is 100 GiB. Upper limit is 100TiB. Specified in bytes.",
           "oneOf": [
             {
-              "default": 107374182400,
               "maximum": 109951162777600,
               "minimum": 107374182400,
               "type": "integer"
@@ -1958,13 +1978,12 @@
       },
       "required": [
         "creationToken",
-        "usageThreshold",
-        "subnetId"
+        "subnetId",
+        "usageThreshold"
       ],
       "type": "object"
     },
     "VolumePropertiesDataProtection": {
-      "description": "DataProtection type volumes include an object containing details of the replication",
       "properties": {
         "backup": {
           "description": "Backup Properties",
@@ -2003,7 +2022,6 @@
       "type": "object"
     },
     "VolumePropertiesExportPolicy": {
-      "description": "Set of export policy rules",
       "properties": {
         "rules": {
           "description": "Export policy rule",
@@ -2023,7 +2041,6 @@
       "type": "object"
     },
     "VolumeSnapshotProperties": {
-      "description": "Volume Snapshot Properties",
       "properties": {
         "snapshotPolicyId": {
           "description": "Snapshot Policy ResourceId",
@@ -2033,7 +2050,6 @@
       "type": "object"
     },
     "WeeklySchedule": {
-      "description": "Weekly Schedule properties, make a snapshot every week at a specific day or days",
       "properties": {
         "day": {
           "description": "Indicates which weekdays snapshot should be taken, accepts a comma separated list of week day names in english",
@@ -2087,7 +2103,7 @@
       "type": "object"
     },
     "netAppAccounts_backupPolicies_childResource": {
-      "description": "Microsoft.NetApp/netAppAccounts/backupPolicies",
+      "description": "backupPolicies",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -2100,7 +2116,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Backup policy Name which uniquely identify backup policy.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -2137,6 +2153,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -2145,7 +2162,7 @@
       "type": "object"
     },
     "netAppAccounts_capacityPools_childResource": {
-      "description": "Microsoft.NetApp/netAppAccounts/capacityPools",
+      "description": "capacityPools",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -2158,7 +2175,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the capacity pool",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 64,
@@ -2205,6 +2222,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -2213,7 +2231,7 @@
       "type": "object"
     },
     "netAppAccounts_capacityPools_volumes_backups_childResource": {
-      "description": "Microsoft.NetApp/netAppAccounts/capacityPools/volumes/backups",
+      "description": "backups",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -2226,7 +2244,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the backup",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -2248,6 +2266,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -2256,7 +2275,7 @@
       "type": "object"
     },
     "netAppAccounts_capacityPools_volumes_childResource": {
-      "description": "Microsoft.NetApp/netAppAccounts/capacityPools/volumes",
+      "description": "volumes",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -2269,7 +2288,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the volume",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 64,
@@ -2316,6 +2335,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -2324,7 +2344,7 @@
       "type": "object"
     },
     "netAppAccounts_capacityPools_volumes_snapshots_childResource": {
-      "description": "Microsoft.NetApp/netAppAccounts/capacityPools/volumes/snapshots",
+      "description": "snapshots",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -2337,7 +2357,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the snapshot",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -2359,6 +2379,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -2367,7 +2388,7 @@
       "type": "object"
     },
     "netAppAccounts_capacityPools_volumes_subvolumes_childResource": {
-      "description": "Microsoft.NetApp/netAppAccounts/capacityPools/volumes/subvolumes",
+      "description": "subvolumes",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -2376,7 +2397,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the subvolume.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 64,
@@ -2416,7 +2437,7 @@
       "type": "object"
     },
     "netAppAccounts_snapshotPolicies_childResource": {
-      "description": "Microsoft.NetApp/netAppAccounts/snapshotPolicies",
+      "description": "snapshotPolicies",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -2429,7 +2450,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the snapshot policy",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -2466,6 +2487,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -2474,7 +2496,7 @@
       "type": "object"
     },
     "netAppAccounts_volumeGroups_childResource": {
-      "description": "Microsoft.NetApp/netAppAccounts/volumeGroups",
+      "description": "volumeGroups",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -2487,7 +2509,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the volumeGroup",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 64,

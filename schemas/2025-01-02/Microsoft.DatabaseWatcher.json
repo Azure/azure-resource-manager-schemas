@@ -29,7 +29,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The database watcher name.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_]{3,60}$",
@@ -55,13 +55,13 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/watchers_targets_childResource"
-              },
-              {
                 "$ref": "#/definitions/watchers_alertRuleResources_childResource"
               },
               {
                 "$ref": "#/definitions/watchers_sharedPrivateLinkResources_childResource"
+              },
+              {
+                "$ref": "#/definitions/watchers_targets_childResource"
               }
             ]
           },
@@ -90,6 +90,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -107,7 +108,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The alert rule proxy resource name.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_.]{0,62}[a-zA-Z0-9_]{1}$",
@@ -154,7 +155,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The Shared Private Link resource name.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_.]{0,62}[a-zA-Z0-9_]{1}$",
@@ -201,7 +202,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The target resource name.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_]{3,60}$",
@@ -241,7 +242,6 @@
   },
   "definitions": {
     "AlertRuleResourceProperties": {
-      "description": "The generic properties of the alert rule proxy resource.",
       "properties": {
         "alertRuleResourceId": {
           "description": "The resource ID of the alert rule resource.",
@@ -272,21 +272,19 @@
         },
         "creationTime": {
           "description": "The creation time of the alert rule resource.",
-          "format": "date-time",
           "type": "string"
         }
       },
       "required": [
         "alertRuleResourceId",
-        "createdWithProperties",
-        "creationTime",
         "alertRuleTemplateId",
-        "alertRuleTemplateVersion"
+        "alertRuleTemplateVersion",
+        "createdWithProperties",
+        "creationTime"
       ],
       "type": "object"
     },
     "Datastore": {
-      "description": "The properties of a data store.",
       "properties": {
         "adxClusterResourceId": {
           "description": "The Azure resource ID of an Azure Data Explorer cluster.",
@@ -300,12 +298,12 @@
           "description": "The Kusto cluster URI.",
           "type": "string"
         },
-        "kustoDataIngestionUri": {
-          "description": "The Kusto data ingestion URI.",
-          "type": "string"
-        },
         "kustoDatabaseName": {
           "description": "The name of a Kusto database.",
+          "type": "string"
+        },
+        "kustoDataIngestionUri": {
+          "description": "The Kusto data ingestion URI.",
           "type": "string"
         },
         "kustoManagementUrl": {
@@ -331,15 +329,14 @@
       },
       "required": [
         "kustoClusterUri",
-        "kustoDataIngestionUri",
         "kustoDatabaseName",
+        "kustoDataIngestionUri",
         "kustoManagementUrl",
         "kustoOfferingType"
       ],
       "type": "object"
     },
     "ManagedServiceIdentity": {
-      "description": "Managed service identity (system assigned and/or user assigned identities)",
       "properties": {
         "type": {
           "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).",
@@ -380,7 +377,6 @@
       "type": "object"
     },
     "SharedPrivateLinkResourceProperties": {
-      "description": "The generic properties of a Shared Private Link resource.",
       "properties": {
         "dnsZone": {
           "description": "The DNS zone segment to be included in the DNS name of the shared private link. Value is required for Azure Data Explorer clusters and SQL managed instances, and must be omitted for SQL logical servers and key vaults. The value is the second segment of the host FQDN name of the resource that the shared private link resource is for. For example: if the host name is 'adx-cluster-21187695.eastus.kusto.windows.net', then the value is 'eastus'; if the host name is 'sql-mi-23961134.767d5869f605.database.windows.net', then the value is '767d5869f605'.",
@@ -400,155 +396,41 @@
         }
       },
       "required": [
-        "privateLinkResourceId",
         "groupId",
+        "privateLinkResourceId",
         "requestMessage"
       ],
       "type": "object"
     },
-    "TargetProperties": {
-      "description": "The generic properties of a target.",
-      "oneOf": [
-        {
-          "description": "The properties specific to a database in Azure SQL Database.",
-          "properties": {
-            "readIntent": {
-              "description": "Set to true to monitor a high availability replica of specified target, if any.",
-              "oneOf": [
-                {
-                  "default": false,
-                  "type": "boolean"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "sqlDbResourceId": {
-              "description": "The Azure resource ID of an Azure SQL DB database target.",
-              "type": "string"
-            },
-            "targetType": {
-              "enum": [
-                "SqlDb"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "sqlDbResourceId",
-            "targetType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "The properties specific to an elastic pool in Azure SQL Database.",
-          "properties": {
-            "anchorDatabaseResourceId": {
-              "description": "The Azure resource ID of the anchor database used to connect to an elastic pool.",
-              "type": "string"
-            },
-            "readIntent": {
-              "description": "Set to true to monitor a high availability replica of specified target, if any.",
-              "oneOf": [
-                {
-                  "default": false,
-                  "type": "boolean"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "sqlEpResourceId": {
-              "description": "The Azure resource ID of an Azure SQL DB elastic pool target.",
-              "type": "string"
-            },
-            "targetType": {
-              "enum": [
-                "SqlEp"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "sqlEpResourceId",
-            "anchorDatabaseResourceId",
-            "targetType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "The properties specific to Azure SQL Managed Instance targets.",
-          "properties": {
-            "connectionTcpPort": {
-              "description": "The TCP port number to optionally use in the connection string when connecting to an Azure SQL Managed Instance target.",
-              "oneOf": [
-                {
-                  "default": 1433,
-                  "type": "integer"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "readIntent": {
-              "description": "Set to true to monitor a high availability replica of specified target, if any.",
-              "oneOf": [
-                {
-                  "default": false,
-                  "type": "boolean"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "sqlMiResourceId": {
-              "description": "The Azure resource ID of an Azure SQL Managed Instance target.",
-              "type": "string"
-            },
-            "targetType": {
-              "enum": [
-                "SqlMi"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "sqlMiResourceId",
-            "targetType"
-          ],
-          "type": "object"
-        }
-      ],
+    "SqlDbElasticPoolTargetProperties": {
       "properties": {
-        "connectionServerName": {
-          "description": "The FQDN host name of the server to use in the connection string when connecting to a target. For example, for an Azure SQL logical server in the Azure commercial cloud, the value might be 'sql-logical-server-22092780.database.windows.net'; for an Azure SQL managed instance in the Azure commercial cloud, the value might be 'sql-mi-39441134.767d5869f605.database.windows.net'. Port number and instance name must be specified separately.",
-          "maxLength": 200,
+        "anchorDatabaseResourceId": {
+          "description": "The Azure resource ID of the anchor database used to connect to an elastic pool.",
           "type": "string"
         },
-        "targetAuthenticationType": {
-          "description": "The type of authentication to use when connecting to a target.",
+        "readIntent": {
+          "description": "Set to true to monitor a high availability replica of specified target, if any.",
           "oneOf": [
             {
-              "enum": [
-                "Aad",
-                "Sql"
-              ],
-              "type": "string"
+              "type": "boolean"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
         },
-        "targetVault": {
-          "description": "To use SQL authentication when connecting to targets, specify the vault where the login name and password secrets are stored.",
+        "sqlEpResourceId": {
+          "description": "The Azure resource ID of an Azure SQL DB elastic pool target.",
+          "type": "string"
+        },
+        "targetType": {
+          "description": "Discriminator property for TargetProperties.",
           "oneOf": [
             {
-              "$ref": "#/definitions/VaultSecret"
+              "enum": [
+                "SqlEp"
+              ],
+              "type": "string"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -557,18 +439,237 @@
         }
       },
       "required": [
-        "targetAuthenticationType",
-        "connectionServerName"
+        "anchorDatabaseResourceId",
+        "sqlEpResourceId",
+        "targetType"
       ],
       "type": "object"
     },
+    "SqlDbSingleDatabaseTargetProperties": {
+      "properties": {
+        "readIntent": {
+          "description": "Set to true to monitor a high availability replica of specified target, if any.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "sqlDbResourceId": {
+          "description": "The Azure resource ID of an Azure SQL DB database target.",
+          "type": "string"
+        },
+        "targetType": {
+          "description": "Discriminator property for TargetProperties.",
+          "oneOf": [
+            {
+              "enum": [
+                "SqlDb"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "sqlDbResourceId",
+        "targetType"
+      ],
+      "type": "object"
+    },
+    "SqlMiTargetProperties": {
+      "properties": {
+        "connectionTcpPort": {
+          "description": "The TCP port number to optionally use in the connection string when connecting to an Azure SQL Managed Instance target.",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "readIntent": {
+          "description": "Set to true to monitor a high availability replica of specified target, if any.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "sqlMiResourceId": {
+          "description": "The Azure resource ID of an Azure SQL Managed Instance target.",
+          "type": "string"
+        },
+        "targetType": {
+          "description": "Discriminator property for TargetProperties.",
+          "oneOf": [
+            {
+              "enum": [
+                "SqlMi"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "sqlMiResourceId",
+        "targetType"
+      ],
+      "type": "object"
+    },
+    "TargetProperties": {
+      "allOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "connectionServerName": {
+              "description": "The FQDN host name of the server to use in the connection string when connecting to a target. For example, for an Azure SQL logical server in the Azure commercial cloud, the value might be 'sql-logical-server-22092780.database.windows.net'; for an Azure SQL managed instance in the Azure commercial cloud, the value might be 'sql-mi-39441134.767d5869f605.database.windows.net'. Port number and instance name must be specified separately.",
+              "oneOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "targetAuthenticationType": {
+              "description": "The type of authentication to use when connecting to a target.",
+              "oneOf": [
+                {
+                  "enum": [
+                    "Aad",
+                    "Sql"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "targetType": {
+              "enum": [
+                "SqlDb",
+                "SqlEp",
+                "SqlMi"
+              ],
+              "type": "string"
+            },
+            "targetVault": {
+              "description": "To use SQL authentication when connecting to targets, specify the vault where the login name and password secrets are stored.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/VaultSecret"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "connectionServerName",
+            "targetAuthenticationType",
+            "targetType"
+          ],
+          "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/SqlDbSingleDatabaseTargetProperties"
+                },
+                {
+                  "properties": {
+                    "targetType": {
+                      "const": "SqlDb"
+                    }
+                  },
+                  "required": [
+                    "targetType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/SqlDbElasticPoolTargetProperties"
+                },
+                {
+                  "properties": {
+                    "targetType": {
+                      "const": "SqlEp"
+                    }
+                  },
+                  "required": [
+                    "targetType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/SqlMiTargetProperties"
+                },
+                {
+                  "properties": {
+                    "targetType": {
+                      "const": "SqlMi"
+                    }
+                  },
+                  "required": [
+                    "targetType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "UserAssignedIdentities": {
+      "additionalProperties": {
+        "$ref": "#/definitions/UserAssignedIdentity"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "UserAssignedIdentity": {
-      "description": "User assigned identity properties",
       "properties": {},
       "type": "object"
     },
     "VaultSecret": {
-      "description": "The vault specific details required if using SQL authentication to connect to a target.",
       "properties": {
         "akvResourceId": {
           "description": "The Azure resource ID of the Key Vault instance storing database authentication secrets.",
@@ -602,7 +703,6 @@
       "type": "object"
     },
     "WatcherProperties": {
-      "description": "The RP specific properties of the resource.",
       "properties": {
         "datastore": {
           "description": "The data store for collected monitoring data.",
@@ -623,7 +723,7 @@
       "type": "object"
     },
     "watchers_alertRuleResources_childResource": {
-      "description": "Microsoft.DatabaseWatcher/watchers/alertRuleResources",
+      "description": "alertRuleResources",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -632,7 +732,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The alert rule proxy resource name.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_.]{0,62}[a-zA-Z0-9_]{1}$",
@@ -670,7 +770,7 @@
       "type": "object"
     },
     "watchers_sharedPrivateLinkResources_childResource": {
-      "description": "Microsoft.DatabaseWatcher/watchers/sharedPrivateLinkResources",
+      "description": "sharedPrivateLinkResources",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -679,7 +779,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The Shared Private Link resource name.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_.]{0,62}[a-zA-Z0-9_]{1}$",
@@ -717,7 +817,7 @@
       "type": "object"
     },
     "watchers_targets_childResource": {
-      "description": "Microsoft.DatabaseWatcher/watchers/targets",
+      "description": "targets",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -726,7 +826,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The target resource name.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_]{3,60}$",

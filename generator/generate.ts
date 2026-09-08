@@ -44,6 +44,13 @@ export async function detectProviderNamespaces(readme: string) {
     return uniq(apiVersionPaths.map(p => path.relative(searchPath, p).split(path.sep)[0]));
 }
 
+export async function getCsharpGeneratorProviderNamespaces(): Promise<string[]> {
+    const indexPath = path.resolve(constants.repoRoot, 'bicep-types-az/generated/index.json');
+    const index = await readJsonFile(indexPath) as { resources: Record<string, unknown> };
+
+    return uniq(Object.keys(index.resources).map(resourceType => resourceType.split('/')[0])).sort(lowerCaseCompare);
+}
+
 export async function generateSchemas(readme: string, autoGenConfig: AutoGenConfig): Promise<SchemaConfiguration[]> {
     const bicepReadmePath = `${path.dirname(readme)}/readme.bicep.md`;
     await generateAutorestConfig(readme, bicepReadmePath);

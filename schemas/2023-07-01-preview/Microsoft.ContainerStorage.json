@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Pool Object",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 253,
@@ -46,10 +46,10 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/pools_volumes_childResource"
+                "$ref": "#/definitions/pools_snapshots_childResource"
               },
               {
-                "$ref": "#/definitions/pools_snapshots_childResource"
+                "$ref": "#/definitions/pools_volumes_childResource"
               }
             ]
           },
@@ -78,6 +78,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -95,7 +96,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Volume Snapshot Resource",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 253,
@@ -144,7 +145,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Volume Resource",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 253,
@@ -186,7 +187,6 @@
   },
   "definitions": {
     "Assignment": {
-      "description": "Assignment Properties",
       "properties": {
         "id": {
           "description": "Resource id for the assigned resource",
@@ -199,7 +199,6 @@
       "type": "object"
     },
     "AzureDisk": {
-      "description": "Azure Disk Pool Properties",
       "properties": {
         "disks": {
           "description": "Only required if individual disk selection is desired. Path to disk, e.g. <nodename>:/dev/sda or WWN. Supports specifying multiple disks (same syntax as tags).",
@@ -250,7 +249,6 @@
       "type": "object"
     },
     "Disk": {
-      "description": "Model for disk for that pool is using",
       "properties": {
         "id": {
           "description": "ID is the disk identifier visible to the OS. It is typically the WWN or disk ID in formats such as eui.e8238fa6bf530001001b448b45263379 or 0x5002cf6cbc5dd460",
@@ -268,7 +266,6 @@
       "type": "object"
     },
     "ElasticSan": {
-      "description": "Elastic San Pool Properties",
       "properties": {
         "encryption": {
           "description": "Encryption specifies the encryption configuration for the Azure Disk pool",
@@ -300,7 +297,6 @@
       "type": "object"
     },
     "Encryption": {
-      "description": "Encryption key properties for the pool.",
       "properties": {
         "identity": {
           "description": "The managed service identities assigned to this resource.",
@@ -329,7 +325,6 @@
       "type": "object"
     },
     "EphemeralDisk": {
-      "description": "Ephemeral Disk Pool Properties",
       "properties": {
         "disks": {
           "description": "Only required if individual disk selection is desired. Path to disk, e.g. <nodename>:/dev/sda or WWN. Supports specifying multiple disks (same syntax as tags).",
@@ -349,7 +344,6 @@
           "description": "The number of data copies. Default 3.",
           "oneOf": [
             {
-              "default": 3,
               "maximum": 3,
               "minimum": 1,
               "type": "integer"
@@ -363,7 +357,6 @@
       "type": "object"
     },
     "ManagedServiceIdentity": {
-      "description": "Managed service identity (system assigned and/or user assigned identities)",
       "properties": {
         "type": {
           "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).",
@@ -404,7 +397,6 @@
       "type": "object"
     },
     "PoolProperties": {
-      "description": "Pool Properties",
       "properties": {
         "assignments": {
           "description": "List of resources that should have access to the pool. Typically ARM references to AKS clusters or ACI Container Groups. For local and standard this must be a single reference. For ElasticSAN there can be many.",
@@ -483,7 +475,6 @@
       "type": "object"
     },
     "PoolType": {
-      "description": "Type of the Pool: ephemeralDisk, azureDisk, or elasticsan",
       "properties": {
         "azureDisk": {
           "description": "Disk Pool Properties",
@@ -522,13 +513,11 @@
       "type": "object"
     },
     "Requests": {
-      "description": "Requests for capacity for the pool.",
       "properties": {
         "storage": {
           "description": "Requested capacity of the pool in GiB.",
           "oneOf": [
             {
-              "default": 1024,
               "maximum": 65536,
               "minimum": 1024,
               "type": "integer"
@@ -542,7 +531,6 @@
       "type": "object"
     },
     "Resources": {
-      "description": "Resource Requests for the pool.",
       "properties": {
         "requests": {
           "description": "Requests for capacity for the pool.",
@@ -559,7 +547,6 @@
       "type": "object"
     },
     "SnapshotProperties": {
-      "description": "Volume Snapshot Properties",
       "properties": {
         "source": {
           "description": "Reference to the source volume",
@@ -581,13 +568,25 @@
       ],
       "type": "object"
     },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "UserAssignedIdentities": {
+      "additionalProperties": {
+        "$ref": "#/definitions/UserAssignedIdentity"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "UserAssignedIdentity": {
-      "description": "User assigned identity properties",
       "properties": {},
       "type": "object"
     },
     "VolumeProperties": {
-      "description": "Volume Properties",
       "properties": {
         "capacityGiB": {
           "description": "Requested capacity in GiB",
@@ -619,13 +618,20 @@
         }
       },
       "required": [
-        "labels",
-        "capacityGiB"
+        "capacityGiB",
+        "labels"
       ],
       "type": "object"
     },
+    "VolumePropertiesLabels": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "pools_snapshots_childResource": {
-      "description": "Microsoft.ContainerStorage/pools/snapshots",
+      "description": "snapshots",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -634,7 +640,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Volume Snapshot Resource",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 253,
@@ -674,7 +680,7 @@
       "type": "object"
     },
     "pools_volumes_childResource": {
-      "description": "Microsoft.ContainerStorage/pools/volumes",
+      "description": "volumes",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -683,7 +689,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Volume Resource",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 253,

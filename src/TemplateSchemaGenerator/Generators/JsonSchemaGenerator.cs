@@ -95,19 +95,33 @@ public static class JsonSchemaGenerator
                 StringComparer.OrdinalIgnoreCase);
 
         var namedTypes = new Dictionary<string, TypeBase>(StringComparer.OrdinalIgnoreCase);
+        var defNameByTypeName = new Dictionary<string, string>(StringComparer.Ordinal);
+        var defNameByType = new Dictionary<TypeBase, string>();
         foreach (var resourceType in resourceTypeArray)
         {
             var (resourceTypeName, _) = ParseResourceTypeName(resourceType.Name);
             foreach (var (name, type) in CollectNamedTypes(resourceType.Body.Type, resourceTypeName))
             {
+                if (!defNameByTypeName.TryGetValue(name, out var defName))
+                {
+                    // Definition keys are compared case-insensitively, so names that only differ by casing
+                    // (e.g. AutoscaleProfile vs AutoScaleProfile) are disambiguated with a numeric suffix.
+                    defName = name;
+                    for (var suffix = 1; namedTypes.ContainsKey(defName); suffix++)
+                    {
+                        defName = $"{name}_{suffix}";
+                    }
+
+                    namedTypes.Add(defName, type);
+                    defNameByTypeName.Add(name, defName);
+                }
+
                 // Prefer first occurrence; most definitions are shared.
-                // Conflicts are unlikely and generally indicate a naming collision in the source type system.
-                namedTypes.TryAdd(name, type);
+                defNameByType.TryAdd(type, defName);
             }
         }
 
-        var defNames = namedTypes.Keys.ToImmutableHashSet(StringComparer.OrdinalIgnoreCase);
-        var converter = new JsonSchemaConverter(defNames);
+        var converter = new JsonSchemaConverter(defNameByType);
 
         var definitionsObject = new JsonObject();
         foreach (var (name, type) in namedTypes.OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase))
@@ -248,7 +262,8 @@ public static class JsonSchemaGenerator
         var referenced = new HashSet<TypeBase>();
         GetReferencedTypes(type, referenced);
 
-        var namedTypes = new Dictionary<string, TypeBase>(StringComparer.OrdinalIgnoreCase);
+        // Names are compared case-sensitively here so that types differing only by casing are both retained.
+        var namedTypes = new Dictionary<string, TypeBase>(StringComparer.Ordinal);
         foreach (var referencedType in referenced)
         {
             switch (referencedType)
@@ -266,7 +281,7 @@ public static class JsonSchemaGenerator
         // Avoid also emitting it as a named definition.
         namedTypes.Remove(resourceTypeName);
 
-        return namedTypes.ToImmutableDictionary(StringComparer.OrdinalIgnoreCase);
+        return namedTypes.ToImmutableDictionary(StringComparer.Ordinal);
     }
 
     private static void GetReferencedTypes(TypeBase type, HashSet<TypeBase> types)
@@ -373,11 +388,11 @@ public static class JsonSchemaGenerator
 
     private sealed class JsonSchemaConverter
     {
-        private readonly ISet<string> defNames;
+        private readonly IReadOnlyDictionary<TypeBase, string> defNameByType;
 
-        public JsonSchemaConverter(ISet<string> defNames)
+        public JsonSchemaConverter(IReadOnlyDictionary<TypeBase, string> defNameByType)
         {
-            this.defNames = defNames;
+            this.defNameByType = defNameByType;
         }
 
         public JsonObject ConvertResourceDefinition(ResourceType resourceType, string resourceTypeName, string apiVersion)
@@ -540,7 +555,7 @@ public static class JsonSchemaGenerator
 
         private bool TryConvertToDefinitionRef(TypeBase type, out JsonObject? schema)
         {
-            if (type is ObjectType objectType && defNames.Contains(objectType.Name))
+            if (type is ObjectType objectType && defNameByType.TryGetValue(objectType, out var objectDefName))
             {
                 // Don't ref a definition that would be a pure additionalProperties map
                 // (all named properties are read-only). Inline it to match legacy TypeScript generator output.
@@ -551,13 +566,13 @@ public static class JsonSchemaGenerator
                     return false;
                 }
 
-                schema = RefToDef(objectType.Name);
+                schema = RefToDef(objectDefName);
                 return true;
             }
 
-            if (type is DiscriminatedObjectType discType && defNames.Contains(discType.Name))
+            if (type is DiscriminatedObjectType discType && defNameByType.TryGetValue(discType, out var discDefName))
             {
-                schema = RefToDef(discType.Name);
+                schema = RefToDef(discDefName);
                 return true;
             }
 

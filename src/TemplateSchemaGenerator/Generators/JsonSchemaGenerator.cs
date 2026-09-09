@@ -99,7 +99,7 @@ public static class JsonSchemaGenerator
         foreach (var resourceType in resourceTypeArray)
         {
             var (resourceTypeName, _) = ParseResourceTypeName(resourceType.Name);
-            foreach (var (name, type) in CollectNamedTypes(resourceType.Body.Type, resourceTypeName))
+            foreach (var (name, type) in CollectNamedTypes(resourceType.Body.Type, resourceTypeName).OrderBy(x => x.Key, StringComparer.Ordinal))
             {
                 // Prefer first occurrence; most definitions are shared.
                 if (defNameByTypeName.ContainsKey(name))

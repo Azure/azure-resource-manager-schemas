@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Kusto cluster.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -76,7 +76,10 @@
         }
       },
       "required": [
+        "location",
         "name",
+        "sku",
+        "properties",
         "apiVersion",
         "type"
       ],
@@ -96,7 +99,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the database in the Kusto cluster.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -137,6 +140,76 @@
     },
     "clusters_databases_dataConnections": {
       "description": "Microsoft.Kusto/clusters/databases/dataConnections",
+      "oneOf": [
+        {
+          "properties": {
+            "kind": {
+              "description": "Kind of the endpoint for the data connection",
+              "oneOf": [
+                {
+                  "enum": [
+                    "EventGrid"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "properties": {
+              "description": "The properties of the Event Grid data connection.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/EventGridConnectionProperties"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "properties"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "description": "Kind of the endpoint for the data connection",
+              "oneOf": [
+                {
+                  "enum": [
+                    "EventHub"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "properties": {
+              "description": "The Event Hub data connection properties to validate.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/EventHubConnectionProperties"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "properties"
+          ],
+          "type": "object"
+        }
+      ],
       "properties": {
         "apiVersion": {
           "enum": [
@@ -149,7 +222,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the data connection.",
+          "description": "The resource name",
           "type": "string"
         },
         "type": {
@@ -163,13 +236,11 @@
         "name",
         "apiVersion",
         "type"
-      ],
-      "type": "object"
+      ]
     }
   },
   "definitions": {
     "AzureSku": {
-      "description": "Azure SKU definition.",
       "properties": {
         "capacity": {
           "description": "The number of instances of the cluster.",
@@ -230,7 +301,6 @@
       "type": "object"
     },
     "ClusterProperties": {
-      "description": "Class representing the Kusto cluster properties.",
       "properties": {
         "trustedExternalTenants": {
           "description": "The cluster's external tenants.",
@@ -250,7 +320,6 @@
       "type": "object"
     },
     "DatabaseProperties": {
-      "description": "Class representing the Kusto database properties.",
       "properties": {
         "hotCachePeriod": {
           "description": "The time the data that should be kept in cache for fast queries in TimeSpan.",
@@ -263,8 +332,185 @@
       },
       "type": "object"
     },
+    "EventGridConnectionProperties": {
+      "properties": {
+        "consumerGroup": {
+          "description": "The event hub consumer group.",
+          "type": "string"
+        },
+        "dataFormat": {
+          "description": "The data format of the message. Optionally the data format can be added to each message.",
+          "oneOf": [
+            {
+              "enum": [
+                "MULTIJSON",
+                "JSON",
+                "CSV",
+                "TSV",
+                "SCSV",
+                "SOHSV",
+                "PSV",
+                "TXT",
+                "RAW",
+                "SINGLEJSON",
+                "AVRO"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "eventHubResourceId": {
+          "description": "The resource ID where the event grid is configured to send events.",
+          "type": "string"
+        },
+        "mappingRuleName": {
+          "description": "The mapping rule to be used to ingest the data. Optionally the mapping information can be added to each message.",
+          "type": "string"
+        },
+        "storageAccountResourceId": {
+          "description": "The resource ID of the storage account where the data resides.",
+          "type": "string"
+        },
+        "tableName": {
+          "description": "The table where the data should be ingested. Optionally the table information can be added to each message.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "consumerGroup",
+        "dataFormat",
+        "eventHubResourceId",
+        "storageAccountResourceId",
+        "tableName"
+      ],
+      "type": "object"
+    },
+    "EventGridDataConnection": {
+      "properties": {
+        "kind": {
+          "description": "Kind of the endpoint for the data connection",
+          "oneOf": [
+            {
+              "enum": [
+                "EventGrid"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "description": "The properties of the Event Grid data connection.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EventGridConnectionProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "type": "object"
+    },
+    "EventHubConnectionProperties": {
+      "properties": {
+        "consumerGroup": {
+          "description": "The event hub consumer group.",
+          "type": "string"
+        },
+        "dataFormat": {
+          "description": "The data format of the message. Optionally the data format can be added to each message.",
+          "oneOf": [
+            {
+              "enum": [
+                "MULTIJSON",
+                "JSON",
+                "CSV",
+                "TSV",
+                "SCSV",
+                "SOHSV",
+                "PSV",
+                "TXT",
+                "RAW",
+                "SINGLEJSON",
+                "AVRO"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "eventHubResourceId": {
+          "description": "The resource ID of the event hub to be used to create a data connection.",
+          "type": "string"
+        },
+        "mappingRuleName": {
+          "description": "The mapping rule to be used to ingest the data. Optionally the mapping information can be added to each message.",
+          "type": "string"
+        },
+        "tableName": {
+          "description": "The table where the data should be ingested. Optionally the table information can be added to each message.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "consumerGroup",
+        "eventHubResourceId"
+      ],
+      "type": "object"
+    },
+    "EventHubDataConnection": {
+      "properties": {
+        "kind": {
+          "description": "Kind of the endpoint for the data connection",
+          "oneOf": [
+            {
+              "enum": [
+                "EventHub"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "description": "The Event Hub data connection properties to validate.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EventHubConnectionProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "type": "object"
+    },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "TrustedExternalTenant": {
-      "description": "Represents a tenant ID that is trusted by the cluster.",
       "properties": {
         "value": {
           "description": "GUID representing an external tenant.",
@@ -274,7 +520,7 @@
       "type": "object"
     },
     "clusters_databases_childResource": {
-      "description": "Microsoft.Kusto/clusters/databases",
+      "description": "databases",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -287,7 +533,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the database in the Kusto cluster.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -317,7 +563,77 @@
       "type": "object"
     },
     "clusters_databases_dataConnections_childResource": {
-      "description": "Microsoft.Kusto/clusters/databases/dataConnections",
+      "description": "dataConnections",
+      "oneOf": [
+        {
+          "properties": {
+            "kind": {
+              "description": "Kind of the endpoint for the data connection",
+              "oneOf": [
+                {
+                  "enum": [
+                    "EventGrid"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "properties": {
+              "description": "The properties of the Event Grid data connection.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/EventGridConnectionProperties"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "properties"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "description": "Kind of the endpoint for the data connection",
+              "oneOf": [
+                {
+                  "enum": [
+                    "EventHub"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "properties": {
+              "description": "The Event Hub data connection properties to validate.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/EventHubConnectionProperties"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "properties"
+          ],
+          "type": "object"
+        }
+      ],
       "properties": {
         "apiVersion": {
           "enum": [
@@ -330,7 +646,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the data connection.",
+          "description": "The resource name",
           "type": "string"
         },
         "type": {
@@ -344,8 +660,7 @@
         "name",
         "apiVersion",
         "type"
-      ],
-      "type": "object"
+      ]
     }
   }
 }

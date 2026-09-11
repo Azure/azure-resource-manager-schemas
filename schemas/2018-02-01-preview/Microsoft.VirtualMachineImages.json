@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the image Template",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[A-Za-z0-9-_]{1,64}$",
@@ -62,6 +62,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -72,12 +73,12 @@
   },
   "definitions": {
     "ImageTemplateCustomizer": {
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Runs a shell script during the customization phase",
+          "additionalProperties": false,
           "properties": {
-            "script": {
-              "description": "The shell script to be run for customizing. It can be a github link, SAS URI for Azure Storage, etc",
+            "name": {
+              "description": "Friendly Name to provide context on what this customization step does",
               "type": "string"
             },
             "type": {
@@ -91,59 +92,57 @@
             "type"
           ],
           "type": "object"
-        }
-      ],
-      "properties": {
-        "name": {
-          "description": "Friendly Name to provide context on what this customization step does",
-          "type": "string"
-        }
-      },
-      "type": "object"
-    },
-    "ImageTemplateDistributor": {
-      "description": "Generic distribution object",
-      "oneOf": [
-        {
-          "description": "Distribute as a Managed Disk Image.",
-          "properties": {
-            "imageId": {
-              "description": "Resource Id of the Managed Disk Image",
-              "type": "string"
-            },
-            "location": {
-              "description": "Azure location for the image, should match if image already exists",
-              "type": "string"
-            },
-            "type": {
-              "enum": [
-                "managedImage"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "imageId",
-            "location",
-            "type"
-          ],
-          "type": "object"
         },
         {
-          "description": "Distribute via Shared Image Gallery.",
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ImageTemplateShellCustomizer"
+                },
+                {
+                  "properties": {
+                    "type": {
+                      "const": "shell"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "ImageTemplateDistributor": {
+      "allOf": [
+        {
+          "additionalProperties": false,
           "properties": {
-            "galleryImageId": {
-              "description": "Resource Id of the Shared Image Gallery image",
-              "type": "string"
-            },
-            "replicationRegions": {
-              "description": "Array of ImageTemplateSharedImageDistributorReplicationRegionsItem",
+            "artifactTags": {
+              "description": "Tags that will be applied to the artifact once it has been created/updated by the distributor.",
               "oneOf": [
                 {
-                  "items": {
+                  "additionalProperties": {
                     "type": "string"
                   },
-                  "type": "array"
+                  "properties": {},
+                  "type": "object"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "runOutputName": {
+              "description": "The name to be used for the associated RunOutput.",
+              "oneOf": [
+                {
+                  "pattern": "^[A-Za-z0-9-_]{1,64}$",
+                  "type": "string"
                 },
                 {
                   "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -152,40 +151,84 @@
             },
             "type": {
               "enum": [
+                "managedImage",
                 "sharedImage"
               ],
               "type": "string"
             }
           },
           "required": [
-            "galleryImageId",
-            "replicationRegions",
+            "runOutputName",
             "type"
           ],
           "type": "object"
-        }
-      ],
-      "properties": {
-        "artifactTags": {
-          "description": "Tags that will be applied to the artifact once it has been created/updated by the distributor.",
+        },
+        {
           "oneOf": [
             {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ImageTemplateManagedImageDistributor"
+                },
+                {
+                  "properties": {
+                    "type": {
+                      "const": "managedImage"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ImageTemplateSharedImageDistributor"
+                },
+                {
+                  "properties": {
+                    "type": {
+                      "const": "sharedImage"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              ]
             }
           ]
+        }
+      ]
+    },
+    "ImageTemplateDistributorArtifactTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "ImageTemplateIsoSource": {
+      "properties": {
+        "sha256Checksum": {
+          "description": "SHA256 Checksum of the ISO image.",
+          "type": "string"
         },
-        "runOutputName": {
-          "description": "The name to be used for the associated RunOutput.",
+        "sourceURI": {
+          "description": "URL to get the ISO image. This URL has to be accessible to the resource provider at the time of the imageTemplate creation.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Specifies the type of source image you want to start with.",
           "oneOf": [
             {
-              "pattern": "^[A-Za-z0-9-_]{1,64}$",
+              "enum": [
+                "ISO"
+              ],
               "type": "string"
             },
             {
@@ -195,7 +238,79 @@
         }
       },
       "required": [
-        "runOutputName"
+        "sha256Checksum",
+        "sourceURI",
+        "type"
+      ],
+      "type": "object"
+    },
+    "ImageTemplateManagedImageDistributor": {
+      "properties": {
+        "imageId": {
+          "description": "Resource Id of the Managed Disk Image",
+          "type": "string"
+        },
+        "location": {
+          "description": "Azure location for the image, should match if image already exists",
+          "type": "string"
+        },
+        "type": {
+          "description": "Type of distribution.",
+          "oneOf": [
+            {
+              "enum": [
+                "managedImage"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "imageId",
+        "location",
+        "type"
+      ],
+      "type": "object"
+    },
+    "ImageTemplatePlatformImageSource": {
+      "properties": {
+        "offer": {
+          "description": "Image offer from the [Azure Gallery Images](https://docs.microsoft.com/en-us/rest/api/compute/virtualmachineimages).",
+          "type": "string"
+        },
+        "publisher": {
+          "description": "Image Publisher in [Azure Gallery Images](https://docs.microsoft.com/en-us/rest/api/compute/virtualmachineimages).",
+          "type": "string"
+        },
+        "sku": {
+          "description": "Image sku from the [Azure Gallery Images](https://docs.microsoft.com/en-us/rest/api/compute/virtualmachineimages).",
+          "type": "string"
+        },
+        "type": {
+          "description": "Specifies the type of source image you want to start with.",
+          "oneOf": [
+            {
+              "enum": [
+                "PlatformImage"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "version": {
+          "description": "Image version from the [Azure Gallery Images](https://docs.microsoft.com/en-us/rest/api/compute/virtualmachineimages).",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
       ],
       "type": "object"
     },
@@ -242,70 +357,142 @@
         }
       },
       "required": [
-        "source",
-        "distribute"
+        "distribute",
+        "source"
+      ],
+      "type": "object"
+    },
+    "ImageTemplateSharedImageDistributor": {
+      "properties": {
+        "galleryImageId": {
+          "description": "Resource Id of the Shared Image Gallery image",
+          "type": "string"
+        },
+        "replicationRegions": {
+          "oneOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "description": "Type of distribution.",
+          "oneOf": [
+            {
+              "enum": [
+                "sharedImage"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "galleryImageId",
+        "replicationRegions",
+        "type"
+      ],
+      "type": "object"
+    },
+    "ImageTemplateShellCustomizer": {
+      "properties": {
+        "script": {
+          "description": "The shell script to be run for customizing. It can be a github link, SAS URI for Azure Storage, etc",
+          "type": "string"
+        },
+        "type": {
+          "description": "The type of customization tool you want to use on the Image. For example, \"shell\" can be shellCustomizer",
+          "oneOf": [
+            {
+              "enum": [
+                "shell"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type"
       ],
       "type": "object"
     },
     "ImageTemplateSource": {
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Describes an image source that is an installation ISO. Currently only supports Red Hat Enterprise Linux 7.2-7.5 ISO's.",
+          "additionalProperties": false,
           "properties": {
-            "sha256Checksum": {
-              "description": "SHA256 Checksum of the ISO image.",
-              "type": "string"
-            },
-            "sourceURI": {
-              "description": "URL to get the ISO image. This URL has to be accessible to the resource provider at the time of the imageTemplate creation.",
-              "type": "string"
-            },
             "type": {
               "enum": [
-                "ISO"
+                "ISO",
+                "PlatformImage"
               ],
               "type": "string"
             }
           },
           "required": [
-            "sourceURI",
-            "sha256Checksum",
             "type"
           ],
           "type": "object"
         },
         {
-          "description": "Describes an image source from [Azure Gallery Images](https://docs.microsoft.com/en-us/rest/api/compute/virtualmachineimages).",
-          "properties": {
-            "offer": {
-              "description": "Image offer from the [Azure Gallery Images](https://docs.microsoft.com/en-us/rest/api/compute/virtualmachineimages).",
-              "type": "string"
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ImageTemplateIsoSource"
+                },
+                {
+                  "properties": {
+                    "type": {
+                      "const": "ISO"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              ]
             },
-            "publisher": {
-              "description": "Image Publisher in [Azure Gallery Images](https://docs.microsoft.com/en-us/rest/api/compute/virtualmachineimages).",
-              "type": "string"
-            },
-            "sku": {
-              "description": "Image sku from the [Azure Gallery Images](https://docs.microsoft.com/en-us/rest/api/compute/virtualmachineimages).",
-              "type": "string"
-            },
-            "type": {
-              "enum": [
-                "PlatformImage"
-              ],
-              "type": "string"
-            },
-            "version": {
-              "description": "Image version from the [Azure Gallery Images](https://docs.microsoft.com/en-us/rest/api/compute/virtualmachineimages).",
-              "type": "string"
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ImageTemplatePlatformImageSource"
+                },
+                {
+                  "properties": {
+                    "type": {
+                      "const": "PlatformImage"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              ]
             }
-          },
-          "required": [
-            "type"
-          ],
-          "type": "object"
+          ]
         }
-      ],
+      ]
+    },
+    "ResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
       "properties": {},
       "type": "object"
     }

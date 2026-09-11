@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the CDN profile which is unique within the resource group.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -76,7 +76,9 @@
         }
       },
       "required": [
+        "location",
         "name",
+        "sku",
         "properties",
         "apiVersion",
         "type"
@@ -97,7 +99,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the endpoint under the profile which is unique globally.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -144,6 +146,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -161,14 +164,14 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the custom domain within an endpoint.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "The JSON object that contains the properties of the custom domain to create.",
           "oneOf": [
             {
-              "$ref": "#/definitions/CustomDomainPropertiesParameters"
+              "$ref": "#/definitions/CustomDomainPropertiesParametersOrCustomDomainProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -193,7 +196,6 @@
   },
   "definitions": {
     "CacheExpirationActionParameters": {
-      "description": "Defines the parameters for the cache expiration action.",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -250,8 +252,7 @@
       ],
       "type": "object"
     },
-    "CustomDomainPropertiesParameters": {
-      "description": "The JSON object that contains the properties of the custom domain to create.",
+    "CustomDomainPropertiesParametersOrCustomDomainProperties": {
       "properties": {
         "hostName": {
           "description": "The host name of the custom domain. Must be a domain name.",
@@ -264,7 +265,6 @@
       "type": "object"
     },
     "DeepCreatedOrigin": {
-      "description": "The main origin of CDN content which is added when creating a CDN endpoint.",
       "properties": {
         "name": {
           "description": "Origin name",
@@ -288,7 +288,6 @@
       "type": "object"
     },
     "DeepCreatedOriginProperties": {
-      "description": "Properties of the origin created on the CDN endpoint.",
       "properties": {
         "hostName": {
           "description": "The address of the origin. It can be a domain name, IPv4 address, or IPv6 address.",
@@ -327,7 +326,6 @@
       "type": "object"
     },
     "DeliveryRule": {
-      "description": "A rule that specifies a set of actions and conditions",
       "properties": {
         "actions": {
           "description": "A list of actions that are executed when all the conditions of a rule are satisfied.",
@@ -370,108 +368,215 @@
         }
       },
       "required": [
-        "order",
-        "actions"
+        "actions",
+        "order"
       ],
       "type": "object"
     },
     "DeliveryRuleAction": {
-      "description": "An action for the delivery rule.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Defines the cache expiration action for the delivery rule.",
+          "additionalProperties": false,
           "properties": {
             "name": {
               "enum": [
                 "CacheExpiration"
               ],
               "type": "string"
-            },
-            "parameters": {
-              "description": "Defines the parameters for the action.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/CacheExpirationActionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
             }
           },
           "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
-        }
-      ],
-      "properties": {},
-      "type": "object"
-    },
-    "DeliveryRuleCondition": {
-      "description": "A condition for the delivery rule.",
-      "oneOf": [
-        {
-          "description": "Defines the URL file extension condition for the delivery rule.",
-          "properties": {
-            "name": {
-              "enum": [
-                "UrlFileExtension"
-              ],
-              "type": "string"
-            },
-            "parameters": {
-              "description": "Defines the parameters for the condition.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/UrlFileExtensionConditionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            }
-          },
-          "required": [
-            "parameters",
             "name"
           ],
           "type": "object"
         },
         {
-          "description": "Defines the URL path condition for the delivery rule.",
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeliveryRuleCacheExpirationAction"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "CacheExpiration"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "DeliveryRuleCacheExpirationAction": {
+      "properties": {
+        "name": {
+          "description": "The name of the action for the delivery rule.",
+          "oneOf": [
+            {
+              "enum": [
+                "CacheExpiration"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "parameters": {
+          "description": "Defines the parameters for the action.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CacheExpirationActionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "type": "object"
+    },
+    "DeliveryRuleCondition": {
+      "allOf": [
+        {
+          "additionalProperties": false,
           "properties": {
             "name": {
+              "enum": [
+                "UrlFileExtension",
+                "UrlPath"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "name"
+          ],
+          "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeliveryRuleUrlFileExtensionCondition"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "UrlFileExtension"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DeliveryRuleUrlPathCondition"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "UrlPath"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "DeliveryRuleUrlFileExtensionCondition": {
+      "properties": {
+        "name": {
+          "description": "The name of the condition for the delivery rule.",
+          "oneOf": [
+            {
+              "enum": [
+                "UrlFileExtension"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "parameters": {
+          "description": "Defines the parameters for the condition.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/UrlFileExtensionConditionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "parameters"
+      ],
+      "type": "object"
+    },
+    "DeliveryRuleUrlPathCondition": {
+      "properties": {
+        "name": {
+          "description": "The name of the condition for the delivery rule.",
+          "oneOf": [
+            {
               "enum": [
                 "UrlPath"
               ],
               "type": "string"
             },
-            "parameters": {
-              "description": "Defines the parameters for the condition.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/UrlPathConditionParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "parameters",
-            "name"
-          ],
-          "type": "object"
+          ]
+        },
+        "parameters": {
+          "description": "Defines the parameters for the condition.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/UrlPathConditionParameters"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
+      },
+      "required": [
+        "name",
+        "parameters"
       ],
-      "properties": {},
       "type": "object"
     },
     "EndpointProperties": {
-      "description": "The JSON object that contains the properties required to create an endpoint.",
       "properties": {
         "contentTypesToCompress": {
           "description": "List of content types on which compression applies. The value should be a valid MIME type.",
@@ -613,7 +718,6 @@
       "type": "object"
     },
     "EndpointPropertiesUpdateParametersDeliveryPolicy": {
-      "description": "A policy that specifies the delivery rules to be used for an endpoint.",
       "properties": {
         "description": {
           "description": "User-friendly description of the policy.",
@@ -640,7 +744,6 @@
       "type": "object"
     },
     "GeoFilter": {
-      "description": "Rules defining user's geo access within a CDN endpoint.",
       "properties": {
         "action": {
           "description": "Action of the geo filter, i.e. allow or block access.",
@@ -677,19 +780,17 @@
         }
       },
       "required": [
-        "relativePath",
         "action",
-        "countryCodes"
+        "countryCodes",
+        "relativePath"
       ],
       "type": "object"
     },
     "ProfileProperties": {
-      "description": "The JSON object that contains the properties required to create a profile.",
       "properties": {},
       "type": "object"
     },
     "Sku": {
-      "description": "The pricing tier (defines a CDN provider, feature list and rate) of the CDN profile.",
       "properties": {
         "name": {
           "description": "Name of the pricing tier.",
@@ -714,8 +815,14 @@
       },
       "type": "object"
     },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "UrlFileExtensionConditionParameters": {
-      "description": "Defines the parameters for the URL file extension condition.",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -752,7 +859,6 @@
       "type": "object"
     },
     "UrlPathConditionParameters": {
-      "description": "Defines the parameters for the URL path condition.",
       "properties": {
         "@odata.type": {
           "oneOf": [
@@ -789,13 +895,13 @@
       },
       "required": [
         "@odata.type",
-        "path",
-        "matchType"
+        "matchType",
+        "path"
       ],
       "type": "object"
     },
     "profiles_endpoints_childResource": {
-      "description": "Microsoft.Cdn/profiles/endpoints",
+      "description": "endpoints",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -808,7 +914,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the endpoint under the profile which is unique globally.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -845,6 +951,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -853,7 +960,7 @@
       "type": "object"
     },
     "profiles_endpoints_customDomains_childResource": {
-      "description": "Microsoft.Cdn/profiles/endpoints/customDomains",
+      "description": "customDomains",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -862,14 +969,14 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the custom domain within an endpoint.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "The JSON object that contains the properties of the custom domain to create.",
           "oneOf": [
             {
-              "$ref": "#/definitions/CustomDomainPropertiesParameters"
+              "$ref": "#/definitions/CustomDomainPropertiesParametersOrCustomDomainProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"

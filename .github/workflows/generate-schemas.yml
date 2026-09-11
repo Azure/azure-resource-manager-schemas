@@ -9,13 +9,53 @@ on:
         description: 'Git ref or full SHA for https://github.com/Azure/azure-rest-api-specs.'
         required: true
         default: 'main'
+      bicep_types_az_ref:
+        description: 'Optional bicep-types-az commit SHA to pin. If empty, pins to latest default branch HEAD.'
+        required: false
+        default: ''
 
 env:
   # This must be kept in sync with the arguments passed to the "batch" matrix
   BATCH_COUNT: 20
 
 jobs:
+  pin:
+    name: Pin bicep-types-az
+    runs-on: ubuntu-22.04 #Pinning the image to a specific version due to an issue with ICU packages in the latest image https://github.com/actions/runner-images/issues/10989
+    outputs:
+      new_sha: ${{ steps.resolve.outputs.new_sha }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Resolve target SHA
+        id: resolve
+        run: |
+          set -e
+          old_sha=$(git ls-tree HEAD bicep-types-az | awk '{print $3}')
+          input='${{ github.event.inputs.bicep_types_az_ref }}'
+          if [ -n "$input" ]; then
+            new_sha=$(git ls-remote https://github.com/Azure/bicep-types-az "$input" | cut -f1)
+            # Fall back to treating the input as a raw SHA if ls-remote returns nothing.
+            [ -z "$new_sha" ] && new_sha="$input"
+            echo "Using requested ref '$input' -> $new_sha"
+          else
+            new_sha=$(git ls-remote https://github.com/Azure/bicep-types-az HEAD | cut -f1)
+            echo "No ref provided; using latest default branch HEAD -> $new_sha"
+          fi
+          echo "new_sha=$new_sha" >> "$GITHUB_OUTPUT"
+          {
+            echo "## bicep-types-az pin"
+            echo "| | commit |"
+            echo "|---|---|"
+            echo "| before | \`$old_sha\` |"
+            echo "| after  | \`$new_sha\` |"
+            echo ""
+            echo "Compare: https://github.com/Azure/bicep-types-az/compare/$old_sha...$new_sha"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
   generate:
+    needs: pin
     name: Update Schemas Batch ${{ matrix.batch }}
     runs-on: ubuntu-22.04 #Pinning the image to a specific version due to an issue with ICU packages in the latest image https://github.com/actions/runner-images/issues/10989
     strategy:
@@ -24,24 +64,31 @@ jobs:
         batch: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with: 
           submodules: recursive
 
+      - name: Pin bicep-types-az to resolved SHA
+        run: |
+          set -e
+          git -C bicep-types-az fetch --depth=1 origin '${{ needs.pin.outputs.new_sha }}'
+          git -C bicep-types-az checkout '${{ needs.pin.outputs.new_sha }}'
+          git -C bicep-types-az submodule update --init --recursive --depth=1
+
       - name: Clone azure-rest-api-specs
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: Azure/azure-rest-api-specs
           path: workflow-temp/azure-rest-api-specs
           ref: ${{ github.event.inputs.api_specs_ref }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 20.x
 
       - name: Setup .NET Core
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
       
       - name: Install generator npm packages
         run: npm ci
@@ -83,36 +130,38 @@ jobs:
         run: cat summary.log >> $GITHUB_STEP_SUMMARY
 
       - name: Upload Schemas
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: batch-${{ matrix.batch }}-schemas
           path: schemas
           if-no-files-found: error
 
       - name: Upload summary log
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: batch-${{ matrix.batch }}-summary
           path: summary.log
           if-no-files-found: error
 
   combine:
-    needs: generate
+    needs: [pin, generate]
     name: Combine Schema Batches
     permissions:
       contents: write
     runs-on: ubuntu-22.04 #Pinning the image to a specific version due to an issue with ICU packages in the latest image https://github.com/actions/runner-images/issues/10989
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: recursive
 
       - name: Download batch results
-        uses: actions/download-artifact@v8
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           path: workflow-temp
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 20.x
       
@@ -132,8 +181,15 @@ jobs:
           npm run list-resources
         working-directory: generator
 
+      - name: Pin bicep-types-az to resolved SHA
+        run: |
+          set -e
+          git -C bicep-types-az fetch --depth=1 origin '${{ needs.pin.outputs.new_sha }}'
+          git -C bicep-types-az checkout '${{ needs.pin.outputs.new_sha }}'
+          git -C bicep-types-az submodule update --init --recursive --depth=1
+
       - name: Push to autogenerate-batch branch
-        uses: stefanzweifel/git-auto-commit-action@v7
+        uses: stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d # v7.2.0
         with:
           commit_message: Update Generated Schemas
           branch: autogenerate-batch

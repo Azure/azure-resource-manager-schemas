@@ -29,7 +29,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the hybrid machine.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -76,6 +76,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -97,7 +98,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the machine extension.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -134,6 +135,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -155,7 +157,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Azure Arc PrivateLinkScope resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -202,6 +204,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -219,7 +222,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the private endpoint connection.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -251,7 +254,6 @@
   },
   "definitions": {
     "HybridComputePrivateLinkScopeProperties": {
-      "description": "Properties that define a Azure Arc PrivateLinkScope resource.",
       "properties": {
         "publicNetworkAccess": {
           "description": "Indicates whether machines associated with the private link scope can also use public Azure Arc service endpoints.",
@@ -272,7 +274,6 @@
       "type": "object"
     },
     "Identity": {
-      "description": "Identity for the resource.",
       "properties": {
         "type": {
           "description": "The identity type.",
@@ -292,7 +293,6 @@
       "type": "object"
     },
     "LocationData": {
-      "description": "Metadata pertaining to the geographic location of the resource.",
       "properties": {
         "city": {
           "description": "The city or locality where the resource is located.",
@@ -308,8 +308,15 @@
         },
         "name": {
           "description": "A canonical name for the geographic or physical location.",
-          "maxLength": 256,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 256,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "required": [
@@ -318,7 +325,6 @@
       "type": "object"
     },
     "MachineExtensionInstanceView": {
-      "description": "Describes the Machine Extension Instance View.",
       "properties": {
         "name": {
           "description": "The machine extension name.",
@@ -347,7 +353,6 @@
       "type": "object"
     },
     "MachineExtensionInstanceViewStatus": {
-      "description": "Instance view status.",
       "properties": {
         "code": {
           "description": "The status code.",
@@ -379,14 +384,12 @@
         },
         "time": {
           "description": "The time of the status.",
-          "format": "date-time",
           "type": "string"
         }
       },
       "type": "object"
     },
     "MachineExtensionProperties": {
-      "description": "Describes the properties of a Machine Extension.",
       "properties": {
         "autoUpgradeMinorVersion": {
           "description": "Indicates whether the extension should use a newer minor version if one is available at deployment time. Once deployed, however, the extension will not upgrade minor versions unless redeployed, even with this property set to true.",
@@ -417,9 +420,7 @@
         "protectedSettings": {
           "description": "The extension can contain either protectedSettings or protectedSettingsFromKeyVault or no protected settings at all.",
           "oneOf": [
-            {
-              "type": "object"
-            },
+            {},
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
@@ -432,9 +433,7 @@
         "settings": {
           "description": "Json formatted public settings for the extension.",
           "oneOf": [
-            {
-              "type": "object"
-            },
+            {},
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
@@ -452,7 +451,6 @@
       "type": "object"
     },
     "MachineProperties": {
-      "description": "Describes the properties of a hybrid machine.",
       "properties": {
         "clientPublicKey": {
           "description": "Public Key that the client provides to be used during initial resource onboarding",
@@ -491,7 +489,9 @@
           "description": "Specifies the hybrid machine unique ID.",
           "oneOf": [
             {
-              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+              "maxLength": 36,
+              "minLength": 36,
+              "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
               "type": "string"
             },
             {
@@ -503,7 +503,6 @@
       "type": "object"
     },
     "PrivateEndpointConnectionProperties": {
-      "description": "Properties of a private endpoint connection.",
       "properties": {
         "privateEndpoint": {
           "description": "Private endpoint which the connection belongs to.",
@@ -531,7 +530,6 @@
       "type": "object"
     },
     "PrivateEndpointProperty": {
-      "description": "Private endpoint which the connection belongs to.",
       "properties": {
         "id": {
           "description": "Resource id of the private endpoint.",
@@ -540,8 +538,14 @@
       },
       "type": "object"
     },
+    "PrivateLinkScopesResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "PrivateLinkServiceConnectionStateProperty": {
-      "description": "State of the private endpoint connection.",
       "properties": {
         "description": {
           "description": "The private link service connection description.",
@@ -553,13 +557,20 @@
         }
       },
       "required": [
-        "status",
-        "description"
+        "description",
+        "status"
       ],
       "type": "object"
     },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "machines_extensions_childResource": {
-      "description": "Microsoft.HybridCompute/machines/extensions",
+      "description": "extensions",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -572,7 +583,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the machine extension.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -609,6 +620,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -617,7 +629,7 @@
       "type": "object"
     },
     "privateLinkScopes_privateEndpointConnections_childResource": {
-      "description": "Microsoft.HybridCompute/privateLinkScopes/privateEndpointConnections",
+      "description": "privateEndpointConnections",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -626,7 +638,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the private endpoint connection.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {

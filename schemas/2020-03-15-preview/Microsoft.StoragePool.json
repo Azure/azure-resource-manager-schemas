@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Disk pool.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 90,
@@ -35,7 +35,7 @@
           "description": "Properties for Disk pool create request.",
           "oneOf": [
             {
-              "$ref": "#/definitions/DiskPoolCreateProperties"
+              "$ref": "#/definitions/DiskPoolCreatePropertiesOrDiskPoolProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -75,6 +75,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -92,14 +93,14 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the iSCSI target.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "Properties for iSCSI target create request.",
           "oneOf": [
             {
-              "$ref": "#/definitions/IscsiTargetCreateProperties"
+              "$ref": "#/definitions/IscsiTargetCreatePropertiesOrIscsiTargetProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -124,7 +125,6 @@
   },
   "definitions": {
     "Acl": {
-      "description": "Access Control List (ACL) for an iSCSI target portal group",
       "properties": {
         "credentials": {
           "description": "Challenge Handshake Authentication Protocol (CHAP) credentials to set for the ACL. Credentials can not be updated for an ACL.",
@@ -163,7 +163,6 @@
       "type": "object"
     },
     "Attributes": {
-      "description": "Attributes of a iSCSI target portal group.",
       "properties": {
         "authentication": {
           "description": "Indicates whether or not authentication is enabled on the ACL.",
@@ -195,7 +194,6 @@
       "type": "object"
     },
     "Disk": {
-      "description": "Azure Managed Disk to attach to the Disk pool.",
       "properties": {
         "id": {
           "description": "Unique Azure Resource ID of the Managed Disk.",
@@ -207,8 +205,7 @@
       ],
       "type": "object"
     },
-    "DiskPoolCreateProperties": {
-      "description": "Properties for Disk pool create or update request.",
+    "DiskPoolCreatePropertiesOrDiskPoolProperties": {
       "properties": {
         "additionalCapabilities": {
           "description": "List of additional capabilities for a Disk pool.",
@@ -280,8 +277,14 @@
       ],
       "type": "object"
     },
+    "DiskPoolCreateTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "IscsiLun": {
-      "description": "LUN to expose the Azure Managed Disk.",
       "properties": {
         "managedDiskAzureResourceId": {
           "description": "Azure Resource ID of the Managed Disk.",
@@ -293,13 +296,12 @@
         }
       },
       "required": [
-        "name",
-        "managedDiskAzureResourceId"
+        "managedDiskAzureResourceId",
+        "name"
       ],
       "type": "object"
     },
-    "IscsiTargetCreateProperties": {
-      "description": "Properties for iSCSI target create or update request.",
+    "IscsiTargetCreatePropertiesOrIscsiTargetProperties": {
       "properties": {
         "targetIqn": {
           "description": "iSCSI target IQN (iSCSI Qualified Name); example: \"iqn.2005-03.org.iscsi:server\".",
@@ -310,7 +312,7 @@
           "oneOf": [
             {
               "items": {
-                "$ref": "#/definitions/TargetPortalGroupCreate"
+                "$ref": "#/definitions/TargetPortalGroupCreateOrTargetPortalGroup"
               },
               "type": "array"
             },
@@ -326,7 +328,6 @@
       "type": "object"
     },
     "IscsiTargetCredentials": {
-      "description": "Challenge Handshake Authentication Protocol (CHAP) credentials for an iSCSI target ACL.",
       "properties": {
         "password": {
           "description": "Password for Challenge Handshake Authentication Protocol (CHAP) authentication.",
@@ -344,19 +345,25 @@
         },
         "username": {
           "description": "Username for Challenge Handshake Authentication Protocol (CHAP) authentication.",
-          "maxLength": 511,
-          "minLength": 7,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 511,
+              "minLength": 7,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "required": [
-        "username",
-        "password"
+        "password",
+        "username"
       ],
       "type": "object"
     },
-    "TargetPortalGroupCreate": {
-      "description": "Target portal group properties for create or update iSCSI target request.",
+    "TargetPortalGroupCreateOrTargetPortalGroup": {
       "properties": {
         "acls": {
           "description": "Access Control List (ACL) for an iSCSI target portal group.",
@@ -399,14 +406,14 @@
         }
       },
       "required": [
-        "luns",
         "acls",
-        "attributes"
+        "attributes",
+        "luns"
       ],
       "type": "object"
     },
     "diskPools_iscsiTargets_childResource": {
-      "description": "Microsoft.StoragePool/diskPools/iscsiTargets",
+      "description": "iscsiTargets",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -415,14 +422,14 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the iSCSI target.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "Properties for iSCSI target create request.",
           "oneOf": [
             {
-              "$ref": "#/definitions/IscsiTargetCreateProperties"
+              "$ref": "#/definitions/IscsiTargetCreatePropertiesOrIscsiTargetProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"

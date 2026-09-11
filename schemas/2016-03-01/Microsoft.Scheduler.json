@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The job collection name.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -82,7 +82,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The job name.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -113,85 +113,87 @@
     }
   },
   "definitions": {
-    "HttpAuthentication": {
-      "oneOf": [
-        {
-          "properties": {
-            "audience": {
-              "description": "Gets or sets the audience.",
-              "type": "string"
-            },
-            "clientId": {
-              "description": "Gets or sets the client identifier.",
-              "type": "string"
-            },
-            "secret": {
-              "description": "Gets or sets the secret, return value will always be empty.",
-              "type": "string"
-            },
-            "tenant": {
-              "description": "Gets or sets the tenant.",
-              "type": "string"
-            },
-            "type": {
-              "enum": [
-                "ActiveDirectoryOAuth"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "type"
-          ],
-          "type": "object"
+    "BasicAuthentication": {
+      "properties": {
+        "password": {
+          "description": "Gets or sets the password, return value will always be empty.",
+          "type": "string"
         },
-        {
-          "properties": {
-            "password": {
-              "description": "Gets or sets the password, return value will always be empty.",
-              "type": "string"
-            },
-            "type": {
+        "type": {
+          "description": "Gets or sets the HTTP authentication type.",
+          "oneOf": [
+            {
               "enum": [
                 "Basic"
               ],
               "type": "string"
             },
-            "username": {
-              "description": "Gets or sets the username.",
-              "type": "string"
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "type"
-          ],
-          "type": "object"
+          ]
         },
+        "username": {
+          "description": "Gets or sets the username.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
+    "ClientCertAuthentication": {
+      "properties": {
+        "certificateExpirationDate": {
+          "description": "Gets or sets the certificate expiration date.",
+          "type": "string"
+        },
+        "certificateSubjectName": {
+          "description": "Gets or sets the certificate subject name.",
+          "type": "string"
+        },
+        "certificateThumbprint": {
+          "description": "Gets or sets the certificate thumbprint.",
+          "type": "string"
+        },
+        "password": {
+          "description": "Gets or sets the certificate password, return value will always be empty.",
+          "type": "string"
+        },
+        "pfx": {
+          "description": "Gets or sets the pfx certificate. Accepts certification in base64 encoding, return value will always be empty.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Gets or sets the HTTP authentication type.",
+          "oneOf": [
+            {
+              "enum": [
+                "ClientCertificate"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
+    "HttpAuthentication": {
+      "allOf": [
         {
+          "additionalProperties": false,
           "properties": {
-            "certificateExpirationDate": {
-              "description": "Gets or sets the certificate expiration date.",
-              "format": "date-time",
-              "type": "string"
-            },
-            "certificateSubjectName": {
-              "description": "Gets or sets the certificate subject name.",
-              "type": "string"
-            },
-            "certificateThumbprint": {
-              "description": "Gets or sets the certificate thumbprint.",
-              "type": "string"
-            },
-            "password": {
-              "description": "Gets or sets the certificate password, return value will always be empty.",
-              "type": "string"
-            },
-            "pfx": {
-              "description": "Gets or sets the pfx certificate. Accepts certification in base64 encoding, return value will always be empty.",
-              "type": "string"
-            },
             "type": {
               "enum": [
+                "ActiveDirectoryOAuth",
+                "Basic",
                 "ClientCertificate"
               ],
               "type": "string"
@@ -201,10 +203,66 @@
             "type"
           ],
           "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/OAuthAuthentication"
+                },
+                {
+                  "properties": {
+                    "type": {
+                      "const": "ActiveDirectoryOAuth"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/BasicAuthentication"
+                },
+                {
+                  "properties": {
+                    "type": {
+                      "const": "Basic"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ClientCertAuthentication"
+                },
+                {
+                  "properties": {
+                    "type": {
+                      "const": "ClientCertificate"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
-      ],
-      "properties": {},
-      "type": "object"
+      ]
     },
     "HttpRequest": {
       "properties": {
@@ -247,6 +305,13 @@
           "type": "string"
         }
       },
+      "type": "object"
+    },
+    "HttpRequestHeaders": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
       "type": "object"
     },
     "JobAction": {
@@ -336,6 +401,13 @@
           ]
         }
       },
+      "type": "object"
+    },
+    "JobCollectionDefinitionTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
       "type": "object"
     },
     "JobCollectionProperties": {
@@ -558,7 +630,6 @@
         },
         "startTime": {
           "description": "Gets or sets the job start time.",
-          "format": "date-time",
           "type": "string"
         },
         "state": {
@@ -596,7 +667,6 @@
         },
         "endTime": {
           "description": "Gets or sets the time at which the job will complete.",
-          "format": "date-time",
           "type": "string"
         },
         "frequency": {
@@ -727,17 +797,6 @@
     },
     "JobRecurrenceScheduleMonthlyOccurrence": {
       "properties": {
-        "Occurrence": {
-          "description": "Gets or sets the occurrence. Must be between -5 and 5.",
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
         "day": {
           "description": "Gets or sets the day. Must be one of monday, tuesday, wednesday, thursday, friday, saturday, sunday.",
           "oneOf": [
@@ -757,8 +816,57 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
+        },
+        "Occurrence": {
+          "description": "Gets or sets the occurrence. Must be between -5 and 5.",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
+      "type": "object"
+    },
+    "OAuthAuthentication": {
+      "properties": {
+        "audience": {
+          "description": "Gets or sets the audience.",
+          "type": "string"
+        },
+        "clientId": {
+          "description": "Gets or sets the client identifier.",
+          "type": "string"
+        },
+        "secret": {
+          "description": "Gets or sets the secret, return value will always be empty.",
+          "type": "string"
+        },
+        "tenant": {
+          "description": "Gets or sets the tenant.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Gets or sets the HTTP authentication type.",
+          "oneOf": [
+            {
+              "enum": [
+                "ActiveDirectoryOAuth"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
       "type": "object"
     },
     "RetryPolicy": {
@@ -867,7 +975,6 @@
         },
         "scheduledEnqueueTimeUtc": {
           "description": "Gets or sets the scheduled enqueue time UTC.",
-          "format": "date-time",
           "type": "string"
         },
         "sessionId": {
@@ -887,6 +994,13 @@
           "type": "string"
         }
       },
+      "type": "object"
+    },
+    "ServiceBusMessageCustomMessageProperties": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
       "type": "object"
     },
     "ServiceBusQueueMessage": {
@@ -1073,7 +1187,7 @@
       "type": "object"
     },
     "jobCollections_jobs_childResource": {
-      "description": "Microsoft.Scheduler/jobCollections/jobs",
+      "description": "jobs",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1082,7 +1196,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The job name.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {

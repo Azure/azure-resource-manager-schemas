@@ -3,7 +3,7 @@
   "title": "Microsoft.ServiceLinker",
   "description": "Microsoft ServiceLinker Resource Types",
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "resourceDefinitions": {
+  "tenant_resourceDefinitions": {
     "linkers": {
       "description": "Microsoft.ServiceLinker/linkers",
       "properties": {
@@ -14,48 +14,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name Linker resource.",
-          "type": "string"
-        },
-        "properties": {
-          "description": "The properties of the linker.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/LinkerProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.ServiceLinker/linkers"
-          ],
-          "type": "string"
-        }
-      },
-      "required": [
-        "name",
-        "properties",
-        "apiVersion",
-        "type"
-      ],
-      "type": "object"
-    }
-  },
-  "subscription_resourceDefinitions": {
-    "linkers": {
-      "description": "Microsoft.ServiceLinker/linkers",
-      "properties": {
-        "apiVersion": {
-          "enum": [
-            "2021-11-01-preview"
-          ],
-          "type": "string"
-        },
-        "name": {
-          "description": "The name Linker resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -96,7 +55,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name Linker resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -126,7 +85,7 @@
       "type": "object"
     }
   },
-  "tenant_resourceDefinitions": {
+  "subscription_resourceDefinitions": {
     "linkers": {
       "description": "Microsoft.ServiceLinker/linkers",
       "properties": {
@@ -137,7 +96,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name Linker resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -167,7 +126,7 @@
       "type": "object"
     }
   },
-  "extension_resourceDefinitions": {
+  "resourceDefinitions": {
     "linkers": {
       "description": "Microsoft.ServiceLinker/linkers",
       "properties": {
@@ -178,7 +137,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name Linker resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -210,137 +169,123 @@
   },
   "definitions": {
     "AuthInfoBase": {
-      "description": "The authentication info",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "The authentication info when authType is secret",
+          "additionalProperties": false,
           "properties": {
             "authType": {
               "enum": [
-                "secret"
-              ],
-              "type": "string"
-            },
-            "name": {
-              "description": "Username or account name for secret auth.",
-              "type": "string"
-            },
-            "secret": {
-              "description": "Password or account key for secret auth.",
-              "type": "string"
-            }
-          },
-          "required": [
-            "authType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "The authentication info when authType is servicePrincipal certificate",
-          "properties": {
-            "authType": {
-              "enum": [
-                "servicePrincipalCertificate"
-              ],
-              "type": "string"
-            },
-            "certificate": {
-              "description": "ServicePrincipal certificate for servicePrincipal auth.",
-              "type": "string"
-            },
-            "clientId": {
-              "description": "Application clientId for servicePrincipal auth.",
-              "type": "string"
-            },
-            "principalId": {
-              "description": "Principal Id for servicePrincipal auth.",
-              "type": "string"
-            }
-          },
-          "required": [
-            "clientId",
-            "principalId",
-            "certificate",
-            "authType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "The authentication info when authType is servicePrincipal secret",
-          "properties": {
-            "authType": {
-              "enum": [
-                "servicePrincipalSecret"
-              ],
-              "type": "string"
-            },
-            "clientId": {
-              "description": "ServicePrincipal application clientId for servicePrincipal auth.",
-              "type": "string"
-            },
-            "principalId": {
-              "description": "Principal Id for servicePrincipal auth.",
-              "type": "string"
-            },
-            "secret": {
-              "description": "Secret for servicePrincipal auth.",
-              "type": "string"
-            }
-          },
-          "required": [
-            "clientId",
-            "principalId",
-            "secret",
-            "authType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "The authentication info when authType is systemAssignedIdentity",
-          "properties": {
-            "authType": {
-              "enum": [
-                "systemAssignedIdentity"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "authType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "The authentication info when authType is userAssignedIdentity",
-          "properties": {
-            "authType": {
-              "enum": [
+                "secret",
+                "servicePrincipalCertificate",
+                "servicePrincipalSecret",
+                "systemAssignedIdentity",
                 "userAssignedIdentity"
               ],
               "type": "string"
-            },
-            "clientId": {
-              "description": "Client Id for userAssignedIdentity.",
-              "type": "string"
-            },
-            "subscriptionId": {
-              "description": "Subscription id for userAssignedIdentity.",
-              "type": "string"
             }
           },
           "required": [
-            "clientId",
-            "subscriptionId",
             "authType"
           ],
           "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/SecretAuthInfo"
+                },
+                {
+                  "properties": {
+                    "authType": {
+                      "const": "secret"
+                    }
+                  },
+                  "required": [
+                    "authType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ServicePrincipalCertificateAuthInfo"
+                },
+                {
+                  "properties": {
+                    "authType": {
+                      "const": "servicePrincipalCertificate"
+                    }
+                  },
+                  "required": [
+                    "authType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ServicePrincipalSecretAuthInfo"
+                },
+                {
+                  "properties": {
+                    "authType": {
+                      "const": "servicePrincipalSecret"
+                    }
+                  },
+                  "required": [
+                    "authType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/SystemAssignedIdentityAuthInfo"
+                },
+                {
+                  "properties": {
+                    "authType": {
+                      "const": "systemAssignedIdentity"
+                    }
+                  },
+                  "required": [
+                    "authType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/UserAssignedIdentityAuthInfo"
+                },
+                {
+                  "properties": {
+                    "authType": {
+                      "const": "userAssignedIdentity"
+                    }
+                  },
+                  "required": [
+                    "authType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
-      ],
-      "properties": {},
-      "type": "object"
+      ]
     },
     "LinkerProperties": {
-      "description": "The properties of the linker.",
       "properties": {
         "authInfo": {
           "description": "The authentication type.",
@@ -405,8 +350,37 @@
       },
       "type": "object"
     },
+    "SecretAuthInfo": {
+      "properties": {
+        "authType": {
+          "description": "The authentication type.",
+          "oneOf": [
+            {
+              "enum": [
+                "secret"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "name": {
+          "description": "Username or account name for secret auth.",
+          "type": "string"
+        },
+        "secret": {
+          "description": "Password or account key for secret auth.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "authType"
+      ],
+      "type": "object"
+    },
     "SecretStore": {
-      "description": "An option to store secret value in secure place",
       "properties": {
         "keyVaultId": {
           "description": "The key vault id to store secret",
@@ -415,8 +389,135 @@
       },
       "type": "object"
     },
+    "ServicePrincipalCertificateAuthInfo": {
+      "properties": {
+        "authType": {
+          "description": "The authentication type.",
+          "oneOf": [
+            {
+              "enum": [
+                "servicePrincipalCertificate"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "certificate": {
+          "description": "ServicePrincipal certificate for servicePrincipal auth.",
+          "type": "string"
+        },
+        "clientId": {
+          "description": "Application clientId for servicePrincipal auth.",
+          "type": "string"
+        },
+        "principalId": {
+          "description": "Principal Id for servicePrincipal auth.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "authType",
+        "certificate",
+        "clientId",
+        "principalId"
+      ],
+      "type": "object"
+    },
+    "ServicePrincipalSecretAuthInfo": {
+      "properties": {
+        "authType": {
+          "description": "The authentication type.",
+          "oneOf": [
+            {
+              "enum": [
+                "servicePrincipalSecret"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "clientId": {
+          "description": "ServicePrincipal application clientId for servicePrincipal auth.",
+          "type": "string"
+        },
+        "principalId": {
+          "description": "Principal Id for servicePrincipal auth.",
+          "type": "string"
+        },
+        "secret": {
+          "description": "Secret for servicePrincipal auth.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "authType",
+        "clientId",
+        "principalId",
+        "secret"
+      ],
+      "type": "object"
+    },
+    "SystemAssignedIdentityAuthInfo": {
+      "properties": {
+        "authType": {
+          "description": "The authentication type.",
+          "oneOf": [
+            {
+              "enum": [
+                "systemAssignedIdentity"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "authType"
+      ],
+      "type": "object"
+    },
+    "UserAssignedIdentityAuthInfo": {
+      "properties": {
+        "authType": {
+          "description": "The authentication type.",
+          "oneOf": [
+            {
+              "enum": [
+                "userAssignedIdentity"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "clientId": {
+          "description": "Client Id for userAssignedIdentity.",
+          "type": "string"
+        },
+        "subscriptionId": {
+          "description": "Subscription id for userAssignedIdentity.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "authType",
+        "clientId",
+        "subscriptionId"
+      ],
+      "type": "object"
+    },
     "VNetSolution": {
-      "description": "The VNet solution for linker",
       "properties": {
         "type": {
           "description": "Type of VNet solution.",

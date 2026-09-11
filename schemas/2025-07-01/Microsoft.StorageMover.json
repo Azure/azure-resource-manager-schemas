@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Storage Mover resource.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
@@ -47,10 +47,10 @@
                 "$ref": "#/definitions/storageMovers_agents_childResource"
               },
               {
-                "$ref": "#/definitions/storageMovers_projects_childResource"
+                "$ref": "#/definitions/storageMovers_endpoints_childResource"
               },
               {
-                "$ref": "#/definitions/storageMovers_endpoints_childResource"
+                "$ref": "#/definitions/storageMovers_projects_childResource"
               }
             ]
           },
@@ -79,6 +79,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -96,8 +97,16 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Agent resource.",
-          "type": "string"
+          "description": "The resource name",
+          "oneOf": [
+            {
+              "pattern": "^[A-Za-z0-9._-]{1,54}$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "properties": {
           "oneOf": [
@@ -145,8 +154,16 @@
           ]
         },
         "name": {
-          "description": "The name of the Endpoint resource.",
-          "type": "string"
+          "description": "The resource name",
+          "oneOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "properties": {
           "description": "The resource specific properties for the Storage Mover resource.",
@@ -184,8 +201,16 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Project resource.",
-          "type": "string"
+          "description": "The resource name",
+          "oneOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "properties": {
           "description": "Project properties.",
@@ -233,8 +258,16 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Job Definition resource.",
-          "type": "string"
+          "description": "The resource name",
+          "oneOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "properties": {
           "description": "Job definition properties.",
@@ -297,7 +330,6 @@
       "type": "object"
     },
     "AzureKeyVaultSmbCredentials": {
-      "description": "The Azure Key Vault secret URIs which store the credentials.",
       "properties": {
         "passwordUri": {
           "description": "The Azure Key Vault secret URI which stores the password. Use empty string to clean-up existing value.",
@@ -327,197 +359,275 @@
       ],
       "type": "object"
     },
-    "EndpointBaseProperties": {
-      "description": "The resource specific properties for the Storage Mover resource.",
-      "oneOf": [
-        {
-          "description": "The properties of Azure MultiCloudConnector endpoint.",
-          "properties": {
-            "awsS3BucketId": {
-              "description": "The AWS S3 bucket ARM resource Id.",
-              "type": "string"
-            },
-            "endpointType": {
+    "AzureMultiCloudConnectorEndpointProperties": {
+      "properties": {
+        "awsS3BucketId": {
+          "description": "The AWS S3 bucket ARM resource Id.",
+          "type": "string"
+        },
+        "endpointType": {
+          "description": "The Endpoint resource type.",
+          "oneOf": [
+            {
               "enum": [
                 "AzureMultiCloudConnector"
               ],
               "type": "string"
             },
-            "multiCloudConnectorId": {
-              "description": "The Azure Resource ID of the MultiCloud Connector resource.",
-              "type": "string"
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "multiCloudConnectorId",
-            "awsS3BucketId",
-            "endpointType"
-          ],
-          "type": "object"
+          ]
         },
-        {
-          "description": "The properties of Azure Storage blob container endpoint.",
-          "properties": {
-            "blobContainerName": {
-              "description": "The name of the Storage blob container that is the target destination.",
-              "type": "string"
-            },
-            "endpointType": {
+        "multiCloudConnectorId": {
+          "description": "The Azure Resource ID of the MultiCloud Connector resource.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "awsS3BucketId",
+        "endpointType",
+        "multiCloudConnectorId"
+      ],
+      "type": "object"
+    },
+    "AzureStorageBlobContainerEndpointProperties": {
+      "properties": {
+        "blobContainerName": {
+          "description": "The name of the Storage blob container that is the target destination.",
+          "type": "string"
+        },
+        "endpointType": {
+          "description": "The Endpoint resource type.",
+          "oneOf": [
+            {
               "enum": [
                 "AzureStorageBlobContainer"
               ],
               "type": "string"
             },
-            "storageAccountResourceId": {
-              "description": "The Azure Resource ID of the storage account that is the target destination.",
-              "type": "string"
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "storageAccountResourceId",
-            "blobContainerName",
-            "endpointType"
-          ],
-          "type": "object"
+          ]
         },
-        {
-          "description": "The properties of Azure Storage NFS file share endpoint.",
-          "properties": {
-            "endpointType": {
+        "storageAccountResourceId": {
+          "description": "The Azure Resource ID of the storage account that is the target destination.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "blobContainerName",
+        "endpointType",
+        "storageAccountResourceId"
+      ],
+      "type": "object"
+    },
+    "AzureStorageNfsFileShareEndpointProperties": {
+      "properties": {
+        "endpointType": {
+          "description": "The Endpoint resource type.",
+          "oneOf": [
+            {
               "enum": [
                 "AzureStorageNfsFileShare"
               ],
               "type": "string"
             },
-            "fileShareName": {
-              "description": "The name of the Azure Storage NFS file share.",
-              "type": "string"
-            },
-            "storageAccountResourceId": {
-              "description": "The Azure Resource ID of the storage account.",
-              "type": "string"
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "storageAccountResourceId",
-            "fileShareName",
-            "endpointType"
-          ],
-          "type": "object"
+          ]
         },
-        {
-          "description": "The properties of Azure Storage SMB file share endpoint.",
-          "properties": {
-            "endpointType": {
+        "fileShareName": {
+          "description": "The name of the Azure Storage NFS file share.",
+          "type": "string"
+        },
+        "storageAccountResourceId": {
+          "description": "The Azure Resource ID of the storage account.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "endpointType",
+        "fileShareName",
+        "storageAccountResourceId"
+      ],
+      "type": "object"
+    },
+    "AzureStorageSmbFileShareEndpointProperties": {
+      "properties": {
+        "endpointType": {
+          "description": "The Endpoint resource type.",
+          "oneOf": [
+            {
               "enum": [
                 "AzureStorageSmbFileShare"
               ],
               "type": "string"
             },
-            "fileShareName": {
-              "description": "The name of the Azure Storage file share.",
-              "type": "string"
-            },
-            "storageAccountResourceId": {
-              "description": "The Azure Resource ID of the storage account.",
-              "type": "string"
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "storageAccountResourceId",
-            "fileShareName",
-            "endpointType"
-          ],
-          "type": "object"
+          ]
         },
-        {
-          "description": "The properties of NFS share endpoint.",
-          "properties": {
-            "endpointType": {
-              "enum": [
-                "NfsMount"
-              ],
-              "type": "string"
-            },
-            "export": {
-              "description": "The directory being exported from the server.",
-              "type": "string"
-            },
-            "host": {
-              "description": "The host name or IP address of the server exporting the file system.",
-              "type": "string"
-            },
-            "nfsVersion": {
-              "description": "The NFS protocol version.",
-              "oneOf": [
-                {
-                  "enum": [
-                    "NFSauto",
-                    "NFSv3",
-                    "NFSv4"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            }
-          },
-          "required": [
-            "host",
-            "export",
-            "endpointType"
-          ],
-          "type": "object"
+        "fileShareName": {
+          "description": "The name of the Azure Storage file share.",
+          "type": "string"
         },
-        {
-          "description": "The properties of SMB share endpoint.",
-          "properties": {
-            "credentials": {
-              "description": "The Azure Key Vault secret URIs which store the required credentials to access the SMB share.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/AzureKeyVaultSmbCredentials"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "endpointType": {
-              "enum": [
-                "SmbMount"
-              ],
-              "type": "string"
-            },
-            "host": {
-              "description": "The host name or IP address of the server exporting the file system.",
-              "type": "string"
-            },
-            "shareName": {
-              "description": "The name of the SMB share being exported from the server.",
-              "type": "string"
-            }
-          },
-          "required": [
-            "host",
-            "shareName",
-            "endpointType"
-          ],
-          "type": "object"
-        }
-      ],
-      "properties": {
-        "description": {
-          "description": "A description for the Endpoint.",
+        "storageAccountResourceId": {
+          "description": "The Azure Resource ID of the storage account.",
           "type": "string"
         }
       },
+      "required": [
+        "endpointType",
+        "fileShareName",
+        "storageAccountResourceId"
+      ],
       "type": "object"
     },
+    "EndpointBaseProperties": {
+      "allOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "description": {
+              "description": "A description for the Endpoint.",
+              "type": "string"
+            },
+            "endpointType": {
+              "enum": [
+                "AzureMultiCloudConnector",
+                "AzureStorageBlobContainer",
+                "AzureStorageNfsFileShare",
+                "AzureStorageSmbFileShare",
+                "NfsMount",
+                "SmbMount"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "endpointType"
+          ],
+          "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/AzureMultiCloudConnectorEndpointProperties"
+                },
+                {
+                  "properties": {
+                    "endpointType": {
+                      "const": "AzureMultiCloudConnector"
+                    }
+                  },
+                  "required": [
+                    "endpointType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/AzureStorageBlobContainerEndpointProperties"
+                },
+                {
+                  "properties": {
+                    "endpointType": {
+                      "const": "AzureStorageBlobContainer"
+                    }
+                  },
+                  "required": [
+                    "endpointType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/AzureStorageNfsFileShareEndpointProperties"
+                },
+                {
+                  "properties": {
+                    "endpointType": {
+                      "const": "AzureStorageNfsFileShare"
+                    }
+                  },
+                  "required": [
+                    "endpointType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/AzureStorageSmbFileShareEndpointProperties"
+                },
+                {
+                  "properties": {
+                    "endpointType": {
+                      "const": "AzureStorageSmbFileShare"
+                    }
+                  },
+                  "required": [
+                    "endpointType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/NfsMountEndpointProperties"
+                },
+                {
+                  "properties": {
+                    "endpointType": {
+                      "const": "NfsMount"
+                    }
+                  },
+                  "required": [
+                    "endpointType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/SmbMountEndpointProperties"
+                },
+                {
+                  "properties": {
+                    "endpointType": {
+                      "const": "SmbMount"
+                    }
+                  },
+                  "required": [
+                    "endpointType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
     "JobDefinitionProperties": {
-      "description": "Job definition properties.",
       "properties": {
         "agentName": {
           "description": "Name of the Agent to assign for new Job Runs of this Job Definition.",
@@ -593,12 +703,10 @@
       "type": "object"
     },
     "JobDefinitionPropertiesSourceTargetMap": {
-      "description": "The list of cloud endpoints to migrate.",
       "properties": {},
       "type": "object"
     },
     "ManagedServiceIdentity": {
-      "description": "Managed service identity (system assigned and/or user assigned identities)",
       "properties": {
         "type": {
           "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).",
@@ -638,8 +746,55 @@
       ],
       "type": "object"
     },
+    "NfsMountEndpointProperties": {
+      "properties": {
+        "endpointType": {
+          "description": "The Endpoint resource type.",
+          "oneOf": [
+            {
+              "enum": [
+                "NfsMount"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "export": {
+          "description": "The directory being exported from the server.",
+          "type": "string"
+        },
+        "host": {
+          "description": "The host name or IP address of the server exporting the file system.",
+          "type": "string"
+        },
+        "nfsVersion": {
+          "description": "The NFS protocol version.",
+          "oneOf": [
+            {
+              "enum": [
+                "NFSauto",
+                "NFSv3",
+                "NFSv4"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "endpointType",
+        "export",
+        "host"
+      ],
+      "type": "object"
+    },
     "ProjectProperties": {
-      "description": "Project properties.",
       "properties": {
         "description": {
           "description": "A description for the Project.",
@@ -648,8 +803,50 @@
       },
       "type": "object"
     },
+    "SmbMountEndpointProperties": {
+      "properties": {
+        "credentials": {
+          "description": "The Azure Key Vault secret URIs which store the required credentials to access the SMB share.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AzureKeyVaultSmbCredentials"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "endpointType": {
+          "description": "The Endpoint resource type.",
+          "oneOf": [
+            {
+              "enum": [
+                "SmbMount"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "host": {
+          "description": "The host name or IP address of the server exporting the file system.",
+          "type": "string"
+        },
+        "shareName": {
+          "description": "The name of the SMB share being exported from the server.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "endpointType",
+        "host",
+        "shareName"
+      ],
+      "type": "object"
+    },
     "StorageMoverProperties": {
-      "description": "The resource specific properties for the Storage Mover resource.",
       "properties": {
         "description": {
           "description": "A description for the Storage Mover.",
@@ -659,7 +856,6 @@
       "type": "object"
     },
     "Time": {
-      "description": "The time of day.",
       "properties": {
         "hour": {
           "description": "The hour element of the time. Allowed values range from 0 (start of the selected day) to 24 (end of the selected day). Hour value 24 cannot be combined with any other minute value but 0.",
@@ -678,15 +874,7 @@
           "description": "The minute element of the time. Allowed values are 0 and 30. If not specified, its value defaults to 0.",
           "oneOf": [
             {
-              "oneOf": [
-                {
-                  "default": 0,
-                  "type": "number"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -699,8 +887,14 @@
       ],
       "type": "object"
     },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "UploadLimitSchedule": {
-      "description": "The WAN-link upload limit schedule. Overlapping recurrences are not allowed.",
       "properties": {
         "weeklyRecurrences": {
           "description": "The set of weekly repeating recurrences of the WAN-link upload limit schedule.",
@@ -720,7 +914,6 @@
       "type": "object"
     },
     "UploadLimitWeeklyRecurrence": {
-      "description": "The weekly recurrence of the WAN-link upload limit schedule. The start time must be earlier in the day than the end time. The recurrence must not span across multiple days.",
       "properties": {
         "days": {
           "description": "The set of days of week for the schedule recurrence. A day must not be specified more than once in a recurrence.",
@@ -781,20 +974,26 @@
         }
       },
       "required": [
-        "limitInMbps",
         "days",
-        "startTime",
-        "endTime"
+        "endTime",
+        "limitInMbps",
+        "startTime"
       ],
       "type": "object"
     },
+    "UserAssignedIdentities": {
+      "additionalProperties": {
+        "$ref": "#/definitions/UserAssignedIdentity"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "UserAssignedIdentity": {
-      "description": "User assigned identity properties",
       "properties": {},
       "type": "object"
     },
     "storageMovers_agents_childResource": {
-      "description": "Microsoft.StorageMover/storageMovers/agents",
+      "description": "agents",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -803,8 +1002,16 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Agent resource.",
-          "type": "string"
+          "description": "The resource name",
+          "oneOf": [
+            {
+              "pattern": "^[A-Za-z0-9._-]{1,54}$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "properties": {
           "oneOf": [
@@ -832,7 +1039,7 @@
       "type": "object"
     },
     "storageMovers_endpoints_childResource": {
-      "description": "Microsoft.StorageMover/storageMovers/endpoints",
+      "description": "endpoints",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -852,8 +1059,16 @@
           ]
         },
         "name": {
-          "description": "The name of the Endpoint resource.",
-          "type": "string"
+          "description": "The resource name",
+          "oneOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "properties": {
           "description": "The resource specific properties for the Storage Mover resource.",
@@ -882,7 +1097,7 @@
       "type": "object"
     },
     "storageMovers_projects_childResource": {
-      "description": "Microsoft.StorageMover/storageMovers/projects",
+      "description": "projects",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -891,8 +1106,16 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Project resource.",
-          "type": "string"
+          "description": "The resource name",
+          "oneOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "properties": {
           "description": "Project properties.",
@@ -921,7 +1144,7 @@
       "type": "object"
     },
     "storageMovers_projects_jobDefinitions_childResource": {
-      "description": "Microsoft.StorageMover/storageMovers/projects/jobDefinitions",
+      "description": "jobDefinitions",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -930,8 +1153,16 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Job Definition resource.",
-          "type": "string"
+          "description": "The resource name",
+          "oneOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "properties": {
           "description": "Job definition properties.",

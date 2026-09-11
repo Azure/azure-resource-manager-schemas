@@ -29,7 +29,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of Azure Machine Learning workspace.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -125,7 +125,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the Azure Machine Learning compute.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -190,7 +190,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Friendly name of the workspace connection",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -229,7 +229,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the private endpoint connection associated with the workspace",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -260,8 +260,85 @@
     }
   },
   "definitions": {
+    "AKS": {
+      "properties": {
+        "computeType": {
+          "description": "The type of compute",
+          "oneOf": [
+            {
+              "enum": [
+                "AKS"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "description": "AKS properties",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/AKSProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "computeType"
+      ],
+      "type": "object"
+    },
+    "AksNetworkingConfiguration": {
+      "properties": {
+        "dnsServiceIP": {
+          "description": "An IP address assigned to the Kubernetes DNS service. It must be within the Kubernetes service address range specified in serviceCidr.",
+          "oneOf": [
+            {
+              "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "dockerBridgeCidr": {
+          "description": "A CIDR notation IP range assigned to the Docker bridge network. It must not overlap with any Subnet IP ranges or the Kubernetes service address range.",
+          "oneOf": [
+            {
+              "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}(\\/([0-9]|[1-2][0-9]|3[0-2]))?$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "serviceCidr": {
+          "description": "A CIDR notation IP range from which to assign service cluster IPs. It must not overlap with any Subnet IP ranges.",
+          "oneOf": [
+            {
+              "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}(\\/([0-9]|[1-2][0-9]|3[0-2]))?$",
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "subnetId": {
+          "description": "Virtual network subnet resource ID the compute nodes belong to",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "AKSProperties": {
-      "description": "AKS properties",
       "properties": {
         "agentCount": {
           "description": "Number of agents",
@@ -308,14 +385,15 @@
       },
       "type": "object"
     },
-    "AksNetworkingConfiguration": {
-      "description": "Advance configuration for AKS networking",
+    "AmlCompute": {
       "properties": {
-        "dnsServiceIP": {
-          "description": "An IP address assigned to the Kubernetes DNS service. It must be within the Kubernetes service address range specified in serviceCidr.",
+        "computeType": {
+          "description": "The type of compute",
           "oneOf": [
             {
-              "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+              "enum": [
+                "AmlCompute"
+              ],
               "type": "string"
             },
             {
@@ -323,39 +401,24 @@
             }
           ]
         },
-        "dockerBridgeCidr": {
-          "description": "A CIDR notation IP range assigned to the Docker bridge network. It must not overlap with any Subnet IP ranges or the Kubernetes service address range.",
+        "properties": {
+          "description": "AML Compute properties",
           "oneOf": [
             {
-              "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}(\\/([0-9]|[1-2][0-9]|3[0-2]))?$",
-              "type": "string"
+              "$ref": "#/definitions/AmlComputeProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
-        },
-        "serviceCidr": {
-          "description": "A CIDR notation IP range from which to assign service cluster IPs. It must not overlap with any Subnet IP ranges.",
-          "oneOf": [
-            {
-              "pattern": "^([0-9]{1,3}\\.){3}[0-9]{1,3}(\\/([0-9]|[1-2][0-9]|3[0-2]))?$",
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "subnetId": {
-          "description": "Virtual network subnet resource ID the compute nodes belong to",
-          "type": "string"
         }
       },
+      "required": [
+        "computeType"
+      ],
       "type": "object"
     },
     "AmlComputeProperties": {
-      "description": "AML Compute properties",
       "properties": {
         "remoteLoginPortPublicAccess": {
           "description": "State of the public SSH port. Possible values are: Disabled - Indicates that the public ssh port is closed on all nodes of the cluster. Enabled - Indicates that the public ssh port is open on all nodes of the cluster. NotSpecified - Indicates that the public ssh port is closed on all nodes of the cluster if VNet is defined, else is open all public nodes. It can be default only during cluster creation time, after creation it will be either enabled or disabled.",
@@ -433,27 +496,34 @@
       "type": "object"
     },
     "Compute": {
-      "description": "Machine Learning compute object.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "A Machine Learning compute based on AKS.",
+          "additionalProperties": false,
           "properties": {
+            "computeLocation": {
+              "description": "Location for the underlying compute",
+              "type": "string"
+            },
             "computeType": {
               "enum": [
-                "AKS"
+                "AKS",
+                "AmlCompute",
+                "ComputeInstance",
+                "Databricks",
+                "DataFactory",
+                "DataLakeAnalytics",
+                "HDInsight",
+                "VirtualMachine"
               ],
               "type": "string"
             },
-            "properties": {
-              "description": "AKS properties",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/AKSProperties"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            "description": {
+              "description": "The description of the Machine Learning compute.",
+              "type": "string"
+            },
+            "resourceId": {
+              "description": "ARM resource id of the underlying compute",
+              "type": "string"
             }
           },
           "required": [
@@ -462,191 +532,189 @@
           "type": "object"
         },
         {
-          "description": "An Azure Machine Learning compute.",
-          "properties": {
-            "computeType": {
-              "enum": [
-                "AmlCompute"
-              ],
-              "type": "string"
-            },
-            "properties": {
-              "description": "AML Compute properties",
-              "oneOf": [
+          "oneOf": [
+            {
+              "allOf": [
                 {
-                  "$ref": "#/definitions/AmlComputeProperties"
+                  "$ref": "#/definitions/AKS"
                 },
                 {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                  "properties": {
+                    "computeType": {
+                      "const": "AKS"
+                    }
+                  },
+                  "required": [
+                    "computeType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/AmlCompute"
+                },
+                {
+                  "properties": {
+                    "computeType": {
+                      "const": "AmlCompute"
+                    }
+                  },
+                  "required": [
+                    "computeType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ComputeInstance"
+                },
+                {
+                  "properties": {
+                    "computeType": {
+                      "const": "ComputeInstance"
+                    }
+                  },
+                  "required": [
+                    "computeType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/Databricks"
+                },
+                {
+                  "properties": {
+                    "computeType": {
+                      "const": "Databricks"
+                    }
+                  },
+                  "required": [
+                    "computeType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DataFactory"
+                },
+                {
+                  "properties": {
+                    "computeType": {
+                      "const": "DataFactory"
+                    }
+                  },
+                  "required": [
+                    "computeType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DataLakeAnalytics"
+                },
+                {
+                  "properties": {
+                    "computeType": {
+                      "const": "DataLakeAnalytics"
+                    }
+                  },
+                  "required": [
+                    "computeType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/HDInsight"
+                },
+                {
+                  "properties": {
+                    "computeType": {
+                      "const": "HDInsight"
+                    }
+                  },
+                  "required": [
+                    "computeType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/VirtualMachine"
+                },
+                {
+                  "properties": {
+                    "computeType": {
+                      "const": "VirtualMachine"
+                    }
+                  },
+                  "required": [
+                    "computeType"
+                  ],
+                  "type": "object"
                 }
               ]
             }
-          },
-          "required": [
-            "computeType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "An Azure Machine Learning compute instance.",
-          "properties": {
-            "computeType": {
+          ]
+        }
+      ]
+    },
+    "ComputeInstance": {
+      "properties": {
+        "computeType": {
+          "description": "The type of compute",
+          "oneOf": [
+            {
               "enum": [
                 "ComputeInstance"
               ],
               "type": "string"
             },
-            "properties": {
-              "description": "Compute Instance properties",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/ComputeInstanceProperties"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "computeType"
-          ],
-          "type": "object"
+          ]
         },
-        {
-          "description": "A DataFactory compute.",
-          "properties": {
-            "computeType": {
-              "enum": [
-                "DataFactory"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "computeType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "A DataLakeAnalytics compute.",
-          "properties": {
-            "computeType": {
-              "enum": [
-                "DataLakeAnalytics"
-              ],
-              "type": "string"
+        "properties": {
+          "description": "Compute Instance properties",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ComputeInstanceProperties"
             },
-            "properties": {
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/DataLakeAnalyticsProperties"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "computeType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "A DataFactory compute.",
-          "properties": {
-            "computeType": {
-              "enum": [
-                "Databricks"
-              ],
-              "type": "string"
-            },
-            "properties": {
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/DatabricksProperties"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            }
-          },
-          "required": [
-            "computeType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "A HDInsight compute.",
-          "properties": {
-            "computeType": {
-              "enum": [
-                "HDInsight"
-              ],
-              "type": "string"
-            },
-            "properties": {
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/HDInsightProperties"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            }
-          },
-          "required": [
-            "computeType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "A Machine Learning compute based on Azure Virtual Machines.",
-          "properties": {
-            "computeType": {
-              "enum": [
-                "VirtualMachine"
-              ],
-              "type": "string"
-            },
-            "properties": {
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/VirtualMachineProperties"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            }
-          },
-          "required": [
-            "computeType"
-          ],
-          "type": "object"
-        }
-      ],
-      "properties": {
-        "computeLocation": {
-          "description": "Location for the underlying compute",
-          "type": "string"
-        },
-        "description": {
-          "description": "The description of the Machine Learning compute.",
-          "type": "string"
-        },
-        "resourceId": {
-          "description": "ARM resource id of the underlying compute",
-          "type": "string"
+          ]
         }
       },
+      "required": [
+        "computeType"
+      ],
       "type": "object"
     },
     "ComputeInstanceProperties": {
-      "description": "Compute Instance properties",
       "properties": {
         "applicationSharingPolicy": {
           "description": "Policy for sharing applications on this compute instance among users of parent workspace. If Personal, only the creator can access applications on this compute instance. When Shared, any workspace user can access applications on this instance depending on his/her assigned role.",
@@ -693,7 +761,6 @@
       "type": "object"
     },
     "ComputeInstanceSshSettings": {
-      "description": "Specifies policy and settings for SSH access.",
       "properties": {
         "adminPublicKey": {
           "description": "Specifies the SSH rsa public key file as a string. Use \"ssh-keygen -t rsa -b 2048\" to generate your SSH key pairs.",
@@ -717,19 +784,105 @@
       },
       "type": "object"
     },
-    "DataLakeAnalyticsProperties": {
+    "Databricks": {
       "properties": {
-        "dataLakeStoreAccountName": {
-          "description": "DataLake Store Account Name",
-          "type": "string"
+        "computeType": {
+          "description": "The type of compute",
+          "oneOf": [
+            {
+              "enum": [
+                "Databricks"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DatabricksProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
+      "required": [
+        "computeType"
+      ],
       "type": "object"
     },
     "DatabricksProperties": {
       "properties": {
         "databricksAccessToken": {
           "description": "Databricks access token",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "DataFactory": {
+      "properties": {
+        "computeType": {
+          "description": "The type of compute",
+          "oneOf": [
+            {
+              "enum": [
+                "DataFactory"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "computeType"
+      ],
+      "type": "object"
+    },
+    "DataLakeAnalytics": {
+      "properties": {
+        "computeType": {
+          "description": "The type of compute",
+          "oneOf": [
+            {
+              "enum": [
+                "DataLakeAnalytics"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DataLakeAnalyticsProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "computeType"
+      ],
+      "type": "object"
+    },
+    "DataLakeAnalyticsProperties": {
+      "properties": {
+        "dataLakeStoreAccountName": {
+          "description": "DataLake Store Account Name",
           "type": "string"
         }
       },
@@ -765,8 +918,40 @@
         }
       },
       "required": [
-        "status",
-        "keyVaultProperties"
+        "keyVaultProperties",
+        "status"
+      ],
+      "type": "object"
+    },
+    "HDInsight": {
+      "properties": {
+        "computeType": {
+          "description": "The type of compute",
+          "oneOf": [
+            {
+              "enum": [
+                "HDInsight"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/HDInsightProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "computeType"
       ],
       "type": "object"
     },
@@ -802,7 +987,6 @@
       "type": "object"
     },
     "Identity": {
-      "description": "Identity for the resource.",
       "properties": {
         "type": {
           "description": "The identity type.",
@@ -842,6 +1026,13 @@
       ],
       "type": "object"
     },
+    "IdentityUserAssignedIdentities": {
+      "additionalProperties": {
+        "$ref": "#/definitions/ComponentsSgqdofSchemasIdentityPropertiesUserassignedidentitiesAdditionalproperties"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "KeyVaultProperties": {
       "properties": {
         "identityClientId": {
@@ -858,18 +1049,16 @@
         }
       },
       "required": [
-        "keyVaultArmId",
-        "keyIdentifier"
+        "keyIdentifier",
+        "keyVaultArmId"
       ],
       "type": "object"
     },
     "PrivateEndpoint": {
-      "description": "The Private Endpoint resource.",
       "properties": {},
       "type": "object"
     },
     "PrivateEndpointConnectionProperties": {
-      "description": "Properties of the PrivateEndpointConnectProperties.",
       "properties": {
         "privateEndpoint": {
           "description": "The resource of private end point.",
@@ -900,7 +1089,6 @@
       "type": "object"
     },
     "PrivateLinkServiceConnectionState": {
-      "description": "A collection of information about the state of the connection between service consumer and provider.",
       "properties": {
         "actionsRequired": {
           "description": "A message indicating if changes on the service provider require any updates on the consumer.",
@@ -932,7 +1120,6 @@
       "type": "object"
     },
     "ResourceId": {
-      "description": "Represents a resource ID. For example, for a subnet, it is the resource URL for the subnet.",
       "properties": {
         "id": {
           "description": "The ID of the resource",
@@ -944,8 +1131,14 @@
       ],
       "type": "object"
     },
+    "ResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "ScaleSettings": {
-      "description": "scale settings for AML Compute",
       "properties": {
         "maxNodeCount": {
           "description": "Max number of nodes to use",
@@ -962,7 +1155,6 @@
           "description": "Min number of nodes to use",
           "oneOf": [
             {
-              "default": 0,
               "type": "integer"
             },
             {
@@ -1001,7 +1193,6 @@
       "type": "object"
     },
     "SharedPrivateLinkResourceProperty": {
-      "description": "Properties of a shared private link resource.",
       "properties": {
         "groupId": {
           "description": "The private link resource group id.",
@@ -1037,7 +1228,6 @@
       "type": "object"
     },
     "Sku": {
-      "description": "Sku of the resource",
       "properties": {
         "name": {
           "description": "Name of the sku",
@@ -1051,7 +1241,6 @@
       "type": "object"
     },
     "SslConfiguration": {
-      "description": "The ssl configuration for scoring",
       "properties": {
         "cert": {
           "description": "Cert data",
@@ -1084,7 +1273,6 @@
       "type": "object"
     },
     "UserAccountCredentials": {
-      "description": "Settings for user account that gets created on each on the nodes of a compute.",
       "properties": {
         "adminUserName": {
           "description": "Name of the administrator user account which can be used to SSH to nodes.",
@@ -1101,6 +1289,38 @@
       },
       "required": [
         "adminUserName"
+      ],
+      "type": "object"
+    },
+    "VirtualMachine": {
+      "properties": {
+        "computeType": {
+          "description": "The type of compute",
+          "oneOf": [
+            {
+              "enum": [
+                "VirtualMachine"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/VirtualMachineProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "computeType"
       ],
       "type": "object"
     },
@@ -1140,7 +1360,6 @@
       "type": "object"
     },
     "VirtualMachineSshCredentials": {
-      "description": "Admin credentials for virtual machine",
       "properties": {
         "password": {
           "description": "Password of admin account",
@@ -1162,7 +1381,6 @@
       "type": "object"
     },
     "WorkspaceConnectionProps": {
-      "description": "Workspace Connection specific properties.",
       "properties": {
         "authType": {
           "description": "Authorization type of the workspace connection.",
@@ -1184,13 +1402,11 @@
       "type": "object"
     },
     "WorkspaceProperties": {
-      "description": "The properties of a machine learning workspace.",
       "properties": {
         "allowPublicAccessWhenBehindVnet": {
           "description": "The flag to indicate whether to allow public access when behind VNet.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -1233,7 +1449,6 @@
           "description": "The flag to signal HBI data in the workspace and reduce diagnostic data collected by the service",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -1271,7 +1486,7 @@
       "type": "object"
     },
     "workspaces_computes_childResource": {
-      "description": "Microsoft.MachineLearningServices/workspaces/computes",
+      "description": "computes",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1295,7 +1510,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the Azure Machine Learning compute.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -1351,7 +1566,7 @@
       "type": "object"
     },
     "workspaces_connections_childResource": {
-      "description": "Microsoft.MachineLearningServices/workspaces/connections",
+      "description": "connections",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1360,7 +1575,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Friendly name of the workspace connection",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -1390,7 +1605,7 @@
       "type": "object"
     },
     "workspaces_privateEndpointConnections_childResource": {
-      "description": "Microsoft.MachineLearningServices/workspaces/privateEndpointConnections",
+      "description": "privateEndpointConnections",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1399,7 +1614,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the private endpoint connection associated with the workspace",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {

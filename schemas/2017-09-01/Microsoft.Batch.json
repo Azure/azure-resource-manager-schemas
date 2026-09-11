@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "A name for the Batch account which must be unique within the region. Batch account names must be between 3 and 24 characters in length and must use only numbers and lowercase letters. This name is used as part of the DNS name that is used to access the Batch service in the region in which the account is created. For example: http://accountname.region.batch.azure.com/.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 24,
@@ -35,7 +35,7 @@
           "description": "The properties of the Batch account.",
           "oneOf": [
             {
-              "$ref": "#/definitions/BatchAccountCreateProperties"
+              "$ref": "#/definitions/BatchAccountCreatePropertiesOrBatchAccountProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -46,13 +46,13 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/batchAccounts_pools_childResource"
-              },
-              {
                 "$ref": "#/definitions/batchAccounts_applications_childResource"
               },
               {
                 "$ref": "#/definitions/batchAccounts_certificates_childResource"
+              },
+              {
+                "$ref": "#/definitions/batchAccounts_pools_childResource"
               }
             ]
           },
@@ -81,6 +81,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -113,7 +114,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The ID of the application.",
+          "description": "The resource name",
           "type": "string"
         },
         "resources": {
@@ -150,7 +151,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The version of the application.",
+          "description": "The resource name",
           "type": "string"
         },
         "type": {
@@ -177,7 +178,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The identifier for the certificate. This must be made up of algorithm and thumbprint separated by a dash, and must match the certificate data in the request. For example SHA1-a3d1c5.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 45,
@@ -194,7 +195,7 @@
           "description": "The properties associated with the certificate.",
           "oneOf": [
             {
-              "$ref": "#/definitions/CertificateCreateOrUpdateProperties"
+              "$ref": "#/definitions/CertificateCreateOrUpdatePropertiesOrCertificateProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -226,7 +227,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The pool name. This must be unique within the account.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 64,
@@ -268,7 +269,6 @@
   },
   "definitions": {
     "ApplicationPackageReference": {
-      "description": "Link to an application package inside the batch account",
       "properties": {
         "id": {
           "description": "The ID of the application package to install. This must be inside the same batch account as the pool. This can either be a reference to a specific version or the default version if one exists.",
@@ -285,7 +285,6 @@
       "type": "object"
     },
     "AutoScaleSettings": {
-      "description": "AutoScale settings for the pool.",
       "properties": {
         "evaluationInterval": {
           "description": "If omitted, the default value is 15 minutes (PT15M).",
@@ -301,8 +300,7 @@
       ],
       "type": "object"
     },
-    "AutoStorageBaseProperties": {
-      "description": "The properties related to the auto-storage account.",
+    "AutoStorageBasePropertiesOrAutoStorageProperties": {
       "properties": {
         "storageAccountId": {
           "description": "The resource ID of the storage account to be used for auto-storage account.",
@@ -315,7 +313,6 @@
       "type": "object"
     },
     "AutoUserSpecification": {
-      "description": "Specifies the parameters for the auto user that runs a task on the Batch service.",
       "properties": {
         "elevationLevel": {
           "description": "nonAdmin - The auto user is a standard user without elevated access. admin - The auto user is a user with elevated access and operates with full Administrator permissions. The default value is nonAdmin.",
@@ -350,14 +347,20 @@
       },
       "type": "object"
     },
-    "BatchAccountCreateProperties": {
-      "description": "The properties of a Batch account.",
+    "BatchAccountCreateParametersTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "BatchAccountCreatePropertiesOrBatchAccountProperties": {
       "properties": {
         "autoStorage": {
           "description": "The properties related to the auto-storage account.",
           "oneOf": [
             {
-              "$ref": "#/definitions/AutoStorageBaseProperties"
+              "$ref": "#/definitions/AutoStorageBasePropertiesOrAutoStorageProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -393,8 +396,7 @@
       },
       "type": "object"
     },
-    "CertificateCreateOrUpdateProperties": {
-      "description": "Certificate properties for create operations",
+    "CertificateCreateOrUpdatePropertiesOrCertificateProperties": {
       "properties": {
         "data": {
           "description": "The maximum size is 10KB.",
@@ -434,7 +436,6 @@
       "type": "object"
     },
     "CertificateReference": {
-      "description": "A reference to a certificate to be installed on compute nodes in a pool. This must exist inside the same account as the pool.",
       "properties": {
         "id": {
           "description": "The fully qualified ID of the certificate to install on the pool. This must be inside the same batch account as the pool.",
@@ -485,7 +486,6 @@
       "type": "object"
     },
     "CloudServiceConfiguration": {
-      "description": "The configuration for nodes in a pool based on the Azure Cloud Services platform.",
       "properties": {
         "currentOSVersion": {
           "description": "This may differ from targetOSVersion if the pool state is Upgrading. In this case some virtual machines may be on the targetOSVersion and some may be on the currentOSVersion during the upgrade process. Once all virtual machines have upgraded, currentOSVersion is updated to be the same as targetOSVersion.",
@@ -506,7 +506,6 @@
       "type": "object"
     },
     "DataDisk": {
-      "description": "Data Disk settings which will be used by the data disks associated to Compute Nodes in the pool.",
       "properties": {
         "caching": {
           "description": "Values are:\n\n none - The caching mode for the disk is not enabled.\n readOnly - The caching mode for the disk is read only.\n readWrite - The caching mode for the disk is read and write.\n\n The default value for caching is none. For information about the caching options see: https://blogs.msdn.microsoft.com/windowsazurestorage/2012/06/27/exploring-windows-azure-drives-disks-and-images/.",
@@ -563,13 +562,12 @@
         }
       },
       "required": [
-        "lun",
-        "diskSizeGB"
+        "diskSizeGB",
+        "lun"
       ],
       "type": "object"
     },
     "DeploymentConfiguration": {
-      "description": "Deployment configuration properties.",
       "properties": {
         "cloudServiceConfiguration": {
           "description": "This property and virtualMachineConfiguration are mutually exclusive and one of the properties must be specified. This property cannot be specified if the Batch account was created with its poolAllocationMode property set to 'UserSubscription'.",
@@ -597,7 +595,6 @@
       "type": "object"
     },
     "EnvironmentSetting": {
-      "description": "An environment variable to be set on a task process.",
       "properties": {
         "name": {
           "description": "The name of the environment variable.",
@@ -614,7 +611,6 @@
       "type": "object"
     },
     "FixedScaleSettings": {
-      "description": "Fixed scale settings for the pool.",
       "properties": {
         "nodeDeallocationOption": {
           "description": "If omitted, the default value is Requeue.",
@@ -663,7 +659,6 @@
       "type": "object"
     },
     "ImageReference": {
-      "description": "A reference to an Azure Virtual Machines Marketplace image or the Azure Image resource of a custom Virtual Machine. To get the list of all imageReferences verified by Azure Batch, see the 'List supported node agent SKUs' operation.",
       "properties": {
         "id": {
           "description": "This property is mutually exclusive with other properties. The virtual machine image must be in the same region and subscription as the Azure Batch account. For information about the firewall settings for Batch node agent to communicate with Batch service see https://docs.microsoft.com/en-us/azure/batch/batch-api-basics#virtual-network-vnet-and-firewall-configuration .",
@@ -689,7 +684,6 @@
       "type": "object"
     },
     "InboundNatPool": {
-      "description": "A inbound NAT pool that can be used to address specific ports on compute nodes in a Batch pool externally.",
       "properties": {
         "backendPort": {
           "description": "This must be unique within a Batch pool. Acceptable values are between 1 and 65535 except for 22, 3389, 29876 and 29877 as these are reserved. If any reserved values are provided the request fails with HTTP status code 400.",
@@ -759,16 +753,15 @@
         }
       },
       "required": [
-        "name",
-        "protocol",
         "backendPort",
+        "frontendPortRangeEnd",
         "frontendPortRangeStart",
-        "frontendPortRangeEnd"
+        "name",
+        "protocol"
       ],
       "type": "object"
     },
     "KeyVaultReference": {
-      "description": "Identifies the Azure key vault associated with a Batch account.",
       "properties": {
         "id": {
           "description": "The resource ID of the Azure key vault associated with the Batch account.",
@@ -786,7 +779,6 @@
       "type": "object"
     },
     "LinuxUserConfiguration": {
-      "description": "Properties used to create a user account on a Linux node.",
       "properties": {
         "gid": {
           "description": "The uid and gid properties must be specified together or not at all. If not specified the underlying operating system picks the gid.",
@@ -818,7 +810,6 @@
       "type": "object"
     },
     "MetadataItem": {
-      "description": "The Batch service does not assign any meaning to this metadata; it is solely for the use of user code.",
       "properties": {
         "name": {
           "description": "The name of the metadata item.",
@@ -836,7 +827,6 @@
       "type": "object"
     },
     "NetworkConfiguration": {
-      "description": "The network configuration for a pool.",
       "properties": {
         "endpointConfiguration": {
           "description": "Pool endpoint configuration is only supported on pools with the virtualMachineConfiguration property.",
@@ -857,7 +847,6 @@
       "type": "object"
     },
     "NetworkSecurityGroupRule": {
-      "description": "A network security group rule to apply to an inbound endpoint.",
       "properties": {
         "access": {
           "description": "The action that should be taken for a specified IP address, subnet range or tag.",
@@ -891,14 +880,13 @@
         }
       },
       "required": [
-        "priority",
         "access",
+        "priority",
         "sourceAddressPrefix"
       ],
       "type": "object"
     },
     "OSDisk": {
-      "description": "Settings for the operating system disk of the virtual machine.",
       "properties": {
         "caching": {
           "description": "Default value is none.",
@@ -920,7 +908,6 @@
       "type": "object"
     },
     "PoolEndpointConfiguration": {
-      "description": "The endpoint configuration for a pool.",
       "properties": {
         "inboundNatPools": {
           "description": "The maximum number of inbound NAT pools per Batch pool is 5. If the maximum number of inbound NAT pools is exceeded the request fails with HTTP status code 400.",
@@ -943,7 +930,6 @@
       "type": "object"
     },
     "PoolProperties": {
-      "description": "Pool properties.",
       "properties": {
         "applicationLicenses": {
           "description": "The list of application licenses must be a subset of available Batch service application licenses. If a license is requested which is not supported, pool creation will fail.",
@@ -1108,7 +1094,6 @@
       "type": "object"
     },
     "ResourceFile": {
-      "description": "A file to be downloaded from Azure blob storage to a compute node.",
       "properties": {
         "blobSource": {
           "description": "This URL must be readable using anonymous access; that is, the Batch service does not present any credentials when downloading the blob. There are two ways to get such a URL for a blob in Azure storage: include a Shared Access Signature (SAS) granting read permissions on the blob, or set the ACL for the blob or its container to allow public access.",
@@ -1130,7 +1115,6 @@
       "type": "object"
     },
     "ScaleSettings": {
-      "description": "Defines the desired size of the pool. This can either be 'fixedScale' where the requested targetDedicatedNodes is specified, or 'autoScale' which defines a formula which is periodically reevaluated. If this property is not specified, the pool will have a fixed scale with 0 targetDedicatedNodes.",
       "properties": {
         "autoScale": {
           "description": "This property and fixedScale are mutually exclusive and one of the properties must be specified.",
@@ -1158,7 +1142,6 @@
       "type": "object"
     },
     "StartTask": {
-      "description": "A task which is run when a compute node joins a pool in the Azure Batch service, or when the compute node is rebooted or reimaged.",
       "properties": {
         "commandLine": {
           "description": "The command line does not run under a shell, and therefore cannot take advantage of shell features such as environment variable expansion. If you want to take advantage of such features, you should invoke the shell in the command line, for example using \"cmd /c MyCommand\" in Windows or \"/bin/sh -c MyCommand\" in Linux. Required if any other properties of the startTask are specified.",
@@ -1229,7 +1212,6 @@
       "type": "object"
     },
     "TaskSchedulingPolicy": {
-      "description": "Specifies how tasks should be distributed across compute nodes.",
       "properties": {
         "nodeFillType": {
           "description": "How tasks should be distributed across compute nodes.",
@@ -1253,7 +1235,6 @@
       "type": "object"
     },
     "UserAccount": {
-      "description": "Properties used to create a user on an Azure Batch node.",
       "properties": {
         "elevationLevel": {
           "description": "nonAdmin - The auto user is a standard user without elevated access. admin - The auto user is a user with elevated access and operates with full Administrator permissions. The default value is nonAdmin.",
@@ -1297,7 +1278,6 @@
       "type": "object"
     },
     "UserIdentity": {
-      "description": "Specify either the userName or autoUser property, but not both.",
       "properties": {
         "autoUser": {
           "description": "The userName and autoUser properties are mutually exclusive; you must specify one but not both.",
@@ -1318,7 +1298,6 @@
       "type": "object"
     },
     "VirtualMachineConfiguration": {
-      "description": "The configuration for compute nodes in a pool based on the Azure Virtual Machines infrastructure.",
       "properties": {
         "dataDisks": {
           "description": "This property must be specified if the compute nodes in the pool need to have empty data disks attached to them.",
@@ -1346,7 +1325,7 @@
           ]
         },
         "licenseType": {
-          "description": "This only applies to images that contain the Windows operating system, and should only be used when you hold valid on-premises licenses for the nodes which will be deployed. If omitted, no on-premises licensing discount is applied. Values are:\n\n Windows_Server - The on-premises license is for Windows Server.\n Windows_Client - The on-premises license is for Windows Client.\n",
+          "description": "This only applies to images that contain the Windows operating system, and should only be used when you hold valid on-premises licenses for the nodes which will be deployed. If omitted, no on-premises licensing discount is applied. Values are:\n\n Windows_Server - The on-premises license is for Windows Server.\n Windows_Client - The on-premises license is for Windows Client.",
           "type": "string"
         },
         "nodeAgentSkuId": {
@@ -1383,7 +1362,6 @@
       "type": "object"
     },
     "WindowsConfiguration": {
-      "description": "Windows operating system settings to apply to the virtual machine.",
       "properties": {
         "enableAutomaticUpdates": {
           "description": "If omitted, the default value is true.",
@@ -1400,7 +1378,7 @@
       "type": "object"
     },
     "batchAccounts_applications_childResource": {
-      "description": "Microsoft.Batch/batchAccounts/applications",
+      "description": "applications",
       "properties": {
         "allowUpdates": {
           "description": "A value indicating whether packages within the application may be overwritten using the same version string.",
@@ -1424,7 +1402,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The ID of the application.",
+          "description": "The resource name",
           "type": "string"
         },
         "type": {
@@ -1442,7 +1420,7 @@
       "type": "object"
     },
     "batchAccounts_applications_versions_childResource": {
-      "description": "Microsoft.Batch/batchAccounts/applications/versions",
+      "description": "versions",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1451,7 +1429,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The version of the application.",
+          "description": "The resource name",
           "type": "string"
         },
         "type": {
@@ -1469,7 +1447,7 @@
       "type": "object"
     },
     "batchAccounts_certificates_childResource": {
-      "description": "Microsoft.Batch/batchAccounts/certificates",
+      "description": "certificates",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1478,7 +1456,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The identifier for the certificate. This must be made up of algorithm and thumbprint separated by a dash, and must match the certificate data in the request. For example SHA1-a3d1c5.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 45,
@@ -1495,7 +1473,7 @@
           "description": "The properties associated with the certificate.",
           "oneOf": [
             {
-              "$ref": "#/definitions/CertificateCreateOrUpdateProperties"
+              "$ref": "#/definitions/CertificateCreateOrUpdatePropertiesOrCertificateProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -1518,7 +1496,7 @@
       "type": "object"
     },
     "batchAccounts_pools_childResource": {
-      "description": "Microsoft.Batch/batchAccounts/pools",
+      "description": "pools",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1527,7 +1505,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The pool name. This must be unique within the account.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 64,

@@ -29,7 +29,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the server.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 63,
@@ -57,16 +57,16 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/flexibleServers_databases_childResource"
-              },
-              {
-                "$ref": "#/definitions/flexibleServers_firewallRules_childResource"
-              },
-              {
                 "$ref": "#/definitions/flexibleServers_administrators_childResource"
               },
               {
                 "$ref": "#/definitions/flexibleServers_configurations_childResource"
+              },
+              {
+                "$ref": "#/definitions/flexibleServers_databases_childResource"
+              },
+              {
+                "$ref": "#/definitions/flexibleServers_firewallRules_childResource"
               }
             ]
           },
@@ -106,6 +106,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -123,14 +124,14 @@
           "type": "string"
         },
         "name": {
-          "description": "Guid of the objectId for the administrator.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "Properties of the active directory administrator.",
           "oneOf": [
             {
-              "$ref": "#/definitions/AdministratorPropertiesForAdd"
+              "$ref": "#/definitions/AdministratorPropertiesForAddOrAdministratorProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -162,7 +163,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the server configuration.",
+          "description": "The resource name",
           "oneOf": [
             {
               "minLength": 1,
@@ -210,7 +211,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the database.",
+          "description": "The resource name",
           "oneOf": [
             {
               "minLength": 1,
@@ -258,7 +259,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the server firewall rule.",
+          "description": "The resource name",
           "oneOf": [
             {
               "minLength": 1,
@@ -298,8 +299,7 @@
     }
   },
   "definitions": {
-    "AdministratorPropertiesForAdd": {
-      "description": "The properties of an Active Directory administrator.",
+    "AdministratorPropertiesForAddOrAdministratorProperties": {
       "properties": {
         "principalName": {
           "description": "Active Directory administrator principal name.",
@@ -330,7 +330,6 @@
       "type": "object"
     },
     "AuthConfig": {
-      "description": "Authentication configuration properties of a server",
       "properties": {
         "activeDirectoryAuthEnabled": {
           "description": "If true, Azure Active Directory authentication is enabled.",
@@ -347,7 +346,6 @@
           "description": "If true, Password authentication is enabled.",
           "oneOf": [
             {
-              "default": true,
               "type": "boolean"
             },
             {
@@ -356,7 +354,6 @@
           ]
         },
         "tenantId": {
-          "default": "",
           "description": "Tenant id of the server.",
           "type": "string"
         }
@@ -364,13 +361,11 @@
       "type": "object"
     },
     "Backup": {
-      "description": "Backup properties of a server",
       "properties": {
         "backupRetentionDays": {
           "description": "Backup retention days for the server.",
           "oneOf": [
             {
-              "default": 7,
               "type": "integer"
             },
             {
@@ -397,7 +392,6 @@
       "type": "object"
     },
     "ConfigurationProperties": {
-      "description": "The properties of a configuration.",
       "properties": {
         "source": {
           "description": "Source of the configuration.",
@@ -410,37 +404,7 @@
       },
       "type": "object"
     },
-    "DataEncryption": {
-      "description": "Data encryption properties of a server",
-      "properties": {
-        "primaryKeyURI": {
-          "description": "URI for the key for data encryption for primary server.",
-          "type": "string"
-        },
-        "primaryUserAssignedIdentityId": {
-          "description": "Resource Id for the User assigned identity to be used for data encryption for primary server.",
-          "type": "string"
-        },
-        "type": {
-          "description": "Data encryption type to depict if it is System assigned vs Azure Key vault.",
-          "oneOf": [
-            {
-              "enum": [
-                "SystemAssigned",
-                "AzureKeyVault"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "type": "object"
-    },
     "DatabaseProperties": {
-      "description": "The properties of a database.",
       "properties": {
         "charset": {
           "description": "The charset of the database.",
@@ -469,8 +433,35 @@
       },
       "type": "object"
     },
+    "DataEncryption": {
+      "properties": {
+        "primaryKeyURI": {
+          "description": "URI for the key for data encryption for primary server.",
+          "type": "string"
+        },
+        "primaryUserAssignedIdentityId": {
+          "description": "Resource Id for the User assigned identity to be used for data encryption for primary server.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Data encryption type to depict if it is System assigned vs Azure Key vault.",
+          "oneOf": [
+            {
+              "enum": [
+                "SystemAssigned",
+                "AzureKeyVault"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
     "FirewallRuleProperties": {
-      "description": "The properties of a server firewall rule.",
       "properties": {
         "endIpAddress": {
           "description": "The end IP address of the server firewall rule. Must be IPv4 format.",
@@ -498,13 +489,12 @@
         }
       },
       "required": [
-        "startIpAddress",
-        "endIpAddress"
+        "endIpAddress",
+        "startIpAddress"
       ],
       "type": "object"
     },
     "HighAvailability": {
-      "description": "High availability properties of a server",
       "properties": {
         "mode": {
           "description": "The HA mode for the server.",
@@ -523,7 +513,6 @@
           ]
         },
         "standbyAvailabilityZone": {
-          "default": "",
           "description": "availability zone information of the standby.",
           "type": "string"
         }
@@ -531,10 +520,8 @@
       "type": "object"
     },
     "MaintenanceWindow": {
-      "description": "Maintenance window properties of a server.",
       "properties": {
         "customWindow": {
-          "default": "Disabled",
           "description": "indicates whether custom window is enabled or disabled",
           "type": "string"
         },
@@ -542,7 +529,6 @@
           "description": "day of week for maintenance window",
           "oneOf": [
             {
-              "default": 0,
               "type": "integer"
             },
             {
@@ -554,7 +540,6 @@
           "description": "start hour for maintenance window",
           "oneOf": [
             {
-              "default": 0,
               "type": "integer"
             },
             {
@@ -566,7 +551,6 @@
           "description": "start minute for maintenance window",
           "oneOf": [
             {
-              "default": 0,
               "type": "integer"
             },
             {
@@ -578,15 +562,12 @@
       "type": "object"
     },
     "Network": {
-      "description": "Network properties of a server",
       "properties": {
         "delegatedSubnetResourceId": {
-          "default": "",
           "description": "delegated subnet arm resource id.",
           "type": "string"
         },
         "privateDnsZoneArmResourceId": {
-          "default": "",
           "description": "private dns zone arm resource id.",
           "type": "string"
         }
@@ -594,7 +575,6 @@
       "type": "object"
     },
     "ServerProperties": {
-      "description": "The properties of a server.",
       "properties": {
         "administratorLogin": {
           "description": "The administrator's login name of a server. Can only be specified when the server is being created (and is required for creation).",
@@ -616,7 +596,6 @@
           ]
         },
         "availabilityZone": {
-          "default": "",
           "description": "availability zone information of the server.",
           "type": "string"
         },
@@ -696,7 +675,6 @@
         },
         "pointInTimeUTC": {
           "description": "Restore point creation time (ISO8601 format), specifying the time to restore from. It's required when 'createMode' is 'PointInTimeRestore' or 'GeoRestore'.",
-          "format": "date-time",
           "type": "string"
         },
         "replicaCapacity": {
@@ -763,7 +741,6 @@
       "type": "object"
     },
     "Sku": {
-      "description": "Sku information related properties of a server.",
       "properties": {
         "name": {
           "description": "The name of the sku, typically, tier + family + cores, e.g. Standard_D4s_v3.",
@@ -793,7 +770,6 @@
       "type": "object"
     },
     "Storage": {
-      "description": "Storage properties of a server",
       "properties": {
         "storageSizeGB": {
           "description": "Max storage allowed for a server.",
@@ -809,8 +785,14 @@
       },
       "type": "object"
     },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "UserAssignedIdentity": {
-      "description": "Information describing the identities associated with this application.",
       "properties": {
         "type": {
           "description": "the types of identities associated with this resource; currently restricted to 'SystemAssigned and UserAssigned'",
@@ -849,8 +831,14 @@
       ],
       "type": "object"
     },
+    "UserAssignedIdentityMap": {
+      "additionalProperties": {
+        "$ref": "#/definitions/UserIdentity"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "UserIdentity": {
-      "description": "Describes a single user-assigned identity associated with the application.",
       "properties": {
         "clientId": {
           "description": "the client identifier of the Service Principal which this identity represents.",
@@ -864,7 +852,7 @@
       "type": "object"
     },
     "flexibleServers_administrators_childResource": {
-      "description": "Microsoft.DBforPostgreSQL/flexibleServers/administrators",
+      "description": "administrators",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -873,14 +861,14 @@
           "type": "string"
         },
         "name": {
-          "description": "Guid of the objectId for the administrator.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "Properties of the active directory administrator.",
           "oneOf": [
             {
-              "$ref": "#/definitions/AdministratorPropertiesForAdd"
+              "$ref": "#/definitions/AdministratorPropertiesForAddOrAdministratorProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -903,7 +891,7 @@
       "type": "object"
     },
     "flexibleServers_configurations_childResource": {
-      "description": "Microsoft.DBforPostgreSQL/flexibleServers/configurations",
+      "description": "configurations",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -912,7 +900,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the server configuration.",
+          "description": "The resource name",
           "oneOf": [
             {
               "minLength": 1,
@@ -951,7 +939,7 @@
       "type": "object"
     },
     "flexibleServers_databases_childResource": {
-      "description": "Microsoft.DBforPostgreSQL/flexibleServers/databases",
+      "description": "databases",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -960,7 +948,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the database.",
+          "description": "The resource name",
           "oneOf": [
             {
               "minLength": 1,
@@ -999,7 +987,7 @@
       "type": "object"
     },
     "flexibleServers_firewallRules_childResource": {
-      "description": "Microsoft.DBforPostgreSQL/flexibleServers/firewallRules",
+      "description": "firewallRules",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1008,7 +996,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the server firewall rule.",
+          "description": "The resource name",
           "oneOf": [
             {
               "minLength": 1,

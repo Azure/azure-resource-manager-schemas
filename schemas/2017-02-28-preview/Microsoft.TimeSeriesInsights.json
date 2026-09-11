@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the environment",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 90,
@@ -35,7 +35,7 @@
           "description": "Properties used to create an environment.",
           "oneOf": [
             {
-              "$ref": "#/definitions/EnvironmentCreationProperties"
+              "$ref": "#/definitions/EnvironmentCreationPropertiesOrEnvironmentResourceProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -46,10 +46,10 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/environments_eventSources_childResource"
+                "$ref": "#/definitions/environments_accessPolicies_childResource"
               },
               {
-                "$ref": "#/definitions/environments_accessPolicies_childResource"
+                "$ref": "#/definitions/environments_eventSources_childResource"
               },
               {
                 "$ref": "#/definitions/environments_referenceDataSets_childResource"
@@ -92,8 +92,10 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
+        "sku",
         "apiVersion",
         "type"
       ],
@@ -109,7 +111,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the access policy.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 90,
@@ -149,6 +151,98 @@
     },
     "environments_eventSources": {
       "description": "Microsoft.TimeSeriesInsights/environments/eventSources",
+      "oneOf": [
+        {
+          "properties": {
+            "kind": {
+              "description": "The kind of the event source.",
+              "oneOf": [
+                {
+                  "enum": [
+                    "Microsoft.EventHub"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "properties": {
+              "description": "Properties of the EventHub event source that are required on create or update requests.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/EventHubEventSourceCreationPropertiesOrEventHubEventSourceResourceProperties"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "properties"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "description": "The kind of the event source.",
+              "oneOf": [
+                {
+                  "enum": [
+                    "Microsoft.IoTHub"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "properties": {
+              "description": "Properties of the IoTHub event source that are required on create or update requests.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/IoTHubEventSourceCreationProperties"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "properties"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "description": "The kind of the event source.",
+              "oneOf": [
+                {
+                  "enum": [
+                    "Microsoft.IotHub"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        }
+      ],
       "properties": {
         "apiVersion": {
           "enum": [
@@ -161,7 +255,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the event source.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 90,
@@ -197,11 +291,11 @@
         }
       },
       "required": [
+        "location",
         "name",
         "apiVersion",
         "type"
-      ],
-      "type": "object"
+      ]
     },
     "environments_referenceDataSets": {
       "description": "Microsoft.TimeSeriesInsights/environments/referenceDataSets",
@@ -217,7 +311,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the reference data set.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 63,
@@ -234,7 +328,7 @@
           "description": "Properties used to create a reference data set.",
           "oneOf": [
             {
-              "$ref": "#/definitions/ReferenceDataSetCreationProperties"
+              "$ref": "#/definitions/ReferenceDataSetCreationPropertiesOrReferenceDataSetResourceProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -264,6 +358,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -304,8 +399,14 @@
       },
       "type": "object"
     },
-    "EnvironmentCreationProperties": {
-      "description": "Properties used to create an environment.",
+    "CreateOrUpdateTrackedResourcePropertiesTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "EnvironmentCreationPropertiesOrEnvironmentResourceProperties": {
       "properties": {
         "dataRetentionTime": {
           "description": "ISO8601 timespan specifying the minimum number of days the environment's events will be available for query.",
@@ -332,8 +433,174 @@
       ],
       "type": "object"
     },
-    "ReferenceDataSetCreationProperties": {
-      "description": "Properties used to create a reference data set.",
+    "EventHubEventSourceCreateOrUpdateParametersOrEventHubEventSourceResource": {
+      "properties": {
+        "kind": {
+          "description": "The kind of the event source.",
+          "oneOf": [
+            {
+              "enum": [
+                "Microsoft.EventHub"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "description": "Properties of the EventHub event source that are required on create or update requests.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EventHubEventSourceCreationPropertiesOrEventHubEventSourceResourceProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "properties"
+      ],
+      "type": "object"
+    },
+    "EventHubEventSourceCreationPropertiesOrEventHubEventSourceResourceProperties": {
+      "properties": {
+        "consumerGroupName": {
+          "description": "The name of the event hub's consumer group that holds the partitions from which events will be read.",
+          "type": "string"
+        },
+        "eventHubName": {
+          "description": "The name of the event hub.",
+          "type": "string"
+        },
+        "eventSourceResourceId": {
+          "description": "The resource id of the event source in Azure Resource Manager.",
+          "type": "string"
+        },
+        "keyName": {
+          "description": "The name of the SAS key that grants the Time Series Insights service access to the event hub. The shared access policies for this key must grant 'Listen' permissions to the event hub.",
+          "type": "string"
+        },
+        "serviceBusNamespace": {
+          "description": "The name of the service bus that contains the event hub.",
+          "type": "string"
+        },
+        "sharedAccessKey": {
+          "description": "The value of the shared access key that grants the Time Series Insights service read access to the event hub. This property is not shown in event source responses.",
+          "type": "string"
+        },
+        "timestampPropertyName": {
+          "description": "The event property that will be used as the event source's timestamp. If a value isn't specified for timestampPropertyName, or if null or empty-string is specified, the event creation time will be used.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "consumerGroupName",
+        "eventHubName",
+        "eventSourceResourceId",
+        "keyName",
+        "serviceBusNamespace",
+        "sharedAccessKey"
+      ],
+      "type": "object"
+    },
+    "IoTHubEventSourceCreateOrUpdateParameters": {
+      "properties": {
+        "kind": {
+          "description": "The kind of the event source.",
+          "oneOf": [
+            {
+              "enum": [
+                "Microsoft.IoTHub"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "description": "Properties of the IoTHub event source that are required on create or update requests.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/IoTHubEventSourceCreationProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "properties"
+      ],
+      "type": "object"
+    },
+    "IoTHubEventSourceCreationProperties": {
+      "properties": {
+        "consumerGroupName": {
+          "description": "The name of the iot hub's consumer group that holds the partitions from which events will be read.",
+          "type": "string"
+        },
+        "eventSourceResourceId": {
+          "description": "The resource id of the event source in Azure Resource Manager.",
+          "type": "string"
+        },
+        "iotHubName": {
+          "description": "The name of the iot hub.",
+          "type": "string"
+        },
+        "keyName": {
+          "description": "The name of the Shared Access Policy key that grants the Time Series Insights service access to the iot hub. This shared access policy key must grant 'service connect' permissions to the iot hub.",
+          "type": "string"
+        },
+        "sharedAccessKey": {
+          "description": "The value of the Shared Access Policy key that grants the Time Series Insights service read access to the iot hub. This property is not shown in event source responses.",
+          "type": "string"
+        },
+        "timestampPropertyName": {
+          "description": "The event property that will be used as the event source's timestamp. If a value isn't specified for timestampPropertyName, or if null or empty-string is specified, the event creation time will be used.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "consumerGroupName",
+        "eventSourceResourceId",
+        "iotHubName",
+        "keyName",
+        "sharedAccessKey"
+      ],
+      "type": "object"
+    },
+    "IoTHubEventSourceResource": {
+      "properties": {
+        "kind": {
+          "description": "The kind of the event source.",
+          "oneOf": [
+            {
+              "enum": [
+                "Microsoft.IotHub"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "type": "object"
+    },
+    "ReferenceDataSetCreationPropertiesOrReferenceDataSetResourceProperties": {
       "properties": {
         "keyProperties": {
           "description": "The list of key properties for the reference data set.",
@@ -356,7 +623,6 @@
       "type": "object"
     },
     "ReferenceDataSetKeyProperty": {
-      "description": "A key property for the reference data set. A reference data set can have multiple key properties.",
       "properties": {
         "name": {
           "description": "The name of the key property.",
@@ -383,7 +649,6 @@
       "type": "object"
     },
     "Sku": {
-      "description": "The sku determines the capacity of the environment, the SLA (in queries-per-minute and total capacity), and the billing rate.",
       "properties": {
         "capacity": {
           "description": "The capacity of the sku. This value can be changed to support scale out of environments after they have been created.",
@@ -415,13 +680,13 @@
         }
       },
       "required": [
-        "name",
-        "capacity"
+        "capacity",
+        "name"
       ],
       "type": "object"
     },
     "environments_accessPolicies_childResource": {
-      "description": "Microsoft.TimeSeriesInsights/environments/accessPolicies",
+      "description": "accessPolicies",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -430,7 +695,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the access policy.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 90,
@@ -469,7 +734,99 @@
       "type": "object"
     },
     "environments_eventSources_childResource": {
-      "description": "Microsoft.TimeSeriesInsights/environments/eventSources",
+      "description": "eventSources",
+      "oneOf": [
+        {
+          "properties": {
+            "kind": {
+              "description": "The kind of the event source.",
+              "oneOf": [
+                {
+                  "enum": [
+                    "Microsoft.EventHub"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "properties": {
+              "description": "Properties of the EventHub event source that are required on create or update requests.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/EventHubEventSourceCreationPropertiesOrEventHubEventSourceResourceProperties"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "properties"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "description": "The kind of the event source.",
+              "oneOf": [
+                {
+                  "enum": [
+                    "Microsoft.IoTHub"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "properties": {
+              "description": "Properties of the IoTHub event source that are required on create or update requests.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/IoTHubEventSourceCreationProperties"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "properties"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "description": "The kind of the event source.",
+              "oneOf": [
+                {
+                  "enum": [
+                    "Microsoft.IotHub"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "type": "object"
+        }
+      ],
       "properties": {
         "apiVersion": {
           "enum": [
@@ -482,7 +839,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the event source.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 90,
@@ -518,14 +875,14 @@
         }
       },
       "required": [
+        "location",
         "name",
         "apiVersion",
         "type"
-      ],
-      "type": "object"
+      ]
     },
     "environments_referenceDataSets_childResource": {
-      "description": "Microsoft.TimeSeriesInsights/environments/referenceDataSets",
+      "description": "referenceDataSets",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -538,7 +895,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the reference data set.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 63,
@@ -555,7 +912,7 @@
           "description": "Properties used to create a reference data set.",
           "oneOf": [
             {
-              "$ref": "#/definitions/ReferenceDataSetCreationProperties"
+              "$ref": "#/definitions/ReferenceDataSetCreationPropertiesOrReferenceDataSetResourceProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -585,6 +942,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",

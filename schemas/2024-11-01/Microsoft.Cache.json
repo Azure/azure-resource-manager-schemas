@@ -29,14 +29,14 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the RedisResource",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "Redis cache properties.",
           "oneOf": [
             {
-              "$ref": "#/definitions/RedisCreateProperties"
+              "$ref": "#/definitions/RedisCreatePropertiesOrRedisProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -47,19 +47,19 @@
           "items": {
             "oneOf": [
               {
+                "$ref": "#/definitions/redis_accessPolicies_childResource"
+              },
+              {
+                "$ref": "#/definitions/redis_accessPolicyAssignments_childResource"
+              },
+              {
                 "$ref": "#/definitions/redis_firewallRules_childResource"
               },
               {
                 "$ref": "#/definitions/redis_linkedServers_childResource"
               },
               {
-                "$ref": "#/definitions/redis_accessPolicies_childResource"
-              },
-              {
                 "$ref": "#/definitions/redis_patchSchedules_childResource"
-              },
-              {
-                "$ref": "#/definitions/redis_accessPolicyAssignments_childResource"
               },
               {
                 "$ref": "#/definitions/redis_privateEndpointConnections_childResource"
@@ -105,6 +105,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -122,7 +123,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the access policy that is being added to the Redis cache.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 63,
@@ -171,7 +172,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the access policy assignment.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 63,
@@ -220,7 +221,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the firewall rule.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -259,14 +260,14 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the RedisLinkedServerWithProperties",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "Properties required to create a linked server.",
           "oneOf": [
             {
-              "$ref": "#/definitions/RedisLinkedServerCreateProperties"
+              "$ref": "#/definitions/RedisLinkedServerCreatePropertiesOrRedisLinkedServerProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -298,7 +299,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the RedisPatchSchedule",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*/default$",
@@ -345,7 +346,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the private endpoint connection associated with the Azure resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -377,7 +378,6 @@
   },
   "definitions": {
     "ManagedServiceIdentity": {
-      "description": "Managed service identity (system assigned and/or user assigned identities)",
       "properties": {
         "type": {
           "description": "Type of managed service identity (where both SystemAssigned and UserAssigned types are allowed).",
@@ -418,12 +418,10 @@
       "type": "object"
     },
     "PrivateEndpoint": {
-      "description": "The private endpoint resource.",
       "properties": {},
       "type": "object"
     },
     "PrivateEndpointConnectionProperties": {
-      "description": "Properties of the private endpoint connection.",
       "properties": {
         "privateEndpoint": {
           "description": "The private endpoint resource.",
@@ -454,7 +452,6 @@
       "type": "object"
     },
     "PrivateLinkServiceConnectionState": {
-      "description": "A collection of information about the state of the connection between service consumer and provider.",
       "properties": {
         "actionsRequired": {
           "description": "A message indicating if changes on the service provider require any updates on the consumer.",
@@ -484,7 +481,6 @@
       "type": "object"
     },
     "RedisCacheAccessPolicyAssignmentProperties": {
-      "description": "Properties for an access policy assignment",
       "properties": {
         "accessPolicyName": {
           "description": "The name of the access policy that is being assigned",
@@ -508,14 +504,13 @@
         }
       },
       "required": [
+        "accessPolicyName",
         "objectId",
-        "objectIdAlias",
-        "accessPolicyName"
+        "objectIdAlias"
       ],
       "type": "object"
     },
     "RedisCacheAccessPolicyProperties": {
-      "description": "All properties of an access policy.",
       "properties": {
         "permissions": {
           "description": "Permissions for the access policy. Learn how to configure permissions at https://aka.ms/redis/AADPreRequisites",
@@ -529,7 +524,6 @@
     },
     "RedisCommonPropertiesRedisConfiguration": {
       "additionalProperties": {},
-      "description": "All Redis Settings. Few possible keys: rdb-backup-enabled,rdb-storage-connection-string,rdb-backup-frequency,maxmemory-delta, maxmemory-policy,notify-keyspace-events, aof-backup-enabled, aof-storage-connection-string-0, aof-storage-connection-string-1 etc.",
       "properties": {
         "aad-enabled": {
           "description": "Specifies whether AAD based authentication has been enabled or disabled for the cache",
@@ -598,14 +592,26 @@
       },
       "type": "object"
     },
-    "RedisCreateProperties": {
-      "description": "Properties supplied to Create Redis operation.",
+    "RedisCommonPropertiesTenantSettings": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "RedisCreateParametersTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "RedisCreatePropertiesOrRedisProperties": {
       "properties": {
         "disableAccessKeyAuthentication": {
           "description": "Authentication to Redis through access keys is disabled when set as true. Default value is false.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -617,7 +623,6 @@
           "description": "Specifies whether the non-ssl Redis server port (6379) is enabled.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -792,7 +797,6 @@
       "type": "object"
     },
     "RedisFirewallRuleProperties": {
-      "description": "Specifies a range of IP addresses permitted to connect to the cache",
       "properties": {
         "endIP": {
           "description": "highest IP address included in the range",
@@ -804,13 +808,12 @@
         }
       },
       "required": [
-        "startIP",
-        "endIP"
+        "endIP",
+        "startIP"
       ],
       "type": "object"
     },
-    "RedisLinkedServerCreateProperties": {
-      "description": "Create properties for a linked server",
+    "RedisLinkedServerCreatePropertiesOrRedisLinkedServerProperties": {
       "properties": {
         "linkedRedisCacheId": {
           "description": "Fully qualified resourceId of the linked redis cache.",
@@ -844,7 +847,6 @@
       "type": "object"
     },
     "ScheduleEntries": {
-      "description": "List of patch schedules for a Redis cache.",
       "properties": {
         "scheduleEntries": {
           "description": "List of patch schedules for a Redis cache.",
@@ -867,7 +869,6 @@
       "type": "object"
     },
     "ScheduleEntry": {
-      "description": "Patch schedule entry for a Premium Redis Cache.",
       "properties": {
         "dayOfWeek": {
           "description": "Day of the week when a cache can be patched.",
@@ -914,7 +915,6 @@
       "type": "object"
     },
     "Sku": {
-      "description": "SKU parameters supplied to the create Redis operation.",
       "properties": {
         "capacity": {
           "description": "The size of the Redis cache to deploy. Valid values: for C (Basic/Standard) family (0, 1, 2, 3, 4, 5, 6), for P (Premium) family (1, 2, 3, 4).",
@@ -960,19 +960,25 @@
         }
       },
       "required": [
-        "name",
+        "capacity",
         "family",
-        "capacity"
+        "name"
       ],
       "type": "object"
     },
+    "UserAssignedIdentities": {
+      "additionalProperties": {
+        "$ref": "#/definitions/UserAssignedIdentity"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "UserAssignedIdentity": {
-      "description": "User assigned identity properties",
       "properties": {},
       "type": "object"
     },
     "redis_accessPolicies_childResource": {
-      "description": "Microsoft.Cache/redis/accessPolicies",
+      "description": "accessPolicies",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -981,7 +987,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the access policy that is being added to the Redis cache.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 63,
@@ -1021,7 +1027,7 @@
       "type": "object"
     },
     "redis_accessPolicyAssignments_childResource": {
-      "description": "Microsoft.Cache/redis/accessPolicyAssignments",
+      "description": "accessPolicyAssignments",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1030,7 +1036,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the access policy assignment.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 63,
@@ -1070,7 +1076,7 @@
       "type": "object"
     },
     "redis_firewallRules_childResource": {
-      "description": "Microsoft.Cache/redis/firewallRules",
+      "description": "firewallRules",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1079,7 +1085,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the firewall rule.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -1109,7 +1115,7 @@
       "type": "object"
     },
     "redis_linkedServers_childResource": {
-      "description": "Microsoft.Cache/redis/linkedServers",
+      "description": "linkedServers",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1118,14 +1124,14 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the RedisLinkedServerWithProperties",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "Properties required to create a linked server.",
           "oneOf": [
             {
-              "$ref": "#/definitions/RedisLinkedServerCreateProperties"
+              "$ref": "#/definitions/RedisLinkedServerCreatePropertiesOrRedisLinkedServerProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -1148,7 +1154,7 @@
       "type": "object"
     },
     "redis_patchSchedules_childResource": {
-      "description": "Microsoft.Cache/redis/patchSchedules",
+      "description": "patchSchedules",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1157,7 +1163,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the RedisPatchSchedule",
+          "description": "The resource name",
           "oneOf": [
             {
               "enum": [
@@ -1197,7 +1203,7 @@
       "type": "object"
     },
     "redis_privateEndpointConnections_childResource": {
-      "description": "Microsoft.Cache/redis/privateEndpointConnections",
+      "description": "privateEndpointConnections",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1206,7 +1212,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the private endpoint connection associated with the Azure resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {

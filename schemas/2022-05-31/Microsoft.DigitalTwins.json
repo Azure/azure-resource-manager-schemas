@@ -29,7 +29,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the DigitalTwinsInstance.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 63,
@@ -92,6 +92,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -109,7 +110,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of Endpoint Resource.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 49,
@@ -158,7 +159,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the private endpoint connection.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -197,7 +198,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of time series database connection.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 49,
@@ -238,8 +239,67 @@
     }
   },
   "definitions": {
+    "AzureDataExplorerConnectionProperties": {
+      "properties": {
+        "adxDatabaseName": {
+          "description": "The name of the Azure Data Explorer database.",
+          "type": "string"
+        },
+        "adxEndpointUri": {
+          "description": "The URI of the Azure Data Explorer endpoint.",
+          "type": "string"
+        },
+        "adxResourceId": {
+          "description": "The resource ID of the Azure Data Explorer cluster.",
+          "type": "string"
+        },
+        "adxTableName": {
+          "description": "The name of the Azure Data Explorer table. Defaults to AdtPropertyEvents.",
+          "type": "string"
+        },
+        "connectionType": {
+          "description": "The type of time series connection resource.",
+          "oneOf": [
+            {
+              "enum": [
+                "AzureDataExplorer"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "eventHubConsumerGroup": {
+          "description": "The EventHub consumer group to use when ADX reads from EventHub. Defaults to $Default.",
+          "type": "string"
+        },
+        "eventHubEndpointUri": {
+          "description": "The URL of the EventHub namespace for identity-based authentication. It must include the protocol sb://",
+          "type": "string"
+        },
+        "eventHubEntityPath": {
+          "description": "The EventHub name in the EventHub namespace for identity-based authentication.",
+          "type": "string"
+        },
+        "eventHubNamespaceResourceId": {
+          "description": "The resource ID of the EventHub namespace.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "adxDatabaseName",
+        "adxEndpointUri",
+        "adxResourceId",
+        "connectionType",
+        "eventHubEndpointUri",
+        "eventHubEntityPath",
+        "eventHubNamespaceResourceId"
+      ],
+      "type": "object"
+    },
     "ConnectionProperties": {
-      "description": "The properties of a private endpoint connection.",
       "properties": {
         "groupIds": {
           "description": "The list of group ids for the private endpoint connection.",
@@ -281,7 +341,6 @@
       "type": "object"
     },
     "ConnectionPropertiesPrivateLinkServiceConnectionState": {
-      "description": "The connection state.",
       "properties": {
         "actionsRequired": {
           "description": "Actions required for a private endpoint connection.",
@@ -310,135 +369,114 @@
         }
       },
       "required": [
-        "status",
-        "description"
+        "description",
+        "status"
       ],
       "type": "object"
     },
     "DigitalTwinsEndpointResourceProperties": {
-      "description": "Properties related to Digital Twins Endpoint",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Properties related to EventGrid.",
+          "additionalProperties": false,
           "properties": {
-            "TopicEndpoint": {
-              "description": "EventGrid Topic Endpoint.",
+            "authenticationType": {
+              "description": "Specifies the authentication type being used for connecting to the endpoint. Defaults to 'KeyBased'. If 'KeyBased' is selected, a connection string must be specified (at least the primary connection string). If 'IdentityBased' is select, the endpointUri and entityPath properties must be specified.",
+              "oneOf": [
+                {
+                  "enum": [
+                    "KeyBased",
+                    "IdentityBased"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "deadLetterSecret": {
+              "description": "Dead letter storage secret for key-based authentication. Will be obfuscated during read.",
               "type": "string"
             },
-            "accessKey1": {
-              "description": "EventGrid secondary accesskey. Will be obfuscated during read.",
-              "type": "string"
-            },
-            "accessKey2": {
-              "description": "EventGrid secondary accesskey. Will be obfuscated during read.",
+            "deadLetterUri": {
+              "description": "Dead letter storage URL for identity-based authentication.",
               "type": "string"
             },
             "endpointType": {
               "enum": [
-                "EventGrid"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "TopicEndpoint",
-            "accessKey1",
-            "endpointType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Properties related to EventHub.",
-          "properties": {
-            "connectionStringPrimaryKey": {
-              "description": "PrimaryConnectionString of the endpoint for key-based authentication. Will be obfuscated during read.",
-              "type": "string"
-            },
-            "connectionStringSecondaryKey": {
-              "description": "SecondaryConnectionString of the endpoint for key-based authentication. Will be obfuscated during read.",
-              "type": "string"
-            },
-            "endpointType": {
-              "enum": [
-                "EventHub"
-              ],
-              "type": "string"
-            },
-            "endpointUri": {
-              "description": "The URL of the EventHub namespace for identity-based authentication. It must include the protocol 'sb://'.",
-              "type": "string"
-            },
-            "entityPath": {
-              "description": "The EventHub name in the EventHub namespace for identity-based authentication.",
-              "type": "string"
-            }
-          },
-          "required": [
-            "endpointType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Properties related to ServiceBus.",
-          "properties": {
-            "endpointType": {
-              "enum": [
+                "EventGrid",
+                "EventHub",
                 "ServiceBus"
               ],
               "type": "string"
-            },
-            "endpointUri": {
-              "description": "The URL of the ServiceBus namespace for identity-based authentication. It must include the protocol 'sb://'.",
-              "type": "string"
-            },
-            "entityPath": {
-              "description": "The ServiceBus Topic name for identity-based authentication.",
-              "type": "string"
-            },
-            "primaryConnectionString": {
-              "description": "PrimaryConnectionString of the endpoint for key-based authentication. Will be obfuscated during read.",
-              "type": "string"
-            },
-            "secondaryConnectionString": {
-              "description": "SecondaryConnectionString of the endpoint for key-based authentication. Will be obfuscated during read.",
-              "type": "string"
             }
           },
           "required": [
             "endpointType"
           ],
           "type": "object"
-        }
-      ],
-      "properties": {
-        "authenticationType": {
-          "description": "Specifies the authentication type being used for connecting to the endpoint. Defaults to 'KeyBased'. If 'KeyBased' is selected, a connection string must be specified (at least the primary connection string). If 'IdentityBased' is select, the endpointUri and entityPath properties must be specified.",
+        },
+        {
           "oneOf": [
             {
-              "enum": [
-                "KeyBased",
-                "IdentityBased"
-              ],
-              "type": "string"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/EventGrid"
+                },
+                {
+                  "properties": {
+                    "endpointType": {
+                      "const": "EventGrid"
+                    }
+                  },
+                  "required": [
+                    "endpointType"
+                  ],
+                  "type": "object"
+                }
+              ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/EventHub"
+                },
+                {
+                  "properties": {
+                    "endpointType": {
+                      "const": "EventHub"
+                    }
+                  },
+                  "required": [
+                    "endpointType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ServiceBus"
+                },
+                {
+                  "properties": {
+                    "endpointType": {
+                      "const": "ServiceBus"
+                    }
+                  },
+                  "required": [
+                    "endpointType"
+                  ],
+                  "type": "object"
+                }
+              ]
             }
           ]
-        },
-        "deadLetterSecret": {
-          "description": "Dead letter storage secret for key-based authentication. Will be obfuscated during read.",
-          "type": "string"
-        },
-        "deadLetterUri": {
-          "description": "Dead letter storage URL for identity-based authentication.",
-          "type": "string"
         }
-      },
-      "type": "object"
+      ]
     },
     "DigitalTwinsIdentity": {
-      "description": "The managed identity for the DigitalTwinsInstance.",
       "properties": {
         "type": {
           "description": "The type of Managed Identity used by the DigitalTwinsInstance. Only SystemAssigned is supported.",
@@ -459,7 +497,6 @@
       "type": "object"
     },
     "DigitalTwinsProperties": {
-      "description": "The properties of a DigitalTwinsInstance.",
       "properties": {
         "privateEndpointConnections": {
           "description": "The private endpoint connections.",
@@ -493,13 +530,92 @@
       },
       "type": "object"
     },
+    "DigitalTwinsResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "EventGrid": {
+      "properties": {
+        "accessKey1": {
+          "description": "EventGrid secondary accesskey. Will be obfuscated during read.",
+          "type": "string"
+        },
+        "accessKey2": {
+          "description": "EventGrid secondary accesskey. Will be obfuscated during read.",
+          "type": "string"
+        },
+        "endpointType": {
+          "description": "The type of Digital Twins endpoint",
+          "oneOf": [
+            {
+              "enum": [
+                "EventGrid"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "TopicEndpoint": {
+          "description": "EventGrid Topic Endpoint.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "accessKey1",
+        "endpointType",
+        "TopicEndpoint"
+      ],
+      "type": "object"
+    },
+    "EventHub": {
+      "properties": {
+        "connectionStringPrimaryKey": {
+          "description": "PrimaryConnectionString of the endpoint for key-based authentication. Will be obfuscated during read.",
+          "type": "string"
+        },
+        "connectionStringSecondaryKey": {
+          "description": "SecondaryConnectionString of the endpoint for key-based authentication. Will be obfuscated during read.",
+          "type": "string"
+        },
+        "endpointType": {
+          "description": "The type of Digital Twins endpoint",
+          "oneOf": [
+            {
+              "enum": [
+                "EventHub"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "endpointUri": {
+          "description": "The URL of the EventHub namespace for identity-based authentication. It must include the protocol 'sb://'.",
+          "type": "string"
+        },
+        "entityPath": {
+          "description": "The EventHub name in the EventHub namespace for identity-based authentication.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "endpointType"
+      ],
+      "type": "object"
+    },
     "PrivateEndpoint": {
-      "description": "The private endpoint property of a private endpoint connection.",
       "properties": {},
       "type": "object"
     },
     "PrivateEndpointConnection": {
-      "description": "The private endpoint connection of a Digital Twin.",
       "properties": {
         "properties": {
           "description": "The connection properties.",
@@ -518,70 +634,87 @@
       ],
       "type": "object"
     },
+    "ServiceBus": {
+      "properties": {
+        "endpointType": {
+          "description": "The type of Digital Twins endpoint",
+          "oneOf": [
+            {
+              "enum": [
+                "ServiceBus"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "endpointUri": {
+          "description": "The URL of the ServiceBus namespace for identity-based authentication. It must include the protocol 'sb://'.",
+          "type": "string"
+        },
+        "entityPath": {
+          "description": "The ServiceBus Topic name for identity-based authentication.",
+          "type": "string"
+        },
+        "primaryConnectionString": {
+          "description": "PrimaryConnectionString of the endpoint for key-based authentication. Will be obfuscated during read.",
+          "type": "string"
+        },
+        "secondaryConnectionString": {
+          "description": "SecondaryConnectionString of the endpoint for key-based authentication. Will be obfuscated during read.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "endpointType"
+      ],
+      "type": "object"
+    },
     "TimeSeriesDatabaseConnectionProperties": {
-      "description": "Properties of a time series database connection resource.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Properties of a time series database connection to Azure Data Explorer with data being sent via an EventHub.",
+          "additionalProperties": false,
           "properties": {
-            "adxDatabaseName": {
-              "description": "The name of the Azure Data Explorer database.",
-              "type": "string"
-            },
-            "adxEndpointUri": {
-              "description": "The URI of the Azure Data Explorer endpoint.",
-              "type": "string"
-            },
-            "adxResourceId": {
-              "description": "The resource ID of the Azure Data Explorer cluster.",
-              "type": "string"
-            },
-            "adxTableName": {
-              "default": "AdtPropertyEvents",
-              "description": "The name of the Azure Data Explorer table. Defaults to AdtPropertyEvents.",
-              "type": "string"
-            },
             "connectionType": {
               "enum": [
                 "AzureDataExplorer"
               ],
               "type": "string"
-            },
-            "eventHubConsumerGroup": {
-              "default": "$Default",
-              "description": "The EventHub consumer group to use when ADX reads from EventHub. Defaults to $Default.",
-              "type": "string"
-            },
-            "eventHubEndpointUri": {
-              "description": "The URL of the EventHub namespace for identity-based authentication. It must include the protocol sb://",
-              "type": "string"
-            },
-            "eventHubEntityPath": {
-              "description": "The EventHub name in the EventHub namespace for identity-based authentication.",
-              "type": "string"
-            },
-            "eventHubNamespaceResourceId": {
-              "description": "The resource ID of the EventHub namespace.",
-              "type": "string"
             }
           },
           "required": [
-            "adxResourceId",
-            "adxEndpointUri",
-            "adxDatabaseName",
-            "eventHubEndpointUri",
-            "eventHubEntityPath",
-            "eventHubNamespaceResourceId",
             "connectionType"
           ],
           "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/AzureDataExplorerConnectionProperties"
+                },
+                {
+                  "properties": {
+                    "connectionType": {
+                      "const": "AzureDataExplorer"
+                    }
+                  },
+                  "required": [
+                    "connectionType"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
-      ],
-      "properties": {},
-      "type": "object"
+      ]
     },
     "digitalTwinsInstances_endpoints_childResource": {
-      "description": "Microsoft.DigitalTwins/digitalTwinsInstances/endpoints",
+      "description": "endpoints",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -590,7 +723,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of Endpoint Resource.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 49,
@@ -630,7 +763,7 @@
       "type": "object"
     },
     "digitalTwinsInstances_privateEndpointConnections_childResource": {
-      "description": "Microsoft.DigitalTwins/digitalTwinsInstances/privateEndpointConnections",
+      "description": "privateEndpointConnections",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -639,7 +772,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the private endpoint connection.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -669,7 +802,7 @@
       "type": "object"
     },
     "digitalTwinsInstances_timeSeriesDatabaseConnections_childResource": {
-      "description": "Microsoft.DigitalTwins/digitalTwinsInstances/timeSeriesDatabaseConnections",
+      "description": "timeSeriesDatabaseConnections",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -678,7 +811,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of time series database connection.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 49,

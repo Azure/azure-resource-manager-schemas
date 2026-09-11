@@ -18,14 +18,14 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Redis cache.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "Redis cache properties.",
           "oneOf": [
             {
-              "$ref": "#/definitions/RedisCreateProperties"
+              "$ref": "#/definitions/RedisCreatePropertiesOrRedisResourceProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -68,6 +68,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -85,7 +86,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the firewall rule.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -124,6 +125,7 @@
           "type": "string"
         },
         "name": {
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*/default$",
@@ -162,8 +164,7 @@
     }
   },
   "definitions": {
-    "RedisCreateProperties": {
-      "description": "Properties supplied to Create Redis operation.",
+    "RedisCreatePropertiesOrRedisResourceProperties": {
       "properties": {
         "enableNonSslPort": {
           "description": "Specifies whether the non-ssl Redis server port (6379) is enabled.",
@@ -259,7 +260,6 @@
       "type": "object"
     },
     "RedisFirewallRuleProperties": {
-      "description": "Specifies a range of IP addresses permitted to connect to the cache",
       "properties": {
         "endIP": {
           "description": "highest IP address included in the range",
@@ -271,100 +271,33 @@
         }
       },
       "required": [
-        "startIP",
-        "endIP"
+        "endIP",
+        "startIP"
       ],
       "type": "object"
     },
-    "Redis_firewallRules_childResource": {
-      "description": "Microsoft.Cache/Redis/firewallRules",
-      "properties": {
-        "apiVersion": {
-          "enum": [
-            "2016-04-01"
-          ],
-          "type": "string"
-        },
-        "name": {
-          "description": "The name of the firewall rule.",
-          "type": "string"
-        },
-        "properties": {
-          "description": "redis cache firewall rule properties",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/RedisFirewallRuleProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "type": {
-          "enum": [
-            "firewallRules"
-          ],
-          "type": "string"
-        }
+    "RedisPropertiesRedisConfiguration": {
+      "additionalProperties": {
+        "type": "string"
       },
-      "required": [
-        "name",
-        "properties",
-        "apiVersion",
-        "type"
-      ],
+      "properties": {},
       "type": "object"
     },
-    "Redis_patchSchedules_childResource": {
-      "description": "Microsoft.Cache/Redis/patchSchedules",
-      "properties": {
-        "apiVersion": {
-          "enum": [
-            "2016-04-01"
-          ],
-          "type": "string"
-        },
-        "name": {
-          "oneOf": [
-            {
-              "enum": [
-                "default"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "properties": {
-          "description": "List of patch schedules for a Redis cache.",
-          "oneOf": [
-            {
-              "$ref": "#/definitions/ScheduleEntries"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "type": {
-          "enum": [
-            "patchSchedules"
-          ],
-          "type": "string"
-        }
+    "RedisPropertiesTenantSettings": {
+      "additionalProperties": {
+        "type": "string"
       },
-      "required": [
-        "name",
-        "properties",
-        "apiVersion",
-        "type"
-      ],
+      "properties": {},
+      "type": "object"
+    },
+    "ResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
       "type": "object"
     },
     "ScheduleEntries": {
-      "description": "List of patch schedules for a Redis cache.",
       "properties": {
         "scheduleEntries": {
           "description": "List of patch schedules for a Redis cache.",
@@ -387,7 +320,6 @@
       "type": "object"
     },
     "ScheduleEntry": {
-      "description": "Patch schedule entry for a Premium Redis Cache.",
       "properties": {
         "dayOfWeek": {
           "description": "Day of the week when a cache can be patched.",
@@ -412,7 +344,7 @@
           ]
         },
         "maintenanceWindow": {
-          "description": "ISO8601 timespan specifying how much time cache patching can take. ",
+          "description": "ISO8601 timespan specifying how much time cache patching can take.",
           "type": "string"
         },
         "startHourUtc": {
@@ -434,7 +366,6 @@
       "type": "object"
     },
     "Sku": {
-      "description": "SKU parameters supplied to the create Redis operation.",
       "properties": {
         "capacity": {
           "description": "The size of the Redis cache to deploy. Valid values: for C (Basic/Standard) family (0, 1, 2, 3, 4, 5, 6), for P (Premium) family (1, 2, 3, 4).",
@@ -480,9 +411,97 @@
         }
       },
       "required": [
-        "name",
+        "capacity",
         "family",
-        "capacity"
+        "name"
+      ],
+      "type": "object"
+    },
+    "Redis_firewallRules_childResource": {
+      "description": "firewallRules",
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "2016-04-01"
+          ],
+          "type": "string"
+        },
+        "name": {
+          "description": "The resource name",
+          "type": "string"
+        },
+        "properties": {
+          "description": "redis cache firewall rule properties",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/RedisFirewallRuleProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "enum": [
+            "firewallRules"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "properties",
+        "apiVersion",
+        "type"
+      ],
+      "type": "object"
+    },
+    "Redis_patchSchedules_childResource": {
+      "description": "patchSchedules",
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "2016-04-01"
+          ],
+          "type": "string"
+        },
+        "name": {
+          "description": "The resource name",
+          "oneOf": [
+            {
+              "enum": [
+                "default"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "description": "List of patch schedules for a Redis cache.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ScheduleEntries"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "enum": [
+            "patchSchedules"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "properties",
+        "apiVersion",
+        "type"
       ],
       "type": "object"
     }

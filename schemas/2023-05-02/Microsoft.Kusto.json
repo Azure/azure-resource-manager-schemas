@@ -29,7 +29,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Kusto cluster.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",
@@ -55,22 +55,19 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/clusters_databases_childResource"
+                "$ref": "#/definitions/clusters_attachedDatabaseConfigurations_childResource"
               },
               {
-                "$ref": "#/definitions/clusters_principalAssignments_childResource"
+                "$ref": "#/definitions/clusters_databases_childResource"
               },
               {
                 "$ref": "#/definitions/clusters_managedPrivateEndpoints_childResource"
               },
               {
+                "$ref": "#/definitions/clusters_principalAssignments_childResource"
+              },
+              {
                 "$ref": "#/definitions/clusters_privateEndpointConnections_childResource"
-              },
-              {
-                "$ref": "#/definitions/clusters_attachedDatabaseConfigurations_childResource"
-              },
-              {
-                "$ref": "#/definitions/clusters_dataConnections_childResource"
               }
             ]
           },
@@ -124,7 +121,10 @@
         }
       },
       "required": [
+        "location",
         "name",
+        "sku",
+        "properties",
         "apiVersion",
         "type"
       ],
@@ -144,7 +144,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the attached database configuration.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",
@@ -183,6 +183,76 @@
     },
     "clusters_databases": {
       "description": "Microsoft.Kusto/clusters/databases",
+      "oneOf": [
+        {
+          "properties": {
+            "kind": {
+              "description": "Kind of the database",
+              "oneOf": [
+                {
+                  "enum": [
+                    "ReadOnlyFollowing"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "properties": {
+              "description": "The database properties.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/ReadOnlyFollowingDatabaseProperties"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "properties"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "description": "Kind of the database",
+              "oneOf": [
+                {
+                  "enum": [
+                    "ReadWrite"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "properties": {
+              "description": "The database properties.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/ReadWriteDatabaseProperties"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "properties"
+          ],
+          "type": "object"
+        }
+      ],
       "properties": {
         "apiVersion": {
           "enum": [
@@ -195,7 +265,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the database in the Kusto cluster.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",
@@ -210,13 +280,13 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/clusters_databases_scripts_childResource"
-              },
-              {
                 "$ref": "#/definitions/clusters_databases_dataConnections_childResource"
               },
               {
                 "$ref": "#/definitions/clusters_databases_principalAssignments_childResource"
+              },
+              {
+                "$ref": "#/definitions/clusters_databases_scripts_childResource"
               }
             ]
           },
@@ -233,11 +303,148 @@
         "name",
         "apiVersion",
         "type"
-      ],
-      "type": "object"
+      ]
     },
     "clusters_databases_dataConnections": {
       "description": "Microsoft.Kusto/clusters/databases/dataConnections",
+      "oneOf": [
+        {
+          "properties": {
+            "kind": {
+              "description": "Kind of the endpoint for the data connection",
+              "oneOf": [
+                {
+                  "enum": [
+                    "CosmosDb"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "properties": {
+              "description": "The properties of the CosmosDb data connection.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/CosmosDbDataConnectionProperties"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "properties"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "description": "Kind of the endpoint for the data connection",
+              "oneOf": [
+                {
+                  "enum": [
+                    "EventGrid"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "properties": {
+              "description": "The properties of the Event Grid data connection.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/EventGridConnectionProperties"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "properties"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "description": "Kind of the endpoint for the data connection",
+              "oneOf": [
+                {
+                  "enum": [
+                    "EventHub"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "properties": {
+              "description": "The Event Hub data connection properties to validate.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/EventHubConnectionProperties"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "properties"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "description": "Kind of the endpoint for the data connection",
+              "oneOf": [
+                {
+                  "enum": [
+                    "IotHub"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "properties": {
+              "description": "The Iot Hub data connection properties.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/IotHubConnectionProperties"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "properties"
+          ],
+          "type": "object"
+        }
+      ],
       "properties": {
         "apiVersion": {
           "enum": [
@@ -250,7 +457,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the data connection.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",
@@ -272,8 +479,7 @@
         "name",
         "apiVersion",
         "type"
-      ],
-      "type": "object"
+      ]
     },
     "clusters_databases_principalAssignments": {
       "description": "Microsoft.Kusto/clusters/databases/principalAssignments",
@@ -285,7 +491,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Kusto principalAssignment.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",
@@ -332,7 +538,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Kusto database script.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",
@@ -379,7 +585,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the managed private endpoint.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",
@@ -426,7 +632,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Kusto principalAssignment.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",
@@ -473,7 +679,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the private endpoint connection.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",
@@ -509,45 +715,10 @@
         "type"
       ],
       "type": "object"
-    },
-    "clusters_dataConnections": {
-      "type": "object",
-      "oneOf": [
-        {
-          "$ref": "#/definitions/GenevaDataConnection"
-        },
-        {
-          "$ref": "#/definitions/GenevaLegacyDataConnection"
-        }
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The data connection name"
-        },
-        "type": {
-          "enum": [
-            "Microsoft.Kusto/clusters/dataconnections"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2023-05-02"
-          ]
-        }
-      },
-      "required": [
-        "apiVersion",
-        "properties",
-        "type"
-      ],
-      "description": "Microsoft.Kusto/clusters/dataConnections"
     }
   },
   "definitions": {
     "AcceptedAudiences": {
-      "description": "Represents an accepted audience trusted by the cluster.",
       "properties": {
         "value": {
           "description": "GUID or valid URL representing an accepted audience.",
@@ -557,7 +728,6 @@
       "type": "object"
     },
     "AttachedDatabaseConfigurationProperties": {
-      "description": "Class representing the an attached database configuration properties of kind specific.",
       "properties": {
         "clusterResourceId": {
           "description": "The resource id of the cluster where the databases you would like to attach reside.",
@@ -604,14 +774,13 @@
         }
       },
       "required": [
-        "databaseName",
         "clusterResourceId",
+        "databaseName",
         "defaultPrincipalsModificationKind"
       ],
       "type": "object"
     },
     "AzureSku": {
-      "description": "Azure SKU definition.",
       "properties": {
         "capacity": {
           "description": "The number of instances of the cluster.",
@@ -724,7 +893,6 @@
       "type": "object"
     },
     "ClusterPrincipalProperties": {
-      "description": "A class representing cluster principal property.",
       "properties": {
         "principalId": {
           "description": "The principal ID assigned to the cluster principal. It can be a user email, application ID, or security group name.",
@@ -768,13 +936,12 @@
       },
       "required": [
         "principalId",
-        "role",
-        "principalType"
+        "principalType",
+        "role"
       ],
       "type": "object"
     },
     "ClusterProperties": {
-      "description": "Class representing the Kusto cluster properties.",
       "properties": {
         "acceptedAudiences": {
           "description": "The cluster's accepted audiences.",
@@ -822,7 +989,6 @@
           "description": "A boolean value that indicates if the cluster could be automatically stopped (due to lack of data or no activity for many days).",
           "oneOf": [
             {
-              "default": true,
               "type": "boolean"
             },
             {
@@ -834,7 +1000,6 @@
           "description": "A boolean value that indicates if the cluster's disks are encrypted.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -846,7 +1011,6 @@
           "description": "A boolean value that indicates if double encryption is enabled.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -858,7 +1022,6 @@
           "description": "A boolean value that indicates if the purge operations are enabled.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -870,7 +1033,6 @@
           "description": "A boolean value that indicates if the streaming ingest is enabled.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -1007,8 +1169,80 @@
       "properties": {},
       "type": "object"
     },
+    "CosmosDbDataConnection": {
+      "properties": {
+        "kind": {
+          "description": "Kind of the endpoint for the data connection",
+          "oneOf": [
+            {
+              "enum": [
+                "CosmosDb"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "description": "The properties of the CosmosDb data connection.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/CosmosDbDataConnectionProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "type": "object"
+    },
+    "CosmosDbDataConnectionProperties": {
+      "properties": {
+        "cosmosDbAccountResourceId": {
+          "description": "The resource ID of the Cosmos DB account used to create the data connection.",
+          "type": "string"
+        },
+        "cosmosDbContainer": {
+          "description": "The name of an existing container in the Cosmos DB database.",
+          "type": "string"
+        },
+        "cosmosDbDatabase": {
+          "description": "The name of an existing database in the Cosmos DB account.",
+          "type": "string"
+        },
+        "managedIdentityResourceId": {
+          "description": "The resource ID of a managed system or user-assigned identity. The identity is used to authenticate with Cosmos DB.",
+          "type": "string"
+        },
+        "mappingRuleName": {
+          "description": "The name of an existing mapping rule to use when ingesting the retrieved data.",
+          "type": "string"
+        },
+        "retrievalStartDate": {
+          "description": "Optional. If defined, the data connection retrieves Cosmos DB documents created or updated after the specified retrieval start date.",
+          "type": "string"
+        },
+        "tableName": {
+          "description": "The case-sensitive name of the existing target table in your cluster. Retrieved data is ingested into this table.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "cosmosDbAccountResourceId",
+        "cosmosDbContainer",
+        "cosmosDbDatabase",
+        "managedIdentityResourceId",
+        "tableName"
+      ],
+      "type": "object"
+    },
     "DatabasePrincipalProperties": {
-      "description": "A class representing database principal property.",
       "properties": {
         "principalId": {
           "description": "The principal ID assigned to the database principal. It can be a user email, application ID, or security group name.",
@@ -1056,13 +1290,292 @@
       },
       "required": [
         "principalId",
-        "role",
-        "principalType"
+        "principalType",
+        "role"
+      ],
+      "type": "object"
+    },
+    "EventGridConnectionProperties": {
+      "properties": {
+        "blobStorageEventType": {
+          "description": "The name of blob storage event type to process.",
+          "oneOf": [
+            {
+              "enum": [
+                "Microsoft.Storage.BlobCreated",
+                "Microsoft.Storage.BlobRenamed"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "consumerGroup": {
+          "description": "The event hub consumer group.",
+          "type": "string"
+        },
+        "databaseRouting": {
+          "description": "Indication for database routing information from the data connection, by default only database routing information is allowed",
+          "oneOf": [
+            {
+              "enum": [
+                "Single",
+                "Multi"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "dataFormat": {
+          "description": "The data format of the message. Optionally the data format can be added to each message.",
+          "oneOf": [
+            {
+              "enum": [
+                "MULTIJSON",
+                "JSON",
+                "CSV",
+                "TSV",
+                "SCSV",
+                "SOHSV",
+                "PSV",
+                "TXT",
+                "RAW",
+                "SINGLEJSON",
+                "AVRO",
+                "TSVE",
+                "PARQUET",
+                "ORC",
+                "APACHEAVRO",
+                "W3CLOGFILE"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "eventGridResourceId": {
+          "description": "The resource ID of the event grid that is subscribed to the storage account events.",
+          "type": "string"
+        },
+        "eventHubResourceId": {
+          "description": "The resource ID where the event grid is configured to send events.",
+          "type": "string"
+        },
+        "ignoreFirstRecord": {
+          "description": "A Boolean value that, if set to true, indicates that ingestion should ignore the first record of every file",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "managedIdentityResourceId": {
+          "description": "The resource ID of a managed identity (system or user assigned) to be used to authenticate with event hub and storage account.",
+          "type": "string"
+        },
+        "mappingRuleName": {
+          "description": "The mapping rule to be used to ingest the data. Optionally the mapping information can be added to each message.",
+          "type": "string"
+        },
+        "storageAccountResourceId": {
+          "description": "The resource ID of the storage account where the data resides.",
+          "type": "string"
+        },
+        "tableName": {
+          "description": "The table where the data should be ingested. Optionally the table information can be added to each message.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "consumerGroup",
+        "eventHubResourceId",
+        "storageAccountResourceId"
+      ],
+      "type": "object"
+    },
+    "EventGridDataConnection": {
+      "properties": {
+        "kind": {
+          "description": "Kind of the endpoint for the data connection",
+          "oneOf": [
+            {
+              "enum": [
+                "EventGrid"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "description": "The properties of the Event Grid data connection.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EventGridConnectionProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "type": "object"
+    },
+    "EventHubConnectionProperties": {
+      "properties": {
+        "compression": {
+          "description": "The event hub messages compression type",
+          "oneOf": [
+            {
+              "enum": [
+                "None",
+                "GZip"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "consumerGroup": {
+          "description": "The event hub consumer group.",
+          "type": "string"
+        },
+        "databaseRouting": {
+          "description": "Indication for database routing information from the data connection, by default only database routing information is allowed",
+          "oneOf": [
+            {
+              "enum": [
+                "Single",
+                "Multi"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "dataFormat": {
+          "description": "The data format of the message. Optionally the data format can be added to each message.",
+          "oneOf": [
+            {
+              "enum": [
+                "MULTIJSON",
+                "JSON",
+                "CSV",
+                "TSV",
+                "SCSV",
+                "SOHSV",
+                "PSV",
+                "TXT",
+                "RAW",
+                "SINGLEJSON",
+                "AVRO",
+                "TSVE",
+                "PARQUET",
+                "ORC",
+                "APACHEAVRO",
+                "W3CLOGFILE"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "eventHubResourceId": {
+          "description": "The resource ID of the event hub to be used to create a data connection.",
+          "type": "string"
+        },
+        "eventSystemProperties": {
+          "description": "System properties of the event hub",
+          "oneOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "managedIdentityResourceId": {
+          "description": "The resource ID of a managed identity (system or user assigned) to be used to authenticate with event hub.",
+          "type": "string"
+        },
+        "mappingRuleName": {
+          "description": "The mapping rule to be used to ingest the data. Optionally the mapping information can be added to each message.",
+          "type": "string"
+        },
+        "retrievalStartDate": {
+          "description": "When defined, the data connection retrieves existing Event hub events created since the Retrieval start date. It can only retrieve events retained by the Event hub, based on its retention period.",
+          "type": "string"
+        },
+        "tableName": {
+          "description": "The table where the data should be ingested. Optionally the table information can be added to each message.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "consumerGroup",
+        "eventHubResourceId"
+      ],
+      "type": "object"
+    },
+    "EventHubDataConnection": {
+      "properties": {
+        "kind": {
+          "description": "Kind of the endpoint for the data connection",
+          "oneOf": [
+            {
+              "enum": [
+                "EventHub"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "description": "The Event Hub data connection properties to validate.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/EventHubConnectionProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind"
       ],
       "type": "object"
     },
     "Identity": {
-      "description": "Identity for the resource.",
       "properties": {
         "type": {
           "description": "The type of managed identity used. The type 'SystemAssigned, UserAssigned' includes both an implicitly created identity and a set of user-assigned identities. The type 'None' will remove all identities.",
@@ -1102,8 +1615,139 @@
       ],
       "type": "object"
     },
+    "IdentityUserAssignedIdentities": {
+      "additionalProperties": {
+        "$ref": "#/definitions/ComponentsSgqdofSchemasIdentityPropertiesUserassignedidentitiesAdditionalproperties"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "IotHubConnectionProperties": {
+      "properties": {
+        "consumerGroup": {
+          "description": "The iot hub consumer group.",
+          "type": "string"
+        },
+        "databaseRouting": {
+          "description": "Indication for database routing information from the data connection, by default only database routing information is allowed",
+          "oneOf": [
+            {
+              "enum": [
+                "Single",
+                "Multi"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "dataFormat": {
+          "description": "The data format of the message. Optionally the data format can be added to each message.",
+          "oneOf": [
+            {
+              "enum": [
+                "MULTIJSON",
+                "JSON",
+                "CSV",
+                "TSV",
+                "SCSV",
+                "SOHSV",
+                "PSV",
+                "TXT",
+                "RAW",
+                "SINGLEJSON",
+                "AVRO",
+                "TSVE",
+                "PARQUET",
+                "ORC",
+                "APACHEAVRO",
+                "W3CLOGFILE"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "eventSystemProperties": {
+          "description": "System properties of the iot hub",
+          "oneOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "iotHubResourceId": {
+          "description": "The resource ID of the Iot hub to be used to create a data connection.",
+          "type": "string"
+        },
+        "mappingRuleName": {
+          "description": "The mapping rule to be used to ingest the data. Optionally the mapping information can be added to each message.",
+          "type": "string"
+        },
+        "retrievalStartDate": {
+          "description": "When defined, the data connection retrieves existing Event hub events created since the Retrieval start date. It can only retrieve events retained by the Event hub, based on its retention period.",
+          "type": "string"
+        },
+        "sharedAccessPolicyName": {
+          "description": "The name of the share access policy",
+          "type": "string"
+        },
+        "tableName": {
+          "description": "The table where the data should be ingested. Optionally the table information can be added to each message.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "consumerGroup",
+        "iotHubResourceId",
+        "sharedAccessPolicyName"
+      ],
+      "type": "object"
+    },
+    "IotHubDataConnection": {
+      "properties": {
+        "kind": {
+          "description": "Kind of the endpoint for the data connection",
+          "oneOf": [
+            {
+              "enum": [
+                "IotHub"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "description": "The Iot Hub data connection properties.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/IotHubConnectionProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "type": "object"
+    },
     "KeyVaultProperties": {
-      "description": "Properties of the key vault.",
       "properties": {
         "keyName": {
           "description": "The name of the key vault key.",
@@ -1125,7 +1769,6 @@
       "type": "object"
     },
     "LanguageExtension": {
-      "description": "The language extension object.",
       "properties": {
         "languageExtensionImageName": {
           "description": "The language extension image name.",
@@ -1162,7 +1805,6 @@
       "type": "object"
     },
     "LanguageExtensionsList": {
-      "description": "The list of language extension objects.",
       "properties": {
         "value": {
           "description": "The list of language extensions.",
@@ -1182,7 +1824,6 @@
       "type": "object"
     },
     "ManagedPrivateEndpointProperties": {
-      "description": "A class representing the properties of a managed private endpoint object.",
       "properties": {
         "groupId": {
           "description": "The groupId in which the managed private endpoint is created.",
@@ -1202,13 +1843,12 @@
         }
       },
       "required": [
-        "privateLinkResourceId",
-        "groupId"
+        "groupId",
+        "privateLinkResourceId"
       ],
       "type": "object"
     },
     "OptimizedAutoscale": {
-      "description": "A class that contains the optimized auto scale definition.",
       "properties": {
         "isEnabled": {
           "description": "A boolean value that indicate if the optimized autoscale feature is enabled or not.",
@@ -1256,15 +1896,14 @@
         }
       },
       "required": [
-        "version",
         "isEnabled",
+        "maximum",
         "minimum",
-        "maximum"
+        "version"
       ],
       "type": "object"
     },
     "PrivateEndpointConnectionProperties": {
-      "description": "Properties of a private endpoint connection.",
       "properties": {
         "privateLinkServiceConnectionState": {
           "description": "Connection State of the Private Endpoint Connection.",
@@ -1284,7 +1923,6 @@
       "type": "object"
     },
     "PrivateLinkServiceConnectionStateProperty": {
-      "description": "Connection State of the Private Endpoint Connection.",
       "properties": {
         "description": {
           "description": "The private link service connection description.",
@@ -1297,14 +1935,111 @@
       },
       "type": "object"
     },
+    "ReadOnlyFollowingDatabase": {
+      "properties": {
+        "kind": {
+          "description": "Kind of the database",
+          "oneOf": [
+            {
+              "enum": [
+                "ReadOnlyFollowing"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "description": "The database properties.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ReadOnlyFollowingDatabaseProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "type": "object"
+    },
+    "ReadOnlyFollowingDatabaseProperties": {
+      "properties": {
+        "hotCachePeriod": {
+          "description": "The time the data should be kept in cache for fast queries in TimeSpan.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ReadWriteDatabase": {
+      "properties": {
+        "kind": {
+          "description": "Kind of the database",
+          "oneOf": [
+            {
+              "enum": [
+                "ReadWrite"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "description": "The database properties.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/ReadWriteDatabaseProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "type": "object"
+    },
+    "ReadWriteDatabaseProperties": {
+      "properties": {
+        "hotCachePeriod": {
+          "description": "The time the data should be kept in cache for fast queries in TimeSpan.",
+          "type": "string"
+        },
+        "keyVaultProperties": {
+          "description": "KeyVault properties for the database encryption.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/KeyVaultProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "softDeletePeriod": {
+          "description": "The time the data should be kept before it stops being accessible to queries in TimeSpan.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "ScriptProperties": {
-      "description": "A class representing database script property.",
       "properties": {
         "continueOnErrors": {
           "description": "Flag that indicates whether to continue if one of the command fails.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -1332,7 +2067,6 @@
       "type": "object"
     },
     "TableLevelSharingProperties": {
-      "description": "Tables that will be included and excluded in the follower database",
       "properties": {
         "externalTablesToExclude": {
           "description": "List of external tables to exclude from the follower database",
@@ -1449,8 +2183,14 @@
       },
       "type": "object"
     },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "TrustedExternalTenant": {
-      "description": "Represents a tenant ID that is trusted by the cluster.",
       "properties": {
         "value": {
           "description": "GUID representing an external tenant.",
@@ -1460,7 +2200,6 @@
       "type": "object"
     },
     "VirtualNetworkConfiguration": {
-      "description": "A class that contains virtual network definition.",
       "properties": {
         "dataManagementPublicIpId": {
           "description": "Data management's service public IP address resource id.",
@@ -1476,14 +2215,14 @@
         }
       },
       "required": [
-        "subnetId",
+        "dataManagementPublicIpId",
         "enginePublicIpId",
-        "dataManagementPublicIpId"
+        "subnetId"
       ],
       "type": "object"
     },
     "clusters_attachedDatabaseConfigurations_childResource": {
-      "description": "Microsoft.Kusto/clusters/attachedDatabaseConfigurations",
+      "description": "attachedDatabaseConfigurations",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1496,7 +2235,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the attached database configuration.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",
@@ -1534,7 +2273,77 @@
       "type": "object"
     },
     "clusters_databases_childResource": {
-      "description": "Microsoft.Kusto/clusters/databases",
+      "description": "databases",
+      "oneOf": [
+        {
+          "properties": {
+            "kind": {
+              "description": "Kind of the database",
+              "oneOf": [
+                {
+                  "enum": [
+                    "ReadOnlyFollowing"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "properties": {
+              "description": "The database properties.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/ReadOnlyFollowingDatabaseProperties"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "properties"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "description": "Kind of the database",
+              "oneOf": [
+                {
+                  "enum": [
+                    "ReadWrite"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "properties": {
+              "description": "The database properties.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/ReadWriteDatabaseProperties"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "properties"
+          ],
+          "type": "object"
+        }
+      ],
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1547,7 +2356,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the database in the Kusto cluster.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",
@@ -1569,11 +2378,148 @@
         "name",
         "apiVersion",
         "type"
-      ],
-      "type": "object"
+      ]
     },
     "clusters_databases_dataConnections_childResource": {
-      "description": "Microsoft.Kusto/clusters/databases/dataConnections",
+      "description": "dataConnections",
+      "oneOf": [
+        {
+          "properties": {
+            "kind": {
+              "description": "Kind of the endpoint for the data connection",
+              "oneOf": [
+                {
+                  "enum": [
+                    "CosmosDb"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "properties": {
+              "description": "The properties of the CosmosDb data connection.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/CosmosDbDataConnectionProperties"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "properties"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "description": "Kind of the endpoint for the data connection",
+              "oneOf": [
+                {
+                  "enum": [
+                    "EventGrid"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "properties": {
+              "description": "The properties of the Event Grid data connection.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/EventGridConnectionProperties"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "properties"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "description": "Kind of the endpoint for the data connection",
+              "oneOf": [
+                {
+                  "enum": [
+                    "EventHub"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "properties": {
+              "description": "The Event Hub data connection properties to validate.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/EventHubConnectionProperties"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "properties"
+          ],
+          "type": "object"
+        },
+        {
+          "properties": {
+            "kind": {
+              "description": "Kind of the endpoint for the data connection",
+              "oneOf": [
+                {
+                  "enum": [
+                    "IotHub"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "properties": {
+              "description": "The Iot Hub data connection properties.",
+              "oneOf": [
+                {
+                  "$ref": "#/definitions/IotHubConnectionProperties"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "properties"
+          ],
+          "type": "object"
+        }
+      ],
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1586,7 +2532,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the data connection.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",
@@ -1608,11 +2554,10 @@
         "name",
         "apiVersion",
         "type"
-      ],
-      "type": "object"
+      ]
     },
     "clusters_databases_principalAssignments_childResource": {
-      "description": "Microsoft.Kusto/clusters/databases/principalAssignments",
+      "description": "principalAssignments",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1621,7 +2566,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Kusto principalAssignment.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",
@@ -1659,7 +2604,7 @@
       "type": "object"
     },
     "clusters_databases_scripts_childResource": {
-      "description": "Microsoft.Kusto/clusters/databases/scripts",
+      "description": "scripts",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1668,7 +2613,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Kusto database script.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",
@@ -1706,7 +2651,7 @@
       "type": "object"
     },
     "clusters_managedPrivateEndpoints_childResource": {
-      "description": "Microsoft.Kusto/clusters/managedPrivateEndpoints",
+      "description": "managedPrivateEndpoints",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1715,7 +2660,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the managed private endpoint.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",
@@ -1753,7 +2698,7 @@
       "type": "object"
     },
     "clusters_principalAssignments_childResource": {
-      "description": "Microsoft.Kusto/clusters/principalAssignments",
+      "description": "principalAssignments",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1762,7 +2707,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Kusto principalAssignment.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",
@@ -1800,7 +2745,7 @@
       "type": "object"
     },
     "clusters_privateEndpointConnections_childResource": {
-      "description": "Microsoft.Kusto/clusters/privateEndpointConnections",
+      "description": "privateEndpointConnections",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1809,7 +2754,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the private endpoint connection.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*$",
@@ -1845,136 +2790,6 @@
         "type"
       ],
       "type": "object"
-    },
-    "clusters_dataConnections_childResource": {
-      "type": "object",
-      "oneOf": [
-        {
-          "$ref": "#/definitions/GenevaDataConnection"
-        },
-        {
-          "$ref": "#/definitions/GenevaLegacyDataConnection"
-        }
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The data connection name"
-        },
-        "type": {
-          "enum": [
-            "Microsoft.Kusto/clusters/dataconnections"
-          ]
-        },
-        "apiVersion": {
-          "type": "string",
-          "enum": [
-            "2023-05-02"
-          ]
-        }
-      },
-      "required": [
-        "apiVersion",
-        "properties",
-        "type"
-      ],
-      "description": "Microsoft.Kusto/clusters/dataConnections"
-    },
-    "GenevaDataConnectionProperties": {
-      "type": "object",
-      "properties": {
-        "genevaEnvironment": {
-          "type": "string",
-          "description": "The Geneva environment of the geneva data connection."
-        },
-        "extractBondFieldNameWithoutLinkingPolicyState": {
-          "type": "string",
-          "enum": [
-            "Enabled",
-            "Disabled"
-          ],
-          "description": "The extractBondFieldNameWithoutLinkingPolicyState property is used to handle Geneva event fields that contain embedded dot (.) characters. When Enabled, field names are not split by dot. Possible values: Enabled or Disabled."
-        }
-      },
-      "required": [
-        "genevaEnvironment"
-      ],
-      "description": "Class representing the Kusto Geneva (GDS) connection properties."
-    },
-    "GenevaDataConnection": {
-      "type": "object",
-      "properties": {
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/GenevaDataConnectionProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Geneva (DGS) data connection properties"
-        },
-        "kind": {
-          "type": "string",
-          "enum": [
-            "Geneva"
-          ]
-        }
-      },
-      "required": [
-        "kind"
-      ],
-      "description": "Information about the Geneva (GDS) data connection"
-    },
-    "GenevaLegacyDataConnectionProperties": {
-      "type": "object",
-      "properties": {
-        "genevaEnvironment": {
-          "type": "string",
-          "description": "The Geneva environment of the geneva data connection."
-        },
-        "mdsAccounts": {
-          "type": "array",
-          "description": "The list of mds accounts of the geneva data connection."
-        },
-        "isScrubbed": {
-          "type": "boolean",
-          "description": "Indicates whether the data is scrubbed."
-        }
-      },
-      "required": [
-        "genevaEnvironment",
-        "mdsAccounts",
-        "isScrubbed"
-      ],
-      "description": "Class representing the Kusto Geneva legacy connection properties."
-    },
-    "GenevaLegacyDataConnection": {
-      "type": "object",
-      "properties": {
-        "properties": {
-          "oneOf": [
-            {
-              "$ref": "#/definitions/GenevaLegacyDataConnectionProperties"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ],
-          "description": "Geneva legacy data connection properties."
-        },
-        "kind": {
-          "type": "string",
-          "enum": [
-            "GenevaLegacy"
-          ]
-        }
-      },
-      "required": [
-        "kind"
-      ],
-      "description": "Information about the Geneva legacy data connection."
     }
   }
 }

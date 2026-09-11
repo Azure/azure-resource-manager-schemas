@@ -29,7 +29,7 @@
           "type": "string"
         },
         "name": {
-          "description": "String that represents a Experiment resource name.",
+          "description": "The resource name",
           "oneOf": [
             {
               "minLength": 1,
@@ -75,108 +75,9 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
-        "apiVersion",
-        "type"
-      ],
-      "type": "object"
-    }
-  },
-  "extension_resourceDefinitions": {
-    "targets": {
-      "description": "Microsoft.Chaos/targets",
-      "properties": {
-        "apiVersion": {
-          "enum": [
-            "2024-01-01"
-          ],
-          "type": "string"
-        },
-        "location": {
-          "description": "Location of the target resource.",
-          "type": "string"
-        },
-        "name": {
-          "description": "String that represents a Target resource name.",
-          "oneOf": [
-            {
-              "pattern": "^[a-zA-Z0-9_\\-\\.]+$",
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "properties": {
-          "description": "The properties of the target resource.",
-          "oneOf": [
-            {
-              "additionalProperties": {},
-              "properties": {},
-              "type": "object"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "resources": {
-          "items": {
-            "oneOf": [
-              {
-                "$ref": "#/definitions/targets_capabilities_childResource"
-              }
-            ]
-          },
-          "type": "array"
-        },
-        "type": {
-          "enum": [
-            "Microsoft.Chaos/targets"
-          ],
-          "type": "string"
-        }
-      },
-      "required": [
-        "name",
-        "properties",
-        "apiVersion",
-        "type"
-      ],
-      "type": "object"
-    },
-    "targets_capabilities": {
-      "description": "Microsoft.Chaos/targets/capabilities",
-      "properties": {
-        "apiVersion": {
-          "enum": [
-            "2024-01-01"
-          ],
-          "type": "string"
-        },
-        "name": {
-          "description": "String that represents a Capability resource name.",
-          "oneOf": [
-            {
-              "pattern": "^[a-zA-Z0-9\\-\\.]+-\\d\\.\\d$",
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "type": {
-          "enum": [
-            "Microsoft.Chaos/targets/capabilities"
-          ],
-          "type": "string"
-        }
-      },
-      "required": [
-        "name",
         "apiVersion",
         "type"
       ],
@@ -185,120 +86,98 @@
   },
   "definitions": {
     "Action": {
-      "description": "Model that represents the base action model. 9 total per experiment.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Model that represents a continuous action.",
+          "additionalProperties": false,
           "properties": {
-            "duration": {
-              "description": "ISO8601 formatted string that represents a duration.",
-              "type": "string"
-            },
-            "parameters": {
-              "description": "List of key value pairs.",
+            "name": {
+              "description": "String that represents a Capability URN.",
               "oneOf": [
                 {
-                  "items": {
-                    "$ref": "#/definitions/KeyValuePair"
-                  },
-                  "type": "array"
+                  "maxLength": 2048,
+                  "type": "string"
                 },
                 {
                   "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
                 }
               ]
             },
-            "selectorId": {
-              "description": "String that represents a selector.",
-              "minLength": 1,
-              "type": "string"
-            },
             "type": {
               "enum": [
-                "continuous"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "duration",
-            "parameters",
-            "selectorId",
-            "type"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Model that represents a delay action.",
-          "properties": {
-            "duration": {
-              "description": "ISO8601 formatted string that represents a duration.",
-              "type": "string"
-            },
-            "type": {
-              "enum": [
-                "delay"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "duration",
-            "type"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Model that represents a discrete action.",
-          "properties": {
-            "parameters": {
-              "description": "List of key value pairs.",
-              "oneOf": [
-                {
-                  "items": {
-                    "$ref": "#/definitions/KeyValuePair"
-                  },
-                  "type": "array"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "selectorId": {
-              "description": "String that represents a selector.",
-              "minLength": 1,
-              "type": "string"
-            },
-            "type": {
-              "enum": [
+                "continuous",
+                "delay",
                 "discrete"
               ],
               "type": "string"
             }
           },
           "required": [
-            "parameters",
-            "selectorId",
+            "name",
             "type"
           ],
           "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ContinuousAction"
+                },
+                {
+                  "properties": {
+                    "type": {
+                      "const": "continuous"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DelayAction"
+                },
+                {
+                  "properties": {
+                    "type": {
+                      "const": "delay"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DiscreteAction"
+                },
+                {
+                  "properties": {
+                    "type": {
+                      "const": "discrete"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
-      ],
-      "properties": {
-        "name": {
-          "description": "String that represents a Capability URN.",
-          "maxLength": 2048,
-          "type": "string"
-        }
-      },
-      "required": [
-        "name"
-      ],
-      "type": "object"
+      ]
     },
     "Branch": {
-      "description": "Model that represents a branch in the step. 9 total per experiment.",
       "properties": {
         "actions": {
           "description": "List of actions.",
@@ -316,18 +195,156 @@
         },
         "name": {
           "description": "String of the branch name.",
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "required": [
-        "name",
-        "actions"
+        "actions",
+        "name"
+      ],
+      "type": "object"
+    },
+    "ContinuousAction": {
+      "properties": {
+        "duration": {
+          "description": "ISO8601 formatted string that represents a duration.",
+          "type": "string"
+        },
+        "parameters": {
+          "description": "List of key value pairs.",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/KeyValuePair"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "selectorId": {
+          "description": "String that represents a selector.",
+          "oneOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "description": "Enum that discriminates between action models.",
+          "oneOf": [
+            {
+              "enum": [
+                "continuous"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "duration",
+        "parameters",
+        "selectorId",
+        "type"
+      ],
+      "type": "object"
+    },
+    "DelayAction": {
+      "properties": {
+        "duration": {
+          "description": "ISO8601 formatted string that represents a duration.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Enum that discriminates between action models.",
+          "oneOf": [
+            {
+              "enum": [
+                "delay"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "duration",
+        "type"
+      ],
+      "type": "object"
+    },
+    "DiscreteAction": {
+      "properties": {
+        "parameters": {
+          "description": "List of key value pairs.",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/KeyValuePair"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "selectorId": {
+          "description": "String that represents a selector.",
+          "oneOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "description": "Enum that discriminates between action models.",
+          "oneOf": [
+            {
+              "enum": [
+                "discrete"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "parameters",
+        "selectorId",
+        "type"
       ],
       "type": "object"
     },
     "ExperimentProperties": {
-      "description": "Model that represents the Experiment properties model.",
       "properties": {
         "selectors": {
           "description": "List of selectors.",
@@ -359,28 +376,16 @@
         }
       },
       "required": [
-        "steps",
-        "selectors"
+        "selectors",
+        "steps"
       ],
       "type": "object"
     },
     "Filter": {
-      "description": "Model that represents available filter types that can be applied to a targets list.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Model that represents a simple target filter.",
+          "additionalProperties": false,
           "properties": {
-            "parameters": {
-              "description": "Model that represents the Simple filter parameters.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/SimpleFilterParameters"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
             "type": {
               "enum": [
                 "Simple"
@@ -392,23 +397,56 @@
             "type"
           ],
           "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/SimpleFilter"
+                },
+                {
+                  "properties": {
+                    "type": {
+                      "const": "Simple"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
         }
-      ],
-      "properties": {},
-      "type": "object"
+      ]
     },
     "KeyValuePair": {
-      "description": "A map to describe the settings of an action.",
       "properties": {
         "key": {
           "description": "The name of the setting for the action.",
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "value": {
           "description": "The value of the setting for the action.",
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "required": [
@@ -417,8 +455,86 @@
       ],
       "type": "object"
     },
+    "ListSelector": {
+      "properties": {
+        "targets": {
+          "description": "List of Target references.",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/TargetReference"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "description": "Enum of the selector type.",
+          "oneOf": [
+            {
+              "enum": [
+                "List"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "targets",
+        "type"
+      ],
+      "type": "object"
+    },
+    "QuerySelector": {
+      "properties": {
+        "queryString": {
+          "description": "Azure Resource Graph (ARG) Query Language query for target resources.",
+          "type": "string"
+        },
+        "subscriptionIds": {
+          "description": "Subscription id list to scope resource query.",
+          "oneOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "description": "Enum of the selector type.",
+          "oneOf": [
+            {
+              "enum": [
+                "Query"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "queryString",
+        "subscriptionIds",
+        "type"
+      ],
+      "type": "object"
+    },
     "ResourceIdentity": {
-      "description": "The identity of a resource.",
       "properties": {
         "type": {
           "description": "String of the resource identity type.",
@@ -458,20 +574,27 @@
       "type": "object"
     },
     "Selector": {
-      "additionalProperties": {},
-      "description": "Model that represents a selector in the Experiment resource.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Model that represents a list selector.",
+          "additionalProperties": false,
           "properties": {
-            "targets": {
-              "description": "List of Target references.",
+            "filter": {
+              "description": "Model that represents available filter types that can be applied to a targets list.",
               "oneOf": [
                 {
-                  "items": {
-                    "$ref": "#/definitions/TargetReference"
-                  },
-                  "type": "array"
+                  "$ref": "#/definitions/Filter"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "id": {
+              "description": "String of the selector ID.",
+              "oneOf": [
+                {
+                  "minLength": 1,
+                  "type": "string"
                 },
                 {
                   "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -480,78 +603,94 @@
             },
             "type": {
               "enum": [
-                "List"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "targets",
-            "type"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Model that represents a query selector.",
-          "properties": {
-            "queryString": {
-              "description": "Azure Resource Graph (ARG) Query Language query for target resources.",
-              "type": "string"
-            },
-            "subscriptionIds": {
-              "description": "Subscription id list to scope resource query.",
-              "oneOf": [
-                {
-                  "items": {
-                    "type": "string"
-                  },
-                  "type": "array"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "type": {
-              "enum": [
+                "List",
                 "Query"
               ],
               "type": "string"
             }
           },
           "required": [
-            "queryString",
-            "subscriptionIds",
+            "id",
             "type"
           ],
           "type": "object"
-        }
-      ],
-      "properties": {
-        "filter": {
-          "description": "Model that represents available filter types that can be applied to a targets list.",
+        },
+        {
           "oneOf": [
             {
-              "$ref": "#/definitions/Filter"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ListSelector"
+                },
+                {
+                  "properties": {
+                    "type": {
+                      "const": "List"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/QuerySelector"
+                },
+                {
+                  "properties": {
+                    "type": {
+                      "const": "Query"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "SimpleFilter": {
+      "properties": {
+        "parameters": {
+          "description": "Model that represents the Simple filter parameters.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SimpleFilterParameters"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
         },
-        "id": {
-          "description": "String of the selector ID.",
-          "minLength": 1,
-          "type": "string"
+        "type": {
+          "description": "Enum that discriminates between filter types. Currently only `Simple` type is supported.",
+          "oneOf": [
+            {
+              "enum": [
+                "Simple"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "required": [
-        "id"
+        "type"
       ],
       "type": "object"
     },
     "SimpleFilterParameters": {
-      "description": "Model that represents the Simple filter parameters.",
       "properties": {
         "zones": {
           "description": "List of Azure availability zones to filter targets by.",
@@ -571,7 +710,6 @@
       "type": "object"
     },
     "Step": {
-      "description": "Model that represents a step in the Experiment resource.",
       "properties": {
         "branches": {
           "description": "List of branches.",
@@ -589,18 +727,29 @@
         },
         "name": {
           "description": "String of the step name.",
-          "minLength": 1,
-          "type": "string"
+          "oneOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "required": [
-        "name",
-        "branches"
+        "branches",
+        "name"
       ],
       "type": "object"
     },
+    "TargetProperties": {
+      "additionalProperties": {},
+      "properties": {},
+      "type": "object"
+    },
     "TargetReference": {
-      "description": "Model that represents a reference to a Target in the selector.",
       "properties": {
         "id": {
           "description": "String of the resource ID of a Target resource.",
@@ -630,18 +779,31 @@
         }
       },
       "required": [
-        "type",
-        "id"
+        "id",
+        "type"
       ],
       "type": "object"
     },
+    "TrackedResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "UserAssignedIdentities": {
+      "additionalProperties": {
+        "$ref": "#/definitions/UserAssignedIdentity"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "UserAssignedIdentity": {
-      "description": "User assigned identity properties",
       "properties": {},
       "type": "object"
     },
     "targets_capabilities_childResource": {
-      "description": "Microsoft.Chaos/targets/capabilities",
+      "description": "capabilities",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -650,7 +812,7 @@
           "type": "string"
         },
         "name": {
-          "description": "String that represents a Capability resource name.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9\\-\\.]+-\\d\\.\\d$",

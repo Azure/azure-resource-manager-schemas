@@ -11,12 +11,22 @@ public class DeploymentsTests
     [TestMethod]
     public void TestSchemaLoader()
     {
-        Action createAssemblyFunc = () =>
-            TestSchemaCache.CreateFromFilePaths(
-                filePaths: Directory.EnumerateFiles(
-                    path: "schemas",
-                    searchPattern: "*.json",
-                    searchOption: SearchOption.AllDirectories));
-        createAssemblyFunc.Should().NotThrow();
+        var cache = TestSchemaCache.CreateFromFilePaths(
+            filePaths: Directory.EnumerateFiles(
+                path: "schemas",
+                searchPattern: "*.json",
+                searchOption: SearchOption.AllDirectories));
+
+        // Load and validate one provider at a time so the whole corpus is never fully parsed/normalized
+        // in memory simultaneously.
+        Action loadAllProvidersFunc = () =>
+        {
+            foreach (var providerKey in cache.ProviderKeys)
+            {
+                cache.GetSchemasForProvider(providerKey);
+            }
+        };
+
+        loadAllProvidersFunc.Should().NotThrow();
     }
 }

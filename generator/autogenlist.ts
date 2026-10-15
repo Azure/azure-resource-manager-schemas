@@ -31,7 +31,6 @@ export const csharpGeneratorDisabledProviders: string[] = [
     'Microsoft.OperationalInsights',
     'Microsoft.ServiceBus',
     'Microsoft.Sql',
-    'Microsoft.Storage',
     'Microsoft.Web',
 ];
 

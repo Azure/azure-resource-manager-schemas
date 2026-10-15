@@ -764,8 +764,11 @@ public static class JsonSchemaGenerator
             baseProperties[discType.Discriminator] = new JsonObject
             {
                 ["type"] = "string",
-                ["enum"] = discriminatorEnum,
             };
+            if (discriminatorValues.Length > 0)
+            {
+                baseProperties[discType.Discriminator]!["enum"] = discriminatorEnum;
+            }
 
             baseRequired.Add(discType.Discriminator);
 
@@ -776,6 +779,11 @@ public static class JsonSchemaGenerator
                 ["required"] = baseRequired,
                 ["additionalProperties"] = false,
             };
+
+            if (discriminatorValues.Length == 0)
+            {
+                return baseSchema;
+            }
 
             var oneOf = new JsonArray();
             foreach (var (key, element) in discType.Elements.OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase))

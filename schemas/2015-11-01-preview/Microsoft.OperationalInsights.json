@@ -22,7 +22,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the workspace.",
+          "description": "The resource name",
           "oneOf": [
             {
               "maxLength": 63,
@@ -131,15 +131,13 @@
           ]
         },
         "name": {
-          "description": "The name of the datasource resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "The data source properties in raw json format, each kind of data source have it's own schema.",
           "oneOf": [
-            {
-              "type": "object"
-            },
+            {},
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
@@ -168,6 +166,78 @@
         }
       },
       "required": [
+        "kind",
+        "name",
+        "properties",
+        "apiVersion",
+        "type"
+      ],
+      "type": "object"
+    },
+    "workspaces_features_machineGroups": {
+      "description": "Microsoft.OperationalInsights/workspaces/features/machineGroups",
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "2015-11-01-preview"
+          ],
+          "type": "string"
+        },
+        "etag": {
+          "description": "Resource ETAG.",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Additional resource type qualifier.",
+          "oneOf": [
+            {
+              "enum": [
+                "machine",
+                "process",
+                "port",
+                "clientGroup",
+                "machineGroup"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "name": {
+          "description": "The resource name",
+          "oneOf": [
+            {
+              "maxLength": 36,
+              "minLength": 36,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "description": "Resource properties.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MachineGroupProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "enum": [
+            "Microsoft.OperationalInsights/workspaces/features/machineGroups"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
         "name",
         "properties",
         "apiVersion",
@@ -185,7 +255,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the linkedServices resource",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -217,7 +287,6 @@
   },
   "definitions": {
     "LinkedServiceProperties": {
-      "description": "Linked service properties.",
       "properties": {
         "resourceId": {
           "description": "The resource id of the resource that will be linked to the workspace.",
@@ -229,8 +298,132 @@
       ],
       "type": "object"
     },
+    "MachineGroupProperties": {
+      "properties": {
+        "count": {
+          "description": "Count of machines in this group. The value of count may be bigger than the number of machines in case of the group has been truncated due to exceeding the max number of machines a group can handle.",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "displayName": {
+          "description": "User defined name for the group",
+          "oneOf": [
+            {
+              "maxLength": 256,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "groupType": {
+          "description": "Type of the machine group",
+          "oneOf": [
+            {
+              "enum": [
+                "unknown",
+                "azure-cs",
+                "azure-sf",
+                "azure-vmss",
+                "user-static"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "machines": {
+          "description": "References of the machines in this group. The hints within each reference do not represent the current value of the corresponding fields. They are a snapshot created during the last time the machine group was updated.",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/MachineReferenceWithHints"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "displayName"
+      ],
+      "type": "object"
+    },
+    "MachineReferenceWithHints": {
+      "properties": {
+        "id": {
+          "description": "Resource URI.",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Specifies the sub-class of the reference.",
+          "oneOf": [
+            {
+              "enum": [
+                "ref:machine",
+                "ref:machinewithhints",
+                "ref:process",
+                "ref:port",
+                "ref:onmachine",
+                "ref:clientgroup"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "properties": {
+          "description": "Machine reference with name and os hints.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/MachineReferenceWithHintsProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "kind"
+      ],
+      "type": "object"
+    },
+    "MachineReferenceWithHintsProperties": {
+      "properties": {},
+      "type": "object"
+    },
+    "ProxyResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "ResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "Sku": {
-      "description": "The SKU (tier) of a workspace.",
       "properties": {
         "name": {
           "description": "The name of the SKU.",
@@ -259,7 +452,6 @@
       "type": "object"
     },
     "WorkspaceProperties": {
-      "description": "Workspace properties.",
       "properties": {
         "provisioningState": {
           "description": "The provisioning state of the workspace.",
@@ -281,7 +473,7 @@
           ]
         },
         "retentionInDays": {
-          "description": "The workspace data retention in days. -1 means Unlimited retention for the Unlimited Sku. 730 days is the maximum allowed for all other Skus. ",
+          "description": "The workspace data retention in days. -1 means Unlimited retention for the Unlimited Sku. 730 days is the maximum allowed for all other Skus.",
           "oneOf": [
             {
               "maximum": 730,
@@ -308,7 +500,7 @@
       "type": "object"
     },
     "workspaces_dataSources_childResource": {
-      "description": "Microsoft.OperationalInsights/workspaces/dataSources",
+      "description": "dataSources",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -349,15 +541,13 @@
           ]
         },
         "name": {
-          "description": "The name of the datasource resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "The data source properties in raw json format, each kind of data source have it's own schema.",
           "oneOf": [
-            {
-              "type": "object"
-            },
+            {},
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
@@ -386,6 +576,7 @@
         }
       },
       "required": [
+        "kind",
         "name",
         "properties",
         "apiVersion",
@@ -394,7 +585,7 @@
       "type": "object"
     },
     "workspaces_linkedServices_childResource": {
-      "description": "Microsoft.OperationalInsights/workspaces/linkedServices",
+      "description": "linkedServices",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -403,7 +594,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the linkedServices resource",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {

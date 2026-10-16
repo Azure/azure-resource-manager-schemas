@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the action group.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -55,6 +55,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -76,7 +77,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the rule.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -113,6 +114,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -123,7 +125,6 @@
   },
   "definitions": {
     "ActionGroup": {
-      "description": "An Azure action group.",
       "properties": {
         "automationRunbookReceivers": {
           "description": "The list of AutomationRunbook receivers that are part of this action group.",
@@ -185,7 +186,6 @@
           "description": "Indicates whether this action group is enabled. If an action group is not enabled, then none of its receivers will receive communications.",
           "oneOf": [
             {
-              "default": true,
               "type": "boolean"
             },
             {
@@ -195,8 +195,15 @@
         },
         "groupShortName": {
           "description": "The short name of the action group. This will be used in SMS messages.",
-          "maxLength": 12,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 12,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "itsmReceivers": {
           "description": "The list of ITSM receivers that are part of this action group.",
@@ -270,13 +277,12 @@
         }
       },
       "required": [
-        "groupShortName",
-        "enabled"
+        "enabled",
+        "groupShortName"
       ],
       "type": "object"
     },
     "AutomationRunbookReceiver": {
-      "description": "The Azure Automation Runbook notification receiver.",
       "properties": {
         "automationAccountId": {
           "description": "The Azure automation account Id which holds this runbook and authenticate to Azure resource.",
@@ -312,14 +318,13 @@
       },
       "required": [
         "automationAccountId",
+        "isGlobalRunbook",
         "runbookName",
-        "webhookResourceId",
-        "isGlobalRunbook"
+        "webhookResourceId"
       ],
       "type": "object"
     },
     "AzureAppPushReceiver": {
-      "description": "The Azure mobile App push notification receiver.",
       "properties": {
         "emailAddress": {
           "description": "The email address registered for the Azure mobile app.",
@@ -331,13 +336,12 @@
         }
       },
       "required": [
-        "name",
-        "emailAddress"
+        "emailAddress",
+        "name"
       ],
       "type": "object"
     },
     "AzureFunctionReceiver": {
-      "description": "An azure function receiver.",
       "properties": {
         "functionAppResourceId": {
           "description": "The azure resource id of the function app.",
@@ -357,21 +361,92 @@
         }
       },
       "required": [
-        "name",
         "functionAppResourceId",
         "functionName",
-        "httpTriggerUrl"
+        "httpTriggerUrl",
+        "name"
+      ],
+      "type": "object"
+    },
+    "DynamicMetricCriteria": {
+      "properties": {
+        "alertSensitivity": {
+          "description": "The extent of deviation required to trigger an alert. This will affect how tight the threshold is to the metric series pattern.",
+          "oneOf": [
+            {
+              "enum": [
+                "Low",
+                "Medium",
+                "High"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "criterionType": {
+          "description": "Specifies the type of threshold criteria",
+          "oneOf": [
+            {
+              "enum": [
+                "DynamicThresholdCriterion"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "failingPeriods": {
+          "description": "The minimum number of violations required within the selected lookback time window required to raise an alert.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/DynamicThresholdFailingPeriods"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "ignoreDataBefore": {
+          "description": "Use this option to set the date from which to start learning the metric historical data and calculate the dynamic thresholds (in ISO8601 format)",
+          "type": "string"
+        },
+        "operator": {
+          "description": "The operator used to compare the metric value against the threshold.",
+          "oneOf": [
+            {
+              "enum": [
+                "GreaterThan",
+                "LessThan",
+                "GreaterOrLessThan"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "alertSensitivity",
+        "criterionType",
+        "failingPeriods",
+        "operator"
       ],
       "type": "object"
     },
     "DynamicThresholdFailingPeriods": {
-      "description": "The minimum number of violations required within the selected lookback time window required to raise an alert.",
       "properties": {
         "minFailingPeriodsToAlert": {
           "description": "The number of violations to trigger an alert. Should be smaller or equal to numberOfEvaluationPeriods.",
           "oneOf": [
             {
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -382,7 +457,7 @@
           "description": "The number of aggregated lookback points. The lookback time window is calculated based on the aggregation granularity (windowSize) and the selected number of aggregated points.",
           "oneOf": [
             {
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -391,13 +466,12 @@
         }
       },
       "required": [
-        "numberOfEvaluationPeriods",
-        "minFailingPeriodsToAlert"
+        "minFailingPeriodsToAlert",
+        "numberOfEvaluationPeriods"
       ],
       "type": "object"
     },
     "EmailReceiver": {
-      "description": "An email receiver.",
       "properties": {
         "emailAddress": {
           "description": "The email address of this receiver.",
@@ -409,13 +483,12 @@
         }
       },
       "required": [
-        "name",
-        "emailAddress"
+        "emailAddress",
+        "name"
       ],
       "type": "object"
     },
     "ItsmReceiver": {
-      "description": "An Itsm receiver.",
       "properties": {
         "connectionId": {
           "description": "Unique identification of ITSM connection among multiple defined in above workspace.",
@@ -439,16 +512,15 @@
         }
       },
       "required": [
-        "name",
-        "workspaceId",
         "connectionId",
+        "name",
+        "region",
         "ticketConfiguration",
-        "region"
+        "workspaceId"
       ],
       "type": "object"
     },
     "LogicAppReceiver": {
-      "description": "A logic app receiver.",
       "properties": {
         "callbackUrl": {
           "description": "The callback url where http request sent to.",
@@ -464,14 +536,13 @@
         }
       },
       "required": [
+        "callbackUrl",
         "name",
-        "resourceId",
-        "callbackUrl"
+        "resourceId"
       ],
       "type": "object"
     },
     "MetricAlertAction": {
-      "description": "An alert action.",
       "properties": {
         "actionGroupId": {
           "description": "the id of the action group to use.",
@@ -495,120 +566,129 @@
       },
       "type": "object"
     },
-    "MetricAlertCriteria": {
+    "MetricAlertActionWebHookProperties": {
       "additionalProperties": {
-        "oneOf": [
-          {
-            "type": "object"
-          },
-          {
-            "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-          }
-        ]
+        "type": "string"
       },
-      "description": "The rule criteria that defines the conditions of the alert rule.",
-      "oneOf": [
+      "properties": {},
+      "type": "object"
+    },
+    "MetricAlertCriteria": {
+      "allOf": [
         {
-          "description": "Specifies the metric alert criteria for multiple resource that has multiple metric criteria.",
+          "additionalProperties": false,
           "properties": {
-            "allOf": {
-              "description": "the list of multiple metric criteria for this 'all of' operation. ",
-              "oneOf": [
+            "odata.type": {
+              "enum": [
+                "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria",
+                "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+                "Microsoft.Azure.Monitor.WebtestLocationAvailabilityCriteria"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "odata.type"
+          ],
+          "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
                 {
-                  "items": {
-                    "$ref": "#/definitions/MultiMetricCriteria"
-                  },
-                  "type": "array"
+                  "$ref": "#/definitions/MetricAlertMultipleResourceMultipleMetricCriteria"
                 },
                 {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                  "properties": {
+                    "odata.type": {
+                      "const": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
+                    }
+                  },
+                  "required": [
+                    "odata.type"
+                  ],
+                  "type": "object"
                 }
               ]
             },
-            "odata.type": {
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/MetricAlertSingleResourceMultipleMetricCriteria"
+                },
+                {
+                  "properties": {
+                    "odata.type": {
+                      "const": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                    }
+                  },
+                  "required": [
+                    "odata.type"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "$ref": "#/definitions/WebtestLocationAvailabilityCriteria"
+                },
+                {
+                  "properties": {
+                    "odata.type": {
+                      "const": "Microsoft.Azure.Monitor.WebtestLocationAvailabilityCriteria"
+                    }
+                  },
+                  "required": [
+                    "odata.type"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "MetricAlertMultipleResourceMultipleMetricCriteria": {
+      "properties": {
+        "allOf": {
+          "description": "the list of multiple metric criteria for this 'all of' operation.",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/MultiMetricCriteria"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "odata.type": {
+          "description": "specifies the type of the alert criteria.",
+          "oneOf": [
+            {
               "enum": [
                 "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
               ],
               "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
-          },
-          "required": [
-            "odata.type"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Specifies the metric alert criteria for a single resource that has multiple metric criteria.",
-          "properties": {
-            "allOf": {
-              "description": "The list of metric criteria for this 'all of' operation. ",
-              "oneOf": [
-                {
-                  "items": {
-                    "$ref": "#/definitions/MetricCriteria"
-                  },
-                  "type": "array"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "odata.type": {
-              "enum": [
-                "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
-              ],
-              "type": "string"
-            }
-          },
-          "required": [
-            "odata.type"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Specifies the metric alert rule criteria for a web test resource.",
-          "properties": {
-            "componentId": {
-              "description": "The Application Insights resource Id.",
-              "type": "string"
-            },
-            "failedLocationCount": {
-              "description": "The number of failed locations.",
-              "oneOf": [
-                {
-                  "type": "number"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "odata.type": {
-              "enum": [
-                "Microsoft.Azure.Monitor.WebtestLocationAvailabilityCriteria"
-              ],
-              "type": "string"
-            },
-            "webTestId": {
-              "description": "The Application Insights web test Id.",
-              "type": "string"
-            }
-          },
-          "required": [
-            "webTestId",
-            "componentId",
-            "failedLocationCount",
-            "odata.type"
-          ],
-          "type": "object"
+          ]
         }
+      },
+      "required": [
+        "odata.type"
       ],
-      "properties": {},
       "type": "object"
     },
     "MetricAlertProperties": {
-      "description": "An alert rule.",
       "properties": {
         "actions": {
           "description": "the array of actions that are performed when the alert rule becomes active, and when an alert condition is resolved.",
@@ -704,27 +784,53 @@
         }
       },
       "required": [
-        "severity",
+        "criteria",
         "enabled",
-        "scopes",
         "evaluationFrequency",
-        "windowSize",
-        "criteria"
+        "scopes",
+        "severity",
+        "windowSize"
+      ],
+      "type": "object"
+    },
+    "MetricAlertSingleResourceMultipleMetricCriteria": {
+      "properties": {
+        "allOf": {
+          "description": "The list of metric criteria for this 'all of' operation.",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/MetricCriteria"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "odata.type": {
+          "description": "specifies the type of the alert criteria.",
+          "oneOf": [
+            {
+              "enum": [
+                "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "odata.type"
       ],
       "type": "object"
     },
     "MetricCriteria": {
-      "additionalProperties": {
-        "oneOf": [
-          {
-            "type": "object"
-          },
-          {
-            "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-          }
-        ]
-      },
-      "description": "Criterion to filter metrics.",
+      "additionalProperties": {},
       "properties": {
         "criterionType": {
           "description": "Specifies the type of threshold criteria",
@@ -800,7 +906,7 @@
           "description": "the criteria threshold value that activates the alert.",
           "oneOf": [
             {
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -827,17 +933,16 @@
         }
       },
       "required": [
+        "criterionType",
+        "metricName",
+        "name",
         "operator",
         "threshold",
-        "criterionType",
-        "name",
-        "metricName",
         "timeAggregation"
       ],
       "type": "object"
     },
     "MetricDimension": {
-      "description": "Specifies a metric dimension.",
       "properties": {
         "name": {
           "description": "Name of the dimension.",
@@ -870,116 +975,66 @@
       "type": "object"
     },
     "MultiMetricCriteria": {
-      "additionalProperties": {
-        "oneOf": [
-          {
-            "type": "object"
-          },
-          {
-            "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-          }
-        ]
-      },
-      "description": "The types of conditions for a multi resource alert.",
-      "oneOf": [
+      "allOf": [
         {
-          "description": "Criterion for dynamic threshold.",
-          "properties": {
-            "alertSensitivity": {
-              "description": "The extent of deviation required to trigger an alert. This will affect how tight the threshold is to the metric series pattern.",
-              "oneOf": [
-                {
-                  "enum": [
-                    "Low",
-                    "Medium",
-                    "High"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "criterionType": {
-              "enum": [
-                "DynamicThresholdCriterion"
-              ],
-              "type": "string"
-            },
-            "failingPeriods": {
-              "description": "The minimum number of violations required within the selected lookback time window required to raise an alert.",
-              "oneOf": [
-                {
-                  "$ref": "#/definitions/DynamicThresholdFailingPeriods"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            },
-            "ignoreDataBefore": {
-              "description": "Use this option to set the date from which to start learning the metric historical data and calculate the dynamic thresholds (in ISO8601 format)",
-              "format": "date-time",
-              "type": "string"
-            },
-            "operator": {
-              "description": "The operator used to compare the metric value against the threshold.",
-              "oneOf": [
-                {
-                  "enum": [
-                    "GreaterThan",
-                    "LessThan",
-                    "GreaterOrLessThan"
-                  ],
-                  "type": "string"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
-            }
-          },
-          "required": [
-            "operator",
-            "alertSensitivity",
-            "failingPeriods",
-            "criterionType"
-          ],
-          "type": "object"
-        },
-        {
-          "description": "Criterion to filter metrics.",
+          "additionalProperties": false,
           "properties": {
             "criterionType": {
               "enum": [
+                "DynamicThresholdCriterion",
                 "StaticThresholdCriterion"
               ],
               "type": "string"
             },
-            "operator": {
-              "description": "the criteria operator.",
+            "dimensions": {
+              "description": "List of dimension conditions.",
               "oneOf": [
                 {
-                  "enum": [
-                    "Equals",
-                    "GreaterThan",
-                    "GreaterThanOrEqual",
-                    "LessThan",
-                    "LessThanOrEqual"
-                  ],
-                  "type": "string"
+                  "items": {
+                    "$ref": "#/definitions/MetricDimension"
+                  },
+                  "type": "array"
                 },
                 {
                   "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
                 }
               ]
             },
-            "threshold": {
-              "description": "the criteria threshold value that activates the alert.",
+            "metricName": {
+              "description": "Name of the metric.",
+              "type": "string"
+            },
+            "metricNamespace": {
+              "description": "Namespace of the metric.",
+              "type": "string"
+            },
+            "name": {
+              "description": "Name of the criteria.",
+              "type": "string"
+            },
+            "skipMetricValidation": {
+              "description": "Allows creating an alert rule on a custom metric that isn't yet emitted, by causing the metric validation to be skipped.",
               "oneOf": [
                 {
-                  "type": "number"
+                  "type": "boolean"
+                },
+                {
+                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                }
+              ]
+            },
+            "timeAggregation": {
+              "description": "the criteria time aggregation types.",
+              "oneOf": [
+                {
+                  "enum": [
+                    "Average",
+                    "Count",
+                    "Minimum",
+                    "Maximum",
+                    "Total"
+                  ],
+                  "type": "string"
                 },
                 {
                   "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -988,79 +1043,63 @@
             }
           },
           "required": [
-            "operator",
-            "threshold",
+            "metricName",
+            "name",
+            "timeAggregation",
             "criterionType"
           ],
           "type": "object"
-        }
-      ],
-      "properties": {
-        "dimensions": {
-          "description": "List of dimension conditions.",
+        },
+        {
           "oneOf": [
             {
-              "items": {
-                "$ref": "#/definitions/MetricDimension"
-              },
-              "type": "array"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/DynamicMetricCriteria"
+                },
+                {
+                  "properties": {
+                    "criterionType": {
+                      "const": "DynamicThresholdCriterion"
+                    }
+                  },
+                  "required": [
+                    "criterionType"
+                  ],
+                  "type": "object"
+                }
+              ]
             },
             {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "metricName": {
-          "description": "Name of the metric.",
-          "type": "string"
-        },
-        "metricNamespace": {
-          "description": "Namespace of the metric.",
-          "type": "string"
-        },
-        "name": {
-          "description": "Name of the criteria.",
-          "type": "string"
-        },
-        "skipMetricValidation": {
-          "description": "Allows creating an alert rule on a custom metric that isn't yet emitted, by causing the metric validation to be skipped.",
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "timeAggregation": {
-          "description": "the criteria time aggregation types.",
-          "oneOf": [
-            {
-              "enum": [
-                "Average",
-                "Count",
-                "Minimum",
-                "Maximum",
-                "Total"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/MetricCriteria"
+                },
+                {
+                  "properties": {
+                    "criterionType": {
+                      "const": "StaticThresholdCriterion"
+                    }
+                  },
+                  "required": [
+                    "criterionType"
+                  ],
+                  "type": "object"
+                }
+              ]
             }
           ]
         }
+      ]
+    },
+    "ResourceTags": {
+      "additionalProperties": {
+        "type": "string"
       },
-      "required": [
-        "name",
-        "metricName",
-        "timeAggregation"
-      ],
+      "properties": {},
       "type": "object"
     },
     "SmsReceiver": {
-      "description": "An SMS receiver.",
       "properties": {
         "countryCode": {
           "description": "The country code of the SMS receiver.",
@@ -1076,14 +1115,13 @@
         }
       },
       "required": [
-        "name",
         "countryCode",
+        "name",
         "phoneNumber"
       ],
       "type": "object"
     },
     "VoiceReceiver": {
-      "description": "A voice receiver.",
       "properties": {
         "countryCode": {
           "description": "The country code of the voice receiver.",
@@ -1099,14 +1137,13 @@
         }
       },
       "required": [
-        "name",
         "countryCode",
+        "name",
         "phoneNumber"
       ],
       "type": "object"
     },
     "WebhookReceiver": {
-      "description": "A webhook receiver.",
       "properties": {
         "name": {
           "description": "The name of the webhook receiver. Names must be unique across all receivers within an action group.",
@@ -1120,6 +1157,50 @@
       "required": [
         "name",
         "serviceUri"
+      ],
+      "type": "object"
+    },
+    "WebtestLocationAvailabilityCriteria": {
+      "properties": {
+        "componentId": {
+          "description": "The Application Insights resource Id.",
+          "type": "string"
+        },
+        "failedLocationCount": {
+          "description": "The number of failed locations.",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "odata.type": {
+          "description": "specifies the type of the alert criteria.",
+          "oneOf": [
+            {
+              "enum": [
+                "Microsoft.Azure.Monitor.WebtestLocationAvailabilityCriteria"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "webTestId": {
+          "description": "The Application Insights web test Id.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "componentId",
+        "failedLocationCount",
+        "odata.type",
+        "webTestId"
       ],
       "type": "object"
     }

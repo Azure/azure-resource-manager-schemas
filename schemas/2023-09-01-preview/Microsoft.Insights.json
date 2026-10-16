@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the action group.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -55,6 +55,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -65,7 +66,6 @@
   },
   "definitions": {
     "ActionGroup": {
-      "description": "An Azure action group.",
       "properties": {
         "armRoleReceivers": {
           "description": "The list of ARM role receivers that are part of this action group. Roles are Azure RBAC roles and only built-in roles are supported.",
@@ -141,7 +141,6 @@
           "description": "Indicates whether this action group is enabled. If an action group is not enabled, then none of its receivers will receive communications.",
           "oneOf": [
             {
-              "default": true,
               "type": "boolean"
             },
             {
@@ -165,8 +164,15 @@
         },
         "groupShortName": {
           "description": "The short name of the action group. This will be used in SMS messages.",
-          "maxLength": 12,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 12,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "incidentReceivers": {
           "description": "The list of incident receivers that are part of this action group.",
@@ -254,13 +260,12 @@
         }
       },
       "required": [
-        "groupShortName",
-        "enabled"
+        "enabled",
+        "groupShortName"
       ],
       "type": "object"
     },
     "ArmRoleReceiver": {
-      "description": "An arm role receiver.",
       "properties": {
         "name": {
           "description": "The name of the arm role receiver. Names must be unique across all receivers within an action group.",
@@ -274,7 +279,6 @@
           "description": "Indicates whether to use common alert schema.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -290,7 +294,6 @@
       "type": "object"
     },
     "AutomationRunbookReceiver": {
-      "description": "The Azure Automation Runbook notification receiver.",
       "properties": {
         "automationAccountId": {
           "description": "The Azure automation account Id which holds this runbook and authenticate to Azure resource.",
@@ -323,7 +326,6 @@
           "description": "Indicates whether to use common alert schema.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -338,14 +340,13 @@
       },
       "required": [
         "automationAccountId",
+        "isGlobalRunbook",
         "runbookName",
-        "webhookResourceId",
-        "isGlobalRunbook"
+        "webhookResourceId"
       ],
       "type": "object"
     },
     "AzureAppPushReceiver": {
-      "description": "The Azure mobile App push notification receiver.",
       "properties": {
         "emailAddress": {
           "description": "The email address registered for the Azure mobile app.",
@@ -357,13 +358,12 @@
         }
       },
       "required": [
-        "name",
-        "emailAddress"
+        "emailAddress",
+        "name"
       ],
       "type": "object"
     },
     "AzureFunctionReceiver": {
-      "description": "An azure function receiver.",
       "properties": {
         "functionAppResourceId": {
           "description": "The azure resource id of the function app.",
@@ -385,7 +385,6 @@
           "description": "Indicates whether to use common alert schema.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -395,15 +394,21 @@
         }
       },
       "required": [
-        "name",
         "functionAppResourceId",
         "functionName",
-        "httpTriggerUrl"
+        "httpTriggerUrl",
+        "name"
       ],
       "type": "object"
     },
+    "AzureResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "EmailReceiver": {
-      "description": "An email receiver.",
       "properties": {
         "emailAddress": {
           "description": "The email address of this receiver.",
@@ -417,7 +422,6 @@
           "description": "Indicates whether to use common alert schema.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -427,13 +431,12 @@
         }
       },
       "required": [
-        "name",
-        "emailAddress"
+        "emailAddress",
+        "name"
       ],
       "type": "object"
     },
     "EventHubReceiver": {
-      "description": "An Event hub receiver.",
       "properties": {
         "eventHubName": {
           "description": "The name of the specific Event Hub queue",
@@ -459,7 +462,6 @@
           "description": "Indicates whether to use common alert schema.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -469,15 +471,14 @@
         }
       },
       "required": [
-        "name",
-        "eventHubNameSpace",
         "eventHubName",
+        "eventHubNameSpace",
+        "name",
         "subscriptionId"
       ],
       "type": "object"
     },
     "IncidentReceiver": {
-      "description": "An Incident receiver.",
       "properties": {
         "connection": {
           "description": "The incident service connection",
@@ -525,15 +526,21 @@
         }
       },
       "required": [
-        "name",
         "connection",
         "incidentManagementService",
-        "mappings"
+        "mappings",
+        "name"
       ],
       "type": "object"
     },
+    "IncidentReceiverMappings": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "IncidentServiceConnection": {
-      "description": "The connection info for Incident Receiver.",
       "properties": {
         "id": {
           "description": "GUID value representing the connection ID for the incident management service.",
@@ -545,13 +552,12 @@
         }
       },
       "required": [
-        "name",
-        "id"
+        "id",
+        "name"
       ],
       "type": "object"
     },
     "ItsmReceiver": {
-      "description": "An Itsm receiver.",
       "properties": {
         "connectionId": {
           "description": "Unique identification of ITSM connection among multiple defined in above workspace.",
@@ -575,16 +581,15 @@
         }
       },
       "required": [
-        "name",
-        "workspaceId",
         "connectionId",
+        "name",
+        "region",
         "ticketConfiguration",
-        "region"
+        "workspaceId"
       ],
       "type": "object"
     },
     "LogicAppReceiver": {
-      "description": "A logic app receiver.",
       "properties": {
         "callbackUrl": {
           "description": "The callback url where http request sent to.",
@@ -602,7 +607,6 @@
           "description": "Indicates whether to use common alert schema.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -612,14 +616,13 @@
         }
       },
       "required": [
+        "callbackUrl",
         "name",
-        "resourceId",
-        "callbackUrl"
+        "resourceId"
       ],
       "type": "object"
     },
     "SmsReceiver": {
-      "description": "An SMS receiver.",
       "properties": {
         "countryCode": {
           "description": "The country code of the SMS receiver.",
@@ -635,14 +638,13 @@
         }
       },
       "required": [
-        "name",
         "countryCode",
+        "name",
         "phoneNumber"
       ],
       "type": "object"
     },
     "VoiceReceiver": {
-      "description": "A voice receiver.",
       "properties": {
         "countryCode": {
           "description": "The country code of the voice receiver.",
@@ -658,14 +660,13 @@
         }
       },
       "required": [
-        "name",
         "countryCode",
+        "name",
         "phoneNumber"
       ],
       "type": "object"
     },
     "WebhookReceiver": {
-      "description": "A webhook receiver.",
       "properties": {
         "identifierUri": {
           "description": "Indicates the identifier uri for aad auth.",
@@ -691,7 +692,6 @@
           "description": "Indicates whether or not use AAD authentication.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -703,7 +703,6 @@
           "description": "Indicates whether to use common alert schema.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {

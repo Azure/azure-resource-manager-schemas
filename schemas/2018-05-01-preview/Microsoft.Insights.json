@@ -1,5 +1,5 @@
 {
-  "id": "https://schema.management.azure.com/schemas/2018-05-01-preview/Microsoft.Insights.Application.json#",
+  "id": "https://schema.management.azure.com/schemas/2018-05-01-preview/Microsoft.Insights.json#",
   "title": "Microsoft.Insights",
   "description": "Microsoft Insights Resource Types",
   "$schema": "http://json-schema.org/draft-04/schema#",
@@ -22,7 +22,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Application Insights component resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -69,6 +69,8 @@
         }
       },
       "required": [
+        "kind",
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -90,7 +92,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The ProactiveDetection configuration ID. This is unique within a Application Insights component.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -148,7 +150,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Application Insights WebTest resource.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -185,6 +187,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -195,7 +198,6 @@
   },
   "definitions": {
     "ApplicationInsightsComponentProactiveDetectionConfigurationProperties": {
-      "description": "Properties that define a ProactiveDetection configuration.",
       "properties": {
         "customEmails": {
           "description": "Custom email addresses for this rule notifications",
@@ -248,7 +250,6 @@
       "type": "object"
     },
     "ApplicationInsightsComponentProactiveDetectionConfigurationPropertiesRuleDefinitions": {
-      "description": "Static definitions of the ProactiveDetection configuration rule (same values for all components).",
       "properties": {
         "Description": {
           "description": "The rule description",
@@ -314,7 +315,6 @@
       "type": "object"
     },
     "ApplicationInsightsComponentProperties": {
-      "description": "Properties that define an Application Insights component resource.",
       "properties": {
         "Application_Type": {
           "description": "Type of application being monitored.",
@@ -387,43 +387,6 @@
             }
           ]
         },
-        "Request_Source": {
-          "description": "Describes what tool created this Application Insights component. Customers using this API should set this to the default 'rest'.",
-          "oneOf": [
-            {
-              "enum": [
-                "rest"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "RetentionInDays": {
-          "description": "Retention period in days.",
-          "oneOf": [
-            {
-              "default": 90,
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "SamplingPercentage": {
-          "description": "Percentage of the data produced by the application being monitored that is being sampled for Application Insights telemetry.",
-          "oneOf": [
-            {
-              "type": "number"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
         "publicNetworkAccessForIngestion": {
           "description": "The network access type for accessing Application Insights ingestion.",
           "oneOf": [
@@ -453,6 +416,42 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
+        },
+        "Request_Source": {
+          "description": "Describes what tool created this Application Insights component. Customers using this API should set this to the default 'rest'.",
+          "oneOf": [
+            {
+              "enum": [
+                "rest"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "RetentionInDays": {
+          "description": "Retention period in days.",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "SamplingPercentage": {
+          "description": "Percentage of the data produced by the application being monitored that is being sampled for Application Insights telemetry.",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         }
       },
       "required": [
@@ -460,8 +459,14 @@
       ],
       "type": "object"
     },
+    "ComponentsResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "HeaderField": {
-      "description": "A header to add to the WebTest.",
       "properties": {
         "key": {
           "description": "The name of the header.",
@@ -475,7 +480,6 @@
       "type": "object"
     },
     "WebTestGeolocation": {
-      "description": "Geo-physical location to run a WebTest from. You must specify one or more locations for the test to run from.",
       "properties": {
         "Id": {
           "description": "Location ID for the WebTest to run from.",
@@ -485,7 +489,6 @@
       "type": "object"
     },
     "WebTestProperties": {
-      "description": "Metadata describing a web test for an Azure resource.",
       "properties": {
         "Configuration": {
           "description": "An XML configuration specification for a WebTest.",
@@ -517,7 +520,6 @@
           "description": "Interval in seconds between test runs for this WebTest. Default value is 300.",
           "oneOf": [
             {
-              "default": 300,
               "type": "integer"
             },
             {
@@ -590,7 +592,6 @@
           "description": "Seconds until this WebTest will timeout and fail. Default value is 30.",
           "oneOf": [
             {
-              "default": 30,
               "type": "integer"
             },
             {
@@ -611,15 +612,14 @@
         }
       },
       "required": [
-        "SyntheticMonitorId",
-        "Name",
         "Kind",
-        "Locations"
+        "Locations",
+        "Name",
+        "SyntheticMonitorId"
       ],
       "type": "object"
     },
     "WebTestPropertiesConfiguration": {
-      "description": "An XML configuration specification for a WebTest.",
       "properties": {
         "WebTest": {
           "description": "The XML specification of a WebTest to run against an application.",
@@ -629,7 +629,6 @@
       "type": "object"
     },
     "WebTestPropertiesRequest": {
-      "description": "The collection of request properties",
       "properties": {
         "FollowRedirects": {
           "description": "Follow redirects for this web test.",
@@ -683,7 +682,6 @@
       "type": "object"
     },
     "WebTestPropertiesValidationRules": {
-      "description": "The collection of validation rule properties",
       "properties": {
         "ContentValidation": {
           "description": "The collection of content validation properties",
@@ -744,7 +742,6 @@
       "type": "object"
     },
     "WebTestPropertiesValidationRulesContentValidation": {
-      "description": "The collection of content validation properties",
       "properties": {
         "ContentMatch": {
           "description": "Content to look for in the return of the WebTest.  Must not be null or empty.",
@@ -775,8 +772,15 @@
       },
       "type": "object"
     },
+    "WebtestsResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "components_ProactiveDetectionConfigs_childResource": {
-      "description": "Microsoft.Insights/components/ProactiveDetectionConfigs",
+      "description": "ProactiveDetectionConfigs",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -789,7 +793,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The ProactiveDetection configuration ID. This is unique within a Application Insights component.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {

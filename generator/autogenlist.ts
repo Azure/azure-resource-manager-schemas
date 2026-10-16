@@ -27,7 +27,6 @@ export const csharpGeneratorDisabledProviders: string[] = [
     'Microsoft.ServiceBus',
     'Microsoft.Sql',
     'Microsoft.Storage',
-    'Microsoft.Web',
 ];
 
 // New providers are onboarded by default. The providers listed here are the only ones **not** onboarded.

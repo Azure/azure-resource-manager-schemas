@@ -20,10 +20,9 @@ If you want to preview or troubleshoot generation locally, you can use the gener
 1. Update submodules and build dependencies:
     ```bash
     git submodule update --init --recursive
-    npm --prefix bicep-types-az/bicep-types/src/bicep-types ci
-    npm --prefix bicep-types-az/bicep-types/src/bicep-types run build
     npm --prefix bicep-types-az/src/autorest.bicep ci
     npm --prefix bicep-types-az/src/autorest.bicep run build
+    ```
 1. Run the following commands, replacing `../azure-rest-api-specs` with your relative path to the swagger repo, and `myprovider/resource-manager` with the base path (discovered with `npm --prefix generator run list-basepaths`)
     ```bash
     npm --prefix generator ci

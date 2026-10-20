@@ -47,16 +47,23 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the storage account within the specified resource group. Storage account names must be between 3 and 24 characters in length and use numbers and lower-case letters only.",
-          "maxLength": 24,
-          "minLength": 3,
-          "type": "string"
+          "description": "The resource name",
+          "oneOf": [
+            {
+              "maxLength": 24,
+              "minLength": 3,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "properties": {
           "description": "The parameters used to create the storage account.",
           "oneOf": [
             {
-              "$ref": "#/definitions/StorageAccountPropertiesCreateParameters"
+              "$ref": "#/definitions/StorageAccountPropertiesCreateParametersOrStorageAccountProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -110,7 +117,11 @@
         }
       },
       "required": [
+        "kind",
+        "location",
         "name",
+        "sku",
+        "properties",
         "apiVersion",
         "type"
       ],
@@ -126,7 +137,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the blob Service within the specified storage account. Blob Service Name must be 'default'",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*/default$",
@@ -167,6 +178,7 @@
       },
       "required": [
         "name",
+        "properties",
         "apiVersion",
         "type"
       ],
@@ -182,10 +194,17 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the blob container within the specified storage account. Blob container names must be between 3 and 63 characters in length and use numbers, lower-case letters and dash (-) only. Every dash (-) character must be immediately preceded and followed by a letter or number.",
-          "maxLength": 63,
-          "minLength": 3,
-          "type": "string"
+          "description": "The resource name",
+          "oneOf": [
+            {
+              "maxLength": 63,
+              "minLength": 3,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "properties": {
           "description": "Properties of the blob container.",
@@ -217,6 +236,7 @@
       },
       "required": [
         "name",
+        "properties",
         "apiVersion",
         "type"
       ],
@@ -232,7 +252,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the blob container immutabilityPolicy within the specified storage account. ImmutabilityPolicy Name must be 'default'",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*/default$",
@@ -263,6 +283,7 @@
       },
       "required": [
         "name",
+        "properties",
         "apiVersion",
         "type"
       ],
@@ -278,7 +299,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Storage Account Management Policy. It should always be 'default'",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^.*/default$",
@@ -306,7 +327,6 @@
   },
   "definitions": {
     "BlobServicePropertiesProperties": {
-      "description": "The properties of a storage account’s Blob service.",
       "properties": {
         "cors": {
           "description": "Specifies CORS rules for the Blob service. You can include up to five CorsRule elements in the request. If no CorsRule elements are included in the request body, all CORS rules will be deleted, and CORS will be disabled for the Blob service.",
@@ -338,7 +358,6 @@
       "type": "object"
     },
     "ContainerProperties": {
-      "description": "The properties of a container.",
       "properties": {
         "metadata": {
           "description": "A name-value pair to associate with the container as metadata.",
@@ -374,8 +393,14 @@
       },
       "type": "object"
     },
+    "ContainerPropertiesMetadata": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "CorsRule": {
-      "description": "Specifies a CORS rule for the Blob service.",
       "properties": {
         "allowedHeaders": {
           "description": "Required if CorsRule element is present. A list of headers allowed to be part of the cross-origin request.",
@@ -455,19 +480,18 @@
         }
       },
       "required": [
-        "allowedOrigins",
+        "allowedHeaders",
         "allowedMethods",
-        "maxAgeInSeconds",
+        "allowedOrigins",
         "exposedHeaders",
-        "allowedHeaders"
+        "maxAgeInSeconds"
       ],
       "type": "object"
     },
     "CorsRules": {
-      "description": "Sets the CORS rules. You can include up to five CorsRule elements in the request. ",
       "properties": {
         "corsRules": {
-          "description": "The List of CORS rules. You can include up to five CorsRule elements in the request. ",
+          "description": "The List of CORS rules. You can include up to five CorsRule elements in the request.",
           "oneOf": [
             {
               "items": {
@@ -484,7 +508,6 @@
       "type": "object"
     },
     "CustomDomain": {
-      "description": "The custom domain assigned to this storage account. This can be set via Update.",
       "properties": {
         "name": {
           "description": "Gets or sets the custom domain name assigned to the storage account. Name is the CNAME source.",
@@ -508,7 +531,6 @@
       "type": "object"
     },
     "DeleteRetentionPolicy": {
-      "description": "The blob service properties for soft delete.",
       "properties": {
         "days": {
           "description": "Indicates the number of days that the deleted blob should be retained. The minimum specified value can be 1 and the maximum value can be 365.",
@@ -538,7 +560,6 @@
       "type": "object"
     },
     "Encryption": {
-      "description": "The encryption settings on the storage account.",
       "properties": {
         "keySource": {
           "description": "The encryption keySource (provider). Possible values (case-insensitive):  Microsoft.Storage, Microsoft.Keyvault",
@@ -584,7 +605,6 @@
       "type": "object"
     },
     "EncryptionService": {
-      "description": "A service that allows server-side encryption to be used.",
       "properties": {
         "enabled": {
           "description": "A boolean indicating whether or not the service encrypts the data as it is stored.",
@@ -601,7 +621,6 @@
       "type": "object"
     },
     "EncryptionServices": {
-      "description": "A list of services that support encryption.",
       "properties": {
         "blob": {
           "description": "The encryption function of the blob storage service.",
@@ -628,8 +647,48 @@
       },
       "type": "object"
     },
+    "Identity": {
+      "properties": {
+        "type": {
+          "description": "The identity type.",
+          "oneOf": [
+            {
+              "enum": [
+                "SystemAssigned"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
+    "ImmutabilityPolicyProperty": {
+      "properties": {
+        "immutabilityPeriodSinceCreationInDays": {
+          "description": "The immutability period for the blobs in the container since the policy creation, in days.",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "immutabilityPeriodSinceCreationInDays"
+      ],
+      "type": "object"
+    },
     "IPRule": {
-      "description": "IP rule with specific IP or IP range in CIDR format.",
       "properties": {
         "action": {
           "description": "The action of IP ACL rule.",
@@ -655,51 +714,7 @@
       ],
       "type": "object"
     },
-    "Identity": {
-      "description": "Identity for the resource.",
-      "properties": {
-        "type": {
-          "description": "The identity type.",
-          "oneOf": [
-            {
-              "enum": [
-                "SystemAssigned"
-              ],
-              "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "required": [
-        "type"
-      ],
-      "type": "object"
-    },
-    "ImmutabilityPolicyProperty": {
-      "description": "The properties of an ImmutabilityPolicy of a blob container.",
-      "properties": {
-        "immutabilityPeriodSinceCreationInDays": {
-          "description": "The immutability period for the blobs in the container since the policy creation, in days.",
-          "oneOf": [
-            {
-              "type": "integer"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        }
-      },
-      "required": [
-        "immutabilityPeriodSinceCreationInDays"
-      ],
-      "type": "object"
-    },
     "KeyVaultProperties": {
-      "description": "Properties of key vault.",
       "properties": {
         "keyname": {
           "description": "The name of KeyVault key.",
@@ -717,7 +732,6 @@
       "type": "object"
     },
     "NetworkRuleSet": {
-      "description": "Network rule set",
       "properties": {
         "bypass": {
           "description": "Specifies whether traffic is bypassed for Logging/Metrics/AzureServices. Possible values are any combination of Logging|Metrics|AzureServices (For example, \"Logging, Metrics\"), or None to bypass none of those traffics.",
@@ -786,7 +800,6 @@
       "type": "object"
     },
     "Restriction": {
-      "description": "The restriction because of which SKU cannot be used.",
       "properties": {
         "reasonCode": {
           "description": "The reason for the restriction. As of now this can be \"QuotaId\" or \"NotAvailableForSubscription\". Quota Id is set when the SKU has requiredQuotas parameter as the subscription does not belong to that quota. The \"NotAvailableForSubscription\" is related to capacity at DC.",
@@ -807,7 +820,6 @@
       "type": "object"
     },
     "Sku": {
-      "description": "The SKU of the storage account.",
       "properties": {
         "name": {
           "description": "Gets or sets the SKU name. Required for account creation; optional for update. Note that in older versions, SKU name was called accountType.",
@@ -848,8 +860,14 @@
       ],
       "type": "object"
     },
-    "StorageAccountPropertiesCreateParameters": {
-      "description": "The parameters used to create the storage account.",
+    "StorageAccountCreateParametersTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "StorageAccountPropertiesCreateParametersOrStorageAccountProperties": {
       "properties": {
         "accessTier": {
           "description": "Required for storage accounts where kind = BlobStorage. The access tier used for billing.",
@@ -936,7 +954,6 @@
       "type": "object"
     },
     "VirtualNetworkRule": {
-      "description": "Virtual Network rule.",
       "properties": {
         "action": {
           "description": "The action of virtual network rule.",
@@ -981,7 +998,7 @@
       "type": "object"
     },
     "storageAccounts_blobServices_childResource": {
-      "description": "Microsoft.Storage/storageAccounts/blobServices",
+      "description": "blobServices",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -990,7 +1007,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the blob Service within the specified storage account. Blob Service Name must be 'default'",
+          "description": "The resource name",
           "oneOf": [
             {
               "enum": [
@@ -1030,7 +1047,7 @@
       "type": "object"
     },
     "storageAccounts_blobServices_containers_childResource": {
-      "description": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "description": "containers",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1039,10 +1056,17 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the blob container within the specified storage account. Blob container names must be between 3 and 63 characters in length and use numbers, lower-case letters and dash (-) only. Every dash (-) character must be immediately preceded and followed by a letter or number.",
-          "maxLength": 63,
-          "minLength": 3,
-          "type": "string"
+          "description": "The resource name",
+          "oneOf": [
+            {
+              "maxLength": 63,
+              "minLength": 3,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "properties": {
           "description": "Properties of the blob container.",
@@ -1071,7 +1095,7 @@
       "type": "object"
     },
     "storageAccounts_blobServices_containers_immutabilityPolicies_childResource": {
-      "description": "Microsoft.Storage/storageAccounts/blobServices/containers/immutabilityPolicies",
+      "description": "immutabilityPolicies",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1080,7 +1104,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the blob container immutabilityPolicy within the specified storage account. ImmutabilityPolicy Name must be 'default'",
+          "description": "The resource name",
           "oneOf": [
             {
               "enum": [
@@ -1120,7 +1144,7 @@
       "type": "object"
     },
     "storageAccounts_managementPolicies_childResource": {
-      "description": "Microsoft.Storage/storageAccounts/managementPolicies",
+      "description": "managementPolicies",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1129,7 +1153,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the Storage Account Management Policy. It should always be 'default'",
+          "description": "The resource name",
           "oneOf": [
             {
               "enum": [

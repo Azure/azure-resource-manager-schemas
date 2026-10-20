@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the vault",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9-]{3,24}$",
@@ -44,10 +44,10 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/vaults_secrets_childResource"
+                "$ref": "#/definitions/vaults_accessPolicies_childResource"
               },
               {
-                "$ref": "#/definitions/vaults_accessPolicies_childResource"
+                "$ref": "#/definitions/vaults_secrets_childResource"
               }
             ]
           },
@@ -76,6 +76,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -93,7 +94,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the operation",
+          "description": "The resource name",
           "oneOf": [
             {
               "enum": [
@@ -144,7 +145,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the secret",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9-]{1,127}$",
@@ -167,7 +168,7 @@
           ]
         },
         "tags": {
-          "description": "The tags that will be assigned to the secret. ",
+          "description": "The tags that will be assigned to the secret.",
           "oneOf": [
             {
               "additionalProperties": {
@@ -199,13 +200,14 @@
   },
   "definitions": {
     "AccessPolicyEntry": {
-      "description": "An identity that have access to the key vault. All identities in the array must use the same tenant ID as the key vault's tenant ID.",
       "properties": {
         "applicationId": {
-          "description": " Application ID of the client making request on behalf of a principal",
+          "description": "Application ID of the client making request on behalf of a principal",
           "oneOf": [
             {
-              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+              "maxLength": 36,
+              "minLength": 36,
+              "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
               "type": "string"
             },
             {
@@ -232,7 +234,9 @@
           "description": "The Azure Active Directory tenant ID that should be used for authenticating requests to the key vault.",
           "oneOf": [
             {
-              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+              "maxLength": 36,
+              "minLength": 36,
+              "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
               "type": "string"
             },
             {
@@ -242,14 +246,13 @@
         }
       },
       "required": [
-        "tenantId",
         "objectId",
-        "permissions"
+        "permissions",
+        "tenantId"
       ],
       "type": "object"
     },
     "Permissions": {
-      "description": "Permissions the identity has for keys, secrets, certificates and storage.",
       "properties": {
         "certificates": {
           "description": "Permissions to certificates",
@@ -371,7 +374,6 @@
       "type": "object"
     },
     "SecretAttributes": {
-      "description": "The secret management attributes.",
       "properties": {
         "enabled": {
           "description": "Determines whether the object is enabled.",
@@ -409,8 +411,14 @@
       },
       "type": "object"
     },
+    "SecretCreateOrUpdateParametersTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "SecretProperties": {
-      "description": "Properties of the secret",
       "properties": {
         "attributes": {
           "description": "The attributes of the secret.",
@@ -435,7 +443,6 @@
       "type": "object"
     },
     "Sku": {
-      "description": "SKU details",
       "properties": {
         "family": {
           "description": "SKU family name",
@@ -474,7 +481,6 @@
       "type": "object"
     },
     "VaultAccessPolicyProperties": {
-      "description": "Properties of the vault access policy",
       "properties": {
         "accessPolicies": {
           "description": "An array of 0 to 16 identities that have access to the key vault. All identities in the array must use the same tenant ID as the key vault's tenant ID.",
@@ -496,8 +502,14 @@
       ],
       "type": "object"
     },
+    "VaultCreateOrUpdateParametersTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "VaultProperties": {
-      "description": "Properties of the vault",
       "properties": {
         "accessPolicies": {
           "description": "An array of 0 to 16 identities that have access to the key vault. All identities in the array must use the same tenant ID as the key vault's tenant ID. When `createMode` is set to `recover`, access policies are not required. Otherwise, access policies are required.",
@@ -522,28 +534,6 @@
                 "default"
               ],
               "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "enablePurgeProtection": {
-          "description": "Property specifying whether protection against purge is enabled for this vault. Setting this property to true activates protection against purge for this vault and its content - only the Key Vault service may initiate a hard, irrecoverable deletion. The setting is effective only if soft delete is also enabled. Enabling this functionality is irreversible - that is, the property does not accept false as its value.",
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "enableSoftDelete": {
-          "description": "Property specifying whether recoverable deletion is enabled for this key vault. Setting this property to true activates the soft delete feature, whereby vaults or vault entities can be recovered after deletion. Enabling this functionality is irreversible - that is, the property does not accept false as its value.",
-          "oneOf": [
-            {
-              "type": "boolean"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -583,6 +573,28 @@
             }
           ]
         },
+        "enablePurgeProtection": {
+          "description": "Property specifying whether protection against purge is enabled for this vault. Setting this property to true activates protection against purge for this vault and its content - only the Key Vault service may initiate a hard, irrecoverable deletion. The setting is effective only if soft delete is also enabled. Enabling this functionality is irreversible - that is, the property does not accept false as its value.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "enableSoftDelete": {
+          "description": "Property specifying whether recoverable deletion is enabled for this key vault. Setting this property to true activates the soft delete feature, whereby vaults or vault entities can be recovered after deletion. Enabling this functionality is irreversible - that is, the property does not accept false as its value.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
         "sku": {
           "description": "SKU details",
           "oneOf": [
@@ -598,7 +610,9 @@
           "description": "The Azure Active Directory tenant ID that should be used for authenticating requests to the key vault.",
           "oneOf": [
             {
-              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+              "maxLength": 36,
+              "minLength": 36,
+              "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
               "type": "string"
             },
             {
@@ -612,13 +626,13 @@
         }
       },
       "required": [
-        "tenantId",
-        "sku"
+        "sku",
+        "tenantId"
       ],
       "type": "object"
     },
     "vaults_accessPolicies_childResource": {
-      "description": "Microsoft.KeyVault/vaults/accessPolicies",
+      "description": "accessPolicies",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -627,7 +641,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the operation",
+          "description": "The resource name",
           "oneOf": [
             {
               "enum": [
@@ -669,7 +683,7 @@
       "type": "object"
     },
     "vaults_secrets_childResource": {
-      "description": "Microsoft.KeyVault/vaults/secrets",
+      "description": "secrets",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -678,7 +692,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the secret",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9-]{1,127}$",
@@ -701,7 +715,7 @@
           ]
         },
         "tags": {
-          "description": "The tags that will be assigned to the secret. ",
+          "description": "The tags that will be assigned to the secret.",
           "oneOf": [
             {
               "additionalProperties": {

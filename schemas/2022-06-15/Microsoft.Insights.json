@@ -33,7 +33,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the rule.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[^#<>%&:\\?/{}*]{1,260}$",
@@ -78,6 +78,82 @@
         }
       },
       "required": [
+        "location",
+        "name",
+        "properties",
+        "apiVersion",
+        "type"
+      ],
+      "type": "object"
+    },
+    "webtests": {
+      "description": "Microsoft.Insights/webtests",
+      "properties": {
+        "apiVersion": {
+          "enum": [
+            "2022-06-15"
+          ],
+          "type": "string"
+        },
+        "kind": {
+          "description": "The kind of WebTest that this web test watches. Choices are ping, multistep and standard.",
+          "oneOf": [
+            {
+              "enum": [
+                "ping",
+                "multistep",
+                "standard"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "location": {
+          "description": "Resource location",
+          "type": "string"
+        },
+        "name": {
+          "description": "The resource name",
+          "type": "string"
+        },
+        "properties": {
+          "description": "Metadata describing a web test for an Azure resource.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WebTestProperties"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "tags": {
+          "description": "Resource tags",
+          "oneOf": [
+            {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "properties": {},
+              "type": "object"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "type": {
+          "enum": [
+            "Microsoft.Insights/webtests"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -88,7 +164,6 @@
   },
   "definitions": {
     "Actions": {
-      "description": "Actions to invoke when the alert fires.",
       "properties": {
         "actionGroups": {
           "description": "Action Group resource Ids to invoke when the alert fires.",
@@ -122,8 +197,14 @@
       },
       "type": "object"
     },
+    "ActionsCustomProperties": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "Condition": {
-      "description": "A condition of the scheduled query rule.",
       "properties": {
         "dimensions": {
           "description": "List of Dimensions conditions",
@@ -188,7 +269,7 @@
           "description": "the criteria threshold value that activates the alert. Relevant and required only for rules of the kind LogAlert.",
           "oneOf": [
             {
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -217,13 +298,11 @@
       "type": "object"
     },
     "ConditionFailingPeriods": {
-      "description": "The minimum number of violations required within the selected lookback time window required to raise an alert. Relevant only for rules of the kind LogAlert.",
       "properties": {
         "minFailingPeriodsToAlert": {
           "description": "The number of violations to trigger an alert. Should be smaller or equal to numberOfEvaluationPeriods. Default value is 1",
           "oneOf": [
             {
-              "default": 1,
               "type": "integer"
             },
             {
@@ -235,7 +314,6 @@
           "description": "The number of aggregated lookback points. The lookback time window is calculated based on the aggregation granularity (windowSize) and the selected number of aggregated points. Default value is 1",
           "oneOf": [
             {
-              "default": 1,
               "type": "integer"
             },
             {
@@ -247,7 +325,6 @@
       "type": "object"
     },
     "Dimension": {
-      "description": "Dimension splitting and filtering definition",
       "properties": {
         "name": {
           "description": "Name of the dimension",
@@ -290,8 +367,20 @@
       ],
       "type": "object"
     },
+    "HeaderField": {
+      "properties": {
+        "key": {
+          "description": "The name of the header.",
+          "type": "string"
+        },
+        "value": {
+          "description": "The value of the header.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
     "ScheduledQueryRuleCriteria": {
-      "description": "The rule criteria that defines the conditions of the scheduled query rule.",
       "properties": {
         "allOf": {
           "description": "A list of conditions to evaluate against the specified scopes",
@@ -311,7 +400,6 @@
       "type": "object"
     },
     "ScheduledQueryRuleProperties": {
-      "description": "scheduled query rule Definition",
       "properties": {
         "actions": {
           "description": "Actions to invoke when the alert fires.",
@@ -406,14 +494,7 @@
           "description": "Severity of the alert. Should be an integer between [0-4]. Value of 0 is severest. Relevant and required only for rules of the kind LogAlert.",
           "oneOf": [
             {
-              "oneOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-                }
-              ]
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -450,6 +531,312 @@
           "type": "string"
         }
       },
+      "type": "object"
+    },
+    "ScheduledQueryRuleResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "WebTestGeolocation": {
+      "properties": {
+        "Id": {
+          "description": "Location ID for the WebTest to run from.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "WebTestProperties": {
+      "properties": {
+        "Configuration": {
+          "description": "An XML configuration specification for a WebTest.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WebTestPropertiesConfiguration"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "Description": {
+          "description": "User defined description for this WebTest.",
+          "type": "string"
+        },
+        "Enabled": {
+          "description": "Is the test actively being monitored.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "Frequency": {
+          "description": "Interval in seconds between test runs for this WebTest. Default value is 300.",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "Kind": {
+          "description": "The kind of web test this is, valid choices are ping, multistep and standard.",
+          "oneOf": [
+            {
+              "enum": [
+                "ping",
+                "multistep",
+                "standard"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "Locations": {
+          "description": "A list of where to physically run the tests from to give global coverage for accessibility of your application.",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/WebTestGeolocation"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "Name": {
+          "description": "User defined name if this WebTest.",
+          "type": "string"
+        },
+        "Request": {
+          "description": "The collection of request properties",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WebTestPropertiesRequest"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "RetryEnabled": {
+          "description": "Allow for retries should this WebTest fail.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "SyntheticMonitorId": {
+          "description": "Unique ID of this WebTest. This is typically the same value as the Name field.",
+          "type": "string"
+        },
+        "Timeout": {
+          "description": "Seconds until this WebTest will timeout and fail. Default value is 30.",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "ValidationRules": {
+          "description": "The collection of validation rule properties",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WebTestPropertiesValidationRules"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "Kind",
+        "Locations",
+        "Name",
+        "SyntheticMonitorId"
+      ],
+      "type": "object"
+    },
+    "WebTestPropertiesConfiguration": {
+      "properties": {
+        "WebTest": {
+          "description": "The XML specification of a WebTest to run against an application.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "WebTestPropertiesRequest": {
+      "properties": {
+        "FollowRedirects": {
+          "description": "Follow redirects for this web test.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "Headers": {
+          "description": "List of headers and their values to add to the WebTest call.",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/HeaderField"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "HttpVerb": {
+          "description": "Http verb to use for this web test.",
+          "type": "string"
+        },
+        "ParseDependentRequests": {
+          "description": "Parse Dependent request for this WebTest.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "RequestBody": {
+          "description": "Base64 encoded string body to send with this web test.",
+          "type": "string"
+        },
+        "RequestUrl": {
+          "description": "Url location to test.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "WebTestPropertiesValidationRules": {
+      "properties": {
+        "ContentValidation": {
+          "description": "The collection of content validation properties",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/WebTestPropertiesValidationRulesContentValidation"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "ExpectedHttpStatusCode": {
+          "description": "Validate that the WebTest returns the http status code provided.",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "IgnoreHttpStatusCode": {
+          "description": "When set, validation will ignore the status code.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "SSLCertRemainingLifetimeCheck": {
+          "description": "A number of days to check still remain before the the existing SSL cert expires.  Value must be positive and the SSLCheck must be set to true.",
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "SSLCheck": {
+          "description": "Checks to see if the SSL cert is still valid.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "WebTestPropertiesValidationRulesContentValidation": {
+      "properties": {
+        "ContentMatch": {
+          "description": "Content to look for in the return of the WebTest.  Must not be null or empty.",
+          "type": "string"
+        },
+        "IgnoreCase": {
+          "description": "When set, this value makes the ContentMatch validation case insensitive.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "PassIfTextFound": {
+          "description": "When true, validation will pass if there is a match for the ContentMatch string.  If false, validation will fail if there is a match",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "WebtestsResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
       "type": "object"
     }
   }

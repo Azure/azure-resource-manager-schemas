@@ -162,6 +162,28 @@ public class JsonSchemaGeneratorTests
         Assert.IsFalse(props.ContainsKey("ApiVersion"), "Should not emit 'ApiVersion' alongside reserved 'apiVersion'.");
     }
 
+    [TestMethod]
+    [DataRow("2017-09-01-preview")]
+    public void Schema_generation_handles_discriminated_objects_without_variants(string apiVersion)
+    {
+        const string providerNamespace = "Microsoft.DataFactory";
+        var typeProvider = new ResourceTypeProvider(new AzTypeLoader());
+        var resourceTypes = typeProvider.GetResourceTypes()
+            .Where(entry => string.Equals(Utils.GetProviderNamespace(entry.resourceType), providerNamespace, System.StringComparison.OrdinalIgnoreCase))
+            .Where(entry => string.Equals(entry.apiVersion, apiVersion, System.StringComparison.OrdinalIgnoreCase))
+            .Select(entry => typeProvider.Get(entry.resourceType, entry.apiVersion))
+            .ToArray();
+
+        var schema = JsonSchemaGenerator.GenerateProviderSchema(providerNamespace, apiVersion, resourceTypes, sortProperties: false);
+        var copySink = schema["definitions"]!["CopySink"]!.AsObject();
+        var discriminator = copySink["properties"]!["type"]!.AsObject();
+
+        Assert.AreEqual("string", discriminator["type"]!.GetValue<string>());
+        Assert.IsFalse(discriminator.ContainsKey("enum"));
+        Assert.IsFalse(copySink.ContainsKey("oneOf"));
+        Assert.IsFalse(copySink.ContainsKey("allOf"));
+    }
+
     private static IEnumerable<string> EnumerateLocalDefinitionRefs(JsonNode? node)
     {
         if (node is null)

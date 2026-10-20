@@ -14,14 +14,14 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of python package.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "Gets or sets the module create properties.",
           "oneOf": [
             {
-              "$ref": "#/definitions/PythonPackageCreateProperties"
+              "$ref": "#/definitions/PythonPackageCreatePropertiesOrModuleProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -72,14 +72,14 @@
           "type": "string"
         },
         "name": {
-          "description": "The runbook name.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "Gets or sets runbook create or update properties.",
           "oneOf": [
             {
-              "$ref": "#/definitions/RunbookCreateOrUpdateProperties"
+              "$ref": "#/definitions/RunbookCreateOrUpdatePropertiesOrRunbookProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -132,6 +132,7 @@
         {
           "properties": {
             "name": {
+              "description": "The resource name",
               "oneOf": [
                 {
                   "pattern": "^.*/content$",
@@ -151,6 +152,7 @@
         {
           "properties": {
             "name": {
+              "description": "The resource name",
               "oneOf": [
                 {
                   "pattern": "^.*/testJob$",
@@ -209,7 +211,6 @@
   },
   "definitions": {
     "ContentHash": {
-      "description": "Definition of the runbook property type.",
       "properties": {
         "algorithm": {
           "description": "Gets or sets the content hash algorithm used to hash the content.",
@@ -227,7 +228,6 @@
       "type": "object"
     },
     "ContentLink": {
-      "description": "Definition of the content link.",
       "properties": {
         "contentHash": {
           "description": "Gets or sets the hash.",
@@ -251,8 +251,131 @@
       },
       "type": "object"
     },
-    "PythonPackageCreateProperties": {
-      "description": "The parameters supplied to the create or update module properties.",
+    "microsoft.automation/automationaccounts/runbooks/draft": {
+      "allOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "enum": [
+                "content",
+                "testJob"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "name"
+          ],
+          "type": "object"
+        },
+        {
+          "oneOf": [
+            {
+              "allOf": [
+                {
+                  "properties": {
+                    "name": {
+                      "description": "The resource name",
+                      "oneOf": [
+                        {
+                          "enum": [
+                            "content"
+                          ],
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "content"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            {
+              "allOf": [
+                {
+                  "properties": {
+                    "name": {
+                      "description": "The resource name",
+                      "oneOf": [
+                        {
+                          "enum": [
+                            "testJob"
+                          ],
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                        }
+                      ]
+                    },
+                    "parameters": {
+                      "description": "Gets or sets the parameters of the test job.",
+                      "oneOf": [
+                        {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "properties": {},
+                          "type": "object"
+                        },
+                        {
+                          "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+                        }
+                      ]
+                    },
+                    "runOn": {
+                      "description": "Gets or sets the runOn which specifies the group name where the job is to be executed.",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                },
+                {
+                  "properties": {
+                    "name": {
+                      "const": "testJob"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "type": "object"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "PythonPackageCreateParametersTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "PythonPackageCreatePropertiesOrModuleProperties": {
       "properties": {
         "contentLink": {
           "description": "Gets or sets the module content link.",
@@ -271,8 +394,14 @@
       ],
       "type": "object"
     },
-    "RunbookCreateOrUpdateProperties": {
-      "description": "The parameters supplied to the create or update runbook properties.",
+    "RunbookCreateOrUpdateParametersTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "RunbookCreateOrUpdatePropertiesOrRunbookProperties": {
       "properties": {
         "description": {
           "description": "Gets or sets the description of the runbook.",
@@ -364,7 +493,6 @@
       "properties": {
         "creationTime": {
           "description": "Gets or sets the creation time of the runbook draft.",
-          "format": "date-time",
           "type": "string"
         },
         "draftContentLink": {
@@ -391,7 +519,6 @@
         },
         "lastModifiedTime": {
           "description": "Gets or sets the last modified time of the runbook draft.",
-          "format": "date-time",
           "type": "string"
         },
         "outputTypes": {
@@ -426,8 +553,14 @@
       },
       "type": "object"
     },
+    "RunbookDraftParameters": {
+      "additionalProperties": {
+        "$ref": "#/definitions/RunbookParameter"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "RunbookParameter": {
-      "description": "Definition of the runbook parameter type.",
       "properties": {
         "defaultValue": {
           "description": "Gets or sets the default value of parameter.",
@@ -462,12 +595,20 @@
       },
       "type": "object"
     },
+    "TestJobCreateParameters": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "automationAccounts_runbooks_draft_childResource": {
-      "description": "Microsoft.Automation/automationAccounts/runbooks/draft",
+      "description": "draft",
       "oneOf": [
         {
           "properties": {
             "name": {
+              "description": "The resource name",
               "oneOf": [
                 {
                   "enum": [
@@ -489,6 +630,7 @@
         {
           "properties": {
             "name": {
+              "description": "The resource name",
               "oneOf": [
                 {
                   "enum": [

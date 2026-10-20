@@ -18,7 +18,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the managed HSM Pool",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -96,7 +96,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the key to be created. The value you provide may be copied globally for the purpose of running the service. The value provided should not include personally identifiable or sensitive information.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9-]{1,127}$",
@@ -166,7 +166,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the private endpoint connection associated with the managed hsm pool.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -235,7 +235,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the vault",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9-]{3,24}$",
@@ -261,16 +261,16 @@
           "items": {
             "oneOf": [
               {
-                "$ref": "#/definitions/vaults_keys_childResource"
-              },
-              {
-                "$ref": "#/definitions/vaults_secrets_childResource"
-              },
-              {
                 "$ref": "#/definitions/vaults_accessPolicies_childResource"
               },
               {
+                "$ref": "#/definitions/vaults_keys_childResource"
+              },
+              {
                 "$ref": "#/definitions/vaults_privateEndpointConnections_childResource"
+              },
+              {
+                "$ref": "#/definitions/vaults_secrets_childResource"
               }
             ]
           },
@@ -299,6 +299,7 @@
         }
       },
       "required": [
+        "location",
         "name",
         "properties",
         "apiVersion",
@@ -316,7 +317,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the operation",
+          "description": "The resource name",
           "oneOf": [
             {
               "enum": [
@@ -367,7 +368,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the key to be created. The value you provide may be copied globally for the purpose of running the service. The value provided should not include personally identifiable or sensitive information.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9-]{1,127}$",
@@ -433,7 +434,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the private endpoint connection associated with the key vault.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -472,7 +473,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the secret. The value you provide may be copied globally for the purpose of running the service. The value provided should not include personally identifiable or sensitive information.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9-]{1,127}$",
@@ -495,7 +496,7 @@
           ]
         },
         "tags": {
-          "description": "The tags that will be assigned to the secret. ",
+          "description": "The tags that will be assigned to the secret.",
           "oneOf": [
             {
               "additionalProperties": {
@@ -527,13 +528,14 @@
   },
   "definitions": {
     "AccessPolicyEntry": {
-      "description": "An identity that have access to the key vault. All identities in the array must use the same tenant ID as the key vault's tenant ID.",
       "properties": {
         "applicationId": {
-          "description": " Application ID of the client making request on behalf of a principal",
+          "description": "Application ID of the client making request on behalf of a principal",
           "oneOf": [
             {
-              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+              "maxLength": 36,
+              "minLength": 36,
+              "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
               "type": "string"
             },
             {
@@ -560,7 +562,9 @@
           "description": "The Azure Active Directory tenant ID that should be used for authenticating requests to the key vault.",
           "oneOf": [
             {
-              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+              "maxLength": 36,
+              "minLength": 36,
+              "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
               "type": "string"
             },
             {
@@ -570,9 +574,9 @@
         }
       },
       "required": [
-        "tenantId",
         "objectId",
-        "permissions"
+        "permissions",
+        "tenantId"
       ],
       "type": "object"
     },
@@ -597,7 +601,6 @@
       "type": "object"
     },
     "IPRule": {
-      "description": "A rule governing the accessibility of a vault from a specific ip address or ip range.",
       "properties": {
         "value": {
           "description": "An IPv4 address range in CIDR notation, such as '124.56.78.91' (simple IP address) or '124.56.78.0/24' (all addresses that start with 124.56.78).",
@@ -610,7 +613,6 @@
       "type": "object"
     },
     "KeyAttributes": {
-      "description": "The object attributes managed by the Azure Key Vault service.",
       "properties": {
         "enabled": {
           "description": "Determines whether or not the object is enabled.",
@@ -638,7 +640,6 @@
           "description": "Indicates if the private key can be exported.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -660,8 +661,14 @@
       },
       "type": "object"
     },
+    "KeyCreateParametersTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "KeyProperties": {
-      "description": "The properties of the key.",
       "properties": {
         "attributes": {
           "description": "The attributes of the key.",
@@ -692,7 +699,6 @@
           ]
         },
         "keyOps": {
-          "description": "Array of JsonWebKeyOperation",
           "oneOf": [
             {
               "items": {
@@ -771,7 +777,6 @@
     "KeyReleasePolicy": {
       "properties": {
         "contentType": {
-          "default": "application/json; charset=utf-8",
           "description": "Content type and version of key release policy",
           "type": "string"
         },
@@ -839,7 +844,6 @@
       "type": "object"
     },
     "ManagedHsmKeyAttributes": {
-      "description": "The object attributes managed by the Azure Key Vault service.",
       "properties": {
         "enabled": {
           "description": "Determines whether or not the object is enabled.",
@@ -888,8 +892,14 @@
       },
       "type": "object"
     },
+    "ManagedHsmKeyCreateParametersTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "ManagedHsmKeyProperties": {
-      "description": "The properties of the key.",
       "properties": {
         "attributes": {
           "description": "The attributes of the key.",
@@ -920,7 +930,6 @@
           ]
         },
         "keyOps": {
-          "description": "Array of JsonWebKeyOperation",
           "oneOf": [
             {
               "items": {
@@ -999,7 +1008,6 @@
     "ManagedHsmKeyReleasePolicy": {
       "properties": {
         "contentType": {
-          "default": "application/json; charset=utf-8",
           "description": "Content type and version of key release policy",
           "type": "string"
         },
@@ -1047,7 +1055,6 @@
       "type": "object"
     },
     "ManagedHsmProperties": {
-      "description": "Properties of the managed HSM Pool",
       "properties": {
         "createMode": {
           "description": "The create mode to indicate whether the resource is being created or is being recovered from a deleted resource.",
@@ -1068,7 +1075,6 @@
           "description": "Property specifying whether protection against purge is enabled for this managed HSM pool. Setting this property to true activates protection against purge for this managed HSM pool and its content - only the Managed HSM service may initiate a hard, irrecoverable deletion. Enabling this functionality is irreversible.",
           "oneOf": [
             {
-              "default": true,
               "type": "boolean"
             },
             {
@@ -1080,7 +1086,6 @@
           "description": "Property to specify whether the 'soft delete' functionality is enabled for this managed HSM pool. Soft delete is enabled by default for all managed HSMs and is immutable.",
           "oneOf": [
             {
-              "default": true,
               "type": "boolean"
             },
             {
@@ -1146,7 +1151,6 @@
           "description": "Soft deleted data retention days. When you delete an HSM or a key, it will remain recoverable for the configured retention period or for a default period of 90 days. It accepts values between 7 and 90.",
           "oneOf": [
             {
-              "default": 90,
               "type": "integer"
             },
             {
@@ -1158,7 +1162,9 @@
           "description": "The Azure Active Directory tenant ID that should be used for authenticating requests to the managed HSM pool.",
           "oneOf": [
             {
-              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+              "maxLength": 36,
+              "minLength": 36,
+              "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
               "type": "string"
             },
             {
@@ -1167,6 +1173,13 @@
           ]
         }
       },
+      "type": "object"
+    },
+    "ManagedHsmResourceTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
       "type": "object"
     },
     "ManagedHsmRotationPolicy": {
@@ -1200,7 +1213,6 @@
       "type": "object"
     },
     "ManagedHsmSku": {
-      "description": "SKU details",
       "properties": {
         "family": {
           "description": "SKU Family of the managed HSM Pool",
@@ -1253,7 +1265,6 @@
       "type": "object"
     },
     "MhsmGeoReplicatedRegion": {
-      "description": "A region that this managed HSM Pool has been extended to.",
       "properties": {
         "isPrimary": {
           "description": "A boolean value that indicates whether the region is the primary region or a secondary region.",
@@ -1273,8 +1284,19 @@
       },
       "type": "object"
     },
+    "MhsmipRule": {
+      "properties": {
+        "value": {
+          "description": "An IPv4 address range in CIDR notation, such as '124.56.78.91' (simple IP address) or '124.56.78.0/24' (all addresses that start with 124.56.78).",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "type": "object"
+    },
     "MhsmNetworkRuleSet": {
-      "description": "A set of rules governing the network accessibility of a managed hsm pool.",
       "properties": {
         "bypass": {
           "description": "Tells what traffic can bypass network rules. This can be 'AzureServices' or 'None'.  If not specified the default is 'AzureServices'.",
@@ -1338,12 +1360,10 @@
       "type": "object"
     },
     "MhsmPrivateEndpoint": {
-      "description": "Private endpoint object properties.",
       "properties": {},
       "type": "object"
     },
     "MhsmPrivateEndpointConnectionProperties": {
-      "description": "Properties of the private endpoint connection resource.",
       "properties": {
         "privateEndpoint": {
           "description": "Properties of the private endpoint object.",
@@ -1390,7 +1410,6 @@
       "type": "object"
     },
     "MhsmPrivateLinkServiceConnectionState": {
-      "description": "An object that represents the approval state of the private link connection.",
       "properties": {
         "actionsRequired": {
           "description": "A message indicating if changes on the service provider require any updates on the consumer.",
@@ -1431,7 +1450,6 @@
       "type": "object"
     },
     "MhsmVirtualNetworkRule": {
-      "description": "A rule governing the accessibility of a managed hsm pool from a specific virtual network.",
       "properties": {
         "id": {
           "description": "Full resource id of a vnet subnet, such as '/subscriptions/subid/resourceGroups/rg1/providers/Microsoft.Network/virtualNetworks/test-vnet/subnets/subnet1'.",
@@ -1443,21 +1461,7 @@
       ],
       "type": "object"
     },
-    "MhsmipRule": {
-      "description": "A rule governing the accessibility of a managed HSM pool from a specific IP address or IP range.",
-      "properties": {
-        "value": {
-          "description": "An IPv4 address range in CIDR notation, such as '124.56.78.91' (simple IP address) or '124.56.78.0/24' (all addresses that start with 124.56.78).",
-          "type": "string"
-        }
-      },
-      "required": [
-        "value"
-      ],
-      "type": "object"
-    },
     "NetworkRuleSet": {
-      "description": "A set of rules governing the network accessibility of a vault.",
       "properties": {
         "bypass": {
           "description": "Tells what traffic can bypass network rules. This can be 'AzureServices' or 'None'.  If not specified the default is 'AzureServices'.",
@@ -1521,7 +1525,6 @@
       "type": "object"
     },
     "Permissions": {
-      "description": "Permissions the identity has for keys, secrets, certificates and storage.",
       "properties": {
         "certificates": {
           "description": "Permissions to certificates",
@@ -1653,12 +1656,10 @@
       "type": "object"
     },
     "PrivateEndpoint": {
-      "description": "Private endpoint object properties.",
       "properties": {},
       "type": "object"
     },
     "PrivateEndpointConnectionProperties": {
-      "description": "Properties of the private endpoint connection resource.",
       "properties": {
         "privateEndpoint": {
           "description": "Properties of the private endpoint object.",
@@ -1705,7 +1706,6 @@
       "type": "object"
     },
     "PrivateLinkServiceConnectionState": {
-      "description": "An object that represents the approval state of the private link connection.",
       "properties": {
         "actionsRequired": {
           "description": "A message indicating if changes on the service provider require any updates on the consumer.",
@@ -1776,7 +1776,6 @@
       "type": "object"
     },
     "SecretAttributes": {
-      "description": "The secret management attributes.",
       "properties": {
         "enabled": {
           "description": "Determines whether the object is enabled.",
@@ -1814,8 +1813,14 @@
       },
       "type": "object"
     },
+    "SecretCreateOrUpdateParametersTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "SecretProperties": {
-      "description": "Properties of the secret",
       "properties": {
         "attributes": {
           "description": "The attributes of the secret.",
@@ -1840,7 +1845,6 @@
       "type": "object"
     },
     "Sku": {
-      "description": "SKU details",
       "properties": {
         "family": {
           "description": "SKU family name",
@@ -1892,7 +1896,6 @@
       "type": "object"
     },
     "VaultAccessPolicyProperties": {
-      "description": "Properties of the vault access policy",
       "properties": {
         "accessPolicies": {
           "description": "An array of 0 to 16 identities that have access to the key vault. All identities in the array must use the same tenant ID as the key vault's tenant ID.",
@@ -1914,8 +1917,14 @@
       ],
       "type": "object"
     },
+    "VaultCreateOrUpdateParametersTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "VaultProperties": {
-      "description": "Properties of the vault",
       "properties": {
         "accessPolicies": {
           "description": "An array of 0 to 1024 identities that have access to the key vault. All identities in the array must use the same tenant ID as the key vault's tenant ID. When `createMode` is set to `recover`, access policies are not required. Otherwise, access policies are required.",
@@ -1940,41 +1949,6 @@
                 "default"
               ],
               "type": "string"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "enablePurgeProtection": {
-          "description": "Property specifying whether protection against purge is enabled for this vault. Setting this property to true activates protection against purge for this vault and its content - only the Key Vault service may initiate a hard, irrecoverable deletion. The setting is effective only if soft delete is also enabled. Enabling this functionality is irreversible - that is, the property does not accept false as its value.",
-          "oneOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "enableRbacAuthorization": {
-          "description": "Property that controls how data actions are authorized. When true, the key vault will use Role Based Access Control (RBAC) for authorization of data actions, and the access policies specified in vault properties will be  ignored. When false, the key vault will use the access policies specified in vault properties, and any policy stored on Azure Resource Manager will be ignored. If null or not specified, the vault is created with the default value of false. Note that management actions are always authorized with RBAC.",
-          "oneOf": [
-            {
-              "default": false,
-              "type": "boolean"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
-        "enableSoftDelete": {
-          "description": "Property to specify whether the 'soft delete' functionality is enabled for this key vault. If it's not set to any value(true or false) when creating new key vault, it will be set to true by default. Once set to true, it cannot be reverted to false.",
-          "oneOf": [
-            {
-              "default": true,
-              "type": "boolean"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -2014,6 +1988,39 @@
             }
           ]
         },
+        "enablePurgeProtection": {
+          "description": "Property specifying whether protection against purge is enabled for this vault. Setting this property to true activates protection against purge for this vault and its content - only the Key Vault service may initiate a hard, irrecoverable deletion. The setting is effective only if soft delete is also enabled. Enabling this functionality is irreversible - that is, the property does not accept false as its value.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "enableRbacAuthorization": {
+          "description": "Property that controls how data actions are authorized. When true, the key vault will use Role Based Access Control (RBAC) for authorization of data actions, and the access policies specified in vault properties will be  ignored. When false, the key vault will use the access policies specified in vault properties, and any policy stored on Azure Resource Manager will be ignored. If null or not specified, the vault is created with the default value of false. Note that management actions are always authorized with RBAC.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
+        "enableSoftDelete": {
+          "description": "Property to specify whether the 'soft delete' functionality is enabled for this key vault. If it's not set to any value(true or false) when creating new key vault, it will be set to true by default. Once set to true, it cannot be reverted to false.",
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
         "networkAcls": {
           "description": "Rules governing the accessibility of the key vault from specific network locations.",
           "oneOf": [
@@ -2041,7 +2048,6 @@
           ]
         },
         "publicNetworkAccess": {
-          "default": "enabled",
           "description": "Property to specify whether the vault will accept traffic from public internet. If set to 'disabled' all traffic except private endpoint traffic and that that originates from trusted services will be blocked. This will override the set firewall rules, meaning that even if the firewall rules are present we will not honor the rules.",
           "type": "string"
         },
@@ -2060,7 +2066,6 @@
           "description": "softDelete data retention days. It accepts >=7 and <=90.",
           "oneOf": [
             {
-              "default": 90,
               "type": "integer"
             },
             {
@@ -2072,7 +2077,9 @@
           "description": "The Azure Active Directory tenant ID that should be used for authenticating requests to the key vault.",
           "oneOf": [
             {
-              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+              "maxLength": 36,
+              "minLength": 36,
+              "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
               "type": "string"
             },
             {
@@ -2086,13 +2093,12 @@
         }
       },
       "required": [
-        "tenantId",
-        "sku"
+        "sku",
+        "tenantId"
       ],
       "type": "object"
     },
     "VirtualNetworkRule": {
-      "description": "A rule governing the accessibility of a vault from a specific virtual network.",
       "properties": {
         "id": {
           "description": "Full resource id of a vnet subnet, such as '/subscriptions/subid/resourceGroups/rg1/providers/Microsoft.Network/virtualNetworks/test-vnet/subnets/subnet1'.",
@@ -2116,7 +2122,7 @@
       "type": "object"
     },
     "managedHSMs_keys_childResource": {
-      "description": "Microsoft.KeyVault/managedHSMs/keys",
+      "description": "keys",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -2125,7 +2131,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the key to be created. The value you provide may be copied globally for the purpose of running the service. The value provided should not include personally identifiable or sensitive information.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9-]{1,127}$",
@@ -2178,7 +2184,7 @@
       "type": "object"
     },
     "managedHSMs_privateEndpointConnections_childResource": {
-      "description": "Microsoft.KeyVault/managedHSMs/privateEndpointConnections",
+      "description": "privateEndpointConnections",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -2195,7 +2201,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the private endpoint connection associated with the managed hsm pool.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -2251,7 +2257,7 @@
       "type": "object"
     },
     "vaults_accessPolicies_childResource": {
-      "description": "Microsoft.KeyVault/vaults/accessPolicies",
+      "description": "accessPolicies",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -2260,7 +2266,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the operation",
+          "description": "The resource name",
           "oneOf": [
             {
               "enum": [
@@ -2302,7 +2308,7 @@
       "type": "object"
     },
     "vaults_keys_childResource": {
-      "description": "Microsoft.KeyVault/vaults/keys",
+      "description": "keys",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -2311,7 +2317,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the key to be created. The value you provide may be copied globally for the purpose of running the service. The value provided should not include personally identifiable or sensitive information.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9-]{1,127}$",
@@ -2364,7 +2370,7 @@
       "type": "object"
     },
     "vaults_privateEndpointConnections_childResource": {
-      "description": "Microsoft.KeyVault/vaults/privateEndpointConnections",
+      "description": "privateEndpointConnections",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -2377,7 +2383,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the private endpoint connection associated with the key vault.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -2407,7 +2413,7 @@
       "type": "object"
     },
     "vaults_secrets_childResource": {
-      "description": "Microsoft.KeyVault/vaults/secrets",
+      "description": "secrets",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -2416,7 +2422,7 @@
           "type": "string"
         },
         "name": {
-          "description": "Name of the secret. The value you provide may be copied globally for the purpose of running the service. The value provided should not include personally identifiable or sensitive information.",
+          "description": "The resource name",
           "oneOf": [
             {
               "pattern": "^[a-zA-Z0-9-]{1,127}$",
@@ -2439,7 +2445,7 @@
           ]
         },
         "tags": {
-          "description": "The tags that will be assigned to the secret. ",
+          "description": "The tags that will be assigned to the secret.",
           "oneOf": [
             {
               "additionalProperties": {

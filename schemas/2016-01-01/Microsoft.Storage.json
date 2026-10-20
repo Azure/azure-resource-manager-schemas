@@ -33,15 +33,22 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the storage account within the specified resource group. Storage account names must be between 3 and 24 characters in length and use numbers and lower-case letters only.",
-          "maxLength": 24,
-          "minLength": 3,
-          "type": "string"
+          "description": "The resource name",
+          "oneOf": [
+            {
+              "maxLength": 24,
+              "minLength": 3,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "properties": {
           "oneOf": [
             {
-              "$ref": "#/definitions/StorageAccountPropertiesCreateParameters"
+              "$ref": "#/definitions/StorageAccountPropertiesCreateParametersOrStorageAccountProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -82,7 +89,11 @@
         }
       },
       "required": [
+        "kind",
+        "location",
         "name",
+        "sku",
+        "properties",
         "apiVersion",
         "type"
       ],
@@ -91,7 +102,6 @@
   },
   "definitions": {
     "CustomDomain": {
-      "description": "The custom domain assigned to this storage account. This can be set via Update.",
       "properties": {
         "name": {
           "description": "Gets or sets the custom domain name assigned to the storage account. Name is the CNAME source.",
@@ -115,7 +125,6 @@
       "type": "object"
     },
     "Encryption": {
-      "description": "The encryption settings on the storage account.",
       "properties": {
         "keySource": {
           "description": "The encryption keySource (provider). Possible values (case-insensitive):  Microsoft.Storage",
@@ -149,7 +158,6 @@
       "type": "object"
     },
     "EncryptionService": {
-      "description": "A service that allows server-side encryption to be used.",
       "properties": {
         "enabled": {
           "description": "A boolean indicating whether or not the service encrypts the data as it is stored.",
@@ -166,7 +174,6 @@
       "type": "object"
     },
     "EncryptionServices": {
-      "description": "A list of services that support encryption.",
       "properties": {
         "blob": {
           "description": "The encryption function of the blob storage service.",
@@ -183,7 +190,6 @@
       "type": "object"
     },
     "Sku": {
-      "description": "The SKU of the storage account.",
       "properties": {
         "name": {
           "description": "Gets or sets the sku name. Required for account creation; optional for update. Note that in older versions, sku name was called accountType.",
@@ -209,7 +215,14 @@
       ],
       "type": "object"
     },
-    "StorageAccountPropertiesCreateParameters": {
+    "StorageAccountCreateParametersTags": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
+    "StorageAccountPropertiesCreateParametersOrStorageAccountProperties": {
       "properties": {
         "accessTier": {
           "description": "Required for storage accounts where kind = BlobStorage. The access tier used for billing.",

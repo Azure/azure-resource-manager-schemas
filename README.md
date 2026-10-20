@@ -29,6 +29,8 @@ If you want to preview or troubleshoot generation locally, you can use the gener
     npm --prefix generator run generate-single -- --specs-dir ../azure-rest-api-specs --base-path myprovider/resource-manager
     ```
 
+The C# generator preserves Compute's VM and VM scale-set extension overrides, including nested extensions and inline scale-set extension profiles. Both generators share the curated definitions in [Microsoft.Compute.Extensions.json](generator/processors/Microsoft.Compute.Extensions.json); generated extension resources and their root-schema references use the companion `Microsoft.Compute.Extensions.json` schema for each API version.
+
 ### Runing Unit Tests
 Use the following commands to execute the test suite locally:
 ```bash

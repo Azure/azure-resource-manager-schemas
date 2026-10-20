@@ -7,9 +7,13 @@ namespace TemplateSchemaGenerator;
 
 internal static class SpecialCaseRewriter
 {
-    public static void Rewrite(string providerNamespace, JsonObject schema)
+    public static void Rewrite(string providerNamespace, JsonObject schema, string? apiVersion = null)
     {
-        if (providerNamespace.Equals("Microsoft.ServiceFabric", StringComparison.OrdinalIgnoreCase))
+        if (providerNamespace.Equals("Microsoft.Compute", StringComparison.OrdinalIgnoreCase))
+        {
+            ComputeExtensionSchema.Rewrite(schema, apiVersion ?? throw new ArgumentNullException(nameof(apiVersion)));
+        }
+        else if (providerNamespace.Equals("Microsoft.ServiceFabric", StringComparison.OrdinalIgnoreCase))
         {
             RewriteServiceFabric(schema);
         }

@@ -22,7 +22,6 @@ import { detectProviderNamespaces } from './generate';
 
 // Providers that have not been onboarded to the C# generator and still use AutoRest.
 export const csharpGeneratorDisabledProviders: string[] = [
-    'Microsoft.Compute',
 ];
 
 // New providers are onboarded by default. The providers listed here are the only ones **not** onboarded.

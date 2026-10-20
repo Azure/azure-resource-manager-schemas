@@ -33,7 +33,7 @@ Generation supports all providers or a single `--provider-namespace`; Swagger pa
 
 The C# generator preserves Compute's VM and VM scale-set extension overrides, including nested extensions and inline scale-set extension profiles. It embeds the curated definitions in [Microsoft.Compute.Extensions.json](generator/processors/Microsoft.Compute.Extensions.json); generated extension resources and their root-schema references use the companion `Microsoft.Compute.Extensions.json` schema for each API version.
 
-Run orchestration regression tests with `npm --prefix generator test`, and C# generator tests with `dotnet test`.
+Validate the TypeScript generator with `npm --prefix generator run lint` and `npm --prefix generator run build`, and run C# generator tests with `dotnet test`.
 
 ### Runing Unit Tests
 Use the following commands to execute the test suite locally:

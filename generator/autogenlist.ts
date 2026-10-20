@@ -24,7 +24,6 @@ import { detectProviderNamespaces } from './generate';
 export const csharpGeneratorDisabledProviders: string[] = [
     'Microsoft.Compute',
     'Microsoft.Network',
-    'Microsoft.ServiceBus',
     'Microsoft.Sql',
 ];
 

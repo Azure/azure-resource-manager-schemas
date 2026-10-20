@@ -12,24 +12,28 @@ This is the repo for template deployment schemas hosted under `https://schema.ma
 Schemas are generated and updated automatically, and should not require any action from RP teams.
 
 ## Generating Locally
-If you want to preview or troubleshoot generation locally, you can use the generator in this repo to generate a schema from a swagger spec checked into the [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs) repo.
+Schema generation uses only the C# generator in `src/TemplateSchemaGenerator`, reading pre-built Bicep types from the pinned `bicep-types-az/generated` submodule. It does not regenerate types from Swagger specs. To use newer API definitions, update the submodule to a commit containing the corresponding generated Bicep types.
 
 ### Instructions
-1. Clone [azure-rest-api-specs](https://github.com/Azure/azure-rest-api-specs).
 1. Fork this repo, and clone it locally.
-1. Update submodules and build dependencies:
+1. Install the .NET SDK specified by `global.json` and Node.js, then initialize submodules and publish the generator:
     ```bash
     git submodule update --init --recursive
-    npm --prefix bicep-types-az/src/autorest.bicep ci
-    npm --prefix bicep-types-az/src/autorest.bicep run build
+    dotnet publish src/TemplateSchemaGenerator
     ```
-1. Run the following commands, replacing `../azure-rest-api-specs` with your relative path to the swagger repo, and `myprovider/resource-manager` with the base path (discovered with `npm --prefix generator run list-basepaths`)
+1. Install the orchestration dependencies and generate a provider:
     ```bash
     npm --prefix generator ci
-    npm --prefix generator run generate-single -- --specs-dir ../azure-rest-api-specs --base-path myprovider/resource-manager
+    npm --prefix generator run generate -- --provider-namespace Microsoft.Compute
     ```
 
-The C# generator preserves Compute's VM and VM scale-set extension overrides, including nested extensions and inline scale-set extension profiles. Both generators share the curated definitions in [Microsoft.Compute.Extensions.json](generator/processors/Microsoft.Compute.Extensions.json); generated extension resources and their root-schema references use the companion `Microsoft.Compute.Extensions.json` schema for each API version.
+Run `npm --prefix generator run generate` without `--provider-namespace` to generate all providers in the Bicep types index in one run and update their root-schema references directly. Existing schemas and references for other providers are preserved. Both modes write a Markdown summary to `summary.log` by default; use `--summary-log-path` to choose another location.
+
+Generation supports all providers or a single `--provider-namespace`; Swagger paths and readmes are not supported as generation inputs. Providers missing from the Bicep types index fail explicitly. The retired Swagger-to-SDK automation integration and its package-result output are no longer supported.
+
+The C# generator preserves Compute's VM and VM scale-set extension overrides, including nested extensions and inline scale-set extension profiles. It embeds the curated definitions in [Microsoft.Compute.Extensions.json](generator/processors/Microsoft.Compute.Extensions.json); generated extension resources and their root-schema references use the companion `Microsoft.Compute.Extensions.json` schema for each API version.
+
+Run orchestration regression tests with `npm --prefix generator test`, and C# generator tests with `dotnet test`.
 
 ### Runing Unit Tests
 Use the following commands to execute the test suite locally:
@@ -53,9 +57,6 @@ Once this is running, you can create a basic template with the following structu
 }
 ```
 **NOTE** Many client tools will cache responses from schema servers, so you may need to clear this cache if you are testing modifications, or alternatively, change the port between retries.
-
-## RP Schemas Repo Issues Bot Notifications
-To get quickly notified on GitHub issues for your RP's schema, please update the [rp-label-to-contact.md](/rp-label-to-contact.md) by submitting a PR with the desired GitHub handle(s) and label for your RP.
 
 ---
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.

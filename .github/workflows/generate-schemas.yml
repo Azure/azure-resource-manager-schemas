@@ -5,18 +5,10 @@ on:
     - cron: '45 5 * * TUE,THU'
   workflow_dispatch:
     inputs:
-      api_specs_ref:
-        description: 'Git ref or full SHA for https://github.com/Azure/azure-rest-api-specs.'
-        required: true
-        default: 'main'
       bicep_types_az_ref:
         description: 'Optional bicep-types-az commit SHA to pin. If empty, pins to latest default branch HEAD.'
         required: false
         default: ''
-
-env:
-  # This must be kept in sync with the arguments passed to the "batch" matrix
-  BATCH_COUNT: 20
 
 jobs:
   pin:
@@ -56,12 +48,10 @@ jobs:
 
   generate:
     needs: pin
-    name: Update Schemas Batch ${{ matrix.batch }}
+    name: Update Schemas
+    permissions:
+      contents: write
     runs-on: ubuntu-22.04 #Pinning the image to a specific version due to an issue with ICU packages in the latest image https://github.com/actions/runner-images/issues/10989
-    strategy:
-      fail-fast: false
-      matrix:
-        batch: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
     steps:
       - name: Checkout repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -75,13 +65,6 @@ jobs:
           git -C bicep-types-az checkout '${{ needs.pin.outputs.new_sha }}'
           git -C bicep-types-az submodule update --init --recursive --depth=1
 
-      - name: Clone azure-rest-api-specs
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: Azure/azure-rest-api-specs
-          path: workflow-temp/azure-rest-api-specs
-          ref: ${{ github.event.inputs.api_specs_ref }}
-
       - name: Setup Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
@@ -94,12 +77,6 @@ jobs:
         run: npm ci
         working-directory: generator
 
-      - name: Build autorest.bicep
-        run: |
-          npm ci
-          npm run build
-        working-directory: bicep-types-az/src/autorest.bicep
-
       - name: .NET Publish
         run: |
           dotnet publish
@@ -107,85 +84,26 @@ jobs:
       - name: Run generator
         run: |
           set -e
-          rm -Rf "$GITHUB_WORKSPACE/schemas"
-          rm -Rf "$GITHUB_WORKSPACE/summary.log"
-          mkdir -p "$GITHUB_WORKSPACE/schemas"
+          rm -f "$GITHUB_WORKSPACE/summary.log"
 
-          npm run generate-all -- \
-            --specs-dir "$GITHUB_WORKSPACE/workflow-temp/azure-rest-api-specs" \
-            --batch-count ${{ env.BATCH_COUNT }} \
-            --batch-index ${{ matrix.batch }} \
-            --summary-log-path "$GITHUB_WORKSPACE/summary.log" \
-            --combine-batch-mode true
+          npm run generate -- \
+            --summary-log-path "$GITHUB_WORKSPACE/summary.log"
         working-directory: generator
 
       - name: Write summary
         if: ${{ always() }}
         run: cat summary.log >> $GITHUB_STEP_SUMMARY
 
-      - name: Upload Schemas
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: batch-${{ matrix.batch }}-schemas
-          path: schemas
-          if-no-files-found: error
-
-      - name: Upload summary log
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: batch-${{ matrix.batch }}-summary
-          path: summary.log
-          if-no-files-found: error
-
-  combine:
-    needs: [pin, generate]
-    name: Combine Schema Batches
-    permissions:
-      contents: write
-    runs-on: ubuntu-22.04 #Pinning the image to a specific version due to an issue with ICU packages in the latest image https://github.com/actions/runner-images/issues/10989
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          submodules: recursive
-
-      - name: Download batch results
-        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
-        with:
-          path: workflow-temp
-
-      - name: Setup Node.js
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: 20.x
-      
-      - name: Install generator npm packages
-        run: npm ci
-        working-directory: generator
-
-      - name: Combine batches
-        run: |
-          npm run combine-batches -- \
-            --input-path "$GITHUB_WORKSPACE/workflow-temp" \
-            --batch-count ${{ env.BATCH_COUNT }}
-        working-directory: generator
-
       - name: Update resources.json
         run: |
           npm run list-resources
         working-directory: generator
 
-      - name: Pin bicep-types-az to resolved SHA
-        run: |
-          set -e
-          git -C bicep-types-az fetch --depth=1 origin '${{ needs.pin.outputs.new_sha }}'
-          git -C bicep-types-az checkout '${{ needs.pin.outputs.new_sha }}'
-          git -C bicep-types-az submodule update --init --recursive --depth=1
-
-      - name: Push to autogenerate-batch branch
+      - name: Push to autogenerate branch
         uses: stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d # v7.2.0
         with:
           commit_message: Update Generated Schemas
-          branch: autogenerate-batch
+          branch: autogenerate
+          file_pattern: schemas generator/resources.json bicep-types-az
           push_options: '--force'
           create_branch: true

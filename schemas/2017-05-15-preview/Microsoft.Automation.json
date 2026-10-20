@@ -14,14 +14,14 @@
           "type": "string"
         },
         "name": {
-          "description": "The job name.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "Gets or sets the list of job properties.",
           "oneOf": [
             {
-              "$ref": "#/definitions/JobCreateProperties"
+              "$ref": "#/definitions/JobCreatePropertiesOrJobProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -53,7 +53,7 @@
           "type": "string"
         },
         "name": {
-          "description": "The name of the software update configuration to be created.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
@@ -92,14 +92,14 @@
           "type": "string"
         },
         "name": {
-          "description": "The source control name.",
+          "description": "The resource name",
           "type": "string"
         },
         "properties": {
           "description": "The properties of the source control.",
           "oneOf": [
             {
-              "$ref": "#/definitions/SourceControlCreateOrUpdateProperties"
+              "$ref": "#/definitions/SourceControlCreateOrUpdatePropertiesOrSourceControlProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -141,10 +141,12 @@
           "type": "string"
         },
         "name": {
-          "description": "The source control sync job id.",
+          "description": "The resource name",
           "oneOf": [
             {
-              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+              "maxLength": 36,
+              "minLength": 36,
+              "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
               "type": "string"
             },
             {
@@ -156,7 +158,7 @@
           "description": "The properties of the source control sync job.",
           "oneOf": [
             {
-              "$ref": "#/definitions/SourceControlSyncJobCreateProperties"
+              "$ref": "#/definitions/SourceControlSyncJobCreatePropertiesOrSourceControlSyncJobByIdProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -181,7 +183,6 @@
   },
   "definitions": {
     "AdvancedSchedule": {
-      "description": "The properties of the create Advanced Schedule.",
       "properties": {
         "monthDays": {
           "description": "Days of the month that the job should execute on. Must be between 1 and 31.",
@@ -229,7 +230,6 @@
       "type": "object"
     },
     "AdvancedScheduleMonthlyOccurrence": {
-      "description": "The properties of the create advanced schedule monthly occurrence.",
       "properties": {
         "day": {
           "description": "Day of the occurrence. Must be one of monday, tuesday, wednesday, thursday, friday, saturday, sunday.",
@@ -266,7 +266,6 @@
       "type": "object"
     },
     "AzureQueryProperties": {
-      "description": "Azure query for the update configuration.",
       "properties": {
         "locations": {
           "description": "List of locations to scope the query to.",
@@ -311,7 +310,6 @@
       "type": "object"
     },
     "ErrorResponse": {
-      "description": "Error response of an operation failure",
       "properties": {
         "code": {
           "description": "Error code",
@@ -324,7 +322,7 @@
       },
       "type": "object"
     },
-    "JobCreateProperties": {
+    "JobCreatePropertiesOrJobProperties": {
       "properties": {
         "parameters": {
           "description": "Gets or sets the parameters of the job.",
@@ -341,10 +339,6 @@
             }
           ]
         },
-        "runOn": {
-          "description": "Gets or sets the runOn which specifies the group name where the job is to be executed.",
-          "type": "string"
-        },
         "runbook": {
           "description": "Gets or sets the runbook.",
           "oneOf": [
@@ -355,12 +349,22 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
+        },
+        "runOn": {
+          "description": "Gets or sets the runOn which specifies the group name where the job is to be executed.",
+          "type": "string"
         }
       },
       "type": "object"
     },
+    "JobCreatePropertiesParameters": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "LinuxProperties": {
-      "description": "Linux specific update configuration.",
       "properties": {
         "excludedPackageNameMasks": {
           "description": "packages excluded from the software update configuration.",
@@ -415,7 +419,6 @@
       "type": "object"
     },
     "NonAzureQueryProperties": {
-      "description": "Non Azure query for the update configuration.",
       "properties": {
         "functionAlias": {
           "description": "Log Analytics Saved Search name.",
@@ -429,7 +432,6 @@
       "type": "object"
     },
     "RunbookAssociationProperty": {
-      "description": "The runbook property associated with the entity.",
       "properties": {
         "name": {
           "description": "Gets or sets the name of the runbook.",
@@ -439,7 +441,6 @@
       "type": "object"
     },
     "ScheduleProperties": {
-      "description": "Definition of schedule parameters.",
       "properties": {
         "advancedSchedule": {
           "description": "Gets or sets the advanced schedule.",
@@ -454,7 +455,6 @@
         },
         "creationTime": {
           "description": "Gets or sets the creation time.",
-          "format": "date-time",
           "type": "string"
         },
         "description": {
@@ -463,14 +463,13 @@
         },
         "expiryTime": {
           "description": "Gets or sets the end time of the schedule.",
-          "format": "date-time",
           "type": "string"
         },
         "expiryTimeOffsetMinutes": {
           "description": "Gets or sets the expiry time's offset in minutes.",
           "oneOf": [
             {
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -511,7 +510,6 @@
           "description": "Gets or sets a value indicating whether this schedule is enabled.",
           "oneOf": [
             {
-              "default": false,
               "type": "boolean"
             },
             {
@@ -521,19 +519,17 @@
         },
         "lastModifiedTime": {
           "description": "Gets or sets the last modified time.",
-          "format": "date-time",
           "type": "string"
         },
         "nextRun": {
           "description": "Gets or sets the next run time of the schedule.",
-          "format": "date-time",
           "type": "string"
         },
         "nextRunOffsetMinutes": {
           "description": "Gets or sets the next run time's offset in minutes.",
           "oneOf": [
             {
-              "type": "number"
+              "type": "integer"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
@@ -542,7 +538,6 @@
         },
         "startTime": {
           "description": "Gets or sets the start time of the schedule.",
-          "format": "date-time",
           "type": "string"
         },
         "timeZone": {
@@ -553,7 +548,6 @@
       "type": "object"
     },
     "SoftwareUpdateConfigurationProperties": {
-      "description": "Software update configuration properties.",
       "properties": {
         "error": {
           "description": "Details of provisioning error",
@@ -601,13 +595,12 @@
         }
       },
       "required": [
-        "updateConfiguration",
-        "scheduleInfo"
+        "scheduleInfo",
+        "updateConfiguration"
       ],
       "type": "object"
     },
     "SoftwareUpdateConfigurationTasks": {
-      "description": "Task properties of the software update configuration.",
       "properties": {
         "postTask": {
           "description": "Post task properties.",
@@ -634,8 +627,7 @@
       },
       "type": "object"
     },
-    "SourceControlCreateOrUpdateProperties": {
-      "description": "The properties of the create source control operation.",
+    "SourceControlCreateOrUpdatePropertiesOrSourceControlProperties": {
       "properties": {
         "autoSync": {
           "description": "The auto async of the source control. Default is false.",
@@ -650,18 +642,39 @@
         },
         "branch": {
           "description": "The repo branch of the source control. Include branch as empty string for VsoTfvc.",
-          "maxLength": 255,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 255,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "description": {
           "description": "The user description of the source control.",
-          "maxLength": 512,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 512,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "folderPath": {
           "description": "The folder path of the source control. Path must be relative.",
-          "maxLength": 255,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 255,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "publishRunbook": {
           "description": "The auto publish of the source control. Default is true.",
@@ -676,8 +689,15 @@
         },
         "repoUrl": {
           "description": "The repo url of the source control.",
-          "maxLength": 2000,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 2000,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "securityToken": {
           "description": "The authorization token for the repo of the source control.",
@@ -713,13 +733,27 @@
       "properties": {
         "accessToken": {
           "description": "The access token.",
-          "maxLength": 1024,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 1024,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "refreshToken": {
           "description": "The refresh token.",
-          "maxLength": 1024,
-          "type": "string"
+          "oneOf": [
+            {
+              "maxLength": 1024,
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
         },
         "tokenType": {
           "description": "The token type. Must be either PersonalAccessToken or Oauth.",
@@ -739,8 +773,7 @@
       },
       "type": "object"
     },
-    "SourceControlSyncJobCreateProperties": {
-      "description": "Definition of create source control sync job properties.",
+    "SourceControlSyncJobCreatePropertiesOrSourceControlSyncJobByIdProperties": {
       "properties": {
         "commitId": {
           "description": "The commit id of the source control sync job. If not syncing to a commitId, enter an empty string.",
@@ -753,7 +786,6 @@
       "type": "object"
     },
     "TagSettingsProperties": {
-      "description": "Tag filter information for the VM.",
       "properties": {
         "filterOperator": {
           "description": "Filter VMs by Any or All specified tags.",
@@ -791,8 +823,17 @@
       },
       "type": "object"
     },
+    "TagSettingsPropertiesTags": {
+      "additionalProperties": {
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "TargetProperties": {
-      "description": "Group specific to the update configuration.",
       "properties": {
         "azureQueries": {
           "description": "List of Azure queries in the software update configuration.",
@@ -826,7 +867,6 @@
       "type": "object"
     },
     "TaskProperties": {
-      "description": "Task properties of the software update configuration.",
       "properties": {
         "parameters": {
           "description": "Gets or sets the parameters of the task.",
@@ -850,8 +890,14 @@
       },
       "type": "object"
     },
+    "TaskPropertiesParameters": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "properties": {},
+      "type": "object"
+    },
     "UpdateConfiguration": {
-      "description": "Update specific properties of the software update configuration.",
       "properties": {
         "azureVirtualMachines": {
           "description": "List of azure resource Ids for azure virtual machines targeted by the software update configuration.",
@@ -940,7 +986,6 @@
       "type": "object"
     },
     "WindowsProperties": {
-      "description": "Windows specific update configuration.",
       "properties": {
         "excludedKbNumbers": {
           "description": "KB numbers excluded from the software update configuration.",
@@ -1000,7 +1045,7 @@
       "type": "object"
     },
     "automationAccounts_sourceControls_sourceControlSyncJobs_childResource": {
-      "description": "Microsoft.Automation/automationAccounts/sourceControls/sourceControlSyncJobs",
+      "description": "sourceControlSyncJobs",
       "properties": {
         "apiVersion": {
           "enum": [
@@ -1009,10 +1054,12 @@
           "type": "string"
         },
         "name": {
-          "description": "The source control sync job id.",
+          "description": "The resource name",
           "oneOf": [
             {
-              "pattern": "^[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}$",
+              "maxLength": 36,
+              "minLength": 36,
+              "pattern": "^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$",
               "type": "string"
             },
             {
@@ -1024,7 +1071,7 @@
           "description": "The properties of the source control sync job.",
           "oneOf": [
             {
-              "$ref": "#/definitions/SourceControlSyncJobCreateProperties"
+              "$ref": "#/definitions/SourceControlSyncJobCreatePropertiesOrSourceControlSyncJobByIdProperties"
             },
             {
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"

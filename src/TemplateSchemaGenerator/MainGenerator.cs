@@ -88,6 +88,12 @@ public class MainGenerator(
                 var schemaPath = Utils.GetSchemaPath(apiVersion, grouped.ProviderNamespace);
                 // TODO set sortProperties to true after the migration to C# is complete
                 var schemaContent = JsonSchemaGenerator.GenerateProviderSchema(grouped.ProviderNamespace, apiVersion, loadedResourceTypes, sortProperties: false);
+                if (grouped.ProviderNamespace.Equals("Microsoft.Compute", StringComparison.OrdinalIgnoreCase))
+                {
+                    var extensionSchema = ComputeExtensionSchema.Extract(schemaContent, apiVersion);
+                    WriteJsonFile(options, Utils.GetSchemaPath(apiVersion, ComputeExtensionSchema.ExtensionProviderNamespace), extensionSchema);
+                }
+
                 WriteJsonFile(options, schemaPath, schemaContent);
 
                 foreach (var resourceType in loadedResourceTypes)

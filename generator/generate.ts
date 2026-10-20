@@ -109,7 +109,8 @@ export async function generateSchemasWithCsharpGenerator(providerNamespace: stri
         // Discover the schemas written by the C# generator for this namespace and build SchemaConfiguration entries.
         const namespaceLower = namespace.toLowerCase();
         const schemaFiles = await findRecursive(tmpFolder, p =>
-            path.basename(p).toLowerCase() === `${namespaceLower}.json`);
+            path.basename(p).toLowerCase() === `${namespaceLower}.json` ||
+            (namespaceLower === 'microsoft.compute' && path.basename(p).toLowerCase() === 'microsoft.compute.extensions.json'));
 
         for (const schemaFilePath of schemaFiles) {
             const relativePath = path.relative(tmpFolder, schemaFilePath).replace(/\\/g, '/');

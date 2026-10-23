@@ -3,12 +3,8 @@ name: Generate Single
 on:
   workflow_dispatch:
     inputs:
-      api_specs_ref:
-        description: 'Git ref or full SHA for https://github.com/Azure/azure-rest-api-specs.'
-        required: true
-        default: 'main'
-      single_path:
-        description: 'The path to generate types for (e.g. "compute/resource-manager", or "keyvault/resource-manager").'
+      provider_namespace:
+        description: 'Provider namespace in the pre-built Bicep types (e.g. "Microsoft.Compute").'
         required: true
 
 jobs:
@@ -24,12 +20,8 @@ jobs:
         with: 
           submodules: recursive
 
-      - name: Clone azure-rest-api-specs
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: Azure/azure-rest-api-specs
-          path: workflow-temp/azure-rest-api-specs
-          ref: ${{ github.event.inputs.api_specs_ref }}
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
 
       - name: Setup Node.js
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
@@ -40,17 +32,13 @@ jobs:
         run: npm ci
         working-directory: generator
 
-      - name: Build autorest.bicep
-        run: |
-          npm ci
-          npm run build
-        working-directory: bicep-types-az/src/autorest.bicep
+      - name: .NET Publish
+        run: dotnet publish
 
       - name: Run generator
         run: |
-          npm run generate-single -- \
-            --specs-dir "$GITHUB_WORKSPACE/workflow-temp/azure-rest-api-specs" \
-            --base-path '${{ github.event.inputs.single_path }}'
+          npm run generate -- \
+            --provider-namespace '${{ github.event.inputs.provider_namespace }}'
         working-directory: generator
 
       - name: Update resources.json
@@ -61,7 +49,7 @@ jobs:
       - name: Push to git branch
         uses: stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d # v7.2.0
         with:
-          commit_message: Update Generated Schemas (${{ github.event.inputs.single_path }})
-          branch: autogenerate-single/${{ github.event.inputs.single_path }}
+          commit_message: Update Generated Schemas (${{ github.event.inputs.provider_namespace }})
+          branch: autogenerate-single/${{ github.event.inputs.provider_namespace }}
           push_options: '--force'
           create_branch: true

@@ -12,11 +12,8 @@ dotnet publish "$root/src/TemplateSchemaGenerator"
 npm --prefix "$root/generator" ci
 
 if ($ProviderNamespace) {
-  npm --prefix "$root/generator" run generate-single -- `
-    --specs-dir "$root/../azure-rest-api-specs" `
+  npm --prefix "$root/generator" run generate -- `
     --provider-namespace $ProviderNamespace
 } else {
-  npm --prefix "$root/generator" run generate-all -- `
-    --specs-dir "$root/../azure-rest-api-specs" `
-    --csharp-only
+  npm --prefix "$root/generator" run generate
 }

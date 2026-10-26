@@ -31,6 +31,8 @@ Run `npm --prefix generator run generate` without `--provider-namespace` to gene
 
 Generation supports all providers or a single `--provider-namespace`; Swagger paths and readmes are not supported as generation inputs. Providers missing from the Bicep types index fail explicitly. The retired Swagger-to-SDK automation integration and its package-result output are no longer supported.
 
+Providers with no writable resource types do not produce deployment schemas. A successful C# generation run with no schema output is reported as skipped in the summary, not as a failure. Missing providers and C# execution errors still fail generation.
+
 The C# generator preserves Compute's VM and VM scale-set extension overrides, including nested extensions and inline scale-set extension profiles. It embeds the curated definitions in [Microsoft.Compute.Extensions.json](generator/processors/Microsoft.Compute.Extensions.json); generated extension resources and their root-schema references use the companion `Microsoft.Compute.Extensions.json` schema for each API version.
 
 Validate the TypeScript generator with `npm --prefix generator run lint` and `npm --prefix generator run build`, and run C# generator tests with `dotnet test`.

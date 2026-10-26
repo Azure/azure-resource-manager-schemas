@@ -66,10 +66,6 @@ export async function generateSchemasWithCsharpGenerator(providerNamespace: stri
         const schemaFiles = await findRecursive(tmpFolder, p =>
             path.basename(p).toLowerCase() === `${namespaceLower}.json` ||
             (namespaceLower === 'microsoft.compute' && path.basename(p).toLowerCase() === 'microsoft.compute.extensions.json'));
-        if (schemaFiles.length === 0) {
-            throw new Error(`C# generator produced no schema files for '${namespace}'.`);
-        }
-
         for (const schemaFilePath of schemaFiles) {
             const relativePath = path.relative(tmpFolder, schemaFilePath).replace(/\\/g, '/');
             const schema = await readJsonFile(schemaFilePath);

@@ -31,28 +31,6 @@ export function executeCmd(cwd: string, cmd: string, args: string[]) : Promise<n
     });
 }
 
-export async function findDirRecursive(basePath: string, filter: (name: string) => boolean): Promise<string[]> {
-    let results: string[] = [];
-
-    for (const subPathName of await readdir(basePath)) {
-        const subPath = path.resolve(`${basePath}/${subPathName}`);
-
-        const fileStat = await stat(subPath);
-        if (!fileStat.isDirectory()) {
-            continue;
-        }
-
-        if (filter(subPath)) {
-            results.push(subPath)
-        }
-
-        const pathResults = await findDirRecursive(subPath, filter);
-        results = results.concat(pathResults);
-    }
-
-    return results;
-}
-
 export async function findRecursive(basePath: string, filter: (name: string) => boolean): Promise<string[]> {
     let results: string[] = [];
 
@@ -103,14 +81,6 @@ export async function rmdirRecursive(basePath: string) {
     await rmdir(basePath);
 }
 
-export function lowerCaseContains(list: string[], item: string): boolean {
-    return list.findIndex(v => lowerCaseEquals(v, item)) > -1;
-}
-
-export function lowerCaseEquals(a: string, b: string): boolean {
-    return a.toLowerCase() === b.toLowerCase();
-}
-
 export function lowerCaseCompare(a: string, b: string) {
     const aLower = a.toLowerCase();
     const bLower = b.toLowerCase();
@@ -149,18 +119,6 @@ export function lowerCaseCompareLists(listA: string[], listB: string[]) {
     return 0;
 }
 
-export function apiVersionCompare(a: string, b: string) {
-  if (a.length === b.length) {
-    return lowerCaseCompare(a, b);
-  } else if (a.length < b.length) {
-    const result = lowerCaseCompare(a, b.substr(0, a.length));
-    return result !== 0 ? result : 1;
-  } else {
-    const result = lowerCaseCompare(a.substr(0, b.length), b);
-    return result !== 0 ? result : -1;
-  }
-}
-
 export async function readJsonFile(filePath: string) {
     try {
         const rawContents = await readFile(filePath, { encoding: 'utf8' });
@@ -194,10 +152,6 @@ export async function safeUnlink(filePath: string) {
     }
 }
 
-export function fileExists(filePath: string) {
-    return existsSync(filePath);
-}
-
 export function executeSynchronous<T>(asyncFunc: () => Promise<T>) {
     series(
         [asyncFunc],
@@ -206,25 +160,4 @@ export function executeSynchronous<T>(asyncFunc: () => Promise<T>) {
                 throw error;
             }
         });
-}
-
-export function chunker<T>(input: T[], chunks: number): T[][] {
-    const minChunkSize = Math.floor(input.length / chunks);
-    let remainder = input.length - (minChunkSize * chunks);
-
-    let position = 0;
-    const output = [];
-    for (let i = 0; i < chunks; i++) {
-        let chunkSize = minChunkSize;
-        if (remainder > 0) {
-            remainder--;
-            chunkSize++;
-        }
-        
-        const chunk = input.slice(position, position + chunkSize);
-        output.push(chunk);
-        position += chunkSize;
-    }
-
-    return output;
 }

@@ -35,6 +35,8 @@ Providers with no writable resource types do not produce deployment schemas. A s
 
 The C# generator preserves Compute's VM and VM scale-set extension overrides, including nested extensions and inline scale-set extension profiles. It embeds the curated definitions in [Microsoft.Compute.Extensions.json](generator/processors/Microsoft.Compute.Extensions.json); generated extension resources and their root-schema references use the companion `Microsoft.Compute.Extensions.json` schema for each API version.
 
+For compatibility with schema consumers, the C# generator replaces `/` with `_` in named definition keys and uses the rewritten keys in `$ref` values. Keys that collide after this replacement or case-insensitive comparison receive numeric suffixes. Resource type values and payload property names are unchanged.
+
 Validate the TypeScript generator with `npm --prefix generator run lint` and `npm --prefix generator run build`, and run C# generator tests with `dotnet test`.
 
 ### Runing Unit Tests

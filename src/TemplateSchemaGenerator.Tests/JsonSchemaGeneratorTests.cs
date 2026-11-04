@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using System.Text.Json.Nodes;
 using Azure.Bicep.Types.Az;
+using Azure.Bicep.Types.Concrete;
 using Azure.Deployments.Testing.Utilities;
 using FluentAssertions;
 
@@ -138,6 +139,103 @@ public class JsonSchemaGeneratorTests
         var key = JsonSchemaGenerator.GetArmResourceDefinitionKey("Microsoft.Billing/billingPeriods/Microsoft.Consumption");
 
         Assert.AreEqual("billingPeriods_Microsoft_Consumption", key);
+    }
+
+    [TestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void Schema_generation_replaces_slashes_in_definition_keys_and_references(bool discriminated)
+    {
+        const string providerNamespace = "Microsoft.HorizonDb";
+        const string apiVersion = "2026-10-01-preview";
+        const string typeName = "microsoft.horizondb/clusters/authentications";
+        const string definitionKey = "microsoft.horizondb_clusters_authentications";
+        var factory = new TypeFactory([]);
+        var stringType = factory.Create(() => new StringType());
+        var variant = factory.Create(() => new ObjectType(
+            typeName + "/variant",
+            new Dictionary<string, ObjectTypeProperty>
+            {
+                ["value/part"] = new(factory.GetReference(stringType), ObjectTypePropertyFlags.Required, null),
+            },
+            additionalProperties: null));
+        TypeBase type = discriminated
+            ? factory.Create(() => new DiscriminatedObjectType(
+                typeName,
+                "kind",
+                new Dictionary<string, ObjectTypeProperty>(),
+                new Dictionary<string, ITypeReference> { ["example"] = factory.GetReference(variant) }))
+            : variant;
+        var expectedDefinitionKey = discriminated ? definitionKey : definitionKey + "_variant";
+        var body = factory.Create(() => new ObjectType(
+            providerNamespace + "/clusters",
+            new Dictionary<string, ObjectTypeProperty>
+            {
+                ["payload/path"] = new(factory.GetReference(type), ObjectTypePropertyFlags.Required, null),
+            },
+            additionalProperties: null));
+        var resource = new ResourceType(
+            providerNamespace + "/clusters@" + apiVersion,
+            factory.GetReference(body),
+            functions: null,
+            writableScopes_in: ScopeType.ResourceGroup,
+            readableScopes_in: ScopeType.ResourceGroup);
+
+        var schema = JsonSchemaGenerator.GenerateProviderSchema(providerNamespace, apiVersion, [resource], sortProperties: false);
+        var definitions = schema["definitions"]!.AsObject();
+        definitions.Select(definition => definition.Key).Should().NotContain(key => key.Contains('/'));
+        definitions.ContainsKey(expectedDefinitionKey).Should().BeTrue();
+        definitions[definitionKey + "_variant"]!["properties"]!["value/part"]!["type"]!
+            .GetValue<string>().Should().Be("string");
+        var resourceSchema = schema["resourceDefinitions"]!["clusters"]!;
+        resourceSchema["properties"]!["payload/path"]!["oneOf"]![0]!["$ref"]!
+            .GetValue<string>().Should().Be("#/definitions/" + expectedDefinitionKey);
+        resourceSchema["required"]!.AsArray().Select(value => value!.GetValue<string>())
+            .Should().Contain("payload/path");
+        resourceSchema["properties"]!["type"]!["enum"]![0]!
+            .GetValue<string>().Should().Be(providerNamespace + "/clusters");
+        EnumerateLocalDefinitionRefs(schema).Should().OnlyContain(key => definitions.ContainsKey(key));
+    }
+
+    [TestMethod]
+    public void Schema_generation_disambiguates_definition_keys_after_replacing_slashes()
+    {
+        const string providerNamespace = "Microsoft.Test";
+        const string apiVersion = "2026-01-01";
+        var factory = new TypeFactory([]);
+        var properties = new Dictionary<string, ObjectTypeProperty>();
+        foreach (var name in new[] { "Path/Type", "Path/Type_1", "Path_Type", "path_type" })
+        {
+            var value = factory.Create(() => new StringLiteralType(name));
+            var type = factory.Create(() => new ObjectType(
+                name,
+                new Dictionary<string, ObjectTypeProperty>
+                {
+                    ["value"] = new(factory.GetReference(value), ObjectTypePropertyFlags.Required, null),
+                },
+                additionalProperties: null));
+            properties.Add(name, new(factory.GetReference(type), ObjectTypePropertyFlags.Required, null));
+        }
+        var body = factory.Create(() => new ObjectType(providerNamespace + "/resources", properties, additionalProperties: null));
+        var resource = new ResourceType(
+            providerNamespace + "/resources@" + apiVersion,
+            factory.GetReference(body),
+            functions: null,
+            writableScopes_in: ScopeType.ResourceGroup,
+            readableScopes_in: ScopeType.ResourceGroup);
+
+        var schema = JsonSchemaGenerator.GenerateProviderSchema(providerNamespace, apiVersion, [resource], sortProperties: false);
+        var definitions = schema["definitions"]!.AsObject();
+        definitions.Select(definition => definition.Key)
+            .Should().BeEquivalentTo("Path_Type", "Path_Type_1", "Path_Type_2", "path_type_3");
+        foreach (var name in properties.Keys)
+        {
+            var reference = schema["resourceDefinitions"]!["resources"]!["properties"]![name]!["oneOf"]![0]!["$ref"]!
+                .GetValue<string>();
+            var definition = definitions[reference["#/definitions/".Length..]]!;
+            definition["properties"]!["value"]!["oneOf"]![0]!["enum"]![0]!
+                .GetValue<string>().Should().Be(name);
+        }
     }
 
     [TestMethod]

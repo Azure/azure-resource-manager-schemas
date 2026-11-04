@@ -107,12 +107,13 @@ public static class JsonSchemaGenerator
                     continue;
                 }
 
-                // Definition keys are compared case-insensitively, so names that only differ by casing
-                // (e.g. AutoscaleProfile vs AutoScaleProfile) are disambiguated with a numeric suffix.
-                var defName = name;
+                // Definition keys are compared case-insensitively; collisions after normalizing
+                // slashes or casing are disambiguated with a numeric suffix.
+                var baseDefName = name.Replace('/', '_');
+                var defName = baseDefName;
                 for (var suffix = 1; namedTypes.ContainsKey(defName); suffix++)
                 {
-                    defName = $"{name}_{suffix}";
+                    defName = $"{baseDefName}_{suffix}";
                 }
 
                 namedTypes.Add(defName, type);

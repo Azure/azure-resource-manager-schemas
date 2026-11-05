@@ -319,7 +319,7 @@
     "AccessPolicyAssignmentProperties": {
       "properties": {
         "accessPolicyName": {
-          "description": "Name of access policy under specific access policy assignment. Only \"default\" policy is supported for now.",
+          "description": "**Deprecated.** This property always returns \"default\". Use `accessString` to configure custom Redis ACL permissions instead.",
           "oneOf": [
             {
               "pattern": "^([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]|[a-zA-Z0-9])$",
@@ -329,6 +329,10 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
+        },
+        "accessString": {
+          "description": "The Redis ACL permissions string applied to this assignment, for example `+@read ~cache:*`. Defaults to `+@all ~*` if not specified.",
+          "type": "string"
         },
         "user": {
           "description": "The user associated with the access policy.",
@@ -343,7 +347,6 @@
         }
       },
       "required": [
-        "accessPolicyName",
         "user"
       ],
       "type": "object"
@@ -433,7 +436,7 @@
           ]
         },
         "firewallRules": {
-          "description": "Firewall rules associated with the cluster.",
+          "description": "The complete set of firewall rules for an Azure Managed Redis (AMR) cluster. At most 250 rules are supported, and non-empty rules require publicNetworkAccess to be Enabled.\n\nOn PUT, the supplied array replaces all existing rules. Omitting this property or supplying an empty array clears all rules.\n\nOn PATCH, omitting this property preserves existing rules. A supplied array replaces all existing rules; rules absent from it are deleted. Supplying an empty array clears all rules.\n\nDisabling publicNetworkAccess also clears existing rules. With publicNetworkAccess Enabled, an empty rule set allows all public traffic; it does not deny all traffic.\n\nFirewall rule changes cannot be combined with scaling or encryption changes in the same update request.",
           "oneOf": [
             {
               "items": {
@@ -733,11 +736,11 @@
     "FirewallRule": {
       "properties": {
         "name": {
-          "description": "The name of the firewall rule.",
+          "description": "The name of the firewall rule, unique within the cluster ignoring case. Must be 1-80 characters and contain only letters, numbers, hyphens, or underscores.",
           "type": "string"
         },
         "sourceAddressPrefix": {
-          "description": "The source address prefix for the firewall rule.",
+          "description": "An IPv4 address (for example, \"203.0.113.1\"), IPv4 CIDR prefix (for example, \"203.0.113.0/24\"), or Azure service tag (for example, \"AzureCloud\"). IPv6 addresses are not supported.",
           "type": "string"
         }
       },

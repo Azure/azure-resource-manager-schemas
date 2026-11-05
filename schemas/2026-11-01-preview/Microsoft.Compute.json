@@ -13,6 +13,17 @@
           ],
           "type": "string"
         },
+        "identity": {
+          "description": "The managed service identities assigned to this resource.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/SystemAssignedServiceIdentity"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
         "location": {
           "description": "The geo-location where the resource lives",
           "type": "string"
@@ -97,11 +108,12 @@
           "type": "string"
         },
         "kind": {
-          "description": "Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type.  If supported, the resource provider must validate and persist this value.",
+          "description": "The capability to enable, fixed when the capability is created.",
           "oneOf": [
             {
               "enum": [
-                "AgentSandbox"
+                "AgentSandbox",
+                "PodSnapshotRestore"
               ],
               "type": "string"
             },
@@ -109,10 +121,6 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
-        },
-        "location": {
-          "description": "The geo-location where the resource lives",
-          "type": "string"
         },
         "name": {
           "description": "The resource name",
@@ -137,21 +145,6 @@
             }
           ]
         },
-        "tags": {
-          "description": "Resource tags.",
-          "oneOf": [
-            {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
         "type": {
           "enum": [
             "Microsoft.Compute/workloadSpaces/capabilities"
@@ -160,7 +153,7 @@
         }
       },
       "required": [
-        "location",
+        "kind",
         "name",
         "properties",
         "apiVersion",
@@ -178,7 +171,7 @@
           "type": "string"
         },
         "kind": {
-          "description": "Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type.  If supported, the resource provider must validate and persist this value.",
+          "description": "The runtime technology, fixed when the binding is created.",
           "oneOf": [
             {
               "enum": [
@@ -191,10 +184,6 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
-        },
-        "location": {
-          "description": "The geo-location where the resource lives",
-          "type": "string"
         },
         "name": {
           "description": "The resource name",
@@ -219,21 +208,6 @@
             }
           ]
         },
-        "tags": {
-          "description": "Resource tags.",
-          "oneOf": [
-            {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
         "type": {
           "enum": [
             "Microsoft.Compute/workloadSpaces/runtimeBindings"
@@ -242,7 +216,7 @@
         }
       },
       "required": [
-        "location",
+        "kind",
         "name",
         "properties",
         "apiVersion",
@@ -257,10 +231,6 @@
           "enum": [
             "2026-11-01-preview"
           ],
-          "type": "string"
-        },
-        "location": {
-          "description": "The geo-location where the resource lives",
           "type": "string"
         },
         "name": {
@@ -286,21 +256,6 @@
             }
           ]
         },
-        "tags": {
-          "description": "Resource tags.",
-          "oneOf": [
-            {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
         "type": {
           "enum": [
             "Microsoft.Compute/workloadSpaces/runtimeLinks"
@@ -309,7 +264,6 @@
         }
       },
       "required": [
-        "location",
         "name",
         "properties",
         "apiVersion",
@@ -321,6 +275,20 @@
   "definitions": {
     "CapabilityProperties": {
       "properties": {
+        "settings": {
+          "description": "Capability-specific configuration entries. AKS core capabilities require this collection to be empty or omitted.",
+          "oneOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/CapabilitySetting"
+              },
+              "type": "array"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        },
         "versionPolicy": {
           "description": "The version selection policy for the capability.",
           "oneOf": [
@@ -336,8 +304,22 @@
           ]
         }
       },
+      "type": "object"
+    },
+    "CapabilitySetting": {
+      "properties": {
+        "name": {
+          "description": "The name of the capability-specific setting.",
+          "type": "string"
+        },
+        "value": {
+          "description": "The string value of the capability-specific setting.",
+          "type": "string"
+        }
+      },
       "required": [
-        "versionPolicy"
+        "name",
+        "value"
       ],
       "type": "object"
     },
@@ -646,6 +628,9 @@
           ]
         }
       },
+      "required": [
+        "executionIdentity"
+      ],
       "type": "object"
     },
     "RuntimeLinkIntegrationProfile": {
@@ -660,7 +645,7 @@
     "RuntimeLinkProperties": {
       "properties": {
         "capacityProfile": {
-          "description": "The mutable capacity policy for the runtime composition.",
+          "description": "Accepted capacity intent only.",
           "oneOf": [
             {
               "$ref": "#/definitions/CapacityProfile"
@@ -688,6 +673,10 @@
         "orchestratorBindingResourceId": {
           "description": "The sibling runtime binding that provides orchestration.",
           "type": "string"
+        },
+        "subnetResourceId": {
+          "description": "The dedicated managed virtual node pool subnet in the bindings' shared virtual network. Required for customer networks; otherwise uses the space-owned subnet. Immutable after creation.",
+          "type": "string"
         }
       },
       "required": [
@@ -702,6 +691,7 @@
           "oneOf": [
             {
               "enum": [
+                "ServiceManaged",
                 "CustomerManaged"
               ],
               "type": "string"
@@ -740,6 +730,29 @@
       ],
       "type": "object"
     },
+    "SystemAssignedServiceIdentity": {
+      "properties": {
+        "type": {
+          "description": "Type of managed service identity (either system assigned, or none).",
+          "oneOf": [
+            {
+              "enum": [
+                "None",
+                "SystemAssigned"
+              ],
+              "type": "string"
+            },
+            {
+              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
     "TrackedResourceTags": {
       "additionalProperties": {
         "type": "string"
@@ -761,11 +774,12 @@
           "type": "string"
         },
         "kind": {
-          "description": "Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type.  If supported, the resource provider must validate and persist this value.",
+          "description": "The capability to enable, fixed when the capability is created.",
           "oneOf": [
             {
               "enum": [
-                "AgentSandbox"
+                "AgentSandbox",
+                "PodSnapshotRestore"
               ],
               "type": "string"
             },
@@ -773,10 +787,6 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
-        },
-        "location": {
-          "description": "The geo-location where the resource lives",
-          "type": "string"
         },
         "name": {
           "description": "The resource name",
@@ -801,21 +811,6 @@
             }
           ]
         },
-        "tags": {
-          "description": "Resource tags.",
-          "oneOf": [
-            {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
         "type": {
           "enum": [
             "capabilities"
@@ -824,7 +819,7 @@
         }
       },
       "required": [
-        "location",
+        "kind",
         "name",
         "properties",
         "apiVersion",
@@ -842,7 +837,7 @@
           "type": "string"
         },
         "kind": {
-          "description": "Metadata used by portal/tooling/etc to render different UX experiences for resources of the same type; e.g. ApiApps are a kind of Microsoft.Web/sites type.  If supported, the resource provider must validate and persist this value.",
+          "description": "The runtime technology, fixed when the binding is created.",
           "oneOf": [
             {
               "enum": [
@@ -855,10 +850,6 @@
               "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
             }
           ]
-        },
-        "location": {
-          "description": "The geo-location where the resource lives",
-          "type": "string"
         },
         "name": {
           "description": "The resource name",
@@ -883,21 +874,6 @@
             }
           ]
         },
-        "tags": {
-          "description": "Resource tags.",
-          "oneOf": [
-            {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
         "type": {
           "enum": [
             "runtimeBindings"
@@ -906,7 +882,7 @@
         }
       },
       "required": [
-        "location",
+        "kind",
         "name",
         "properties",
         "apiVersion",
@@ -921,10 +897,6 @@
           "enum": [
             "2026-11-01-preview"
           ],
-          "type": "string"
-        },
-        "location": {
-          "description": "The geo-location where the resource lives",
           "type": "string"
         },
         "name": {
@@ -950,21 +922,6 @@
             }
           ]
         },
-        "tags": {
-          "description": "Resource tags.",
-          "oneOf": [
-            {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "properties": {},
-              "type": "object"
-            },
-            {
-              "$ref": "https://schema.management.azure.com/schemas/common/definitions.json#/definitions/expression"
-            }
-          ]
-        },
         "type": {
           "enum": [
             "runtimeLinks"
@@ -973,7 +930,6 @@
         }
       },
       "required": [
-        "location",
         "name",
         "properties",
         "apiVersion",
